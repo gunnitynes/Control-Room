@@ -55,6 +55,31 @@ game(roundGame(mcSpec({
   reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;animateBars(m);},
 })));
 
+/* ---------- THE STUDIO VAULT · audio history & production trivia ---------- */
+function buildVaultDeck(o){
+  const pool=o.vols.flatMap(v=>(VAULT[v]||[]).map(q=>({vol:v,q}))),out=[],seen=new Set();
+  for(const {vol,q} of shuffle(pool)){const keys=q[3]?['#'+q[3]]:[];if(keys.some(k=>seen.has(k)))continue;keys.forEach(k=>seen.add(k));
+    out.push({vol,text:q[0],...shuffledOpts(q[2],q[1])});if(o.n&&out.length>=o.n)break;}
+  return out;
+}
+game(roundGame(mcSpec({
+  id:'vault',group:'brain',name:'The Studio Vault',tag:'Audio history and production trivia: the stories behind famous records, rooms and machines.',
+  how:['A story from studio history goes up on the big screen.','The four possible answers open on every phone — tap one.','The reveal shows how the room split. Fast right answers score more.'],
+  badges:['Scored',`${Object.values(VAULT).reduce((a,v)=>a+v.length,0)} questions`],
+  icon:`<svg viewBox="0 0 64 64"><rect x="4" y="6" width="56" height="52" rx="4" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><circle cx="32" cy="32" r="15" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle cx="32" cy="32" r="4" fill="var(--red)" stroke="var(--ink)" stroke-width="2"/><path d="M32 17v6M32 41v6M17 32h6M41 32h6" stroke="var(--ink)" stroke-width="3"/><rect x="50" y="20" width="6" height="24" fill="var(--yel)" stroke="var(--ink)" stroke-width="2"/></svg>`,
+  options:[
+    {key:'vols',type:'multi',label:'Volumes',choices:Object.keys(VAULT).map(v=>[v,'Volume '+v,VAULT[v].length+' questions']),def:Object.keys(VAULT),sub:v=>`${v.vols.length} of ${Object.keys(VAULT).length}`},
+    {key:'n',label:'Questions',choices:[[10,'10','qs'],[15,'15','qs'],[20,'20','qs'],[0,'ALL','of them']],def:15},
+    {key:'secs',label:'Answer time',choices:[[15,'15','seconds'],[20,'20','seconds'],[30,'30','seconds'],[0,'OFF','no clock']],def:20},
+  ],
+  check:v=>v.vols.length?'':'Pick at least one volume',
+  prepMs:5000,prepLabel:'READ',prepSub:'the story',
+  prepText:()=>({big:'Eyes up',small:'Read the question on the big screen. The answers appear here in a moment.'}),
+  secs:o=>o.secs,build:buildVaultDeck,roundInfo:r=>'Volume '+r.vol,
+  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div><h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
+  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div><h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;animateBars(m);},
+})));
+
 /* ---------- DAW SHORTCUT SHOWDOWN ---------- */
 const keycaps=s=>s.split(/(?=[⌘⇧⌥⌃])|\+/).filter(Boolean).map(k=>`<kbd>${esc(k)}</kbd>`).join('');
 game(roundGame(mcSpec({

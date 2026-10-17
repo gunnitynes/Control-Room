@@ -75,7 +75,7 @@ const numOf=g=>pad2(ordered().indexOf(g)+1);
 /* =====================================================================
    HOST
    ===================================================================== */
-const G={code:'',peer:null,status:'',players:new Map(),banned:new Set(),view:'menu',game:null,gs:null,timers:[]};
+const G={splash:!QS.has('nosplash'),code:'',peer:null,status:'',players:new Map(),banned:new Set(),view:'menu',game:null,gs:null,timers:[]};
 function later(fn,ms){const t=setTimeout(fn,ms);G.timers.push(t);return t;}
 function clearLater(){G.timers.forEach(clearTimeout);G.timers=[];}
 const players=()=>[...G.players.values()];
@@ -91,7 +91,7 @@ async function openRoom(code){
   return new Promise(res=>{
     const tryOpen=left=>{
       G.code=code||newCode();const peer=new Peer(peerId(G.code),{debug:0});G.peer=peer;
-      peer.on('open',()=>{G.status='';saveRoom();render();res(true);});
+      peer.on('open',()=>{G.status='';saveRoom();if(G.splash){const sc=$('.spcode');if(sc)sc.innerHTML=`<span class="lab">Room</span><b>${G.code}</b>`;}else render();res(true);});
       peer.on('error',e=>{
         if(e.type==='unavailable-id'&&left>0){peer.destroy();if(code)setTimeout(()=>tryOpen(left-1),1500);else tryOpen(left-1);return;}
         if(e.type==='peer-unavailable')return;
@@ -161,6 +161,7 @@ function render(){
   if(ROLE!=='host')return;
   document.body.classList.add('hostb');
   const app=$('#app');app.className='host';
+  if(G.splash){rSplash(app);return;}
   app.innerHTML=topBar()+`<main class="stage" id="stage"></main>`;
   const st=$('#stage');
   try{if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
@@ -168,6 +169,39 @@ function render(){
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
   const mq=$('#miniQR');if(mq){drawQR(mq,G.code,160);mq.onclick=()=>showBigQR(G.code);}
+}
+/* splash: the original Control Room poster — faders breathing like a live mix,
+   the four answer shapes orbiting — until the first click or key */
+let POSTER=null;
+function rSplash(app){
+  app.className='splash';
+  app.innerHTML=`<canvas id="poster"></canvas><div class="sptt"><div class="kick">Production class · a sister to Meter Lab</div><h1>Control<br><i>Room</i></h1>
+    <p>${GAMES.length} games for one room. The big screen asks, the phones answer.</p><button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
+    <div class="spcode">${G.code?`<span class="lab">Room</span><b>${G.code}</b>`:'<span class="lab">Opening the room…</span>'}</div>`;
+  const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
+  const enter=()=>{if(!G.splash)return;G.splash=false;POSTER=null;removeEventListener('keydown',key);try{audio();}catch(e){}sfx.open();render();};
+  const key=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();enter();}};
+  app.onclick=enter;addEventListener('keydown',key);
+}
+function posterSize(){if(!POSTER)return;const r=POSTER.c.getBoundingClientRect(),d=devicePixelRatio||1;POSTER.c.width=r.width*d;POSTER.c.height=r.height*d;POSTER.ctx.setTransform(d,0,0,d,0,0);POSTER.w=r.width;POSTER.h=r.height;}
+function posterDraw(now){
+  if(!POSTER.c.isConnected){POSTER=null;return;}
+  const {ctx,w,h}=POSTER,t=now/1000,ink=css('--ink');ctx.clearRect(0,0,w,h);
+  const cols=COLS.map(css);
+  // faders: eight channel strips, levels breathing like a live mix
+  const fx=w*.52,fw=w*.42,top=h*.08,bot=h*.6;
+  for(let k=0;k<8;k++){const x=fx+k*fw/8+fw/16,lv=.5+.42*Math.sin(t*.7+k*1.3)*Math.sin(t*.23+k);
+    ctx.strokeStyle=ink;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bot);ctx.stroke();
+    const y=bot-(bot-top)*lv,fwd=Math.min(40,w*.022);ctx.fillStyle=cols[k%4];ctx.fillRect(x-fwd/2,y-fwd*.3,fwd,fwd*.6);ctx.lineWidth=3;ctx.strokeRect(x-fwd/2,y-fwd*.3,fwd,fwd*.6);}
+  // the four answer shapes, orbiting
+  const S=Math.min(w,h)*.25,R=S*.46; // a tight circular orbit, so neighbours overlap a little
+  // centred over the CONTROL ROOM title, sitting just above it
+  const t1=$('.sptt h1'),tb=t1&&t1.getBoundingClientRect(),cb=POSTER.c.getBoundingClientRect();
+  const cx=tb?tb.left-cb.left+tb.width/2:w*.27,cy=tb?Math.max(R+S*.45,tb.top-cb.top-S*.25-R-S*.4):h*.3;
+  [0,1,2,3].forEach(i=>{const a=t*.25+i*Math.PI/2,x=cx+Math.cos(a)*R,y=cy+Math.sin(a)*R,s=S*(.75+.06*Math.sin(t+i));
+    ctx.save();ctx.translate(x,y);ctx.rotate(i===1?t*.2:i===3?Math.PI/4:0);ctx.fillStyle=cols[i];ctx.strokeStyle=ink;ctx.lineWidth=Math.max(4,S*.025);ctx.beginPath();
+    if(i===0)ctx.arc(0,0,s/2,0,Math.PI*2);else if(i===1||i===3)ctx.rect(-s/2.6,-s/2.6,s/1.3,s/1.3);else{ctx.moveTo(0,-s/2);ctx.lineTo(s/2,s/2.4);ctx.lineTo(-s/2,s/2.4);ctx.closePath();}
+    ctx.fill();ctx.stroke();ctx.restore();});
 }
 function setTopInfo(){const t=$('#tinfo');if(t&&G.game&&G.game.topInfo)t.textContent=G.game.topInfo();}
 
@@ -254,8 +288,8 @@ function ringDraw(r,t){
     ctx.globalAlpha=b.a??1;ctx.lineWidth=2;ctx.strokeStyle=ink;ctx.fillStyle=b.f?(b.f[0]==='-'?css(b.f):b.f):paper;
     ctx.beginPath();ctx.arc(x,y,b.big?z*1.15:z,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.globalAlpha=1;});
 }
-addEventListener('resize',()=>{RINGS.forEach(ringSize);if(G.game&&G.game.resize)G.game.resize();});
-function frame(t){if(ROLE==='host'){RINGS.forEach(r=>ringDraw(r,t));if(G.view==='play'&&G.game&&G.game.frame)try{G.game.frame(t);}catch(e){console.error(e);}}else pFrame(t);requestAnimationFrame(frame);}
+addEventListener('resize',()=>{RINGS.forEach(ringSize);posterSize();if(G.game&&G.game.resize)G.game.resize();});
+function frame(t){if(ROLE==='host'){if(POSTER)posterDraw(t);RINGS.forEach(r=>ringDraw(r,t));if(G.view==='play'&&G.game&&G.game.frame)try{G.game.frame(t);}catch(e){console.error(e);}}else pFrame(t);requestAnimationFrame(frame);}
 
 /* ---------- leaderboard + podium (shared by every scored game) ---------- */
 function rBoard(st,{title='Leaderboard',after='',next='Next round',onNext}={}){
@@ -344,10 +378,14 @@ function roundGame(spec){
     const s=G.gs;if(!s)return;
     if(s.phase==='prep')open();
     else if(s.phase==='open')reveal();
-    else if(s.phase==='reveal'){g.leave&&g.leave();s.phase='board';sfx.board();render();syncAll();}
+    else if(s.phase==='reveal'){if(boardDue())g.toBoard();else g.skip();}
     else if(s.phase==='board'){if(s.done+1<s.rounds.length)goRound(s.done+1);else{s.phase='end';sfx.fanfare();render();syncAll();}}
     else if(s.phase==='end')exitGame(true);
   };
+  // the leaderboard comes up every third round (and after the last); either way one button jumps past it
+  const boardDue=()=>{const s=G.gs;return (s.done+1)%3===0||s.done+1>=s.rounds.length;};
+  g.toBoard=()=>{const s=G.gs;g.leave&&g.leave();s.phase='board';sfx.board();render();syncAll();};
+  g.skip=()=>{const s=G.gs;g.leave&&g.leave();if(s.done+1<s.rounds.length)goRound(s.done+1);else{s.phase='end';sfx.fanfare();render();syncAll();}};
   g.stop=()=>{g.leave&&g.leave();};
   g.act=(p,d)=>{if(d.t==='ans')answer(p,d);else if(g.onAct)g.onAct(p,d);};
   g.live=()=>{const s=G.gs;if(!s)return;const a=$('#nAns');if(a)a.innerHTML=`${[...s.ans.keys()].length}<span>/${online().length}</span>`;
@@ -358,10 +396,12 @@ function roundGame(spec){
     if(s.phase==='board')return rBoard(st,{after:`after ${s.done+1} of ${s.rounds.length}`,next:s.done+1<s.rounds.length?'Next round':'Reveal the podium'});
     if(s.phase==='end')return rPodium(st);
     const ctx={phase:s.phase,opts:s.opts,s,list:g.answers()};
-    const btn={prep:g.prepBtn||'Open answers now',open:'Reveal now',reveal:'Leaderboard'}[s.phase];
+    const last=s.done+1>=s.rounds.length,due=boardDue();
+    const btn={prep:g.prepBtn||'Open answers now',open:'Reveal now',reveal:due?'Leaderboard':'Next round'}[s.phase];
+    const alt=s.phase==='reveal'?`<button class="ghost wide" id="bAlt">${due?(last?'Skip to the podium':'Skip to the next round'):'Show the leaderboard'}</button>`:'';
     st.innerHTML=`<div class="rg ph-${s.phase}"><section class="rgm dots" id="rgm"></section>
       <aside class="side"><div class="ringbox"><canvas id="ring"></canvas></div><div class="sinfo" id="sinfo"></div>
-      <div class="sact">${g.replay?`<button class="ghost wide" id="bReplay">▶ ${esc(g.replayLabel||'Play again')}</button>`:''}<button class="big ${s.phase==='reveal'?'go':''}" id="bNext">${esc(btn)} <small>SPACE</small></button><span class="keys">Space / → next · Q join code</span></div></aside></div>
+      <div class="sact">${g.replay?`<button class="ghost wide" id="bReplay">▶ ${esc(g.replayLabel||'Play again')}</button>`:''}<button class="big ${s.phase==='reveal'?'go':''}" id="bNext">${esc(btn)} <small>SPACE</small></button>${alt}<span class="keys">Space / → next · Q join code</span></div></aside></div>
       ${s.phase==='prep'&&s.prepMsTot>0?'<i class="readbar" id="readbar"></i>':''}`;
     const m=$('#rgm');(s.phase==='reveal'?g.reveal:g.stage).call(g,m,r,ctx);
     const si=$('#sinfo');
@@ -370,7 +410,7 @@ function roundGame(spec){
       si.innerHTML=(g.revealSide?g.revealSide(r,ctx):`<div class="stat"><b>${g.okAt>=.99?Math.round(100*L.filter(x=>x.res&&x.res.cls==='yes').length/Math.max(1,players().length))+'%':avg+'%'}</b><span>${g.okAt>=.99?'got it right':'average accuracy'}</span></div>`)
         +(best&&best.res&&best.res.pts>0?`<div class="fast"><span class="lab">Top score this round</span><b>${esc(best.p.name)}</b><span class="lab">+${best.res.pts}${best.res.note?' · '+esc(best.res.note):''}</span></div>`:`<div class="fast"><span class="lab">Nobody scored</span><b>Stump the room ✓</b></div>`);
     }else si.innerHTML=`<div class="stat"><b id="nAns">${s.ans.size}<span>/${online().length}</span></b><span>answered</span></div><p class="fine">${s.phase==='prep'?(g.prepSide?g.prepSide(r,s.opts):'Get ready…'):(g.openSide?g.openSide(r,s.opts):'Revealed when everyone has answered'+(s.T?' or the clock runs out.':'.'))}</p>`;
-    $('#bNext').onclick=g.next;if(g.replay)$('#bReplay').onclick=()=>g.replay(r,s.phase,s.opts);
+    $('#bNext').onclick=g.next;if($('#bAlt'))$('#bAlt').onclick=due?g.skip:g.toBoard;if(g.replay)$('#bReplay').onclick=()=>g.replay(r,s.phase,s.opts);
     ring($('#ring'),t=>{
       const beads=players().map(p=>{const a=s.ans.has(p.id),on=p.conn&&p.conn.open,rs=s.res.get(p.id);
         return {f:s.phase==='reveal'?(rs?{yes:'--green',close:'--yel',no:'--red',none:''}[rs.cls]:''):a?'--ink':'',big:a,a:on?1:.3};});
@@ -492,7 +532,7 @@ function pFrame(){
 /* ---------- boot ---------- */
 function boot(){
   document.addEventListener('keydown',e=>{
-    if(ROLE!=='host'||e.target.closest('input,textarea'))return;
+    if(ROLE!=='host'||G.splash||e.target.closest('input,textarea'))return;
     if(e.key==='Escape'){const o=$('#qrbig');if(o)o.remove();return;}
     if((e.key==='q'||e.key==='Q')&&G.code){const o=$('#qrbig');o?o.remove():showBigQR(G.code);return;}
     if(e.key===' '||e.key==='ArrowRight'||(e.key==='Enter'&&e.target.tagName!=='BUTTON')){

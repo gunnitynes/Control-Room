@@ -665,3 +665,16 @@ kbd{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding:
 .psynth{align-content:start}
 .psynth>.big{width:100%}
 .psynth .pclock{margin-bottom:4px}
+
+/* ---------- splash ---------- */
+.splash{position:fixed;inset:0;cursor:pointer;background:var(--paper);background-image:radial-gradient(var(--hair) 1.2px,transparent 1.4px);background-size:24px 24px;overflow:hidden}
+.splash canvas{position:absolute;inset:0;width:100%;height:100%}
+.sptt{position:absolute;left:clamp(24px,4vw,64px);bottom:clamp(24px,5vh,64px);display:grid;gap:16px;justify-items:start}
+.sptt h1{font:900 clamp(72px,10vw,180px)/.8 var(--disp);font-stretch:62%;text-transform:uppercase;letter-spacing:-.02em}
+.sptt h1 i{font-style:normal;color:var(--red)}
+.sptt p{max-width:44ch;font-size:clamp(15px,1.3vw,20px);line-height:1.45;color:var(--ink2);background:var(--paper)}
+.sptt .kick{display:flex;gap:8px;align-items:center;font:700 11px var(--mono);text-transform:uppercase}
+.sptt .kick::before{content:"";width:10px;height:10px;background:var(--blue)}
+.spcode{position:absolute;right:clamp(24px,4vw,64px);bottom:clamp(24px,5vh,64px);display:grid;justify-items:end;gap:4px}
+.spcode b{font:900 clamp(60px,7vw,120px)/.8 var(--disp);font-stretch:62%;letter-spacing:.08em;color:var(--red)}
+.sact .ghost.wide+.keys,.sact #bAlt{margin-top:0}
