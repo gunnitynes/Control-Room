@@ -397,8 +397,9 @@ function buildDeck(){
   CATS.filter(c=>G.set.cats.includes(c.id)).forEach(c=>c.qs.forEach(q=>pool.push({cat:c.id,q})));
   const out=[];
   for(const {cat,q} of shuffle(pool)){
-    const key=q[2][q[1]].toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,48); // same right answer = same question
-    if(seen.has(key))continue;seen.add(key);
+    // same right answer, or the same topic tag (q[3]), counts as the same question
+    const keys=[q[2][q[1]].toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,48)];if(q[3])keys.push('#'+q[3]);
+    if(keys.some(k=>seen.has(k)))continue;keys.forEach(k=>seen.add(k));
     const order=shuffle([0,1,2,3]);
     out.push({cat,text:q[0],opts:order.map(k=>q[2][k]),c:order.indexOf(q[1])});
     if(G.set.n&&out.length>=G.set.n)break;
