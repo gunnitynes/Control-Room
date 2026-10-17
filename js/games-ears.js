@@ -23,9 +23,9 @@ const pinkBuf=()=>{const ac=audio();if(AU.pink)return AU.pink;const sr=ac.sample
 function playPink(dest){const ac=audio(),s=ac.createBufferSource();s.buffer=pinkBuf();s.loop=true;const g=gn(ac,1);s.connect(g).connect(dest);s.start();const h={stop(){try{g.gain.setTargetAtTime(0,ac.currentTime,.03);s.stop(ac.currentTime+.2);}catch(e){}AU.live.delete(h);}};AU.live.add(h);return h;}
 
 /* ---------- phone: a big slider (log or linear) ---------- */
-function pSlider(root,{min,max,log=true,fmt,name,marks=[],start=.5,lock='Lock in'},submit){
+function pSlider(root,{min,max,log=true,fmt,name,marks=[],start=.5,lock='Lock in',bigName=false},submit){
   let u=start;const val=()=>log?logU(min,max,u):min+(max-min)*u;
-  root.innerHTML=`<div class="pslide"><div class="pread"><b class="sv"></b><span class="sn"></span></div>
+  root.innerHTML=`<div class="pslide${bigName?' bigname':''}"><div class="pread"><b class="sv"></b><span class="sn"></span></div>
     <div class="strack"><i class="sfill"></i>${marks.map(m=>`<i class="smark" style="left:${100*(log?unLog(min,max,m.v):(m.v-min)/(max-min))}%"><span>${esc(m.l)}</span></i>`).join('')}<i class="sknob"></i></div>
     <div class="snudge"><button data-d="-1">◀</button><span class="lab">drag, or nudge</span><button data-d="1">▶</button></div>
     <button class="big go plock">${esc(lock)}</button></div>`;
@@ -111,7 +111,7 @@ game(roundGame({
   decaySrc:r=>r.chop?(ac,d,t)=>songChop(ac,d,t,r.chop):r.src,
   onPrep(r){const go=()=>setAud(playDecay({rt:r.rt,src:this.decaySrc(r),pre:r.pre,damp:r.damp}));r.chop?withSong(go):go();},leave:stopAud,
   replay(r){const go=()=>setAud(playDecay({rt:r.rt,src:this.decaySrc(r),pre:r.pre,damp:r.damp,hits:2}));r.chop?withSong(go):go();},
-  stage:(m,r,ctx)=>{m.innerHTML=listenStage(ctx.phase==='prep'?'Where are we?':'How long was the tail?',ctx.phase==='prep'?'Close your eyes. Picture the room.':'Slide to the decay time on your phone.',`<div class="zones">${ROOMS.slice(0,7).map((z,i)=>`<span><b>${esc(z[1].replace(/^an? /,''))}</b>${i?ROOMS[i-1][0]:0}–${z[0]} s</span>`).join('')}</div>`);},
+  stage:(m,r,ctx)=>{m.innerHTML=listenStage(ctx.phase==='prep'?'Where are we?':'How long was the tail?',ctx.phase==='prep'?'Close your eyes. Picture the room.':'Slide to the decay time on your phone.',`<div class="zones rooms">${ROOMS.slice(0,7).map((z,i)=>`<span><b>${esc(z[1].replace(/^an? /,''))}</b><em>${i?ROOMS[i-1][0]:0}–${z[0]}<small> s</small></em></span>`).join('')}</div>`);},
   reveal:(m,r,ctx)=>{
     const W=900,H=220,X=t=>40+(W-60)*t/Math.max(8,r.rt*1.3),Y=db=>16+(H-50)*(-db/72);let d='';for(let i=0;i<=100;i++){const t=i/100*Math.max(8,r.rt*1.3);d+=(i?'L':'M')+X(t).toFixed(1)+' '+Y(Math.max(-72,-60*t/r.rt)).toFixed(1);}
     m.innerHTML=`<div class="axwrap"><h2 class="qtext">RT60 = <span class="hl">${fmtS(r.rt)}</span> — about ${esc(roomOf(r.rt))}.${r.chop?` <span class="songtag">the dry sound: ${esc(r.chop.name.toLowerCase())} at ${Math.floor(r.chop.at/60)}:${pad2(Math.floor(r.chop.at%60))} in the song</span>`:''}</h2>
@@ -120,7 +120,7 @@ game(roundGame({
       ${axisPlot({min:.2,max:10,fmt:fmtS,marks:RT_MARKS},ctx.list,r.rt,{truthLabel:roomOf(r.rt)})}</div>`;},
   ringLabel:r=>({label:fmtS(r.rt).replace(' ',''),fill:'--blue'}),
   public:()=>({}),valid:(r,a)=>a>0&&a<30,
-  input:(root,pub,submit)=>pSlider(root,{min:.2,max:10,fmt:fmtS,name:s=>roomOf(s),marks:RT_MARKS,start:.45},submit),
+  input:(root,pub,submit)=>pSlider(root,{min:.2,max:10,fmt:fmtS,name:s=>roomOf(s),marks:RT_MARKS,start:.45,bigName:true},submit),
   locked:(box,mine)=>{box.innerHTML=`<div class="bignum">${fmtS(mine)}</div><p>${esc(roomOf(mine))}</p>`;},
   score:(r,a)=>{const e=octErr(a,r.rt);return {acc:clamp(1-e/1.2,0,1),note:`${fmtS(a)} vs ${fmtS(r.rt)}`};},
   publicReveal:r=>({rt:r.rt}),
@@ -178,6 +178,11 @@ game(roundGame({
 }));
 
 /* ---------- ENVELOPE SCULPTOR ---------- */
+// options must look clearly different: compare attack, decay, sustain, release and length on a log scale
+const envVec=E=>[Math.log10(E.a+.01),Math.log10(E.d+.01),E.s*1.5,Math.log10(E.r+.01),Math.log10(E.hold)];
+const envDist=(A,B)=>Math.hypot(...envVec(A).map((v,i)=>v-envVec(B)[i]));
+function pickDistinctEnvs(E){const out=[];for(const x of shuffle(ENVELOPES.filter(x=>x!==E))){if(envDist(x,E)>.7&&out.every(y=>envDist(x,y)>.7))out.push(x);if(out.length===3)break;}
+  for(const x of shuffle(ENVELOPES.filter(x=>x!==E&&!out.includes(x)))){if(out.length===3)break;out.push(x);}return out;}
 function adsrSVG(E,{W=200,H=90}={}){
   const sus=Math.max(.25,E.hold-E.a-E.d),tot=E.a+E.d+sus+E.r,X=t=>8+(W-16)*Math.pow(t/tot,.75),Y=v=>H-8-(H-18)*v;
   const pts=[[0,0],[E.a,1],[E.a+E.d,E.s],[E.a+E.d+sus,E.s],[tot,0]];
@@ -193,7 +198,7 @@ game(roundGame(mcSpec({
   prepMs:r=>Math.round((r.E.hold+r.E.r*1.6)*1000+900),prepLabel:'LISTEN',prepSub:'to the shape',
   prepText:()=>({big:'Listen',small:'Watch the four shapes on the big screen while it plays.'}),
   secs:o=>o.secs,
-  build:o=>{const fz=dealSong(SONG.freeze,o.n);return shuffle(ENVELOPES).slice(0,o.n).map((E,k)=>{const others=shuffle(ENVELOPES.filter(x=>x!==E)).slice(0,3);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E),fz:o.src==='song'?fz[k]:null};});},
+  build:o=>{const fz=dealSong(SONG.freeze,o.n);return shuffle(ENVELOPES).slice(0,o.n).map((E,k)=>{const others=pickDistinctEnvs(E);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E),fz:o.src==='song'?fz[k]:null};});},
   sound(r){if(r.fz)withSong(()=>setAud(playFreeze(r.fz,r.E)));else setAud(playEnvelope(r.E));},
   onPrep(r){this.sound(r);},onOpen(r){later(()=>{if(G.gs&&G.gs.phase==='open')this.sound(r);},300);},leave:stopAud,
   replay(r){this.sound(r);},

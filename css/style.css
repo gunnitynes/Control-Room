@@ -700,3 +700,11 @@ kbd{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding:
 .opts.k-ml .opt span small{font:700 11px var(--mono);text-transform:uppercase;opacity:.85}
 .mlwrap .tiles{flex:none}
 .mlwrap .tile{min-height:clamp(64px,9vh,110px)}
+
+/* Decay Guessr: bigger room cards with big decay times; a big room name on phones */
+.zones.rooms{gap:10px;max-width:1100px}
+.zones.rooms span{padding:10px 16px;gap:4px;justify-items:center;box-shadow:4px 4px 0 var(--ink);min-width:118px}
+.zones.rooms span b{font:900 clamp(15px,1.4vw,22px)/1 var(--disp);font-stretch:85%}
+.zones.rooms span em{font:900 clamp(34px,3.4vw,56px)/.85 var(--disp);font-stretch:62%;font-style:normal;color:var(--red);font-variant-numeric:tabular-nums}
+.zones.rooms span em small{font:700 .4em var(--mono)}
+.pslide.bigname .sn{font:900 clamp(26px,8vw,38px)/1 var(--disp);font-stretch:85%;text-transform:uppercase;color:var(--ink);text-align:center;margin-top:6px}

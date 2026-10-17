@@ -422,7 +422,7 @@ const patchDist=(a,b)=>PATCH_KNOBS.reduce((s,{k})=>s+Math.abs((a[k]??0)-(b[k]??0
 
 /* ---------- the demo song (games 05–08) ----------
    One recording, used four ways: bar-locked loops, dry one-shot chops,
-   and a granular "freeze" that turns a single moment into a held tone. */
+   and a spectral "freeze" that turns a single moment into a steady held tone. */
 function songReady(){
   if(AU.song)return Promise.resolve(AU.song);
   if(!window.SONG||!SONG.src)return Promise.reject(new Error('No demo song configured'));
@@ -445,15 +445,48 @@ function songChop(ac,d,t,ch){
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+.003);g.gain.setValueAtTime(1,t+len-.06);g.gain.exponentialRampToValueAtTime(.0005,t+len);
   s.connect(g).connect(d);s.start(t,Math.max(0,ch.at-.02),len+.01);
 }
-// granular freeze: overlapping 120 ms grains read from one spot, shaped by an ADSR
-const HANN=(()=>{const n=64,c=new Float32Array(n);for(let i=0;i<n;i++)c[i]=.66*(.5-.5*Math.cos(2*Math.PI*i/(n-1)));return c;})();
+/* spectral freeze: take the spectrum of ~0.75 s of the song at one moment, find
+   the notes sounding there (the spectral peaks) and resynthesise each as a pure,
+   steady sine at its exact frequency, over a quiet random-phase bed of the rest of
+   the spectrum for colour. One inverse FFT builds it, so it loops seamlessly: the
+   song's own chord, held perfectly still, with no beats or transients — a clean
+   tone for the envelope to shape. */
+function fftInPlace(re,im,inv){
+  const n=re.length;for(let i=1,j=0;i<n;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){[re[i],re[j]]=[re[j],re[i]];[im[i],im[j]]=[im[j],im[i]];}}
+  for(let len=2;len<=n;len<<=1){const a=(inv?2:-2)*Math.PI/len,wr=Math.cos(a),wi=Math.sin(a);
+    for(let i=0;i<n;i+=len){let cr=1,ci=0;for(let k=0;k<len/2;k++){const p=i+k,q=p+len/2,tr=re[q]*cr-im[q]*ci,ti=re[q]*ci+im[q]*cr;re[q]=re[p]-tr;im[q]=im[p]-ti;re[p]+=tr;im[p]+=ti;const nr=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=nr;}}}
+}
+AU.frz={};
+function freezeBuffer(fr){
+  const key=fr.at;if(AU.frz[key])return AU.frz[key];
+  const ac=audio(),src=AU.song,sr=src.sampleRate,N=1<<15,M=1<<17,L=src.getChannelData(0),R=src.numberOfChannels>1?src.getChannelData(1):L;
+  const i0=Math.max(0,Math.floor(fr.at*sr)-N/2),re=new Float64Array(N),im=new Float64Array(N);
+  for(let i=0;i<N;i++){const w=.5-.5*Math.cos(2*Math.PI*i/(N-1));re[i]=((L[i0+i]||0)+(R[i0+i]||0))*.5*w;}
+  fftInPlace(re,im,false);
+  const H=N/2,mag=new Float64Array(H+1),bin=sr/N;for(let k=0;k<=H;k++)mag[k]=Math.hypot(re[k],im[k]);
+  // a smooth spectral envelope (for the noise bed and the peak threshold)
+  const env=new Float64Array(H+1),W=24;{let acc=0;for(let k=0;k<=H;k++){acc+=mag[k];if(k>=2*W+1)acc-=mag[k-2*W-1];env[Math.max(0,k-W)]=acc/(2*W+1);}}
+  // the notes: local maxima clearly above the envelope, 70 Hz – 6 kHz, strongest 48
+  const peaks=[];for(let k=3;k<H-3;k++){const f=k*bin;if(f<70||f>6000)continue;const m=mag[k];
+    if(m>mag[k-1]&&m>=mag[k+1]&&m>mag[k-2]&&m>=mag[k+2]&&m>env[k]*2.2){const a=Math.log(mag[k-1]+1e-12),b=Math.log(m+1e-12),c=Math.log(mag[k+1]+1e-12),d=.5*(a-c)/(a-2*b+c);peaks.push({f:(k+d)*bin,a:m});}}
+  peaks.sort((x,y)=>y.a-x.a);const top=peaks.slice(0,48);
+  // a gentle tilt (+3 dB/octave below 1 kHz) so the bass doesn't swamp the chord
+  const tilt=f=>f<1000?Math.sqrt(f/1000):1;
+  const out=ac.createBuffer(2,M,sr);
+  for(let c=0;c<2;c++){const R2=new Float64Array(M),I2=new Float64Array(M);
+    for(let k=1;k<M/2;k++){const hz=k*sr/M;if(hz<60||hz>12000)continue;const e=env[Math.min(H,Math.round(hz/bin))]*.18*tilt(hz),ph=Math.random()*2*Math.PI;R2[k]=e*Math.cos(ph);I2[k]=e*Math.sin(ph);}
+    top.forEach(p=>{const k=Math.round(p.f*M/sr),amp=p.a*tilt(p.f)*Math.sqrt(M/N)*4,ph=Math.random()*2*Math.PI;if(k>0&&k<M/2){R2[k]+=amp*Math.cos(ph);I2[k]+=amp*Math.sin(ph);}});
+    for(let k=1;k<M/2;k++){R2[M-k]=R2[k];I2[M-k]=-I2[k];}
+    fftInPlace(R2,I2,true);const d=out.getChannelData(c);for(let i=0;i<M;i++)d[i]=R2[i];}
+  // fixed loudness for every freeze point, so the envelopes compare fairly
+  let ss=0;for(let c=0;c<2;c++){const d=out.getChannelData(c);for(let i=0;i<M;i++)ss+=d[i]*d[i];}
+  const g=.12/Math.sqrt(ss/(2*M)+1e-12);for(let c=0;c<2;c++){const d=out.getChannelData(c);for(let i=0;i<M;i++)d[i]*=g;}
+  out.notes=top.length;return AU.frz[key]=out;
+}
 function playFreeze(fr,E,dest){
   const ac=audio(),r=rig(dest,{rt:.6});r.strip('e',{gain:1,send:.04});
-  // level-match every freeze point: measure the song around the spot
-  const d=AU.song.getChannelData(0),sr=AU.song.sampleRate,i0=Math.floor(fr.at*sr);let ss=0;for(let i=i0-2600;i<i0+2600;i++)ss+=(d[i]||0)**2;
-  const peak=clamp(.18/Math.sqrt(ss/5200+1e-9),.2,5);
-  const t0=ac.currentTime+.08,out=gn(ac,0),end=adsr(out,t0,{a:E.a,d:E.d,s:E.s,r:E.r,len:E.hold,peak});out.connect(r.strips.e.in);
-  const gd=.12,hop=.04,srcs=[];
-  for(let tt=0;tt<end-t0;tt+=hop){const s=ac.createBufferSource(),g=gn(ac,0);s.buffer=AU.song;g.gain.setValueCurveAtTime(HANN,t0+tt,gd);s.connect(g).connect(out);s.start(t0+tt,Math.max(0,fr.at+(Math.random()-.5)*.02),gd+.01);srcs.push(s);}
+  const t0=ac.currentTime+.06,s=ac.createBufferSource(),out=gn(ac,0);s.buffer=freezeBuffer(fr);s.loop=true;
+  const end=adsr(out,t0,{a:E.a,d:E.d,s:E.s,r:E.r,len:E.hold,peak:1.2});
+  s.connect(out).connect(r.strips.e.in);s.start(t0,Math.random()*2);s.stop(end+.05);
   r.dur=end-t0;return r;
 }
