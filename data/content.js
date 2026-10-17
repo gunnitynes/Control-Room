@@ -205,3 +205,36 @@ window.SCENES=[
   {title:'Fireworks over a frozen lake',art:'fireworks'},
 ];
 window.METAPHOR_CHIPS=['Reverb decay over 6 s','No high frequencies above 4 kHz','Only band-passed noise','Everything mono','Nothing under 200 Hz','Tape wobble on everything','No attack — swells only','One note, endlessly','Distant, behind glass','Granular shimmer','Dripping, irregular rhythm','Sub bass you feel, not hear','Bitcrushed to 8-bit','Long pre-delay','Pitch slowly falling','Metallic resonances','Dry and close, no room','Wide stereo wash'];
+
+/* ---------- The demo song: the sound source for games 05–08 ----------
+   120 BPM, first beat at 0.139 s, so a bar is 2 s and bars start at 0.139 + 2·n.
+   excerpts: 4-bar loops (Frequency Detective, Frequency Sculptor)
+   chops:    one dry hit cut out of the song (Decay Guessr)
+   freeze:   a tonal moment frozen into a steady tone (Envelope Sculptor)
+   Times are in seconds — listen and adjust freely. Set vocal:true on parts with singing. */
+window.SONG={
+  src:'audio/demosong.mp3',bpm:120,beat0:0.139,
+  excerpts:[
+    {name:'Intro',at:6.139,bars:4},
+    {name:'First lift',at:20.139,bars:4},
+    {name:'Drop',at:44.139,bars:4},
+    {name:'Groove',at:58.139,bars:4},
+    {name:'Bright section',at:74.139,bars:4},
+    {name:'Breakdown',at:124.139,bars:4},
+    {name:'Melodic section',at:140.139,bars:4},
+    {name:'Second groove',at:166.139,bars:4},
+    {name:'Peak',at:180.139,bars:4},
+    {name:'Second drop',at:202.139,bars:4},
+    {name:'Last drop',at:226.139,bars:4},
+  ],
+  chops:[
+    {name:'Kick',at:88.60,len:.28},{name:'Kick',at:163.11,len:.28},{name:'Kick',at:225.97,len:.28},
+    {name:'Snare / clap',at:8.70,len:.24},{name:'Snare / clap',at:68.40,len:.24},{name:'Snare / clap',at:169.63,len:.24},
+    {name:'Chord stab',at:13.17,len:.34},{name:'Chord stab',at:32.09,len:.34},{name:'Chord stab',at:152.13,len:.34},
+    {name:'Melodic slice',at:110.0,len:.38},{name:'Melodic slice',at:149.5,len:.38},{name:'Melodic slice',at:193.0,len:.38},
+  ],
+  freeze:[
+    {name:'Intro chord',at:8.5},{name:'Intro pad',at:17.0},{name:'Lift',at:33.5},{name:'Groove tone',at:86.0},
+    {name:'Bridge tone',at:110.0},{name:'Breakdown chord',at:125.5},{name:'Melodic tone',at:149.5},{name:'Peak tone',at:193.0},
+  ],
+};

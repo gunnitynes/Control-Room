@@ -385,7 +385,7 @@ const DECAY_SRC={
 function playDecay({rt,src='clap',pre=.02,damp=.4,hits=3},dest){
   const ac=audio(),out=gn(ac,1);out.connect(dest||AU.music);const cv=ac.createConvolver();cv.buffer=makeIR(ac,rt,{pre,damp});const wet=gn(ac,2.4),dry=gn(ac,1.5),inp=gn(ac,1);
   inp.connect(dry).connect(out);inp.connect(cv);cv.connect(wet).connect(out);const gap=Math.max(1.1,rt*1.05+.4),t0=ac.currentTime+.1;
-  for(let i=0;i<hits;i++)DECAY_SRC[src](ac,inp,t0+i*gap);
+  const play=typeof src==='function'?src:DECAY_SRC[src];for(let i=0;i<hits;i++)play(ac,inp,t0+i*gap);
   const h={dur:gap*hits,stop(f=.08){const t=ac.currentTime;out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+f);setTimeout(()=>{try{out.disconnect();}catch(e){}},f*1000+500);AU.live.delete(h);}};AU.live.add(h);return h;
 }
 
@@ -419,3 +419,41 @@ function playPatch(p,dest,{loops=1}={}){
   AU.live.add(h);setTimeout(()=>{if(AU.live.has(h))h.stop(.6);},(dur+1.8)*1000);return h;
 }
 const patchDist=(a,b)=>PATCH_KNOBS.reduce((s,{k})=>s+Math.abs((a[k]??0)-(b[k]??0)),0)/PATCH_KNOBS.length;
+
+/* ---------- the demo song (games 05–08) ----------
+   One recording, used four ways: bar-locked loops, dry one-shot chops,
+   and a granular "freeze" that turns a single moment into a held tone. */
+function songReady(){
+  if(AU.song)return Promise.resolve(AU.song);
+  if(!window.SONG||!SONG.src)return Promise.reject(new Error('No demo song configured'));
+  if(!AU.songP)AU.songP=fetch(SONG.src).then(r=>{if(!r.ok)throw new Error('Demo song: HTTP '+r.status);return r.arrayBuffer();})
+    .then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej))).then(buf=>AU.song=buf).catch(e=>{AU.songP=null;console.warn(e);throw e;});
+  return AU.songP;
+}
+const barSec=()=>240/SONG.bpm;
+function songHandle(ac,nodes,out){const h={stop(f=.08){const t=ac.currentTime;out.gain.cancelScheduledValues(t);out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+f);nodes.forEach(n=>{try{n.stop(t+f+.02);}catch(e){}});setTimeout(()=>{try{out.disconnect();}catch(e){}},f*1000+400);AU.live.delete(h);}};AU.live.add(h);return h;}
+// a 4-bar excerpt, looping exactly on its bar lines
+function playExcerpt(ex,dest,{gain=.85}={}){
+  const ac=audio(),s=ac.createBufferSource(),g=gn(ac,0),t=ac.currentTime+.05;
+  s.buffer=AU.song;s.loop=true;s.loopStart=ex.at;s.loopEnd=ex.at+ex.bars*barSec();
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+.03);s.connect(g).connect(dest||AU.music);s.start(t,ex.at);
+  return songHandle(ac,[s],g);
+}
+// one dry hit cut out of the song, with a quick fade so it ends cleanly
+function songChop(ac,d,t,ch){
+  const s=ac.createBufferSource(),g=gn(ac,0),len=ch.len+.02;s.buffer=AU.song;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+.003);g.gain.setValueAtTime(1,t+len-.06);g.gain.exponentialRampToValueAtTime(.0005,t+len);
+  s.connect(g).connect(d);s.start(t,Math.max(0,ch.at-.02),len+.01);
+}
+// granular freeze: overlapping 120 ms grains read from one spot, shaped by an ADSR
+const HANN=(()=>{const n=64,c=new Float32Array(n);for(let i=0;i<n;i++)c[i]=.66*(.5-.5*Math.cos(2*Math.PI*i/(n-1)));return c;})();
+function playFreeze(fr,E,dest){
+  const ac=audio(),r=rig(dest,{rt:.6});r.strip('e',{gain:1,send:.04});
+  // level-match every freeze point: measure the song around the spot
+  const d=AU.song.getChannelData(0),sr=AU.song.sampleRate,i0=Math.floor(fr.at*sr);let ss=0;for(let i=i0-2600;i<i0+2600;i++)ss+=(d[i]||0)**2;
+  const peak=clamp(.18/Math.sqrt(ss/5200+1e-9),.2,5);
+  const t0=ac.currentTime+.08,out=gn(ac,0),end=adsr(out,t0,{a:E.a,d:E.d,s:E.s,r:E.r,len:E.hold,peak});out.connect(r.strips.e.in);
+  const gd=.12,hop=.04,srcs=[];
+  for(let tt=0;tt<end-t0;tt+=hop){const s=ac.createBufferSource(),g=gn(ac,0);s.buffer=AU.song;g.gain.setValueCurveAtTime(HANN,t0+tt,gd);s.connect(g).connect(out);s.start(t0+tt,Math.max(0,fr.at+(Math.random()-.5)*.02),gd+.01);srcs.push(s);}
+  r.dur=end-t0;return r;
+}

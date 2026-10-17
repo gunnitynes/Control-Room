@@ -4,6 +4,12 @@
    Sculptor · Preset Archeologist · Ghost Note · Stereo Stage · Sample
    Chronologist. All audio comes from js/audio.js.
    ==================================================================== */
+/* the demo song: wait for it to load, then play — unless the round has moved on */
+function withSong(fn){if(AU.song){fn();return;}toast('Loading the demo song…');const s=G.gs,i=s&&s.i,ph=s&&s.phase;
+  songReady().then(()=>{if(G.gs===s&&s.i===i&&(s.phase==='prep'||s.phase==='open'||s.phase===ph))fn();}).catch(()=>toast('Could not load the demo song (audio/demosong.mp3)'));}
+// hand out song parts so no part repeats until all have been used
+function dealSong(list,n){let deck=[];return [...Array(n)].map(()=>{if(!deck.length)deck=shuffle(list);return deck.pop();});}
+const songTag=ex=>ex?` <span class="songtag">from the song · ${esc(ex.name)} · ${Math.floor(ex.at/60)}:${pad2(Math.floor(ex.at%60))}</span>`:'';
 function stopAud(){const s=G.gs;if(s&&s.aud){try{s.aud.stop();}catch(e){}s.aud=null;}}
 function setAud(h){stopAud();if(G.gs)G.gs.aud=h;return h;}
 const octErr=(a,b)=>Math.abs(Math.log2(a/b));
@@ -47,7 +53,7 @@ game(roundGame({
   badges:['Scored','Listening'],speed:.15,okAt:.8,closeAt:.45,yesWord:'Spot on!',
   icon:`<svg viewBox="0 0 64 64"><path d="M4 50 Q20 50 26 24 Q32 4 38 24 Q44 50 60 50" fill="none" stroke="var(--ink)" stroke-width="4"/><circle cx="32" cy="20" r="9" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><line x1="4" y1="58" x2="60" y2="58" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
-    {key:'src',label:'Source',choices:[['mix','Full mix','the demo band'],['noise','Pink noise','easier']],def:'mix'},
+    {key:'src',label:'Source',choices:[['song','Demo song','a new part every round'],['noise','Pink noise','easier'],['mix','Synth band','built-in']],def:'song'},
     {key:'q',label:'Filter width',choices:[[2.5,'Wide','easier'],[5,'Narrow','classic'],[9,'Razor','hard']],def:5},
     {key:'n',label:'Rounds',choices:[[5,'5'],[8,'8'],[10,'10']],def:8},
     {key:'secs',label:'Answer time',choices:[[15,'15','seconds'],[25,'25','seconds'],[0,'OFF','no clock']],def:25},
@@ -55,20 +61,22 @@ game(roundGame({
   prepMs:7000,prepLabel:'HUNT',prepSub:'the filter moves',
   prepText:()=>({big:'Listen',small:'The filter is sweeping. Your slider appears when it stops.'}),
   secs:o=>o.secs,
-  build:o=>shuffle([90,160,300,550,1000,1800,3200,5600,9000,12000]).slice(0,o.n).map(b=>({f:Math.round(b*rnd(.85,1.18)),start:pick([120,400,1500,6000])})),
+  build:o=>{const ex=dealSong(SONG.excerpts,o.n);return shuffle([90,160,300,550,1000,1800,3200,5600,9000,12000]).slice(0,o.n).map((b,k)=>({f:Math.round(b*rnd(.85,1.18)),start:pick([120,400,1500,6000]),ex:o.src==='song'?ex[k]:null}));},
   onPrep(r,o){const ac=audio(),bp=bq(ac,'bandpass',r.start,o.q),mk=gn(ac,o.src==='noise'?3:4.5);bp.connect(mk).connect(AU.music);
-    const src=o.src==='noise'?playPink(bp):playDemo(bp,{rt:1.1});
+    let src={stop(){}};if(o.src==='song')withSong(()=>{src=playExcerpt(r.ex,bp);});else src=o.src==='noise'?playPink(bp):playDemo(bp,{rt:1.1});
     const n=96,c=new Float32Array(n);let w=Math.log2(r.start);for(let i=0;i<n;i++){const k=i/(n-1);w+=(Math.random()-.5)*.45;c[i]=Math.pow(2,lerp(w,Math.log2(r.f),Math.pow(k,2.2)));}c[n-1]=r.f;
     bp.frequency.setValueCurveAtTime(c,ac.currentTime+.15,6.4);
+    // the song is bass-heavy: lift the gain as the filter climbs so high bands aren't faint (≈ +2.7 dB/octave)
+    if(o.src==='song'){const gc=c.map(f=>4.5*Math.pow(f/1000,.45));mk.gain.setValueCurveAtTime(gc,ac.currentTime+.15,6.4);}
     setAud({bp,mk,stop(){src.stop();setTimeout(()=>{try{mk.disconnect();}catch(e){}},800);}});},
   leave:stopAud,
-  replay(r,ph,o){const ac=audio(),bp=bq(ac,'bandpass',r.f,o.q),mk=gn(ac,o.src==='noise'?3:4.5),dry=gn(ac,0),sum=gn(ac,1);bp.connect(mk).connect(sum);dry.connect(sum);sum.connect(AU.music);
-    const inp=gn(ac,1);inp.connect(bp);inp.connect(dry);const src=o.src==='noise'?playPink(inp):playDemo(inp,{rt:1.1});
+  replay(r,ph,o){const ac=audio(),bp=bq(ac,'bandpass',r.f,o.q),mk=gn(ac,o.src==='noise'?3:o.src==='song'?4.5*Math.pow(r.f/1000,.45):4.5),dry=gn(ac,0),sum=gn(ac,1);bp.connect(mk).connect(sum);dry.connect(sum);sum.connect(AU.music);
+    const inp=gn(ac,1);inp.connect(bp);inp.connect(dry);let src={stop(){}};if(o.src==='song')withSong(()=>{src=playExcerpt(r.ex,inp);});else src=o.src==='noise'?playPink(inp):playDemo(inp,{rt:1.1});
     if(ph==='reveal'){const t=ac.currentTime+3.5;mk.gain.setValueAtTime(mk.gain.value,t);mk.gain.linearRampToValueAtTime(0,t+1.5);dry.gain.setValueAtTime(0,t);dry.gain.linearRampToValueAtTime(.9,t+1.5);toast('Filtered for 3 s, then the full mix');}
     setAud({stop(){src.stop();setTimeout(()=>{try{sum.disconnect();}catch(e){}},800);}});},
   replayLabel:'Hear it again',
   stage:(m,r,ctx)=>{m.innerHTML=listenStage(ctx.phase==='prep'?'The filter is hunting…':'Where did it stop?',ctx.phase==='prep'?'Follow the sound. It is about to park on one frequency.':'Lock in the frequency on your phone.',`<div class="zones">${FREQ_ZONES.slice(0,7).map(z=>`<span><b>${esc(z[2])}</b>${fmtHz(z[0])}–${fmtHz(z[1])}</span>`).join('')}</div>`);},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="axwrap"><h2 class="qtext">It parked at <span class="hl">${fmtHz(r.f)}</span> — the ${esc(zoneOf(r.f).toLowerCase())}.</h2>${axisPlot({min:40,max:16000,fmt:fmtHz,marks:FREQ_MARKS},ctx.list,r.f,{truthLabel:zoneOf(r.f)})}<p class="fine">Press “Hear it again” to hear the band, then the full mix it came from.</p></div>`;},
+  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="axwrap"><h2 class="qtext">It parked at <span class="hl">${fmtHz(r.f)}</span> — the ${esc(zoneOf(r.f).toLowerCase())}.${songTag(r.ex)}</h2>${axisPlot({min:40,max:16000,fmt:fmtHz,marks:FREQ_MARKS},ctx.list,r.f,{truthLabel:zoneOf(r.f)})}<p class="fine">Press “Hear it again” to hear the band, then the full mix it came from.</p></div>`;},
   ringLabel:r=>({label:fmtHz(r.f).replace(' ',''),fill:'--red'}),
   public:()=>({}),valid:(r,a)=>a>=20&&a<=20000,
   input:(root,pub,submit)=>pSlider(root,{min:40,max:16000,fmt:fmtHz,name:f=>zoneOf(f),marks:FREQ_MARKS},submit),
@@ -89,20 +97,24 @@ game(roundGame({
   badges:['Scored','Listening'],speed:.15,okAt:.8,closeAt:.45,yesWord:'Nailed it!',
   icon:`<svg viewBox="0 0 64 64"><rect x="4" y="10" width="8" height="44" fill="var(--ink)"/><path d="M14 14 Q30 40 60 52" fill="none" stroke="var(--red)" stroke-width="5"/><path d="M14 30 Q28 46 60 54" fill="none" stroke="var(--blue)" stroke-width="3"/><line x1="4" y1="58" x2="60" y2="58" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
-    {key:'src',label:'Dry sound',choices:[['clap','Clap'],['snare','Snare'],['hey','Voice'],['chord','Guitar chord'],['mix','Mixed','changes every round']],def:'mix'},
+    {key:'src',label:'Dry sound',choices:[['song','Song chops','a different hit every round'],['mix','Synth sounds','clap, snare, voice, chord']],def:'song'},
     {key:'n',label:'Rounds',choices:[[5,'5'],[7,'7'],[9,'9']],def:7},
     {key:'secs',label:'Answer time',choices:[[15,'15','seconds'],[25,'25','seconds'],[0,'OFF','no clock']],def:15},
   ],
   prepMs:r=>Math.round((Math.max(1.1,r.rt*1.05+.4)*3+.6)*1000),prepLabel:'LISTEN',prepSub:'to the tail',
   prepText:()=>({big:'Listen to the tail',small:'Three hits. Your slider opens after the last one dies away.'}),
   secs:o=>o.secs,
-  build:o=>shuffle([.3,.55,.9,1.4,2.1,3.2,4.8,7]).slice(0,o.n).map(b=>({rt:+(b*rnd(.88,1.14)).toFixed(2),src:o.src==='mix'?pick(['clap','snare','hey','chord']):o.src,pre:rnd(.005,.035),damp:rnd(.25,.6)})),
-  onPrep(r){setAud(playDecay({rt:r.rt,src:r.src,pre:r.pre,damp:r.damp}));},leave:stopAud,
-  replay(r){setAud(playDecay({rt:r.rt,src:r.src,pre:r.pre,damp:r.damp,hits:2}));},
+  build:o=>{// spread the chop types: kick, snare, stab, melodic in turn, each a different moment of the song
+    const kinds=shuffle([...new Set(SONG.chops.map(c=>c.name))]),by=Object.fromEntries(kinds.map(k=>[k,shuffle(SONG.chops.filter(c=>c.name===k))]));
+    return shuffle([.3,.55,.9,1.4,2.1,3.2,4.8,7]).slice(0,o.n).map((b,i)=>({rt:+(b*rnd(.88,1.14)).toFixed(2),src:o.src==='song'?null:pick(['clap','snare','hey','chord']),
+      chop:o.src==='song'?by[kinds[i%kinds.length]][Math.floor(i/kinds.length)%3]:null,pre:rnd(.005,.035),damp:rnd(.25,.6)}));},
+  decaySrc:r=>r.chop?(ac,d,t)=>songChop(ac,d,t,r.chop):r.src,
+  onPrep(r){const go=()=>setAud(playDecay({rt:r.rt,src:this.decaySrc(r),pre:r.pre,damp:r.damp}));r.chop?withSong(go):go();},leave:stopAud,
+  replay(r){const go=()=>setAud(playDecay({rt:r.rt,src:this.decaySrc(r),pre:r.pre,damp:r.damp,hits:2}));r.chop?withSong(go):go();},
   stage:(m,r,ctx)=>{m.innerHTML=listenStage(ctx.phase==='prep'?'Where are we?':'How long was the tail?',ctx.phase==='prep'?'Close your eyes. Picture the room.':'Slide to the decay time on your phone.',`<div class="zones">${ROOMS.slice(0,7).map((z,i)=>`<span><b>${esc(z[1].replace(/^an? /,''))}</b>${i?ROOMS[i-1][0]:0}–${z[0]} s</span>`).join('')}</div>`);},
   reveal:(m,r,ctx)=>{
     const W=900,H=220,X=t=>40+(W-60)*t/Math.max(8,r.rt*1.3),Y=db=>16+(H-50)*(-db/72);let d='';for(let i=0;i<=100;i++){const t=i/100*Math.max(8,r.rt*1.3);d+=(i?'L':'M')+X(t).toFixed(1)+' '+Y(Math.max(-72,-60*t/r.rt)).toFixed(1);}
-    m.innerHTML=`<div class="axwrap"><h2 class="qtext">RT60 = <span class="hl">${fmtS(r.rt)}</span> — about ${esc(roomOf(r.rt))}.</h2>
+    m.innerHTML=`<div class="axwrap"><h2 class="qtext">RT60 = <span class="hl">${fmtS(r.rt)}</span> — about ${esc(roomOf(r.rt))}.${r.chop?` <span class="songtag">the dry sound: ${esc(r.chop.name.toLowerCase())} at ${Math.floor(r.chop.at/60)}:${pad2(Math.floor(r.chop.at%60))} in the song</span>`:''}</h2>
       <svg class="decaysvg" viewBox="0 0 ${W} ${H}"><line x1="40" y1="${Y(-60)}" x2="${W-20}" y2="${Y(-60)}" stroke="var(--hair)" stroke-width="2" stroke-dasharray="6 6"/><text x="${W-24}" y="${Y(-60)-8}" text-anchor="end" font-family="Space Mono" font-size="14" fill="var(--ink2)">−60 dB</text>
         <path d="${d}" fill="none" stroke="var(--red)" stroke-width="5"/><circle cx="${X(r.rt)}" cy="${Y(-60)}" r="9" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/></svg>
       ${axisPlot({min:.2,max:10,fmt:fmtS,marks:RT_MARKS},ctx.list,r.rt,{truthLabel:roomOf(r.rt)})}</div>`;},
@@ -130,22 +142,24 @@ game(roundGame({
   badges:['Scored','Listening'],speed:.15,okAt:.78,closeAt:.45,yesWord:'Fixed it!',
   icon:`<svg viewBox="0 0 64 64"><path d="M4 32 L22 32 Q28 32 30 52 Q32 60 34 52 Q36 32 42 32 L60 32" fill="none" stroke="var(--ink)" stroke-width="4"/><circle cx="32" cy="54" r="7" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><path d="M44 10 l10 10 M54 10 l-10 10" stroke="var(--ink)" stroke-width="4"/></svg>`,
   options:[
+    {key:'src',label:'Source',choices:[['song','Demo song','a new part every round'],['mix','Synth band','built-in']],def:'song'},
     {key:'n',label:'Rounds',choices:[[4,'4'],[6,'6'],[8,'8']],def:6},
     {key:'secs',label:'Answer time',choices:[[20,'20','seconds'],[30,'30','seconds'],[0,'OFF','no clock']],def:30},
   ],
   prepMs:5000,prepLabel:'LISTEN',prepSub:'for the flaw',
   prepText:()=>({big:'What’s wrong?',small:'Listen for the ugly bit. Your EQ appears in a moment.'}),
   secs:o=>o.secs,
-  build:o=>shuffle(EQ_PROBLEMS).slice(0,o.n).map(p=>({...p,f:Math.round(p.f*rnd(.87,1.15))})),
+  build:o=>{const ex=dealSong(SONG.excerpts,o.n);return shuffle(EQ_PROBLEMS).slice(0,o.n).map((p,k)=>({...p,f:Math.round(p.f*rnd(.87,1.15)),ex:o.src==='song'?ex[k]:null}));},
   play(r,cut){const ac=audio(),pk=bq(ac,'peaking',r.f,2.5,12),c=bq(ac,'peaking',cut||1000,2.5,cut?-12:0),g=gn(ac,.7);pk.connect(c).connect(g).connect(AU.music);
-    const src=playDemo(pk,{rt:1.1});setAud({stop(){src.stop();setTimeout(()=>{try{g.disconnect();}catch(e){}},800);}});},
+    let src={stop(){}};const h=setAud({stop(){src.stop();setTimeout(()=>{try{g.disconnect();}catch(e){}},800);}});
+    if(r.ex)withSong(()=>{if(G.gs&&G.gs.aud===h)src=playExcerpt(r.ex,pk);});else src=playDemo(pk,{rt:1.1});},
   onPrep(r){this.play(r);},leave:stopAud,
   replay(r,ph){const s=G.gs;if(ph!=='reveal'){this.play(r);return;}
     const best=this.answers().sort((a,b)=>(b.res?.acc||0)-(a.res?.acc||0))[0];s.fixOn=!s.fixOn;
     if(s.fixOn&&best){this.play(r,+best.a);toast(`Fixed with ${best.p.name}'s cut at ${fmtHz(+best.a)}`);}else{this.play(r);toast('The flawed mix');}},
   replayLabel:'A/B the fix',
   stage:(m,r,ctx)=>{m.innerHTML=listenStage(ctx.phase==='prep'?'Something is off…':'Find it and cut it',ctx.phase==='prep'?'Boomy? Boxy? Harsh? Listen to where it lives.':'Drag the notch on your phone onto the problem.',eqGraphSVG({}));},
-  reveal(m,r,ctx){m.innerHTML=`<div class="axwrap"><h2 class="qtext"><span class="hl">${esc(r.name)}</span> at ${fmtHz(r.f)} — ${esc(r.hint)}.</h2>${eqGraphSVG({bump:r.f,cuts:ctx.list.map(x=>({f:+x.a,sh:x.p.sh}))})}${axisPlot({min:40,max:16000,fmt:fmtHz,marks:FREQ_MARKS},ctx.list,r.f,{truthLabel:r.name})}<p class="fine">“A/B the fix” switches between the flawed mix and the best student’s cut.</p></div>`;G.gs.fixOn=false;},
+  reveal(m,r,ctx){m.innerHTML=`<div class="axwrap"><h2 class="qtext"><span class="hl">${esc(r.name)}</span> at ${fmtHz(r.f)} — ${esc(r.hint)}.${songTag(r.ex)}</h2>${eqGraphSVG({bump:r.f,cuts:ctx.list.map(x=>({f:+x.a,sh:x.p.sh}))})}${axisPlot({min:40,max:16000,fmt:fmtHz,marks:FREQ_MARKS},ctx.list,r.f,{truthLabel:r.name})}<p class="fine">“A/B the fix” switches between the flawed mix and the best student’s cut.</p></div>`;G.gs.fixOn=false;},
   ringLabel:r=>({label:fmtHz(r.f).replace(' ',''),fill:'--red'}),
   public:()=>({}),valid:(r,a)=>a>=20&&a<=20000,
   input(root,pub,submit){
@@ -171,19 +185,21 @@ function adsrSVG(E,{W=200,H=90}={}){
 }
 game(roundGame(mcSpec({
   id:'envelope',group:'ears',name:'Envelope Sculptor',tag:'Hear a sound, pick its shape: attack, decay, sustain, release.',
-  how:['One synth note plays — same tone every time, only its envelope changes.','Four ADSR shapes appear on your phone. Tap the one you heard.','Fast right answers score more.'],
+  how:['A moment of the demo song is frozen into a held tone — then shaped by one of the envelopes.','Four ADSR shapes appear on your phone. Tap the one you heard.','Fast right answers score more.'],
   badges:['Scored','Listening'],speed:.4,htmlOpts:true,kind:'env',
   icon:`<svg viewBox="0 0 64 64"><path d="M4 56 L16 8 L28 30 L44 30 L60 56" fill="var(--yel)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/><line x1="4" y1="58" x2="60" y2="58" stroke="var(--ink)" stroke-width="3"/></svg>`,
-  options:[{key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10']],def:8},{key:'secs',label:'Answer time',choices:[[12,'12','seconds'],[20,'20','seconds'],[0,'OFF','no clock']],def:20}],
+  options:[{key:'src',label:'Sound',choices:[['song','Frozen song','a moment of the song held still'],['mix','Synth tone','the same tone every time']],def:'song'},
+    {key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10']],def:8},{key:'secs',label:'Answer time',choices:[[12,'12','seconds'],[20,'20','seconds'],[0,'OFF','no clock']],def:20}],
   prepMs:r=>Math.round((r.E.hold+r.E.r*1.6)*1000+900),prepLabel:'LISTEN',prepSub:'to the shape',
   prepText:()=>({big:'Listen',small:'Watch the four shapes on the big screen while it plays.'}),
   secs:o=>o.secs,
-  build:o=>shuffle(ENVELOPES).slice(0,o.n).map(E=>{const others=shuffle(ENVELOPES.filter(x=>x!==E)).slice(0,3);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E)};}),
-  onPrep(r){setAud(playEnvelope(r.E));},onOpen(r){later(()=>{if(G.gs&&G.gs.phase==='open')setAud(playEnvelope(r.E));},300);},leave:stopAud,
-  replay(r){setAud(playEnvelope(r.E));},
+  build:o=>{const fz=dealSong(SONG.freeze,o.n);return shuffle(ENVELOPES).slice(0,o.n).map((E,k)=>{const others=shuffle(ENVELOPES.filter(x=>x!==E)).slice(0,3);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E),fz:o.src==='song'?fz[k]:null};});},
+  sound(r){if(r.fz)withSong(()=>setAud(playFreeze(r.fz,r.E)));else setAud(playEnvelope(r.E));},
+  onPrep(r){this.sound(r);},onOpen(r){later(()=>{if(G.gs&&G.gs.phase==='open')this.sound(r);},300);},leave:stopAud,
+  replay(r){this.sound(r);},
   public:r=>({opts:r.opts.map(E=>adsrSVG(E)),html:true,kind:'env'}),
   stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><h2 class="qtext">Which envelope is this?</h2>${mcTiles({...r,opts:r.opts},{...ctx,phase:ctx.phase==='prep'?'open':ctx.phase},{optHTML:E=>adsrSVG(E)})}</div>`;},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><h2 class="qtext"><span class="hl">${esc(r.E.name)}</span> · A ${r.E.a}s · D ${r.E.d}s · S ${Math.round(r.E.s*100)}% · R ${r.E.r}s</h2>${mcTiles(r,ctx,{optHTML:E=>adsrSVG(E)+`<small>${esc(E.name)}</small>`})}</div>`;animateBars(m);},
+  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><h2 class="qtext"><span class="hl">${esc(r.E.name)}</span> · A ${r.E.a}s · D ${r.E.d}s · S ${Math.round(r.E.s*100)}% · R ${r.E.r}s${r.fz?` <span class="songtag">the sound: the song frozen at ${Math.floor(r.fz.at/60)}:${pad2(Math.floor(r.fz.at%60))} (${esc(r.fz.name.toLowerCase())})</span>`:''}</h2>${mcTiles(r,ctx,{optHTML:E=>adsrSVG(E)+`<small>${esc(E.name)}</small>`})}</div>`;animateBars(m);},
 })));
 
 /* ---------- PRESET ARCHEOLOGIST ---------- */
@@ -249,74 +265,61 @@ game(roundGame({
   pReveal:(box,st)=>{box.innerHTML=`<div class="minigrid truth">${Object.entries(st.rv.lanes).map(([l,s])=>`<div>${[...s].map((c,i)=>`<i class="${c==='x'?'on':''} ${st.mine&&st.mine[l]&&st.mine[l][i]?(c==='x'?'hit':'extra'):''}"></i>`).join('')}</div>`).join('')}</div><p class="lab">white = the real hits · yellow box = your taps</p>`;},
 }));
 
-/* ---------- THE STEREO STAGE ---------- */
-const STAGE_INST=['vocal','kick','snare','hats','bass','guitar','pads'];
-const STAGE_RULE={vocal:{x:0,tol:.12,y:[0,.35],role:'the lead vocal'},kick:{x:0,tol:.12,y:[0,.5],role:'the kick'},bass:{x:0,tol:.12,y:[0,.6],role:'the bass'},snare:{x:0,tol:.2,y:[0,.55],role:'the snare'},
-  hats:{side:[.2,.8],y:[.2,.75],role:'the hi-hats'},guitar:{side:[.3,1],y:[.15,.7],role:'the guitar'},pads:{side:[0,1],y:[.55,1],role:'the pads'}};
-const STAGE_MASK=[['guitar','vocal'],['pads','vocal'],['guitar','pads'],['snare','vocal'],['hats','guitar']];
-function stageScore(L){
-  const pen=[];let s=1;
-  STAGE_INST.forEach(n=>{const p=L[n],R=STAGE_RULE[n];if(!p){s-=.15;pen.push(`${DEMO.inst[n]} wasn't placed`);return;}
-    if(R.x!=null&&Math.abs(p.x)>R.tol){const d=Math.min(.18,(Math.abs(p.x)-R.tol)*.4);s-=d;pen.push([d,`Keep ${R.role} centred`]);}
-    if(R.side&&(Math.abs(p.x)<R.side[0]||Math.abs(p.x)>R.side[1])){const d=.08;s-=d;pen.push([d,`Pan ${R.role} off-centre`]);}
-    if(p.y<R.y[0]||p.y>R.y[1]){const d=.07;s-=d;pen.push([d,p.y>R.y[1]?`Bring ${R.role} forward`:`Push ${R.role} further back`]);}});
-  STAGE_MASK.forEach(([a,b])=>{const A=L[a],B=L[b];if(!A||!B)return;const d=Math.hypot(A.x-B.x,(A.y-B.y)*.8);if(d<.25){const k=(.25-d)*.5;s-=k;pen.push([k,`${DEMO.inst[a]} masks ${DEMO.inst[b].toLowerCase()} — move them apart`]);}});
-  const sides=['hats','guitar'].map(n=>L[n]).filter(Boolean);if(sides.length===2&&Math.sign(sides[0].x)===Math.sign(sides[1].x)&&Math.abs(sides[0].x)>.15){s-=.08;pen.push([.08,'Hats and guitar on the same side — balance the stage']);}
-  const notes=pen.filter(Array.isArray).sort((a,b)=>b[0]-a[0]).map(x=>x[1]).concat(pen.filter(x=>!Array.isArray(x)));
-  return {acc:clamp(s,0,1),note:notes[0]||'A clean, balanced stage',notes:notes.slice(0,3)};
+/* ---------- METER LAB ----------
+   The Meter Lab project (meterlab/index.html) runs inside the big screen in
+   embed mode: its own rhythm engine, sounds and animated figures. Control Room
+   asks it for Rhythm Arcade "hear it" questions; the phones answer them. */
+const ML={frame:null,ready:false,want:null};
+function mlFrame(){
+  if(ML.frame&&ML.frame.isConnected)return ML.frame;
+  const f=el('iframe','mlframe');f.src='meterlab/index.html?embed';f.setAttribute('allow','autoplay');f.title='Meter Lab';f.hidden=true;
+  f.onload=()=>{const t=setInterval(()=>{const api=f.contentWindow&&f.contentWindow.MLAPI;if(api){clearInterval(t);ML.ready=true;api.theme(document.documentElement.dataset.theme==='night');if(ML.want){const w=ML.want;ML.want=null;w(api);}}},100);};
+  document.body.appendChild(f);ML.frame=f;return f;
 }
-const layoutAudio=L=>Object.fromEntries(STAGE_INST.map(n=>{const p=L[n]||{x:0,y:.3};return [n,{pan:p.x,send:.04+p.y*.55,gain:1-p.y*.35,lp:18000-p.y*12000}];}));
-function stageMapHTML(list,avg){
-  return `<div class="smap"><div class="smgrid"><span class="lab sl">L</span><span class="lab sr">R</span><span class="lab sb">BACK</span><span class="lab sf">FRONT · listener</span>
-    ${list.flatMap(x=>STAGE_INST.map(n=>x.a&&x.a[n]?`<i class="sdot i-${n}" style="left:${50+x.a[n].x*50}%;top:${100-(1-x.a[n].y)*100}%"></i>`:'')).join('')}
-    ${avg?STAGE_INST.map(n=>avg[n]?`<b class="stok i-${n}" style="left:${50+avg[n].x*50}%;top:${100-(1-avg[n].y)*100}%">${esc(DEMO.inst[n])}</b>`:'').join(''):''}</div></div>`;
-}
-const avgLayout=list=>{const out={};STAGE_INST.forEach(n=>{const ps=list.map(x=>x.a&&x.a[n]).filter(Boolean);if(ps.length)out[n]={x:ps.reduce((a,p)=>a+p.x,0)/ps.length,y:ps.reduce((a,p)=>a+p.y,0)/ps.length};});return out;};
+function mlApi(fn){const f=mlFrame();const api=ML.ready&&f.contentWindow&&f.contentWindow.MLAPI;if(api)fn(api);else ML.want=fn;}
+function mlPlace(){const f=ML.frame,slot=$('#mlslot');if(!f)return;if(!slot){f.hidden=true;return;}const b=slot.getBoundingClientRect();f.hidden=false;Object.assign(f.style,{left:b.left+'px',top:b.top+'px',width:b.width+'px',height:b.height+'px'});}
+const mlOptHTML=o=>o.mini?`<span class="mlmini">${[...o.mini].map(c=>`<i class="${c==='1'?'on':''}"></i>`).join('')}</span>`:`<b class="mlbig">${esc(o.big)}</b>${o.small?`<small>${esc(o.small)}</small>`:''}`;
 game(roundGame({
-  id:'stereo',noWord:'Not quite',group:'ears',name:'The Stereo Stage',tag:'Treat the stereo field like a floor plan. Place the band, then hear your mix.',
-  how:['A dense band loop plays with every instrument stacked in the centre.','Drag each instrument onto the stage on your phone: left to right, front to back.','Points for a clean, balanced layout with nothing masking — then the room hears the best mix.'],
-  badges:['Scored','Mixing'],speed:0,okAt:.85,closeAt:.55,yesWord:'Clean mix!',
-  icon:`<svg viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><line x1="32" y1="4" x2="32" y2="60" stroke="var(--hair)" stroke-width="2"/><circle cx="32" cy="46" r="7" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5"/><rect x="10" y="20" width="12" height="12" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5"/><polygon points="48,16 56,30 40,30" fill="var(--yel)" stroke="var(--ink)" stroke-width="2.5"/></svg>`,
-  options:[{key:'n',label:'Rounds',choices:[[1,'1'],[2,'2','mix it twice']],def:1},{key:'secs',label:'Time to place',choices:[[60,'60','seconds'],[90,'90','seconds'],[0,'OFF','no clock']],def:90}],
-  prepMs:4000,prepLabel:'HEAR',prepSub:'the pile-up',
-  prepText:()=>({big:'Hear the pile-up',small:'Everything is in the middle. Your stage opens in a moment.'}),
-  secs:o=>o.secs,build:o=>[...Array(o.n)].map((_,i)=>({i})),
-  onPrep(){setAud(playDemo(AU.music,{layout:Object.fromEntries(STAGE_INST.map(n=>[n,{pan:0,send:.05}]))}));},
-  leave:stopAud,
-  replay(r,ph){const s=G.gs,list=this.answers();if(ph!=='reveal'||!list.length){setAud(playDemo(AU.music,{layout:Object.fromEntries(STAGE_INST.map(n=>[n,{pan:0,send:.05}]))}));toast('Everything centred');return;}
-    s.mixMode=((s.mixMode??-1)+1)%3;const best=list.slice().sort((a,b)=>(b.res?.acc||0)-(a.res?.acc||0))[0];
-    const L=s.mixMode===0?best.a:s.mixMode===1?avgLayout(list):Object.fromEntries(STAGE_INST.map(n=>[n,{x:0,y:.2}]));
-    setAud(playDemo(AU.music,{layout:layoutAudio(L)}));toast(['Best mix: '+best.p.name,'The room’s average mix','Everything centred (before)'][s.mixMode]);},
-  replayLabel:'Play: best / average / centred',
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="stagew"><h2 class="qtext">${ctx.phase==='prep'?'Seven instruments, all in one spot':'Build the stage on your phone'}</h2>${stageMapHTML([],Object.fromEntries(STAGE_INST.map((n,i)=>[n,{x:(i-3)*.04,y:.15}])))}</div>`;},
-  reveal:(m,r,ctx)=>{const best=ctx.list.slice().sort((a,b)=>(b.res?.acc||0)-(a.res?.acc||0))[0];
-    m.innerHTML=`<div class="stagew"><h2 class="qtext">The room’s stage${best?` · best mix by <span class="hl">${esc(best.p.name)}</span>`:''}</h2>${stageMapHTML(ctx.list,avgLayout(ctx.list))}<p class="fine">Small dots: every placement. Labels: the room's average. “Play” cycles the best mix, the average mix and the centred pile-up.</p></div>`;},
-  ringLabel:()=>({label:'L·R',fill:'--blue'}),
-  public:()=>({inst:STAGE_INST.map(n=>[n,DEMO.inst[n]])}),
-  valid:(r,a)=>a&&typeof a==='object',
-  input(root,pub,submit){
-    const L={};let sel=null;
-    root.innerHTML=`<div class="pstage"><div class="psgrid"><span class="lab sl">L</span><span class="lab sr">R</span><span class="lab sb">BACK</span><span class="lab sf">FRONT · you</span></div>
-      <div class="ptray">${pub.inst.map(([n,l])=>`<button class="ptok i-${n}" data-n="${n}">${esc(l)}</button>`).join('')}</div><button class="big go plock" disabled>Lock in my stage</button></div>`;
-    const grid=$('.psgrid',root),tray=$('.ptray',root);
-    const place=(n,x,y)=>{L[n]={x:+clamp(x,-1,1).toFixed(3),y:+clamp(y,0,1).toFixed(3)};const b=$(`.ptok[data-n="${n}"]`,root);if(b.parentNode!==grid)grid.appendChild(b);b.classList.add('placed');b.style.left=(50+L[n].x*50)+'%';b.style.top=((1-L[n].y)*100)+'%';
-      $('.plock',root).disabled=Object.keys(L).length<pub.inst.length;};
-    const pos=e=>{const b=grid.getBoundingClientRect();return {x:((e.clientX-b.left)/b.width)*2-1,y:1-(e.clientY-b.top)/b.height,inside:e.clientX>=b.left&&e.clientX<=b.right&&e.clientY>=b.top&&e.clientY<=b.bottom};};
-    // placed tokens drag inside the stage; tray tokens follow the finger and land on release (or tap one, then tap the stage)
-    $$('.ptok',root).forEach(b=>{let x0=0,y0=0;
-      b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);x0=e.clientX;y0=e.clientY;b.classList.add('drag');sel=b.dataset.n;$$('.ptok',root).forEach(x=>x.classList.toggle('sel',x===b));});
-      b.addEventListener('pointermove',e=>{if(!b.hasPointerCapture(e.pointerId))return;const p=pos(e);
-        if(b.parentNode===grid){if(p.inside)place(b.dataset.n,p.x,p.y);}else b.style.transform=`translate(${e.clientX-x0}px,${e.clientY-y0}px)`;});
-      b.addEventListener('pointerup',e=>{b.classList.remove('drag');b.style.transform='';const p=pos(e);if(p.inside){place(b.dataset.n,p.x,p.y);papi.vibe(10);}});
-    });
-    grid.addEventListener('click',e=>{if(e.target.closest('.ptok')||!sel)return;const p=pos(e);place(sel,p.x,p.y);});
-    $('.plock',root).onclick=()=>submit(L);
-  },
-  locked:(box,mine)=>{box.innerHTML=`<div class="smap mini"><div class="smgrid">${STAGE_INST.map(n=>mine[n]?`<b class="stok i-${n}" style="left:${50+mine[n].x*50}%;top:${(1-mine[n].y)*100}%">${esc(DEMO.inst[n].split(' ').pop())}</b>`:'').join('')}</div></div>`;},
-  score:(r,a)=>stageScore(a),
-  publicReveal:(r,a,res)=>({notes:(res&&res.notes||[]).slice(1)}),
-  pReveal:(box,st)=>{if(st.rv&&st.rv.notes.length)box.innerHTML=`<ul class="notes">${st.rv.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`;},
+  id:'meterlab',group:'ears',name:'Meter Lab',tag:'The rhythm lab: hear a groove, name its meter, grouping, polyrhythm, pattern or swing.',
+  how:['A groove loops on the big speakers while Meter Lab’s figure says LISTEN.','Name what you hear on your phone — time signature, grouping, ratio, loop length, pattern or swing.','The reveal shows the moving figure and explains the answer. Fast right answers score more.'],
+  badges:['Scored','Rhythm','Meter Lab'],speed:.4,
+  icon:`<svg viewBox="0 0 64 64"><circle cx="20" cy="40" r="14" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="34" y="8" width="24" height="24" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><path d="M36 58 L58 58 L47 38Z" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 q8 -8 16 0 t16 0" fill="none" stroke="var(--ink)" stroke-width="3"/></svg>`,
+  options:[
+    {key:'topics',type:'multi',label:'Topics',choices:[['meter','Meter','time signatures, beats, simple or compound'],['grouping','Grouping','additive bars: 2s and 3s'],['poly','Polyrhythm','two voices, two ratios'],['polymeter','Polymeter','loops of different lengths'],['pattern','Pattern','Euclidean and famous rhythms'],['swing','Swing','straight, swung, early or late']],def:['meter','grouping','poly','polymeter','pattern','swing'],sub:v=>`${v.topics.length} of 6`},
+    {key:'level',label:'Level',choices:[[1,'I','warm-up'],[2,'II','groove'],[3,'III','odd']],def:1},
+    {key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10']],def:8},
+    {key:'secs',label:'Answer time',choices:[[20,'20','seconds'],[30,'30','seconds'],[0,'OFF','no clock']],def:30},
+  ],
+  check:v=>v.topics.length?'':'Pick at least one topic',
+  note:'Powered by Meter Lab (meterlab/index.html). <a href="meterlab/" target="_blank" rel="noopener">Open the full Meter Lab workstation</a> in a new tab for teaching.',
+  prepMs:5000,prepLabel:'LISTEN',prepSub:'to the groove',
+  prepText:()=>({big:'Listen',small:'Feel the groove on the big speakers. The answers open in a moment.'}),
+  secs:o=>o.secs,
+  build:o=>[...Array(o.n)].map(()=>({q:null})),
+  // questions come from Meter Lab itself, so each round asks for one as it starts
+  onPrep(r,o){mlApi(api=>{if(!r.q){const q=api.question(o.level,o.topics);let opts=q.options;
+      if(opts.length>4){const right=opts.find(x=>x.id===q.answer);opts=shuffle([right,...shuffle(opts.filter(x=>x!==right)).slice(0,3)]);}
+      r.q=q;r.opts=opts;r.c=opts.findIndex(x=>x.id===q.answer);}
+    api.listen('LISTEN');api.play();render();syncAll();});},
+  leave(){mlApi(api=>api.stop());},
+  stop(){mlApi(api=>api.stop());if(ML.frame)ML.frame.hidden=true;},
+  replay(){mlApi(api=>api.play());},replayLabel:'Play the groove',
+  onReveal(){mlApi(api=>{api.reveal();api.play();});},
+  frame(){mlPlace();},resize(){mlPlace();},
+  roundInfo:r=>r.q?(MLTOPIC[r.q.topic]||r.q.topic):'',
+  stage(m,r,ctx){const q=r.q;
+    m.innerHTML=`<div class="mlwrap"><div class="mlhead"><span class="dawtag">Meter Lab · ${esc(q?MLTOPIC[q.topic]:'loading')}</span><h2 class="qtext">${q?esc(q.prompt):'Loading Meter Lab…'}</h2>${q&&ctx.phase!=='prep'?`<p class="fine">${esc(q.hint)}</p>`:''}</div>
+      <div class="mlslot" id="mlslot"></div>${q?mcTiles({opts:r.opts,c:r.c},ctx,{optHTML:mlOptHTML}):''}</div>`;mlPlace();},
+  reveal(m,r,ctx){const q=r.q;if(!q){m.innerHTML='';return;}
+    m.innerHTML=`<div class="mlwrap reveal mc"><div class="mlhead"><span class="dawtag">Meter Lab · ${esc(MLTOPIC[q.topic])}</span><h2 class="qtext">${esc(q.prompt)}</h2><p class="mlexplain">${q.explain}</p></div>
+      <div class="mlslot" id="mlslot"></div>${mcTiles({opts:r.opts,c:r.c},ctx,{optHTML:mlOptHTML})}</div>`;animateBars(m);mlPlace();},
+  public:r=>({opts:r.q?r.opts.map(mlOptHTML):[],html:true,kind:'ml'}),
+  valid:(r,a)=>!!r.q&&Number.isInteger(a)&&a>=0&&a<r.opts.length,
+  input:mcInput,locked:mcLocked,pReveal:mcPReveal,
+  score:(r,a)=>({acc:a===r.c?1:0}),publicReveal:r=>({c:r.c}),
+  ringLabel:r=>({label:LET[r.c]||'✓',sub:'is right',fill:COLS[r.c]||'--green'}),
 }));
+const MLTOPIC={meter:'Meter',grouping:'Grouping',poly:'Polyrhythm',polymeter:'Polymeter',pattern:'Pattern',swing:'Swing'};
 
 /* ---------- THE SAMPLE CHRONOLOGIST ---------- */
 const ERA_YEARS=Object.keys(ERAS).map(Number);

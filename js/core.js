@@ -92,7 +92,7 @@ async function openRoom(code){
   return new Promise(res=>{
     const tryOpen=left=>{
       G.code=code||newCode();const peer=new Peer(peerId(G.code),{debug:0});G.peer=peer;
-      peer.on('open',()=>{G.status='';saveRoom();if(G.splash){const sc=$('.spcode');if(sc)sc.innerHTML=`<span class="lab">Room</span><b>${G.code}</b>`;}else render();res(true);});
+      peer.on('open',()=>{G.status='';saveRoom();if(!G.splash)render();res(true);});
       peer.on('error',e=>{
         if(e.type==='unavailable-id'&&left>0){peer.destroy();if(code)setTimeout(()=>tryOpen(left-1),1500);else tryOpen(left-1);return;}
         if(e.type==='peer-unavailable')return;
@@ -169,6 +169,9 @@ function render(){
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
+  // the CONTROL ROOM wordmark is the home button
+  const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
+  home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
   const mq=$('#miniQR');if(mq){drawQR(mq,G.code,160);mq.onclick=()=>showBigQR(G.code);}
 }
 /* splash: the original Control Room poster — faders breathing like a live mix,
@@ -178,7 +181,7 @@ function rSplash(app){
   app.className='splash';
   app.innerHTML=`<canvas id="poster"></canvas><div class="sptt"><div class="kick">Production class · a sister to Meter Lab</div><h1>Control<br><i>Room</i></h1>
     <p>${GAMES.length} games for one room. The big screen asks, the phones answer.</p><button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
-    <div class="spcode">${G.code?`<span class="lab">Room</span><b>${G.code}</b>`:'<span class="lab">Opening the room…</span>'}</div>`;
+`;
   const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
   const enter=()=>{if(!G.splash)return;G.splash=false;POSTER=null;removeEventListener('keydown',key);try{audio();}catch(e){}sfx.open();render();};
   const key=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();enter();}};
@@ -387,7 +390,8 @@ function roundGame(spec){
   const boardDue=()=>{const s=G.gs;return (s.done+1)%3===0||s.done+1>=s.rounds.length;};
   g.toBoard=()=>{const s=G.gs;g.leave&&g.leave();s.phase='board';sfx.board();render();syncAll();};
   g.skip=()=>{const s=G.gs;g.leave&&g.leave();if(s.done+1<s.rounds.length)goRound(s.done+1);else{s.phase='end';sfx.fanfare();render();syncAll();}};
-  g.stop=()=>{g.leave&&g.leave();};
+  const ownStop=spec.stop; // a module's own stop hook (e.g. hiding an embedded frame) still runs
+  g.stop=()=>{g.leave&&g.leave();ownStop&&ownStop.call(g);};
   g.act=(p,d)=>{if(d.t==='ans')answer(p,d);else if(g.onAct)g.onAct(p,d);};
   g.live=()=>{const s=G.gs;if(!s)return;const a=$('#nAns');if(a)a.innerHTML=`${[...s.ans.keys()].length}<span>/${online().length}</span>`;
     if(s.phase==='open')online().forEach(sync);};
@@ -545,6 +549,7 @@ function boot(){
     const s=store.get('room',null);
     if(s&&Date.now()-s.t<12*3600e3){s.players.forEach((p,k)=>G.players.set(p.id,{...blankP(),...p,sh:p.sh??k%4,conn:null}));G.banned=new Set(s.banned||[]);}
     render();
+    if(typeof songReady==='function')songReady().catch(()=>{});
     openRoom(s&&Date.now()-s.t<12*3600e3?s.code:null).then(async ok=>{if(!ok&&s){try{G.peer&&G.peer.destroy();}catch(e){}await openRoom();}render();});
     addEventListener('beforeunload',e=>{if(G.view==='play'){e.preventDefault();e.returnValue='';}});
   }else{
