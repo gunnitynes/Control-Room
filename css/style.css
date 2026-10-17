@@ -58,10 +58,8 @@ h1,h2,h3,p{margin:0}
 .top{background:var(--paper);border-bottom:3px solid var(--ink);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:stretch;min-height:64px;position:relative;z-index:5}
 .logo{display:flex;align-items:center;gap:10px;padding:0 18px;border-right:3px solid var(--ink)}
 .lg{position:relative;display:grid;padding:4px 0 2px}
-.lg b{position:relative;z-index:1;font:900 24px/.8 var(--disp);font-stretch:62%;text-transform:uppercase;letter-spacing:.005em;color:var(--ink)}
+.lg b{position:relative;font:900 26px/.8 var(--disp);font-stretch:62%;text-transform:uppercase;letter-spacing:.005em;color:var(--ink)}
 .lg b+b{color:var(--red)}
-.lgs{position:absolute;z-index:0;left:0;right:0;top:4px;bottom:2px;width:100%;height:calc(100% - 6px);overflow:visible}
-.logo{overflow:hidden}
 .tmid{display:flex;align-items:stretch;min-width:0}
 .qno{display:grid;align-content:center;padding:0 18px;background:var(--ink);color:var(--paper)}
 .qno b{font:900 34px/.85 var(--disp);font-stretch:62%;font-variant-numeric:tabular-nums}

@@ -55,11 +55,8 @@ function shape(i,s=34,stroke='var(--ink)',fill='var(--paper)'){
     `<polygon points="${h},${sw*1.2} ${s-sw},${s-sw} ${sw},${s-sw}"/>`,`<polygon points="${h},${sw} ${s-sw},${h} ${h},${s-sw} ${sw},${h}"/>`][i%4];
   return `<svg class="shape" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true"><g fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round">${body}</g></svg>`;
 }
-/* the wordmark: CONTROL in ink over ROOM in red, the four answer shapes big behind the letters */
-const LOGO_SHAPES=`<svg class="lgs" viewBox="0 0 200 100" preserveAspectRatio="none" aria-hidden="true"><g stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round">
-  <polygon points="122,-34 157,-5 122,25 89,-4" fill="var(--green)"/><polygon points="38,-4 96,-3 70,56" fill="var(--yel)"/>
-  <circle cx="152" cy="54" r="38" fill="var(--red)"/><rect x="79" y="54" width="54" height="54" fill="var(--blue)" transform="rotate(-18 106 81)"/></g></svg>`;
-function logo(){return `<div class="logo"><span class="lg">${LOGO_SHAPES}<b>Control</b><b>Room</b></span></div>`;}
+/* the wordmark: CONTROL in ink over ROOM in red */
+function logo(){return `<div class="logo"><span class="lg"><b>Control</b><b>Room</b></span></div>`;}
 if(store.get('theme','paper')==='night')document.documentElement.dataset.theme='night';
 function toggleTheme(){const n=document.documentElement.dataset.theme==='night'?'paper':'night';if(n==='night')document.documentElement.dataset.theme='night';else delete document.documentElement.dataset.theme;store.set('theme',n);}
 const ROLE=QS.has('room')||(matchMedia('(max-width:700px)').matches&&!QS.has('host'))?'player':'host';
