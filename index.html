@@ -313,19 +313,72 @@ const theme=store.get('theme','paper');if(theme==='night')document.documentEleme
 function toggleTheme(){const n=document.documentElement.dataset.theme==='night'?'paper':'night';if(n==='night')document.documentElement.dataset.theme='night';else delete document.documentElement.dataset.theme;store.set('theme',n);}
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-/* ---------- sound (host only): small synth blips, no samples ---------- */
+/* ---------- sound (host only) ----------
+   Synthesised, no samples: sine and FM bells, soft filtered pads, noise swells,
+   all through one generated reverb and a gentle bus compressor, so every cue
+   sits in the same warm space instead of beeping at you. */
 const SFX={ac:null,on:store.get('sfx',true)};
-function blip(f,d=.08,type='triangle',g=.08,at=0){
-  if(!SFX.on)return;try{SFX.ac=SFX.ac||new (window.AudioContext||window.webkitAudioContext)();const ac=SFX.ac;if(ac.state==='suspended')ac.resume();
-  const t=ac.currentTime+at,o=ac.createOscillator(),v=ac.createGain();o.type=type;o.frequency.value=f;v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.005);v.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(v).connect(ac.destination);o.start(t);o.stop(t+d+.02);}catch(e){}
+function audio(){
+  if(SFX.ac){if(SFX.ac.state==='suspended')SFX.ac.resume();return SFX.ac;}
+  const ac=new (window.AudioContext||window.webkitAudioContext)();SFX.ac=ac;
+  const bus=ac.createGain();bus.gain.value=2.2;
+  const comp=ac.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;comp.attack.value=.01;comp.release.value=.25;
+  bus.connect(comp).connect(ac.destination);
+  // reverb: 2.8 s of decaying stereo noise, darkened as it decays
+  const len=Math.floor(ac.sampleRate*2.8),ir=ac.createBuffer(2,len,ac.sampleRate);
+  for(let c=0;c<2;c++){const d=ir.getChannelData(c);let lp=0;for(let i=0;i<len;i++){const k=i/len,a=.35+.6*k;lp=lp*a+(Math.random()*2-1)*(1-a);d[i]=lp*Math.pow(1-k,2.6)*(i<ac.sampleRate*.012?i/(ac.sampleRate*.012):1)*2.4;}}
+  const verb=ac.createConvolver();verb.buffer=ir;const vr=ac.createGain();vr.gain.value=.55;verb.connect(vr).connect(bus);
+  SFX.bus=bus;SFX.verb=verb;
+  const nb=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate),nd=nb.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;SFX.noise=nb;
+  return ac;
 }
+function out(ac,node,wet,pan=0){
+  const p=ac.createStereoPanner?ac.createStereoPanner():null;let n=node;if(p){p.pan.value=pan;n.connect(p);n=p;}
+  n.connect(SFX.bus);if(wet){const w=ac.createGain();w.gain.value=wet;n.connect(w).connect(SFX.verb);}
+}
+// a voice: oscillator (optionally FM) → lowpass → envelope
+function voice({f,type='sine',at=0,a=.005,d=.4,g=.1,glide=0,cut=0,q=.7,cutEnd=0,fm=0,ratio=2,fmDecay=.2,detune=0,wet=.3,pan=0}){
+  if(!SFX.on)return;let ac;try{ac=audio();}catch(e){return;}
+  const t=ac.currentTime+.01+at,o=ac.createOscillator(),env=ac.createGain();
+  o.type=type;o.frequency.setValueAtTime(glide?f*glide:f,t);if(glide)o.frequency.exponentialRampToValueAtTime(f,t+Math.min(.12,d*.5));o.detune.value=detune;
+  if(fm){const m=ac.createOscillator(),mg=ac.createGain();m.frequency.value=f*ratio;mg.gain.setValueAtTime(f*fm,t);mg.gain.exponentialRampToValueAtTime(f*fm*.01+.01,t+fmDecay);m.connect(mg).connect(o.frequency);m.start(t);m.stop(t+d+.1);}
+  let n=o;if(cut){const fl=ac.createBiquadFilter();fl.type='lowpass';fl.Q.value=q;fl.frequency.setValueAtTime(cut,t);if(cutEnd)fl.frequency.exponentialRampToValueAtTime(cutEnd,t+d);o.connect(fl);n=fl;}
+  env.gain.setValueAtTime(0,t);env.gain.linearRampToValueAtTime(g,t+a);env.gain.exponentialRampToValueAtTime(.0001,t+a+d);
+  n.connect(env);out(ac,env,wet,pan);o.start(t);o.stop(t+a+d+.05);
+}
+// filtered noise: swells, air, whooshes
+function air({at=0,a=.3,d=.4,g=.08,f0=400,f1=4000,q=2,type='bandpass',wet=.4,pan=0}){
+  if(!SFX.on)return;let ac;try{ac=audio();}catch(e){return;}
+  const t=ac.currentTime+.01+at,src=ac.createBufferSource(),fl=ac.createBiquadFilter(),env=ac.createGain();
+  src.buffer=SFX.noise;src.loop=true;fl.type=type;fl.Q.value=q;fl.frequency.setValueAtTime(f0,t);fl.frequency.exponentialRampToValueAtTime(f1,t+a+d*.6);
+  env.gain.setValueAtTime(0,t);env.gain.linearRampToValueAtTime(g,t+a);env.gain.exponentialRampToValueAtTime(.0001,t+a+d);
+  src.connect(fl).connect(env);out(ac,env,wet,pan);src.start(t);src.stop(t+a+d+.05);
+}
+const hz=m=>440*Math.pow(2,(m-69)/12);
+const bell=(m,at,g=.06,pan=0,d=1.6)=>{voice({f:hz(m),at,g,d,fm:1.4,ratio:3.5,fmDecay:.35,wet:.5,pan});voice({f:hz(m+12),at,g:g*.25,d:d*.5,wet:.6,pan:-pan});};
+const pad=(ms,at,{g=.035,a=.25,d=1.8,cut=1800,cutEnd=500,wet=.55}={})=>ms.forEach((m,i)=>[-9,9].forEach(dt=>voice({f:hz(m),type:'sawtooth',at,a,d,g,cut,cutEnd,detune:dt,wet,pan:(i/(ms.length-1||1)-.5)*.8})));
+const PENTA=[0,2,4,7,9,12,14,16];
 const sfx={
-  tick:()=>blip(1320,.05,'square',.035),
-  inn:()=>blip(880+Math.random()*220,.07,'triangle',.05),
-  open:()=>{blip(392,.12,'square',.05);blip(784,.18,'square',.04,.09);},
-  reveal:()=>[523.25,659.25,783.99,1046.5].forEach((f,i)=>blip(f,.35,'triangle',.08,i*.07)),
-  board:()=>[196,247,294,392].forEach((f,i)=>blip(f,.22,'square',.035,i*.05)),
-  fanfare:()=>[[523,0],[523,.14],[523,.28],[659,.42],[784,.62],[1047,.9]].forEach(([f,t])=>blip(f,.3,'square',.05,t)),
+  // last five seconds: a soft woody pulse that climbs as time runs out
+  tick:sec=>{const k=5-clamp(sec||5,1,5);voice({f:hz(76+k*2),g:.12,d:.09,glide:1.5,wet:.15});voice({f:hz(40+k),g:.2,d:.18,glide:2,wet:.05});},
+  // an answer lands: a little water-drop pluck from a pentatonic scale, panned at random
+  inn:()=>{const m=72+PENTA[Math.floor(Math.random()*PENTA.length)];voice({f:hz(m),g:.14,d:.35,glide:.6,wet:.45,pan:Math.random()*1.2-.6});},
+  // someone joins the lobby: two soft glass notes
+  join:()=>{const m=79+PENTA[Math.floor(Math.random()*5)];bell(m,0,.08,-.3,1.1);bell(m+7,.09,.06,.3,1.1);},
+  // answers open: an airy rising swell into a gentle bell
+  open:()=>{air({a:.35,d:.35,g:.06,f0:300,f1:5000,q:1.4});bell(81,.32,.05,0,1.4);voice({f:hz(45),g:.09,a:.3,d:.6,cut:300,wet:.2});},
+  // the reveal: a warm chord bloom; bright when the class nailed it, darker when it didn't
+  reveal:(pct=50)=>{const ch=pct>=60?[57,64,69,73,76]:pct>=30?[57,64,69,71,76]:[57,63,67,70,74];
+    air({a:.04,d:.5,g:.05,f0:6000,f1:900,q:.8,type:'lowpass'});
+    voice({f:hz(33),g:.16,a:.01,d:1.2,glide:1.8,cut:200,wet:.1});
+    pad(ch,0,{g:.03,a:.04,d:2.2,cut:3200,cutEnd:600});
+    ch.slice(2).forEach((m,i)=>bell(m+12,.06+i*.07,.035,(i-1)*.5,1.8));},
+  // into the leaderboard: a downward whoosh with a sub drop
+  board:()=>{air({a:.25,d:.6,g:.07,f0:5000,f1:250,q:1.2});voice({f:hz(38),g:.14,a:.2,d:.7,glide:2,cut:220,wet:.15});},
+  // the podium: a big slow bloom with a shimmer of bells on top
+  fanfare:()=>{air({a:.9,d:.8,g:.06,f0:200,f1:7000,q:1});voice({f:hz(33),g:.16,a:.9,d:2.5,cut:240,wet:.2});
+    pad([45,57,64,69,73,76],.85,{g:.035,a:.08,d:3.6,cut:4200,cutEnd:700});
+    [81,85,88,93,88,97].forEach((m,i)=>bell(m,1+i*.11,.04,(i%2?.5:-.5),2.4));},
 };
 
 const ROLE=new URLSearchParams(location.search).has('room')||(matchMedia('(max-width:700px)').matches&&!new URLSearchParams(location.search).has('host'))?'player':'host';
@@ -397,7 +450,7 @@ function hostData(conn,m){
     if(G.banned.has(id)){try{conn.send({t:'kick'});}catch(e){}setTimeout(()=>conn.close(),300);return;}
     let p=G.players.get(id);
     if(p){if(p.conn&&p.conn!==conn)try{p.conn.close();}catch(e){}p.conn=conn;}
-    else{p={id,name:uniqueName(m.name,id),score:0,streak:0,best:0,right:0,answers:{},last:null,conn,sh:G.players.size%4};G.players.set(id,p);if(G.phase==='lobby')blip(660,.1,'triangle',.06);}
+    else{p={id,name:uniqueName(m.name,id),score:0,streak:0,best:0,right:0,answers:{},last:null,conn,sh:G.players.size%4};G.players.set(id,p);if(G.phase==='lobby')sfx.join();}
     send(p);if(G.phase==='lobby')render();else liveUpdate();save();
   }else if(m.t==='ans'){
     const p=[...G.players.values()].find(x=>x.conn===conn);if(!p)return;
@@ -450,7 +503,7 @@ function reveal(){
     if(ok){p.streak++;p.right++;p.best=Math.max(p.best,p.streak);pts=T?Math.round(1000*(1-.5*clamp(a.ms/T,0,1))/10)*10:1000;pts+=Math.min(p.streak-1,5)*100;}else p.streak=0;
     p.score+=pts;p.last={ok,pts,c:a?a.c:null};
   });
-  G.done=G.i;G.phase='reveal';sfx.reveal();render();pushAll();save();
+  G.done=G.i;G.phase='reveal';sfx.reveal(G.players.size?100*[...G.players.values()].filter(p=>p.last&&p.last.ok).length/G.players.size:50);render();pushAll();save();
 }
 function toBoard(){G.phase='board';sfx.board();render();pushAll();save();}
 function toFinal(){G.phase='end';sfx.fanfare();render();pushAll();save();}
@@ -609,7 +662,7 @@ function ringDraw(now){
     if(G.phase==='reveal'&&ans){ctx.fillStyle=ans.c===G.deck[G.i].c?css('--green'):red;}else ctx.fillStyle=ans?ink:paper;
     ctx.beginPath();ctx.arc(x,y,ans?s*1.15:s,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.globalAlpha=1;});
   // clock ticks + time-out
-  if(G.phase==='q'&&G.qEnd){const left=G.qEnd-now,sec=Math.ceil(left/1000);if(left>0&&sec<=5&&sec!==G.lastTick){G.lastTick=sec;sfx.tick();}}
+  if(G.phase==='q'&&G.qEnd){const left=G.qEnd-now,sec=Math.ceil(left/1000);if(left>0&&sec<=5&&sec!==G.lastTick){G.lastTick=sec;sfx.tick(sec);}}
   if(G.phase==='read'){const rb=$('#readbar');if(rb)rb.style.transform=`scaleX(${1-frac})`;}
 }
 function loop(now){if(ROLE==='host'&&RING)ringDraw(now);if(POSTER)posterDraw(now);requestAnimationFrame(loop);}
