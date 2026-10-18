@@ -354,7 +354,7 @@ function rMenu(st){
   const ps=players(),tot=rankBy('total');
   st.innerHTML=`<div class="menu">
     <aside class="roomp">
-      <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
+      <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
         <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
@@ -368,6 +368,7 @@ function rMenu(st){
   $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
   if($('#selCls'))$('#selCls').onchange=e=>{const v=e.target.value;
     if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}
+    if(v==='__off'){e.target.value=ATT.cls;if(confirm('Disconnect your Google Sheet in this browser? Students will type their names instead.'))attUse('');return;}
     if(v==='__def'){e.target.value=ATT.cls;if(confirm('Stop using your own sheet in this browser and go back to the built-in class list?'))attUse('');return;}
     attSetClass(v);};
 }

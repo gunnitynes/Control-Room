@@ -62,7 +62,8 @@ Phones and the host keep old files otherwise.
   QR as art (`artQR`, error correction H; check scannability with jsQR after changing it).
 - Teacher-uploaded clips (Chronologist decades, Ear Atlas songs) live in IndexedDB on the host only
   (`clipDB`, `MYCLIPS`; songs use `dec:-1`). They are never uploaded anywhere.
-- Class list + attendance: see `integrations/attendance/README.md`.
+- Class list + attendance: see `integrations/attendance/README.md`. No sheet is built in: each teacher connects their own
+  Apps Script web app on the main menu (`attUrl()`, stored per browser as `att.url`).
 - **Login = CADCAST first** (sister repo gunnitynes/CADCAST). Each student computer shows
   gunnitynes.github.io/CADCAST/go (a QR card on the desk links there). It asks the **lobby** peer
   `controlroom-lobby-<CLASS_KEY>` (content.js; the host registers it on open, answers `{t:'room?'}` with the code)

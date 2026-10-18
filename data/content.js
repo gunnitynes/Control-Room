@@ -182,7 +182,7 @@ window.GUIDE={"quiz": {"play": ["tap4"], "lesson": "Open the lesson with ten que
 /* the class key: Control Room on the teacher's Mac answers "which room is open?" at relay address controlroom-lobby-<key>.
    The CADCAST computer page uses it, so students only ever scan their computer. Keep it unique to this class. */
 window.CLASS_KEY='gunnitynes';
-window.ATTENDANCE={url:'https://script.google.com/macros/s/AKfycbyf7HfaXossjes5l4Fz569eXIYkwx5NmLrOsX444GUlIUHNfqI5RWcsDar_WLf1Jhof/exec'};
+window.ATTENDANCE={url:''};   // every teacher connects their own sheet on the main menu (Class list ▸ Connect your own Google Sheet)
 
 /* ---------- Sample Chronologist: real recordings by decade (audio/eras, credits in CREDITS.txt) ----------
    clips are filled in below; decades with none use the teacher's own clips or the browser re-creation. */
