@@ -50,6 +50,10 @@ Phones and the host keep old files otherwise.
 - Teacher-uploaded clips (Chronologist decades, Ear Atlas songs) live in IndexedDB on the host only
   (`clipDB`, `MYCLIPS`; songs use `dec:-1`). They are never uploaded anywhere.
 - Class list + attendance: see `integrations/attendance/README.md`.
+- CADCAST pairing (sister repo gunnitynes/CADCAST): a student's computer opens gunnitynes.github.io/CADCAST/go and
+  shows a QR → `?pair=<pc id>` here. `pairPage()` (phone) sends `{t:'pair', id, pc}` to the host; `cadcastPair()`
+  (host) writes `controlroom.cadcast.allow`, tells the computer `{t:'paired', name, desk:'cadcast-desk-<room>'}`
+  over PeerJS. The CADCAST patch bay (same site, same Chrome) reads the room code and allow-list from localStorage.
 
 ## Audio and licences
 

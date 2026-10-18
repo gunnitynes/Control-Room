@@ -59,7 +59,7 @@ function shape(i,s=34,stroke='var(--ink)',fill='var(--paper)'){
 function logo(){return `<div class="logo"><span class="lg"><b>Control</b><b>Room</b></span></div>`;}
 if(store.get('theme','paper')==='night')document.documentElement.dataset.theme='night';
 function toggleTheme(){const n=document.documentElement.dataset.theme==='night'?'paper':'night';if(n==='night')document.documentElement.dataset.theme='night';else delete document.documentElement.dataset.theme;store.set('theme',n);}
-const ROLE=QS.has('room')||(matchMedia('(max-width:700px)').matches&&!QS.has('host'))?'player':'host';
+const ROLE=QS.has('room')||QS.has('pair')||(matchMedia('(max-width:700px)').matches&&!QS.has('host'))?'player':'host';
 
 /* ---------- registry ---------- */
 const GROUPS=[
@@ -146,6 +146,25 @@ function attCheckIn(p){if(!ATT.cls||!attMatch(p.name))return;const k=attDay()+'|
 // phones that are connected but haven't picked a name yet
 function namesMsg(){return {t:'names',cls:ATT.cls,names:ATT.cls?ATT.names.map(n=>({n,here:players().some(p=>p.name===n&&p.conn&&p.conn.open)})):[]};}
 function lobbyNames(){G.lobby.forEach(c=>{if(c.open)try{c.send(namesMsg());}catch(e){}});}
+/* ---------- CADCAST pairing ----------
+   A student's computer opens gunnitynes.github.io/CADCAST/go and shows a QR; their phone (already in this room)
+   scans it and asks the host here to vouch for it. The host tells the computer its name and where the patch bay is,
+   and lists it as allowed for the CADCAST patch bay (same site, so it reads controlroom.cadcast.allow). */
+const CADCAST_BC=window.BroadcastChannel?new BroadcastChannel('cadcast'):null;
+const cadcastDesk=()=>'cadcast-desk-'+G.code.toLowerCase();
+function cadcastPair(conn,m){
+  const p=G.players.get(String(m.id||'').slice(0,40)),pc=String(m.pc||'').replace(/[^a-z0-9]/gi,'').slice(0,24);
+  const reply=o=>{try{conn.send({t:'paired',...o});}catch(e){}};
+  if(!pc)return reply({ok:false,why:'That code is not a CADCAST computer.'});
+  if(!p)return reply({ok:false,why:'Your phone is not in this room yet. Scan the big screen and pick your name first.'});
+  const allow=store.get('cadcast.allow',{});allow[pc]={name:p.name,pid:p.id,at:Date.now()};
+  for(const k in allow)if(Date.now()-allow[k].at>12*3600e3)delete allow[k];
+  store.set('cadcast.allow',allow);if(CADCAST_BC)CADCAST_BC.postMessage({t:'allow',pc,name:p.name});
+  let told=false;const tell=()=>{const c=G.peer.connect('cadcast-pc-'+pc,{serialization:'json',reliable:true});
+    c.on('open',()=>{told=true;c.send({t:'paired',name:p.name,desk:cadcastDesk()});setTimeout(()=>{try{c.close();}catch(e){}},4000);});c.on('error',()=>{});};
+  tell();setTimeout(()=>{if(!told)tell();},3000);
+  reply({ok:true,name:p.name});toast(p.name+'’s computer is paired with CADCAST');
+}
 function resetPoints(){if(!confirm('Reset everyone’s total points to zero?'))return;players().forEach(p=>{p.total=0;p.gp=0;});saveRoom();render();syncAll();}
 function uniqueName(name,id,max=30){
   name=String(name||'').replace(/\s+/g,' ').trim().slice(0,max)||'Player';let n=name,k=2;
@@ -156,6 +175,7 @@ function hostData(conn,m){
   if(!m||typeof m!=='object')return;
   if(m.t==='ping'){try{conn.send({t:'pong'});}catch(e){}return;}
   if(m.t==='who'){G.lobby.add(conn);try{conn.send(namesMsg());}catch(e){}return;}
+  if(m.t==='pair'){cadcastPair(conn,m);return;}
   if(m.t==='hi'){
     const id=String(m.id||'').slice(0,40);if(!id)return;
     if(G.banned.has(id)){try{conn.send({t:'kick'});}catch(e){}setTimeout(()=>conn.close(),300);return;}
@@ -542,7 +562,7 @@ function pData(m){
   if(m.t==='taken'){PL.joined=false;PL.st=null;store.del('proom');PL.status=m.name+' is already in the room on another phone. Tell your teacher if that isn’t you.';pRender();return;}
   if(m.t==='kick'){PL.kicked=true;PL.st={view:'kicked',why:m.why};try{PL.conn.close();}catch(e){}pRender();return;}
   if(m.t!=='st')return;
-  const prev=PL.st;PL.st=m;PL.name=m.name;
+  const prev=PL.st;PL.st=m;PL.name=m.name;if(m.name&&m.view!=='kicked'&&store.get('pname','')!==m.name)store.set('pname',m.name);
   const key=m.view+'|'+m.g+'|'+(m.s?m.s.k:'');
   if(prev&&key===PL.key&&m.view==='play'){const g=gameById(m.g);const top=$('.pscore');if(top)top.textContent=m.total;if(g&&g.pupdate)g.pupdate($('#pbody'),m.s,papi);return;}
   if(m.view==='play'&&m.s&&m.s.ph==='reveal'&&navigator.vibrate)navigator.vibrate(m.s.cls==='yes'?[40,40,40]:120);
@@ -599,6 +619,25 @@ function pRender(){
     <p>${s.g?'The game starts in a moment.':`Look for <b>${esc(s.name)}</b> on the big screen. The next game starts soon.`}</p>
     ${s.total?`<p class="lab">Room total · ${s.total} pts · ${ordinal(s.rank)} of ${s.of}</p>`:''}${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>`;
 }
+/* the phone scanned a computer's CADCAST code: vouch for it through the room's host, then get out of the way */
+async function pairPage(){
+  const pc=String(QS.get('pair')||'').replace(/[^a-z0-9]/gi,'').slice(0,24),code=String(store.get('proom','')||'').toUpperCase(),name=store.get('pname','');
+  const app=$('#app');app.className='ply';
+  const show=(h,p,cls='')=>{app.innerHTML=`<header class="ptop">${logo()}</header><main class="pbody"><div class="pcenter dots pairp ${cls}">${h}${p}</div></main>`;};
+  if(!code||!name)return show('<h2>Join the room first</h2>','<p>Scan the QR code on the big screen and pick your name. Then scan your computer’s code again.</p>','bad');
+  show(`<div class="pairspin"></div><h2>Connecting your computer</h2>`,`<p>as <b>${esc(name)}</b> · room ${esc(code)}</p>`);
+  const fail=why=>show('<h2>Not connected</h2>',`<p>${esc(why)}</p><p class="fine">Scan your computer’s code to try again.</p>`,'bad');
+  try{await needPeer();}catch(e){return fail('No internet connection.');}
+  const peer=new Peer({debug:0});let done=false;const to=setTimeout(()=>{if(!done)fail(`Could not reach room ${code}. Is Control Room open on the teacher’s Mac?`);},12000);
+  peer.on('error',e=>{if(!done&&e.type==='peer-unavailable'){done=true;clearTimeout(to);fail(`Room ${code} is closed. Scan the big screen to join the new room.`);}});
+  peer.on('open',()=>{const c=peer.connect(peerId(code),{serialization:'json',reliable:true});
+    c.on('open',()=>c.send({t:'pair',id:PL.id,pc}));
+    c.on('data',m=>{if(!m||m.t!=='paired')return;done=true;clearTimeout(to);
+      if(!m.ok)return fail(m.why||'The teacher’s Mac said no.');
+      if(navigator.vibrate)navigator.vibrate([30,40,30]);
+      show(`<div class="paircheck">✓</div><h2>Your computer is now</h2><div class="pairname">${esc(m.name)}</div>`,'<p>It connects to the teacher’s patch bay by itself. You can close this tab.</p>','ok');
+      setTimeout(()=>{try{peer.destroy();}catch(e){}},2000);});});
+}
 const NB_ICON='<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="2" width="16" height="18" fill="var(--yel)" stroke="var(--ink)" stroke-width="2"/><path d="M7 2v18M10 7h6M10 11h6M10 15h4" stroke="var(--ink)" stroke-width="2"/></svg>';
 const NB_KINDS=[['brief','Briefs & styles','◆'],['rules','Rules you wrote','✎'],['pick','Picks you kept','●'],['card','Cards you were dealt','▲'],['team','Teams & chains','■'],['finish','Results','★'],['star','Milestones','★']];
 function openNotebook(){
@@ -638,6 +677,7 @@ function boot(){
     openRoom(s&&Date.now()-s.t<12*3600e3?s.code:null).then(async ok=>{if(!ok&&s){try{G.peer&&G.peer.destroy();}catch(e){}await openRoom();}render();});
     addEventListener('beforeunload',e=>{if(G.view==='play'){e.preventDefault();e.returnValue='';}});
   }else{
+    if(QS.has('pair')){pairPage();requestAnimationFrame(frame);return;}
     const u=QS.get('room');PL.code=(u||store.get('proom','')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
     if(u&&PL.name&&store.get('proom','')===PL.code){PL.joined=true;pConnect();}
     else if(u&&PL.code.length===4)pConnect(); // connect first, so the class list can arrive before the student picks a name
