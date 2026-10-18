@@ -1211,9 +1211,9 @@ body:has(#app.guidepage){overflow:auto}
 .sheetcard h2 i{font-style:normal;color:var(--green)}
 .shlead{margin:0;font-size:16px}
 .shsteps{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:12px}
-.shsteps li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start;border:3px solid var(--ink);padding:12px;background:var(--paper2);box-shadow:5px 5px 0 var(--ink)}
-.shsteps li>b{display:grid;place-items:center;width:44px;height:44px;background:var(--ink);color:var(--paper);font:900 28px var(--disp);font-stretch:62%}
-.shsteps li:nth-child(1)>b{background:var(--red)}.shsteps li:nth-child(2)>b{background:var(--blue)}.shsteps li:nth-child(3)>b{background:var(--yel);color:#161514}.shsteps li:nth-child(4)>b{background:var(--green)}
+.shsteps>li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start;border:3px solid var(--ink);padding:12px;background:var(--paper2);box-shadow:5px 5px 0 var(--ink)}
+.shsteps>li>b{display:grid;place-items:center;width:44px;height:44px;background:var(--ink);color:var(--paper);font:900 28px var(--disp);font-stretch:62%}
+.shsteps>li:nth-child(1)>b{background:var(--red)}.shsteps>li:nth-child(2)>b{background:var(--blue)}.shsteps>li:nth-child(3)>b{background:var(--yel);color:#161514}.shsteps>li:nth-child(4)>b{background:var(--green)}
 .shsteps strong{font:900 20px/1 var(--disp);text-transform:uppercase;font-stretch:85%}
 .shsteps p{margin:4px 0 8px;font-size:14px;line-height:1.4}
 .shsteps .big{justify-self:start;font-size:14px;padding:10px 16px}
@@ -1234,3 +1234,11 @@ body:has(#app.guidepage){overflow:auto}
 .mlrfig{flex:1;min-height:clamp(220px,34vh,480px);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:var(--paper)}
 .mlrbody .mlcols{grid-template-columns:1fr;align-content:start;gap:12px}
 @media (max-width:1100px){.mlrbody{grid-template-columns:1fr}}
+.shsub{margin:2px 0 10px;padding-left:20px;display:grid;gap:5px;font-size:14px;line-height:1.4}
+.shsub li{padding-left:2px}.shsub li::marker{font:900 14px var(--disp);color:var(--ink2)}
+.sheetcard kbd{font:700 12px var(--mono);background:#fff;color:#161514;border:2px solid var(--ink);border-bottom-width:3px;padding:0 5px;white-space:nowrap}
+.sheetcard code{font:700 12px var(--mono);background:#fff;color:#161514;padding:1px 4px;word-break:break-all}
+.shtip{background:color-mix(in srgb,var(--yel) 30%,var(--paper));border-left:5px solid var(--yel);padding:8px 10px}
+.shhelp{border:3px solid var(--ink);background:var(--paper2);padding:8px 12px}
+.shhelp summary{cursor:pointer;font:900 16px var(--disp);text-transform:uppercase}
+.shhelp ul{margin:8px 0 2px;padding-left:18px;display:grid;gap:6px;font-size:14px;line-height:1.4}

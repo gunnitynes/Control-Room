@@ -164,12 +164,35 @@ function openSheetSetup(){let ov=$('#sheetov');if(!ov){ov=el('div','sheetov');ov
     <ol class="shsteps">
       <li><b>1</b><div><strong>Make the sheet</strong><p>One tab per class (the tab name is the class), student names in column A from row 2. A <em>MasterLog</em> tab is added for you.</p>
         <div class="shmini"><span>Student name</span><span>Ada</span><span>Alan</span><span>Grace</span><i>CLASS-A</i><i>CLASS-B</i><i>MasterLog</i></div></div></li>
-      <li><b>2</b><div><strong>Add the script</strong><p>In the sheet: Extensions ▸ Apps Script. Delete what is there, paste the script, save.</p>
+      <li><b>2</b><div><strong>Add the script</strong><p>Apps Script is a small code editor built into Google Sheets. You only paste, nothing to write.</p>
+        <ol class="shsub">
+          <li>Open your sheet in the browser, signed in with the Google account that owns it.</li>
+          <li>In the sheet’s top menu choose <kbd>Extensions</kbd> ▸ <kbd>Apps Script</kbd>. A new tab opens with a file called <em>Code.gs</em>.</li>
+          <li>Click in the code, select everything (<kbd>⌘A</kbd> on a Mac, <kbd>Ctrl A</kbd> on Windows) and delete it.</li>
+          <li>Press the button below, go back to the editor and paste (<kbd>⌘V</kbd> / <kbd>Ctrl V</kbd>).</li>
+          <li>Save: the disk icon <kbd>💾</kbd> or <kbd>⌘S</kbd>. If it asks for a project name, type <em>Control Room</em>.</li>
+        </ol>
         <button class="big go" id="shCopy">Copy the script</button></div></li>
-      <li><b>3</b><div><strong>Deploy it</strong><p>Deploy ▸ New deployment ▸ ⚙ Web app. Execute as: <b>Me</b>. Who has access: <b>Anyone</b>. Deploy, allow access, and copy the <b>Web app URL</b>.</p></div></li>
+      <li><b>3</b><div><strong>Deploy it</strong><p>This turns the script into a private link that only Control Room uses.</p>
+        <ol class="shsub">
+          <li>Top right of the editor: the blue <kbd>Deploy</kbd> button ▸ <kbd>New deployment</kbd>.</li>
+          <li>Next to “Select type” click the gear <kbd>⚙</kbd> ▸ <kbd>Web app</kbd>.</li>
+          <li>Description: anything (<em>Control Room</em>). <b>Execute as: Me</b>. <b>Who has access: Anyone</b> (not “Anyone with a Google account”).</li>
+          <li>Click <kbd>Deploy</kbd>, then <kbd>Authorize access</kbd> and pick your account.</li>
+          <li>If Google says <em>“Google hasn’t verified this app”</em>: click <kbd>Advanced</kbd> ▸ <kbd>Go to Control Room (unsafe)</kbd> ▸ <kbd>Allow</kbd>. It is your own script and only works on this sheet.</li>
+          <li>Copy the <b>Web app URL</b> (the long link that ends in <em>/exec</em>) with its <kbd>Copy</kbd> button.</li>
+        </ol>
+        <p class="shtip">Test it: open that link in a new tab. You should see your class names listed, like <code>{"ok":true,"classes":["CLASS-A"]}</code>.</p></div></li>
       <li><b>4</b><div><strong>Paste the link</strong><input id="shUrl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(store.get('att.url',''))}" spellcheck="false" autocomplete="off">
         <div class="frow"><button class="big go" id="shGo">Connect</button>${attOwn()?'<button class="ghost" id="shOff">Disconnect</button>':''}</div><p class="shst" id="shSt"></p></div></li>
     </ol>
+    <details class="shhelp"><summary>Something not working?</summary><ul>
+      <li><b>“Can’t reach the attendance sheet”</b>: in step 3, “Who has access” must be <b>Anyone</b>. Make sure you copied the Web app URL ending in <em>/exec</em>, not the editor’s address.</li>
+      <li><b>No classes show up</b>: each class needs its own tab, with the names in column A from row 2. The MasterLog tab is not a class.</li>
+      <li><b>“Anyone” isn’t offered</b>: some school Google accounts block it. Use a personal Google account for the sheet.</li>
+      <li><b>You changed the script later</b>: <kbd>Deploy</kbd> ▸ <kbd>Manage deployments</kbd> ▸ the pencil <kbd>✎</kbd> ▸ Version: <kbd>New version</kbd> ▸ <kbd>Deploy</kbd>. The link stays the same. (A “New deployment” makes a new link that you would have to paste again.)</li>
+      <li><b>Optional</b>: in the editor, pick <em>setup</em> in the menu next to <kbd>▶ Run</kbd> and run it once to make the MasterLog and an example class tab.</li>
+    </ul></details>
     <p class="fine">The link is saved in this browser only. Names go from your sheet to this computer and the phones in the room, nowhere else.</p></div>`;
   ov.onclick=e=>{if(e.target===ov)close();};$('#shX').onclick=close;
   const st=(t,bad)=>{const e=$('#shSt');e.textContent=t;e.classList.toggle('bad',!!bad);};
