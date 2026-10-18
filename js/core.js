@@ -245,15 +245,31 @@ function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)retur
   if(!e||e.dead){const conn=G.peer.connect('cadcast-pc-'+pc,{serialization:'json',reliable:true});e={conn,q:[],dead:false};PCC.set(pc,e);
     conn.on('open',()=>{e.q.forEach(m=>{try{conn.send(m);}catch(x){}});e.q=[];});conn.on('close',()=>{e.dead=true;});conn.on('error',()=>{e.dead=true;});}
   if(e.conn.open){try{e.conn.send(msg);}catch(x){e.q.push(msg);}}else e.q.push(msg);return true;}
-/* ---------- the class lobby: a fixed relay address (controlroom-lobby-<CLASS_KEY>) that tells any device which
-   room is open right now. The CADCAST computer page puts it in its QR; a phone without a room asks it too. */
-const lobbyId=()=>{const k=String(window.CLASS_KEY||'').toLowerCase().replace(/[^a-z0-9]/g,'');return k?'controlroom-lobby-'+k:'';};
+/* ---------- the class lobby: a relay address named after the TEACHER (controlroom-lobby-<name>) that tells any device
+   which room that teacher has open right now. Student computers (CADCAST/go?t=<name>) ask it, so two teachers teaching
+   at the same time never meet. The host asks the teacher's name once; a phone gets it from the QR (&t=). */
+const teacherKey=n=>String(n||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').slice(0,40);
+const teacherName=()=>store.get('teacher','');
+const lobbyId=()=>{const k=teacherKey(ROLE==='host'?teacherName():QS.get('t'));return k?'controlroom-lobby-'+k:'';};
+const goURL=()=>new URL('../CADCAST/go/?t='+encodeURIComponent(teacherName()).replace(/%20/g,'+'),location.href).href.replace(/^http:\/\/localhost:\d+\//,'https://gunnitynes.github.io/');
+function setTeacher(n){n=String(n||'').replace(/\s+/g,' ').trim().slice(0,40);if(!teacherKey(n))return false;store.set('teacher',n);
+  if(G.lobbyPeer)try{G.lobbyPeer.destroy();}catch(e){}G.lobbyPeer=null;G.lobbyErr=false;startLobby();render();return true;}
+/* asked once when Control Room opens on a computer, changeable in the room panel */
+function askTeacher(){if($('#teachov'))return;const ov=el('div','sheetov');ov.id='teachov';document.body.appendChild(ov);
+  ov.innerHTML=`<form class="sheetcard teachcard" id="teachForm"><span class="lab">Welcome</span><h2>Who’s<br><i>teaching?</i></h2>
+    <p class="shlead">Student computers find <b>your</b> class by your name, so several teachers can run Control Room at the same time.</p>
+    <input id="teachIn" maxlength="40" placeholder="Your name, e.g. Gunnar Tynes" value="${esc(teacherName())}" autocomplete="name">
+    <p class="fine">If a colleague has the same first name, add your last name.</p>
+    <div class="frow"><button class="big go" type="submit">That’s me</button></div></form>`;
+  const f=$('#teachForm');setTimeout(()=>$('#teachIn').focus(),50);
+  f.onsubmit=e=>{e.preventDefault();if(setTeacher($('#teachIn').value))ov.remove();else $('#teachIn').focus();};}
 // the CADCAST patch bay must run in this same browser: it reads the room code and the paired computers from localStorage
 function openMixer(){const w=window.open(new URL('../CADCAST/patch/',location.href).href,'cadcast-patch');if(w)try{w.focus();}catch(e){}else toast('Allow pop-ups for this page to open the mixer');}
 function startLobby(){const id=lobbyId();if(!id||!window.Peer||(G.lobbyPeer&&!G.lobbyPeer.destroyed))return;
   const lp=new Peer(id,{debug:0});G.lobbyPeer=lp;
+  lp.on('open',()=>{if(G.lobbyErr){G.lobbyErr=false;if(G.view==='menu')render();}});
   lp.on('connection',c=>{c.on('data',m=>{if(m&&m.t==='room?')try{c.send({t:'room',code:G.code});}catch(e){}});c.on('error',()=>{});});
-  lp.on('error',e=>{if(e.type==='unavailable-id')setTimeout(()=>{if(G.lobbyPeer===lp){lp.destroy();G.lobbyPeer=null;startLobby();}},20000);});   // another host tab holds it
+  lp.on('error',e=>{if(e.type==='unavailable-id'){if(!G.lobbyErr){G.lobbyErr=true;if(G.view==='menu')render();}}if(e.type==='unavailable-id')setTimeout(()=>{if(G.lobbyPeer===lp){lp.destroy();G.lobbyPeer=null;startLobby();}},20000);});   // another host tab holds it
   lp.on('disconnected',()=>{setTimeout(()=>{if(!lp.destroyed)try{lp.reconnect();}catch(e){}},1500);});}
 async function lobbyRoom(){const id=lobbyId();if(!id)return null;try{await needPeer();}catch(e){return null;}
   return new Promise(res=>{const p=new Peer({debug:0});let done=false;const fin=v=>{if(done)return;done=true;res(v);setTimeout(()=>{try{p.destroy();}catch(e){}},500);};
@@ -377,6 +393,9 @@ function rMenu(st){
   const ps=players(),tot=rankBy('total');
   st.innerHTML=`<div class="menu">
     <aside class="roomp">
+      <div class="teachbox${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">Change</button></div>
+        ${G.lobbyErr?`<p class="tbwarn">Another Control Room is already open as “${esc(teacherName())}” (another tab, or a colleague with the same name). Student computers may find that room instead: add your last name.</p>`:''}
+        <span class="fine">Student computers: <a href="${esc(goURL())}" target="_blank" rel="noopener">${esc(goURL().replace(/^https?:\/\//,''))}</a></span></div>
       <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
         <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
@@ -389,6 +408,7 @@ function rMenu(st){
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
   $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
+  $('#bTeach').onclick=askTeacher;if(!teacherName())setTimeout(askTeacher,300);
   if($('#selCls'))$('#selCls').onchange=e=>{const v=e.target.value;
     if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}
     if(v==='__off'){e.target.value=ATT.cls;if(confirm('Disconnect your Google Sheet in this browser? Students will type their names instead.'))attUse('');return;}

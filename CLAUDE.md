@@ -66,9 +66,11 @@ Phones and the host keep old files otherwise.
   (`clipDB`, `MYCLIPS`; songs use `dec:-1`). They are never uploaded anywhere.
 - Class list + attendance: see `integrations/attendance/README.md`. No sheet is built in: each teacher connects their own
   Apps Script web app on the main menu (`attUrl()`, stored per browser as `att.url`).
+- **Lobby per teacher**: `controlroom-lobby-<teacher name>` (asked once on the host, `teacher` in localStorage; computers use
+  `CADCAST/go/?t=<name>` or type it once; the room panel shows that link and warns on a name clash).
 - **Login = CADCAST first** (sister repo gunnitynes/CADCAST). Each student computer shows
   gunnitynes.github.io/CADCAST/go (a QR card on the desk links there). It asks the **lobby** peer
-  `controlroom-lobby-<CLASS_KEY>` (content.js; the host registers it on open, answers `{t:'room?'}` with the code)
+  `controlroom-lobby-<teacher>` (see above; the host registers it on open, answers `{t:'room?'}` with the code)
   and draws a QR → `?pair=<pc id>&room=<code>` here. The phone scans it, taps its name (the normal join), and once
   joined sends `{t:'pair', id, pc}`; `cadcastPair()` (host) writes `controlroom.cadcast.allow` and tells the computer
   `{t:'paired', name, desk}`; the phone gets `{t:'paired'}` and shows "Your computer is now NAME". One scan signs the
