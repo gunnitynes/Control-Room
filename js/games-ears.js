@@ -217,21 +217,44 @@ game(roundGame(mcSpec({
 })));
 
 /* ---------- PRESET ARCHEOLOGIST ---------- */
+// one clip of a machine: a real recording, or the real TR-808 one-shots played as a groove
+function presetPlay(c){if(c.kit)return play808();const h={inner:null,stopped:false,stop(f){h.stopped=true;if(h.inner)h.inner.stop(f);AU.live.delete(h);}};AU.live.add(h);
+  sampleReady(c.src).then(buf=>{if(!h.stopped)h.inner=playSample(buf,AU.music,{gain:.9,maxDur:12});}).catch(()=>toast('Could not load that recording'));return h;}
 game(roundGame(mcSpec({
   id:'presets',group:'ears',name:'Preset Archeologist',tag:'Dig up a legendary sound. Which machine made it famous?',
-  how:['A classic machine sound plays on the big speakers (recreated live in the browser).','Race to pick the instrument from four on your phone.','The reveal brings the year and the story.'],
+  how:['A real recording of a classic machine plays on the big speakers: drum machines, synths, organs, toys, effects and game chips.','Name the machine, its kind or its decade on your phone, from four.','The reveal brings the year and the story. Every game digs up different machines.'],
   badges:['Scored','Listening','History'],speed:.5,
   icon:`<svg viewBox="0 0 64 64"><rect x="4" y="40" width="56" height="18" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/><rect x="4" y="24" width="56" height="16" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><rect x="18" y="6" width="28" height="22" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><circle cx="27" cy="17" r="4" fill="var(--paper)"/><circle cx="37" cy="17" r="4" fill="var(--red)"/></svg>`,
-  options:[{key:'n',label:'Rounds',choices:[[6,'6'],[8,'8','all of them']],def:8},{key:'secs',label:'Answer time',choices:[[12,'12','seconds'],[20,'20','seconds']],def:20}],
-  note:'Real recordings for the TR-808, TB-303, Juno-60 and Alpha Juno "Hoover" (credits on each reveal, in audio/presets/CREDITS.txt); the TR-909, DX7, Minimoog and Simmons are recreated in the browser. Add your own samples in data/content.js (PRESETS → src).',
+  options:[
+    {key:'types',type:'multi',label:'Questions',choices:[['machine','Which machine?','name it from four'],['kind','What kind of machine?','drum machine, mono synth, organ…'],['decade','Which decade?','when it came out']],def:['machine','kind','decade'],sub:v=>`${v.types.length} of 3`},
+    {key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10'],[12,'12'],[16,'16']],def:10},
+    {key:'secs',label:'Answer time',choices:[[12,'12','seconds'],[20,'20','seconds'],[30,'30','seconds']],def:20}],
+  check:v=>v.types.length?'':'Pick at least one kind of question',
+  get note(){const P=window.PRESETS||[];return `${P.length} machines in ${P.reduce((a,x)=>a+x.clips.length,0)} real recordings (Wikimedia Commons and Freesound, credits on every reveal and in audio/presets/CREDITS.txt). The game plays the machines and clips this browser has heard least first, so every lesson digs somewhere new.`;},
   prepMs:3500,prepLabel:'DIG',prepSub:'listen',
-  prepText:()=>({big:'Listen…',small:'Which machine is this? The answers open in a moment.'}),
+  prepText:r=>({big:'Listen…',small:r&&r.type==='kind'?'What kind of machine is this?':r&&r.type==='decade'?'When did this machine come out?':'Which machine is this? The answers open in a moment.'}),
   secs:o=>o.secs,
-  build:o=>shuffle(PRESETS).slice(0,o.n).map(P=>{const decoys=shuffle([...PRESETS.filter(x=>x!==P).map(x=>x.name),...PRESET_DECOYS]).slice(0,3);const order=shuffle([P.name,...decoys]);return {P,opts:order,c:order.indexOf(P.name)};}),
-  onPrep(r){setAud(playMachine(r.P.id));},leave:stopAud,replay(r){setAud(playMachine(r.P.id));},
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><div class="dig"><span></span><span></span><span></span><b>?</b></div><h2 class="qtext">Which machine is this?</h2>${mcTiles(r,ctx)}</div>`;},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><div class="artifact"><b>${r.P.year}</b><div><h3>${esc(r.P.name)}</h3><p>${esc(r.P.what)} · ${esc(r.P.fact)}</p></div></div>${mcTiles(r,ctx)}
-      <p class="credit">${r.P.credit?'Sound: '+esc(r.P.credit):'Sound: recreated in the browser (no freely licensed original recording available)'}</p></div>`;animateBars(m);},
+  build:o=>{const L=(window.PRESETS||[]).filter(x=>x.clips&&x.clips.length);if(!L.length)return [];
+    const seen=store.get('presets.seen',{}),n=k=>seen[k]||0,used=new Set(),out=[];let deck=[];
+    for(let k=0;k<o.n;k++){if(!deck.length)deck=shuffle(o.types.slice());const type=deck.pop();
+      const pool=L.filter(x=>!used.has(x.id)),src=pool.length?pool:L,min=Math.min(...src.map(x=>n('m'+x.id)));
+      const P=pick(src.filter(x=>n('m'+x.id)===min));used.add(P.id);
+      const cmin=Math.min(...P.clips.map(c=>n(c.src||c.kit))),clip=pick(P.clips.filter(c=>n(c.src||c.kit)===cmin));
+      let right,others;
+      if(type==='kind'){right=P.kind;others=shuffle([...new Set(L.map(x=>x.kind))].filter(x=>x!==right)).slice(0,3);}
+      else if(type==='decade'){const d=Math.floor(P.year/10)*10;right=d+'s';const near=[d-30,d-20,d-10,d+10,d+20].filter(x=>x>=1930&&x<=2000).map(x=>x+'s');others=shuffle(near).slice(0,3);}
+      else{right=P.name;const same=shuffle(L.filter(x=>x!==P&&x.kind===P.kind)).slice(0,1).map(x=>x.name);
+        others=[...same,...shuffle([...L.filter(x=>x!==P&&!same.includes(x.name)).map(x=>x.name),...PRESET_DECOYS])].filter((x,i,a)=>a.indexOf(x)===i).slice(0,3);}
+      const opts=type==='decade'?[right,...others].sort():shuffle([right,...others]);
+      seen['m'+P.id]=n('m'+P.id)+1;seen[clip.src||clip.kit]=n(clip.src||clip.kit)+1;
+      out.push({P,clip,type,opts,c:opts.indexOf(right)});}
+    store.set('presets.seen',seen);out.forEach(r=>{if(r.clip.src)sampleReady(r.clip.src).catch(()=>{});});return out;},
+  roundInfo:r=>({machine:'Which machine',kind:'What kind',decade:'Which decade'})[r.type],
+  onPrep(r){setAud(presetPlay(r.clip));},leave:stopAud,replay(r){setAud(presetPlay(r.clip));},replayLabel:'Dig it up again',
+  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><div class="dig"><span></span><span></span><span></span><b>?</b></div><h2 class="qtext">${({machine:'Which machine is this?',kind:'What kind of machine is this?',decade:'When did this machine come out?'})[r.type]}</h2>${mcTiles(r,ctx)}</div>`;},
+  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><div class="artifact"><b>${r.P.year}</b><div><h3>${esc(r.P.name)}</h3><p><span class="lab">${esc(r.P.kind)}</span> ${esc(r.P.fact)}</p></div></div>${mcTiles(r,ctx)}
+      <p class="credit">Sound: ${esc(r.clip.credit||'')}</p></div>`;animateBars(m);},
+  publicReveal:r=>({c:r.c,info:r.P.name+' · '+r.P.year}),
 })));
 
 /* ---------- METER LAB ----------

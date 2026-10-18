@@ -1,0 +1,1372 @@
+{
+ "audio/presets/minimoog-1.mp3": {
+  "title": "Badass Minimoog bass C4",
+  "who": "Garzul",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/213900/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 10.0,
+  "dur": 10.0
+ },
+ "audio/presets/minimoog-3.mp3": {
+  "title": "Minimoog bass",
+  "who": "Garzul",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/213656/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 6.48,
+  "dur": 6.5
+ },
+ "audio/presets/minimoog-5.mp3": {
+  "title": "minimoog_vibrating_G-4",
+  "who": "Garzul",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/266813/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 5.0,
+  "dur": 5.0
+ },
+ "audio/presets/minimoog-7.mp3": {
+  "title": "MiniMoog16",
+  "who": "gaijinbuzz",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/689109/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 4.99,
+  "dur": 5.0
+ },
+ "audio/presets/juno60-1.mp3": {
+  "title": "JUNO-60 PWM Strings",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJUNO-60_PWM_Strings.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 24.25,
+  "ln": 10.0,
+  "dur": 50.3
+ },
+ "audio/presets/juno60-2.mp3": {
+  "title": "JUNO-60 PWM Strings",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJUNO-60_PWM_Strings.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 6.5,
+  "ln": 10.0,
+  "dur": 50.3
+ },
+ "audio/presets/juno60-3.mp3": {
+  "title": "JUNO-60 Manual PWM",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJUNO-60_Manual_PWM.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 77.25,
+  "ln": 10.0,
+  "dur": 110.7
+ },
+ "audio/presets/juno60-4.mp3": {
+  "title": "JUNO-60 Manual PWM",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJUNO-60_Manual_PWM.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 40.75,
+  "ln": 10.0,
+  "dur": 110.7
+ },
+ "audio/presets/juno60-5.mp3": {
+  "title": "JUNO-60 Resonance Sweep",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJUNO-60_Resonance_Sweep.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 3.0,
+  "ln": 10.0,
+  "dur": 21.0
+ },
+ "audio/presets/jupiter4-1.mp3": {
+  "title": "JP-4 Bass Arpeggio",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJP-4_Bass_Arpeggio.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 167.75,
+  "ln": 10.0,
+  "dur": 233.6
+ },
+ "audio/presets/jupiter4-2.mp3": {
+  "title": "JP-4 Bass Arpeggio",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJP-4_Bass_Arpeggio.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 200.25,
+  "ln": 10.0,
+  "dur": 233.6
+ },
+ "audio/presets/jupiter4-3.mp3": {
+  "title": "JP-4 Bass Arpeggio",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJP-4_Bass_Arpeggio.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 49.5,
+  "ln": 10.0,
+  "dur": 233.6
+ },
+ "audio/presets/jupiter8-1.mp3": {
+  "title": "J8 / Jupiter 8 - Citylights PD - Amin9 chord",
+  "who": "voxlab",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/624728/",
+  "where": "Freesound",
+  "t0": 1.0,
+  "ln": 10.0,
+  "dur": 20.2
+ },
+ "audio/presets/jupiter8-3.mp3": {
+  "title": "Roland_Jupiter-8_Bass_130bpm",
+  "who": "Snapper4298",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/735156/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 7.38,
+  "dur": 7.4
+ },
+ "audio/presets/jupiter8-5.mp3": {
+  "title": "120bpm_Jupiter8_AcidResLoop",
+  "who": "Snapper4298",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/760724/",
+  "where": "Freesound",
+  "t0": 24.5,
+  "ln": 10.0,
+  "dur": 54.0
+ },
+ "audio/presets/jupiter8-6.mp3": {
+  "title": "120bpm_Jupiter8_AcidResLoop",
+  "who": "Snapper4298",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/760724/",
+  "where": "Freesound",
+  "t0": 3.0,
+  "ln": 10.0,
+  "dur": 54.0
+ },
+ "audio/presets/sh101-1.mp3": {
+  "title": "Resonance Sweeps - Roland SH-101 Synthesizer",
+  "who": "freezegelman",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/418381/",
+  "where": "Freesound",
+  "t0": 1.75,
+  "ln": 10.0,
+  "dur": 24.0
+ },
+ "audio/presets/tb303-1.mp3": {
+  "title": "The Sound of Roland TB-303 for Wikipedia",
+  "who": "I speak so quietly",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AThe_Sound_of_Roland_TB-303_for_Wikipedia.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 71.5,
+  "ln": 10.0,
+  "dur": 128.0
+ },
+ "audio/presets/tb303-2.mp3": {
+  "title": "The Sound of Roland TB-303 for Wikipedia",
+  "who": "I speak so quietly",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AThe_Sound_of_Roland_TB-303_for_Wikipedia.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 34.25,
+  "ln": 10.0,
+  "dur": 128.0
+ },
+ "audio/presets/tb303-3.mp3": {
+  "title": "Overdriven TB303 Patterns varying resonance",
+  "who": "Djnebula1",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOverdriven_TB303_Patterns_varying_resonance.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 24.75,
+  "ln": 10.0,
+  "dur": 38.5
+ },
+ "audio/presets/tb303-4.mp3": {
+  "title": "Overdriven TB303 Patterns varying resonance",
+  "who": "Djnebula1",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOverdriven_TB303_Patterns_varying_resonance.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 2.25,
+  "ln": 10.0,
+  "dur": 38.5
+ },
+ "audio/presets/ms20-1.mp3": {
+  "title": "KorgMS20 Scale Sonology Esmuc",
+  "who": "",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AKorgMS20_Scale_Sonology_Esmuc.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 19.75,
+  "ln": 10.0,
+  "dur": 63.8
+ },
+ "audio/presets/ms20-2.mp3": {
+  "title": "KorgMS20 Scale Sonology Esmuc",
+  "who": "",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AKorgMS20_Scale_Sonology_Esmuc.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 3.75,
+  "ln": 10.0,
+  "dur": 63.8
+ },
+ "audio/presets/ms20-3.mp3": {
+  "title": "korg ms 20 baff base",
+  "who": "wildegans",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/161505/",
+  "where": "Freesound",
+  "t0": 3.5,
+  "ln": 10.0,
+  "dur": 43.2
+ },
+ "audio/presets/ms20-5.mp3": {
+  "title": "korg ms 20 baff base",
+  "who": "wildegans",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/161505/",
+  "where": "Freesound",
+  "t0": 3.5,
+  "ln": 10.0,
+  "dur": 43.2
+ },
+ "audio/presets/ms20-6.mp3": {
+  "title": "korg ms 20 baff base",
+  "who": "wildegans",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/161505/",
+  "where": "Freesound",
+  "t0": 28.0,
+  "ln": 10.0,
+  "dur": 43.2
+ },
+ "audio/presets/odyssey-1.mp3": {
+  "title": "ARP Odyssey wind",
+  "who": "eon_polyphonic",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/152317/",
+  "where": "Freesound",
+  "t0": 13.75,
+  "ln": 10.0,
+  "dur": 32.2
+ },
+ "audio/presets/odyssey-3.mp3": {
+  "title": "ARP Odyssey glide",
+  "who": "eon_polyphonic",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/152320/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 5.96,
+  "dur": 6.0
+ },
+ "audio/presets/odyssey-5.mp3": {
+  "title": "ARP Odyssey sawtooth pulse",
+  "who": "eon_polyphonic",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/152321/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 7.92,
+  "dur": 7.9
+ },
+ "audio/presets/odyssey-7.mp3": {
+  "title": "ARP Odyssey",
+  "who": "andreasflorin",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/529674/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 4.8,
+  "dur": 4.8
+ },
+ "audio/presets/arp2600-1.mp3": {
+  "title": "ARP2600 - 1950Computer C",
+  "who": "Paper Jam",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/79100/",
+  "where": "Freesound",
+  "t0": 1.0,
+  "ln": 10.0,
+  "dur": 18.1
+ },
+ "audio/presets/arp2600-3.mp3": {
+  "title": "ARP2600 - CE_Baujolpif",
+  "who": "Paper Jam",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/79102/",
+  "where": "Freesound",
+  "t0": 0.75,
+  "ln": 10.0,
+  "dur": 16.4
+ },
+ "audio/presets/proone-1.mp3": {
+  "title": "Sequential Circuits Pro One - Saw sequencer with filter",
+  "who": "druidbloke",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/167424/",
+  "where": "Freesound",
+  "t0": 37.25,
+  "ln": 10.0,
+  "dur": 52.1
+ },
+ "audio/presets/proone-2.mp3": {
+  "title": "Sequential Circuits Pro One - Saw sequencer with filter",
+  "who": "druidbloke",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/167424/",
+  "where": "Freesound",
+  "t0": 15.5,
+  "ln": 10.0,
+  "dur": 52.1
+ },
+ "audio/presets/proone-3.mp3": {
+  "title": "Pro One Sound Texture 1.1",
+  "who": "allofdrab",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/184952/",
+  "where": "Freesound",
+  "t0": 61.25,
+  "ln": 10.0,
+  "dur": 187.4
+ },
+ "audio/presets/proone-4.mp3": {
+  "title": "Pro One Sound Texture 1.1",
+  "who": "allofdrab",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/184952/",
+  "where": "Freesound",
+  "t0": 96.0,
+  "ln": 10.0,
+  "dur": 187.4
+ },
+ "audio/presets/oberheim-1.mp3": {
+  "title": "Oberheim Panned Voices",
+  "who": "Analogist",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/453056/",
+  "where": "Freesound",
+  "t0": 11.25,
+  "ln": 10.0,
+  "dur": 125.7
+ },
+ "audio/presets/oberheim-2.mp3": {
+  "title": "Oberheim Panned Voices",
+  "who": "Analogist",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/453056/",
+  "where": "Freesound",
+  "t0": 27.25,
+  "ln": 10.0,
+  "dur": 125.7
+ },
+ "audio/presets/oberheim-3.mp3": {
+  "title": "Oberheim Panned Voices",
+  "who": "Analogist",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/453056/",
+  "where": "Freesound",
+  "t0": 71.25,
+  "ln": 10.0,
+  "dur": 125.7
+ },
+ "audio/presets/polysix-1.mp3": {
+  "title": "Polysix chug",
+  "who": "alchemical",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/22385/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 9.69,
+  "dur": 9.7
+ },
+ "audio/presets/polysix-3.mp3": {
+  "title": "Warm Polysix",
+  "who": "Upright",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/242482/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 10.0,
+  "dur": 13.0
+ },
+ "audio/presets/cs15-1.mp3": {
+  "title": "YAMAHA CS15D BASS SAMPLE CHAIN X24",
+  "who": "SONICUPRISING",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/387396/",
+  "where": "Freesound",
+  "t0": 19.75,
+  "ln": 10.0,
+  "dur": 40.0
+ },
+ "audio/presets/cs15-2.mp3": {
+  "title": "YAMAHA CS15D BASS SAMPLE CHAIN X24",
+  "who": "SONICUPRISING",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/387396/",
+  "where": "Freesound",
+  "t0": 2.25,
+  "ln": 10.0,
+  "dur": 40.0
+ },
+ "audio/presets/dx7-1.mp3": {
+  "title": "DX7 SynthWave Chords",
+  "who": "ValentinSosnitskiy",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/554256/",
+  "where": "Freesound",
+  "t0": 12.25,
+  "ln": 10.0,
+  "dur": 46.8
+ },
+ "audio/presets/dx7-2.mp3": {
+  "title": "DX7 SynthWave Chords",
+  "who": "ValentinSosnitskiy",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/554256/",
+  "where": "Freesound",
+  "t0": 28.25,
+  "ln": 10.0,
+  "dur": 46.8
+ },
+ "audio/presets/dx7-3.mp3": {
+  "title": "Korg Volca fm 2 - Demo using Yamaha DX7 presets",
+  "who": "Attosaur",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AKorg_Volca_fm_2_-_Demo_using_Yamaha_DX7_presets.flac",
+  "where": "Wikimedia Commons",
+  "t0": 52.0,
+  "ln": 10.0,
+  "dur": 130.6
+ },
+ "audio/presets/dx7-4.mp3": {
+  "title": "Korg Volca fm 2 - Demo using Yamaha DX7 presets",
+  "who": "Attosaur",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AKorg_Volca_fm_2_-_Demo_using_Yamaha_DX7_presets.flac",
+  "where": "Wikimedia Commons",
+  "t0": 101.5,
+  "ln": 10.0,
+  "dur": 130.6
+ },
+ "audio/presets/d50-1.mp3": {
+  "title": "D-50 Pizzagogo - Patch",
+  "who": "User:W. B. Jaeger",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AD-50_Pizzagogo_-_Patch.wav",
+  "where": "Wikimedia Commons",
+  "t0": 0.75,
+  "ln": 10.0,
+  "dur": 14.2
+ },
+ "audio/presets/m1-1.mp3": {
+  "title": "KorgM1 Sonology Esmuc",
+  "who": "",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AKorgM1_Sonology_Esmuc.flac",
+  "where": "Wikimedia Commons",
+  "t0": 13.0,
+  "ln": 10.0,
+  "dur": 32.3
+ },
+ "audio/presets/m1-3.mp3": {
+  "title": "M1 Classic Organ",
+  "who": "Cloud-10",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/680995/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 2.65,
+  "dur": 2.7
+ },
+ "audio/presets/jx3p-1.mp3": {
+  "title": "Roland jx3p demo",
+  "who": "No machine-readable author provided. Ziggystar assumed (based on copyright claim",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3ARoland_jx3p_demo.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 2.25,
+  "ln": 10.0,
+  "dur": 38.6
+ },
+ "audio/presets/jx3p-2.mp3": {
+  "title": "Roland jx3p demo",
+  "who": "No machine-readable author provided. Ziggystar assumed (based on copyright claim",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3ARoland_jx3p_demo.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 22.5,
+  "ln": 10.0,
+  "dur": 38.6
+ },
+ "audio/presets/jv1080-1.mp3": {
+  "title": "JV-1080 black rain",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJV-1080_black_rain.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 13.5,
+  "ln": 10.0,
+  "dur": 26.4
+ },
+ "audio/presets/jv1080-3.mp3": {
+  "title": "JV-1080 spaced voxx",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJV-1080_spaced_voxx.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 16.5,
+  "ln": 10.0,
+  "dur": 60.5
+ },
+ "audio/presets/jv1080-4.mp3": {
+  "title": "JV-1080 spaced voxx",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJV-1080_spaced_voxx.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 44.0,
+  "ln": 10.0,
+  "dur": 60.5
+ },
+ "audio/presets/jv1080-5.mp3": {
+  "title": "JV-1080 raggertronic",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJV-1080_raggertronic.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 18.25,
+  "ln": 10.0,
+  "dur": 112.6
+ },
+ "audio/presets/jv1080-6.mp3": {
+  "title": "JV-1080 raggertronic",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJV-1080_raggertronic.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 34.25,
+  "ln": 10.0,
+  "dur": 112.6
+ },
+ "audio/presets/solina-1.mp3": {
+  "title": "ARP-Solina Demo Akkords clean+modulated",
+  "who": "MFbay",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3AARP-Solina_Demo_Akkords_clean%2Bmodulated.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 3.25,
+  "ln": 10.0,
+  "dur": 45.2
+ },
+ "audio/presets/solina-2.mp3": {
+  "title": "ARP-Solina Demo Akkords clean+modulated",
+  "who": "MFbay",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3AARP-Solina_Demo_Akkords_clean%2Bmodulated.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 24.75,
+  "ln": 10.0,
+  "dur": 45.2
+ },
+ "audio/presets/solina-3.mp3": {
+  "title": "ARP-Solina ViolaViolinHorn modulated Akkord",
+  "who": "MFbay",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3AARP-Solina_ViolaViolinHorn_modulated_Akkord.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 18.25,
+  "ln": 10.0,
+  "dur": 41.2
+ },
+ "audio/presets/solina-4.mp3": {
+  "title": "ARP-Solina ViolaViolinHorn modulated Akkord",
+  "who": "MFbay",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3AARP-Solina_ViolaViolinHorn_modulated_Akkord.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 2.25,
+  "ln": 10.0,
+  "dur": 41.2
+ },
+ "audio/presets/solina-5.mp3": {
+  "title": "Solina Chords",
+  "who": "Analogist",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/450989/",
+  "where": "Freesound",
+  "t0": 87.5,
+  "ln": 10.0,
+  "dur": 128.0
+ },
+ "audio/presets/polymoog-1.mp3": {
+  "title": "Vox Humana Polymoog",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AVox_Humana_Polymoog.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 3.75,
+  "ln": 10.0,
+  "dur": 61.6
+ },
+ "audio/presets/polymoog-2.mp3": {
+  "title": "Vox Humana Polymoog",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AVox_Humana_Polymoog.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 38.5,
+  "ln": 10.0,
+  "dur": 61.6
+ },
+ "audio/presets/polymoog-3.mp3": {
+  "title": "Vox Humana Polymoog",
+  "who": "Raymangold22",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AVox_Humana_Polymoog.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 19.75,
+  "ln": 10.0,
+  "dur": 61.6
+ },
+ "audio/presets/syntorchestra-1.mp3": {
+  "title": "Syntorchestra Demo",
+  "who": "Jupiter80",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3ASyntorchestra_Demo.wav",
+  "where": "Wikimedia Commons",
+  "t0": 2.0,
+  "ln": 10.0,
+  "dur": 16.0
+ },
+ "audio/presets/mellotron-1.mp3": {
+  "title": "Reverb Cello Mellotron Riff",
+  "who": "f-r-a-g-i-l-e",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/496742/",
+  "where": "Freesound",
+  "t0": 7.75,
+  "ln": 10.0,
+  "dur": 25.3
+ },
+ "audio/presets/mellotron-3.mp3": {
+  "title": "MellotronC",
+  "who": "spaceman102",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/622092/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 5.0,
+  "dur": 5.0
+ },
+ "audio/presets/fairlight-1.mp3": {
+  "title": "Fairlight CMI",
+  "who": "ZoeVixen",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/419058/",
+  "where": "Freesound",
+  "t0": 19.0,
+  "ln": 10.0,
+  "dur": 92.5
+ },
+ "audio/presets/fairlight-2.mp3": {
+  "title": "Fairlight CMI",
+  "who": "ZoeVixen",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/419058/",
+  "where": "Freesound",
+  "t0": 60.5,
+  "ln": 10.0,
+  "dur": 92.5
+ },
+ "audio/presets/fairlight-3.mp3": {
+  "title": "Fairlight CMI",
+  "who": "ZoeVixen",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/419058/",
+  "where": "Freesound",
+  "t0": 44.5,
+  "ln": 10.0,
+  "dur": 92.5
+ },
+ "audio/presets/tr808-1.mp3": {
+  "title": "808patterns 01",
+  "who": "Theofanis Siassios",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3A808patterns_01.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 37.5,
+  "ln": 10.0,
+  "dur": 53.5
+ },
+ "audio/presets/tr808-2.mp3": {
+  "title": "808patterns 01",
+  "who": "Theofanis Siassios",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3A808patterns_01.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 3.0,
+  "ln": 10.0,
+  "dur": 53.5
+ },
+ "audio/presets/tr808-3.mp3": {
+  "title": "808acctrig 01",
+  "who": "Theofanis Siassios",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3A808acctrig_01.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 8.25,
+  "ln": 10.0,
+  "dur": 20.8
+ },
+ "audio/presets/tr909-1.mp3": {
+  "title": "TR-909 House Beat",
+  "who": "Thejames428",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ATR-909_House_Beat.wav",
+  "where": "Wikimedia Commons",
+  "t0": 0.0,
+  "ln": 8.02,
+  "dur": 8.0
+ },
+ "audio/presets/tr909-3.mp3": {
+  "title": "909 house pattern",
+  "who": "Christian Carville",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3A909_house_pattern.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 0.0,
+  "ln": 8.09,
+  "dur": 8.1
+ },
+ "audio/presets/tr909-5.mp3": {
+  "title": "TR-909 sound example",
+  "who": "TBergman",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ATR-909_sound_example.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 1.25,
+  "ln": 10.0,
+  "dur": 16.1
+ },
+ "audio/presets/tr909-7.mp3": {
+  "title": "TR-909",
+  "who": "The original uploader was Sylvain87 at French Wikipedia.",
+  "lic": "CC BY 1.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ATR-909.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 22.0,
+  "ln": 10.0,
+  "dur": 60.2
+ },
+ "audio/presets/tr909-8.mp3": {
+  "title": "TR-909",
+  "who": "The original uploader was Sylvain87 at French Wikipedia.",
+  "lic": "CC BY 1.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ATR-909.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 38.0,
+  "ln": 10.0,
+  "dur": 60.2
+ },
+ "audio/presets/tr707-1.mp3": {
+  "title": "SevenOSeven Dry",
+  "who": "drriquet",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/130028/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 8.0,
+  "dur": 8.0
+ },
+ "audio/presets/tr606-1.mp3": {
+  "title": "TR-606 (Modified) - Series 2 - Beat 10",
+  "who": "vdb4f",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/159052/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 3.56,
+  "dur": 3.6
+ },
+ "audio/presets/cr78-1.mp3": {
+  "title": "CR-78 Presets Rock-1A - Disco-2B",
+  "who": "Wexstun",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACR-78_Presets_Rock-1A_-_Disco-2B.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 51.5,
+  "ln": 10.0,
+  "dur": 104.7
+ },
+ "audio/presets/cr78-2.mp3": {
+  "title": "CR-78 Presets Rock-1A - Disco-2B",
+  "who": "Wexstun",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACR-78_Presets_Rock-1A_-_Disco-2B.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 33.75,
+  "ln": 10.0,
+  "dur": 104.7
+ },
+ "audio/presets/cr78-3.mp3": {
+  "title": "CR-78 Presets Waltz - Rhumba",
+  "who": "Wexstun",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACR-78_Presets_Waltz_-_Rhumba.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 146.75,
+  "ln": 10.0,
+  "dur": 191.4
+ },
+ "audio/presets/cr78-4.mp3": {
+  "title": "CR-78 Presets Waltz - Rhumba",
+  "who": "Wexstun",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACR-78_Presets_Waltz_-_Rhumba.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 92.25,
+  "ln": 10.0,
+  "dur": 191.4
+ },
+ "audio/presets/cr78-5.mp3": {
+  "title": "CR-78 Fills",
+  "who": "Wexstun",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACR-78_Fills.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 1.5,
+  "ln": 10.0,
+  "dur": 28.5
+ },
+ "audio/presets/linndrum-1.mp3": {
+  "title": "Linn Drum Cassette A",
+  "who": "Uberproduktion",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/702852/",
+  "where": "Freesound",
+  "t0": 174.5,
+  "ln": 10.0,
+  "dur": 296.0
+ },
+ "audio/presets/linndrum-2.mp3": {
+  "title": "Linn Drum Cassette A",
+  "who": "Uberproduktion",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/702852/",
+  "where": "Freesound",
+  "t0": 228.75,
+  "ln": 10.0,
+  "dur": 296.0
+ },
+ "audio/presets/linndrum-3.mp3": {
+  "title": "dr_linn 130 dry_20190309 Klang Raum Wort",
+  "who": "KlangRaumWort",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/462950/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 7.4,
+  "dur": 7.4
+ },
+ "audio/presets/mt40-1.mp3": {
+  "title": "Casio MT-40 Drumpattern",
+  "who": "drum pattern: Casio; recording: Maximilian Schönherr",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACasio_MT-40_Drumpattern.mp3",
+  "where": "Wikimedia Commons",
+  "t0": 7.0,
+  "ln": 10.0,
+  "dur": 19.4
+ },
+ "audio/presets/hr16-1.mp3": {
+  "title": "90bpm hr16a bouncing drums pattern",
+  "who": "Garzul",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/213898/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 10.0,
+  "dur": 10.7
+ },
+ "audio/presets/vl1-1.mp3": {
+  "title": "Casio vl1 rock1",
+  "who": "Havelbaude",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACasio_vl1_rock1.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 3.75,
+  "ln": 10.0,
+  "dur": 42.7
+ },
+ "audio/presets/vl1-2.mp3": {
+  "title": "Casio vl1 rock1",
+  "who": "Havelbaude",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACasio_vl1_rock1.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 27.5,
+  "ln": 10.0,
+  "dur": 42.7
+ },
+ "audio/presets/vl1-3.mp3": {
+  "title": "Casio vl1 music",
+  "who": "Havelbaude",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACasio_vl1_music.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 49.75,
+  "ln": 10.0,
+  "dur": 68.0
+ },
+ "audio/presets/vl1-4.mp3": {
+  "title": "Casio vl1 music",
+  "who": "Havelbaude",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ACasio_vl1_music.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 20.75,
+  "ln": 10.0,
+  "dur": 68.0
+ },
+ "audio/presets/sk1-1.mp3": {
+  "title": "SK1 Drum Patterns REEL Remaster 2x",
+  "who": "dualmono",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/510519/",
+  "where": "Freesound",
+  "t0": 3.25,
+  "ln": 10.0,
+  "dur": 37.4
+ },
+ "audio/presets/sk1-2.mp3": {
+  "title": "SK1 Drum Patterns REEL Remaster 2x",
+  "who": "dualmono",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/510519/",
+  "where": "Freesound",
+  "t0": 21.25,
+  "ln": 10.0,
+  "dur": 37.4
+ },
+ "audio/presets/omnichord-1.mp3": {
+  "title": "Omnichord Strummed Sonic Strings",
+  "who": "InDimension",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOmnichord_Strummed_Sonic_Strings.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 2.0,
+  "ln": 10.0,
+  "dur": 18.3
+ },
+ "audio/presets/omnichord-3.mp3": {
+  "title": "Omnichord Chords",
+  "who": "InDimension",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOmnichord_Chords.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 3.0,
+  "ln": 10.0,
+  "dur": 15.9
+ },
+ "audio/presets/omnichord-5.mp3": {
+  "title": "Omnichord Rhythm Pattern Rock 1",
+  "who": "InDimension",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOmnichord_Rhythm_Pattern_Rock_1.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 5.5,
+  "ln": 10.0,
+  "dur": 20.9
+ },
+ "audio/presets/stylophone-1.mp3": {
+  "title": "Notes on a stylophone",
+  "who": "sisterray",
+  "lic": "CC0",
+  "page": "https://commons.wikimedia.org/wiki/File%3ANotes_on_a_stylophone.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 16.5,
+  "ln": 10.0,
+  "dur": 34.1
+ },
+ "audio/presets/stylophone-3.mp3": {
+  "title": "stylophone",
+  "who": "sisterray",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/66366/",
+  "where": "Freesound",
+  "t0": 16.5,
+  "ln": 10.0,
+  "dur": 34.1
+ },
+ "audio/presets/optigan-1.mp3": {
+  "title": "Optigan Drums MG Reel",
+  "who": "makenoisemusic",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/522914/",
+  "where": "Freesound",
+  "t0": 2.0,
+  "ln": 10.0,
+  "dur": 34.1
+ },
+ "audio/presets/optigan-2.mp3": {
+  "title": "Optigan Drums MG Reel",
+  "who": "makenoisemusic",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/522914/",
+  "where": "Freesound",
+  "t0": 19.75,
+  "ln": 10.0,
+  "dur": 34.1
+ },
+ "audio/presets/rhodes-1.mp3": {
+  "title": "rhodes loop 1",
+  "who": "tim.kahn",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/42981/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 10.0,
+  "dur": 13.7
+ },
+ "audio/presets/rhodes-3.mp3": {
+  "title": "Random Rhodes Riff ",
+  "who": "SouthernUK",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/219400/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 6.34,
+  "dur": 6.3
+ },
+ "audio/presets/rhodes-5.mp3": {
+  "title": "C_S Rhodes Mark II G1",
+  "who": "tim.kahn",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/65762/",
+  "where": "Freesound",
+  "t0": 1.5,
+  "ln": 10.0,
+  "dur": 25.6
+ },
+ "audio/presets/wurlitzer-1.mp3": {
+  "title": "Wurlitzer EP200",
+  "who": "Ritchie333",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AWurlitzer_EP200.mp3",
+  "where": "Wikimedia Commons",
+  "t0": 30.5,
+  "ln": 10.0,
+  "dur": 52.1
+ },
+ "audio/presets/wurlitzer-2.mp3": {
+  "title": "Wurlitzer EP200",
+  "who": "Ritchie333",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AWurlitzer_EP200.mp3",
+  "where": "Wikimedia Commons",
+  "t0": 14.5,
+  "ln": 10.0,
+  "dur": 52.1
+ },
+ "audio/presets/wurlitzer-3.mp3": {
+  "title": "I don't beleve (wurlitzer)",
+  "who": "EKVelika",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/411470/",
+  "where": "Freesound",
+  "t0": 27.25,
+  "ln": 10.0,
+  "dur": 56.1
+ },
+ "audio/presets/wurlitzer-4.mp3": {
+  "title": "I don't beleve (wurlitzer)",
+  "who": "EKVelika",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/411470/",
+  "where": "Freesound",
+  "t0": 6.75,
+  "ln": 10.0,
+  "dur": 56.1
+ },
+ "audio/presets/wurlitzer-5.mp3": {
+  "title": "World of Wurli",
+  "who": "FrenchSam",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/516868/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 10.0,
+  "dur": 10.1
+ },
+ "audio/presets/clavinet-1.mp3": {
+  "title": "Hohner Clavinet D6",
+  "who": "Markus Ruffing.",
+  "lic": "Copyrighted free use",
+  "page": "https://commons.wikimedia.org/wiki/File%3AHohner_Clavinet_D6.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 15.25,
+  "ln": 10.0,
+  "dur": 101.0
+ },
+ "audio/presets/clavinet-2.mp3": {
+  "title": "Hohner Clavinet D6",
+  "who": "Markus Ruffing.",
+  "lic": "Copyrighted free use",
+  "page": "https://commons.wikimedia.org/wiki/File%3AHohner_Clavinet_D6.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 59.0,
+  "ln": 10.0,
+  "dur": 101.0
+ },
+ "audio/presets/clavinet-3.mp3": {
+  "title": "Wah clavinet funky",
+  "who": "EKVelika",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/168578/",
+  "where": "Freesound",
+  "t0": 6.5,
+  "ln": 10.0,
+  "dur": 27.0
+ },
+ "audio/presets/hammond-1.mp3": {
+  "title": "Hammond Organ - Model A Medley",
+  "who": "Organgrinder010 (Nathaniel C. Wilcox)",
+  "lic": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AHammond_Organ_-_Model_A_Medley.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 116.75,
+  "ln": 10.0,
+  "dur": 206.6
+ },
+ "audio/presets/hammond-2.mp3": {
+  "title": "Hammond Organ - Model A Medley",
+  "who": "Organgrinder010 (Nathaniel C. Wilcox)",
+  "lic": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AHammond_Organ_-_Model_A_Medley.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 69.75,
+  "ln": 10.0,
+  "dur": 206.6
+ },
+ "audio/presets/hammond-3.mp3": {
+  "title": "LeslieCabinetSlowFastSlow",
+  "who": "",
+  "lic": "Public domain",
+  "page": "https://commons.wikimedia.org/wiki/File%3ALeslieCabinetSlowFastSlow.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 2.0,
+  "ln": 10.0,
+  "dur": 26.5
+ },
+ "audio/presets/hammond-5.mp3": {
+  "title": "Hammond Tonewheel Organ",
+  "who": "MrAuralization",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/158628/",
+  "where": "Freesound",
+  "t0": 1.25,
+  "ln": 10.0,
+  "dur": 23.4
+ },
+ "audio/presets/voxcont-1.mp3": {
+  "title": "Vox Continental",
+  "who": "Ritchie333",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AVox_Continental.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 27.0,
+  "ln": 10.0,
+  "dur": 40.8
+ },
+ "audio/presets/voxcont-2.mp3": {
+  "title": "Vox Continental",
+  "who": "Ritchie333",
+  "lic": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AVox_Continental.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 9.5,
+  "ln": 10.0,
+  "dur": 40.8
+ },
+ "audio/presets/univibe-1.mp3": {
+  "title": "Original Shin-Ei Univibe demo with Stratocaster on clean amp (with spring reverb)",
+  "who": "Fret Junkies",
+  "lic": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOriginal_Shin-Ei_Univibe_demo_with_Stratocaster_on_clean_amp_%28with_spring_reverb%29.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 573.75,
+  "ln": 10.0,
+  "dur": 846.6
+ },
+ "audio/presets/univibe-2.mp3": {
+  "title": "Original Shin-Ei Univibe demo with Stratocaster on clean amp (with spring reverb)",
+  "who": "Fret Junkies",
+  "lic": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOriginal_Shin-Ei_Univibe_demo_with_Stratocaster_on_clean_amp_%28with_spring_reverb%29.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 752.25,
+  "ln": 10.0,
+  "dur": 846.6
+ },
+ "audio/presets/univibe-3.mp3": {
+  "title": "Original Shin-Ei Univibe demo with Stratocaster on clean amp (with spring reverb)",
+  "who": "Fret Junkies",
+  "lic": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AOriginal_Shin-Ei_Univibe_demo_with_Stratocaster_on_clean_amp_%28with_spring_reverb%29.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 441.75,
+  "ln": 10.0,
+  "dur": 846.6
+ },
+ "audio/presets/spaceecho-1.mp3": {
+  "title": "space echo 1",
+  "who": "tim.kahn",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/8626/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 8.72,
+  "dur": 8.7
+ },
+ "audio/presets/spaceecho-3.mp3": {
+  "title": "space echo 2",
+  "who": "tim.kahn",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/8627/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 10.0,
+  "dur": 11.5
+ },
+ "audio/presets/nes-1.mp3": {
+  "title": "Chiptune3",
+  "who": "Joseph.elkhouri",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AChiptune3.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 31.75,
+  "ln": 10.0,
+  "dur": 57.2
+ },
+ "audio/presets/nes-2.mp3": {
+  "title": "Chiptune3",
+  "who": "Joseph.elkhouri",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AChiptune3.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 9.0,
+  "ln": 10.0,
+  "dur": 57.2
+ },
+ "audio/presets/nes-3.mp3": {
+  "title": "NES 80 bpm",
+  "who": "Brotherprovisional",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/32875/",
+  "where": "Freesound",
+  "t0": 33.5,
+  "ln": 10.0,
+  "dur": 51.0
+ },
+ "audio/presets/nes-4.mp3": {
+  "title": "NES 80 bpm",
+  "who": "Brotherprovisional",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/32875/",
+  "where": "Freesound",
+  "t0": 15.5,
+  "ln": 10.0,
+  "dur": 51.0
+ },
+ "audio/presets/nes-5.mp3": {
+  "title": "NES 160 bpm",
+  "who": "Brotherprovisional",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/32874/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 9.38,
+  "dur": 9.4
+ },
+ "audio/presets/atari2600-1.mp3": {
+  "title": "Atari 2600 Synthcart Beat 89.88 bpm",
+  "who": "kev_durr",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/320524/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 10.0,
+  "dur": 10.7
+ },
+ "audio/presets/atari2600-3.mp3": {
+  "title": "Yar's Revenge",
+  "who": "dal_kas",
+  "lic": "CC BY",
+  "page": "https://freesound.org/s/126242/",
+  "where": "Freesound",
+  "t0": 0.0,
+  "ln": 5.15,
+  "dur": 5.2
+ },
+ "audio/presets/alphajuno-1.mp3": {
+  "title": "Juno Hoover What The patch",
+  "who": "Djnebula1",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJuno_Hoover_What_The_patch.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 26.5,
+  "ln": 10.0,
+  "dur": 61.5
+ },
+ "audio/presets/alphajuno-2.mp3": {
+  "title": "Juno Hoover What The patch",
+  "who": "Djnebula1",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJuno_Hoover_What_The_patch.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 9.0,
+  "ln": 10.0,
+  "dur": 61.5
+ },
+ "audio/presets/alphajuno-3.mp3": {
+  "title": "Juno Hoover What The patch",
+  "who": "Djnebula1",
+  "lic": "CC BY-SA 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File%3AJuno_Hoover_What_The_patch.ogg",
+  "where": "Wikimedia Commons",
+  "t0": 43.0,
+  "ln": 10.0,
+  "dur": 61.5
+ },
+ "audio/presets/ms20-4.mp3": {
+  "title": "korg ms 20 baff base",
+  "who": "wildegans",
+  "lic": "CC0",
+  "page": "https://freesound.org/s/161505/",
+  "where": "Freesound",
+  "t0": 28.0,
+  "ln": 10.0,
+  "dur": 43.2
+ }
+}

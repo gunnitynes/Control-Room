@@ -19,6 +19,8 @@ js/audio.js         WebAudio engine: buses, drums (DR), voices (VO), rig/seq seq
 js/assets.js        Constraint Generator files: seeded recipes → MIDI (written byte by byte) or WAV (offline render); also loaded by CADCAST/go
 js/games-brain.js   Know your stuff: The Quiz (+ Studio Vault bank), Shortcut Showdown, Translation Grid
 js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
+                    (Preset Archeologist: 46 machines, real recordings only, question kinds machine / kind / decade,
+                    least-heard first via localStorage presets.seen; build with tools/presets/build.py)
                     (Meter Lab embeds meterlab/index.html?embed: questions in three styles, Hear it / See it / Hear + see;
                     See it shows the question's own figure with P.hide, MLAPI.see()/mute(); the reveal shows the figure with labels)
 js/games-make.js    Make something: Constraint Generator, Genre Cross-Pollinator, Soundabout Roundabout,

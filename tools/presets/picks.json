@@ -1,0 +1,1121 @@
+[
+ {
+  "id": "minimoog",
+  "name": "Moog Minimoog Model D",
+  "year": 1970,
+  "kind": "Analog mono synth",
+  "fact": "Three oscillators into the ladder filter: the fat lead and bass of funk, prog and G-funk.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "213900",
+    "title": "Badass Minimoog bass C4",
+    "url": "https://cdn.freesound.org/previews/213/213900_862453-hq.mp3",
+    "lic": "CC0",
+    "artist": "Garzul"
+   },
+   {
+    "type": "freesound",
+    "id": "213656",
+    "title": "Minimoog bass",
+    "url": "https://cdn.freesound.org/previews/213/213656_862453-hq.mp3",
+    "lic": "CC0",
+    "artist": "Garzul"
+   },
+   {
+    "type": "freesound",
+    "id": "266813",
+    "title": "minimoog_vibrating_G-4.wav",
+    "url": "https://cdn.freesound.org/previews/266/266813_862453-hq.mp3",
+    "lic": "CC0",
+    "artist": "Garzul"
+   },
+   {
+    "type": "freesound",
+    "id": "689109",
+    "title": "MiniMoog16.wav",
+    "url": "https://cdn.freesound.org/previews/689/689109_12855464-hq.mp3",
+    "lic": "CC0",
+    "artist": "gaijinbuzz"
+   }
+  ]
+ },
+ {
+  "id": "juno60",
+  "name": "Roland Juno-60",
+  "year": 1982,
+  "kind": "Analog poly synth",
+  "fact": "One oscillator per voice, pulse-width modulation and that famous chorus.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "JUNO-60 PWM Strings.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/JUNO-60_PWM_Strings.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   },
+   {
+    "type": "commons",
+    "title": "JUNO-60 Manual PWM.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/JUNO-60_Manual_PWM.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   },
+   {
+    "type": "commons",
+    "title": "JUNO-60 Resonance Sweep.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/26/JUNO-60_Resonance_Sweep.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   }
+  ]
+ },
+ {
+  "id": "jupiter4",
+  "name": "Roland Jupiter-4",
+  "year": 1978,
+  "kind": "Analog poly synth",
+  "fact": "Roland’s first polysynth, with a famous random arpeggiator.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "JP-4 Bass Arpeggio.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/04/JP-4_Bass_Arpeggio.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   }
+  ]
+ },
+ {
+  "id": "jupiter8",
+  "name": "Roland Jupiter-8",
+  "year": 1981,
+  "kind": "Analog poly synth",
+  "fact": "Eight voices, two oscillators each: the flagship of 80s synth-pop.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "624728",
+    "title": "J8 / Jupiter 8 - Citylights PD - Amin9 chord",
+    "url": "https://cdn.freesound.org/previews/624/624728_11173586-hq.mp3",
+    "lic": "CC0",
+    "artist": "voxlab"
+   },
+   {
+    "type": "freesound",
+    "id": "735156",
+    "title": "Roland_Jupiter-8_Bass_130bpm",
+    "url": "https://cdn.freesound.org/previews/735/735156_33044-hq.mp3",
+    "lic": "CC BY",
+    "artist": "Snapper4298"
+   },
+   {
+    "type": "freesound",
+    "id": "760724",
+    "title": "120bpm_Jupiter8_AcidResLoop",
+    "url": "https://cdn.freesound.org/previews/760/760724_33044-hq.mp3",
+    "lic": "CC BY",
+    "artist": "Snapper4298"
+   }
+  ]
+ },
+ {
+  "id": "sh101",
+  "name": "Roland SH-101",
+  "year": 1982,
+  "kind": "Analog mono synth",
+  "fact": "A cheap mono synth you could wear like a guitar, now an acid and techno staple.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "418381",
+    "title": "Resonance Sweeps - Roland SH-101 Synthesizer",
+    "url": "https://cdn.freesound.org/previews/418/418381_245603-hq.mp3",
+    "lic": "CC0",
+    "artist": "freezegelman"
+   }
+  ]
+ },
+ {
+  "id": "tb303",
+  "name": "Roland TB-303",
+  "year": 1981,
+  "kind": "Analog mono synth",
+  "fact": "Sold as a bass accompanist, rescued from bargain bins to invent acid house.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "The Sound of Roland TB-303 for Wikipedia.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/The_Sound_of_Roland_TB-303_for_Wikipedia.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": "I speak so quietly"
+   },
+   {
+    "type": "commons",
+    "title": "Overdriven TB303 Patterns varying resonance.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Overdriven_TB303_Patterns_varying_resonance.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Djnebula1"
+   }
+  ]
+ },
+ {
+  "id": "ms20",
+  "name": "Korg MS-20",
+  "year": 1978,
+  "kind": "Analog mono synth",
+  "fact": "Two aggressive filters and a patch panel: the screaming mono synth.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "KorgMS20 Scale Sonology Esmuc.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/KorgMS20_Scale_Sonology_Esmuc.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": ""
+   },
+   {
+    "type": "freesound",
+    "id": "155504",
+    "title": "chiara_korg_ms20_analog_bass_2.wav",
+    "url": "https://cdn.freesound.org/previews/155/155504_964888-hq.mp3",
+    "lic": "CC BY",
+    "artist": "beatmad"
+   },
+   {
+    "type": "freesound",
+    "id": "161505",
+    "title": "korg ms 20 baff base.wav",
+    "url": "https://cdn.freesound.org/previews/161/161505_439611-hq.mp3",
+    "lic": "CC0",
+    "artist": "wildegans"
+   }
+  ],
+  "drop": [
+   "ms20-2.mp3"
+  ]
+ },
+ {
+  "id": "odyssey",
+  "name": "ARP Odyssey",
+  "year": 1972,
+  "kind": "Analog mono synth",
+  "fact": "ARP’s answer to the Minimoog, two oscillators that could play two notes at once.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "152317",
+    "title": "ARP Odyssey wind",
+    "url": "https://cdn.freesound.org/previews/152/152317_2692149-hq.mp3",
+    "lic": "CC0",
+    "artist": "eon_polyphonic"
+   },
+   {
+    "type": "freesound",
+    "id": "152320",
+    "title": "ARP Odyssey glide",
+    "url": "https://cdn.freesound.org/previews/152/152320_2692149-hq.mp3",
+    "lic": "CC0",
+    "artist": "eon_polyphonic"
+   },
+   {
+    "type": "freesound",
+    "id": "152321",
+    "title": "ARP Odyssey sawtooth pulse",
+    "url": "https://cdn.freesound.org/previews/152/152321_2692149-hq.mp3",
+    "lic": "CC0",
+    "artist": "eon_polyphonic"
+   },
+   {
+    "type": "freesound",
+    "id": "529674",
+    "title": "ARP Odyssey.wav",
+    "url": "https://cdn.freesound.org/previews/529/529674_4140201-hq.mp3",
+    "lic": "CC0",
+    "artist": "andreasflorin"
+   }
+  ]
+ },
+ {
+  "id": "arp2600",
+  "name": "ARP 2600",
+  "year": 1971,
+  "kind": "Analog mono synth",
+  "fact": "A semi-modular synth with patch cables, the voice of R2-D2.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "79100",
+    "title": "ARP2600 - 1950Computer C.wav",
+    "url": "https://cdn.freesound.org/previews/79/79100_1223235-hq.mp3",
+    "lic": "CC BY",
+    "artist": "Paper Jam"
+   },
+   {
+    "type": "freesound",
+    "id": "79102",
+    "title": "ARP2600 - CE_Baujolpif.wav",
+    "url": "https://cdn.freesound.org/previews/79/79102_1223235-hq.mp3",
+    "lic": "CC BY",
+    "artist": "Paper Jam"
+   }
+  ]
+ },
+ {
+  "id": "proone",
+  "name": "Sequential Pro-One",
+  "year": 1981,
+  "kind": "Analog mono synth",
+  "fact": "A one-voice Prophet-5 in a small box.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "167424",
+    "title": "Sequential Circuits Pro One - Saw sequencer with filter",
+    "url": "https://cdn.freesound.org/previews/167/167424_331583-hq.mp3",
+    "lic": "CC0",
+    "artist": "druidbloke"
+   },
+   {
+    "type": "freesound",
+    "id": "184952",
+    "title": "Pro One Sound Texture 1.1.wav",
+    "url": "https://cdn.freesound.org/previews/184/184952_7493-hq.mp3",
+    "lic": "CC0",
+    "artist": "allofdrab"
+   }
+  ]
+ },
+ {
+  "id": "oberheim",
+  "name": "Oberheim SEM / polysynths",
+  "year": 1974,
+  "kind": "Analog poly synth",
+  "fact": "Oberheim’s fat, brassy voices powered Van Halen’s Jump and countless film scores.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "453056",
+    "title": "Oberheim Panned Voices.aif",
+    "url": "https://cdn.freesound.org/previews/453/453056_872361-hq.mp3",
+    "lic": "CC0",
+    "artist": "Analogist"
+   }
+  ]
+ },
+ {
+  "id": "polysix",
+  "name": "Korg Polysix",
+  "year": 1981,
+  "kind": "Analog poly synth",
+  "fact": "An affordable six-voice analog poly with a warm ensemble effect.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "22385",
+    "title": "Polysix chug.aif",
+    "url": "https://cdn.freesound.org/previews/22/22385_38848-hq.mp3",
+    "lic": "CC0",
+    "artist": "alchemical"
+   },
+   {
+    "type": "freesound",
+    "id": "242482",
+    "title": "Warm Polysix.wav",
+    "url": "https://cdn.freesound.org/previews/242/242482_321627-hq.mp3",
+    "lic": "CC0",
+    "artist": "Upright"
+   }
+  ]
+ },
+ {
+  "id": "cs15",
+  "name": "Yamaha CS-15",
+  "year": 1979,
+  "kind": "Analog mono synth",
+  "fact": "Two oscillators, two filters: Yamaha’s compact analog mono synth.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "387396",
+    "title": "YAMAHA CS15D BASS SAMPLE CHAIN X24.wav",
+    "url": "https://cdn.freesound.org/previews/387/387396_2397571-hq.mp3",
+    "lic": "CC0",
+    "artist": "SONICUPRISING"
+   }
+  ]
+ },
+ {
+  "id": "dx7",
+  "name": "Yamaha DX7",
+  "year": 1983,
+  "kind": "Digital synth",
+  "fact": "FM synthesis made it the best-selling synth of the 80s: electric pianos, bells and basses.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "554256",
+    "title": "DX7 SynthWave Chords",
+    "url": "https://cdn.freesound.org/previews/554/554256_3908940-hq.mp3",
+    "lic": "CC0",
+    "artist": "ValentinSosnitskiy"
+   },
+   {
+    "type": "commons",
+    "title": "Korg Volca fm 2 - Demo using Yamaha DX7 presets.flac",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Korg_Volca_fm_2_-_Demo_using_Yamaha_DX7_presets.flac",
+    "lic": "CC BY-SA 4.0",
+    "artist": "Attosaur"
+   }
+  ]
+ },
+ {
+  "id": "d50",
+  "name": "Roland D-50",
+  "year": 1987,
+  "kind": "Digital synth",
+  "fact": "Short sampled attacks glued to synth tones: the sound of late-80s pop.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "D-50 Pizzagogo - Patch.wav",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/D-50_Pizzagogo_-_Patch.wav",
+    "lic": "CC0",
+    "artist": "User:W. B. Jaeger"
+   }
+  ]
+ },
+ {
+  "id": "m1",
+  "name": "Korg M1",
+  "year": 1988,
+  "kind": "Digital synth",
+  "fact": "The best-selling workstation ever: its organ and piano presets are all over 90s house.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "KorgM1 Sonology Esmuc.flac",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/KorgM1_Sonology_Esmuc.flac",
+    "lic": "CC BY-SA 4.0",
+    "artist": ""
+   },
+   {
+    "type": "freesound",
+    "id": "680995",
+    "title": "M1 Classic Organ",
+    "url": "https://cdn.freesound.org/previews/680/680995_10403690-hq.mp3",
+    "lic": "CC0",
+    "artist": "Cloud-10"
+   }
+  ]
+ },
+ {
+  "id": "jx3p",
+  "name": "Roland JX-3P",
+  "year": 1983,
+  "kind": "Analog poly synth",
+  "fact": "One of the first synths with MIDI, a bright little analog poly.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Roland jx3p demo.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Roland_jx3p_demo.ogg",
+    "lic": "Public domain",
+    "artist": "No machine-readable author provided. Ziggystar assumed (based on copyright claim"
+   }
+  ]
+ },
+ {
+  "id": "jv1080",
+  "name": "Roland JV-1080",
+  "year": 1994,
+  "kind": "Digital synth",
+  "fact": "A rack of ROM samples and effects: the soundtrack of 90s studios and games.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "JV-1080 black rain.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/JV-1080_black_rain.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   },
+   {
+    "type": "commons",
+    "title": "JV-1080 spaced voxx.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/74/JV-1080_spaced_voxx.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   },
+   {
+    "type": "commons",
+    "title": "JV-1080 raggertronic.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/JV-1080_raggertronic.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   }
+  ]
+ },
+ {
+  "id": "solina",
+  "name": "ARP Solina String Ensemble",
+  "year": 1974,
+  "kind": "String machine",
+  "fact": "A string machine: one buzzy tone plus a lush chorus, all over 70s disco and Pink Floyd.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "ARP-Solina Demo Akkords clean+modulated.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0d/ARP-Solina_Demo_Akkords_clean%2Bmodulated.ogg",
+    "lic": "Public domain",
+    "artist": "MFbay"
+   },
+   {
+    "type": "commons",
+    "title": "ARP-Solina ViolaViolinHorn modulated Akkord.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/ARP-Solina_ViolaViolinHorn_modulated_Akkord.ogg",
+    "lic": "Public domain",
+    "artist": "MFbay"
+   },
+   {
+    "type": "freesound",
+    "id": "450989",
+    "title": "Solina Chords.aif",
+    "url": "https://cdn.freesound.org/previews/450/450989_872361-hq.mp3",
+    "lic": "CC0",
+    "artist": "Analogist"
+   }
+  ]
+ },
+ {
+  "id": "polymoog",
+  "name": "Moog Polymoog",
+  "year": 1975,
+  "kind": "Analog poly synth",
+  "fact": "Moog’s first polyphonic synth: its Vox Humana preset is Gary Numan’s Cars.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Vox Humana Polymoog.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Vox_Humana_Polymoog.ogg",
+    "lic": "CC0",
+    "artist": "Raymangold22"
+   }
+  ]
+ },
+ {
+  "id": "syntorchestra",
+  "name": "Farfisa Syntorchestra",
+  "year": 1975,
+  "kind": "String machine",
+  "fact": "An Italian string-and-synth keyboard from the string-machine era.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Syntorchestra Demo.wav",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Syntorchestra_Demo.wav",
+    "lic": "Public domain",
+    "artist": "Jupiter80"
+   }
+  ]
+ },
+ {
+  "id": "mellotron",
+  "name": "Mellotron",
+  "year": 1963,
+  "kind": "Sampler / tape keyboard",
+  "fact": "Each key starts a strip of tape with a real recording: the flutes of Strawberry Fields.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "496742",
+    "title": "Reverb Cello Mellotron Riff",
+    "url": "https://cdn.freesound.org/previews/496/496742_8466114-hq.mp3",
+    "lic": "CC0",
+    "artist": "f-r-a-g-i-l-e"
+   },
+   {
+    "type": "freesound",
+    "id": "622092",
+    "title": "MellotronC.mp3",
+    "url": "https://cdn.freesound.org/previews/622/622092_931745-hq.mp3",
+    "lic": "CC0",
+    "artist": "spaceman102"
+   }
+  ]
+ },
+ {
+  "id": "fairlight",
+  "name": "Fairlight CMI",
+  "year": 1979,
+  "kind": "Sampler / tape keyboard",
+  "fact": "The first famous sampler, with a light pen: the orchestra hit of the 80s.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "419058",
+    "title": "Fairlight CMI.wav",
+    "url": "https://cdn.freesound.org/previews/419/419058_8286949-hq.mp3",
+    "lic": "CC0",
+    "artist": "ZoeVixen"
+   }
+  ]
+ },
+ {
+  "id": "tr808",
+  "name": "Roland TR-808",
+  "year": 1980,
+  "kind": "Drum machine",
+  "fact": "Its booming kick and cowbell flopped at first, then built hip-hop, Miami bass and trap.",
+  "sources": [
+   {
+    "type": "kit",
+    "kit": "tr808"
+   },
+   {
+    "type": "commons",
+    "title": "808patterns 01.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/808patterns_01.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Theofanis Siassios"
+   },
+   {
+    "type": "commons",
+    "title": "808acctrig 01.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/808acctrig_01.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Theofanis Siassios"
+   }
+  ]
+ },
+ {
+  "id": "tr909",
+  "name": "Roland TR-909",
+  "year": 1983,
+  "kind": "Drum machine",
+  "fact": "Analog kick, sampled hats: the drum machine of house and techno.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "TR-909 House Beat.wav",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/TR-909_House_Beat.wav",
+    "lic": "CC BY-SA 4.0",
+    "artist": "Thejames428"
+   },
+   {
+    "type": "commons",
+    "title": "909 house pattern.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/909_house_pattern.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": "Christian Carville"
+   },
+   {
+    "type": "commons",
+    "title": "TR-909 sound example.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/TR-909_sound_example.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "TBergman"
+   },
+   {
+    "type": "commons",
+    "title": "TR-909.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/TR-909.ogg",
+    "lic": "CC BY 1.0",
+    "artist": "The original uploader was Sylvain87 at French Wikipedia."
+   }
+  ]
+ },
+ {
+  "id": "tr707",
+  "name": "Roland TR-707",
+  "year": 1985,
+  "kind": "Drum machine",
+  "fact": "All-sampled drums with chunky buttons: Chicago house and freestyle.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "130028",
+    "title": "SevenOSeven Dry.wav",
+    "url": "https://cdn.freesound.org/previews/130/130028_615581-hq.mp3",
+    "lic": "CC0",
+    "artist": "drriquet"
+   }
+  ]
+ },
+ {
+  "id": "tr606",
+  "name": "Roland TR-606",
+  "year": 1981,
+  "kind": "Drum machine",
+  "fact": "The TB-303’s little sister for drums: tight, ticky and dry.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "159052",
+    "title": "TR-606 (Modified) - Series 2 - Beat 10.wav",
+    "url": "https://cdn.freesound.org/previews/159/159052_2872594-hq.mp3",
+    "lic": "CC0",
+    "artist": "vdb4f"
+   }
+  ]
+ },
+ {
+  "id": "cr78",
+  "name": "Roland CR-78",
+  "year": 1978,
+  "kind": "Drum machine",
+  "fact": "A preset rhythm box you could program: Blondie’s Heart of Glass and Phil Collins.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "CR-78 Presets Rock-1A - Disco-2B.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/CR-78_Presets_Rock-1A_-_Disco-2B.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Wexstun"
+   },
+   {
+    "type": "commons",
+    "title": "CR-78 Presets Waltz - Rhumba.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/76/CR-78_Presets_Waltz_-_Rhumba.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Wexstun"
+   },
+   {
+    "type": "commons",
+    "title": "CR-78 Fills.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/CR-78_Fills.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Wexstun"
+   },
+   {
+    "type": "freesound",
+    "id": "19059",
+    "title": "CR78Beat1_LC_120bpm.wav",
+    "url": "https://cdn.freesound.org/previews/19/19059_34300-hq.mp3",
+    "lic": "CC0",
+    "artist": "aikighost"
+   }
+  ],
+  "drop": [
+   "cr78-4.mp3",
+   "cr78-5.mp3"
+  ]
+ },
+ {
+  "id": "linndrum",
+  "name": "LinnDrum",
+  "year": 1982,
+  "kind": "Drum machine",
+  "fact": "Real recorded drums in a box: Prince, the 80s snare and every synth-pop hit.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "702852",
+    "title": "Linn Drum Cassette A.flac",
+    "url": "https://cdn.freesound.org/previews/702/702852_3677139-hq.mp3",
+    "lic": "CC0",
+    "artist": "Uberproduktion"
+   },
+   {
+    "type": "freesound",
+    "id": "462950",
+    "title": "dr_linn 130 dry_20190309 Klang Raum Wort.wav",
+    "url": "https://cdn.freesound.org/previews/462/462950_9699315-hq.mp3",
+    "lic": "CC0",
+    "artist": "KlangRaumWort"
+   }
+  ]
+ },
+ {
+  "id": "mt40",
+  "name": "Casio MT-40",
+  "year": 1981,
+  "kind": "Home keyboard / toy",
+  "fact": "A toy keyboard whose rock preset became Jamaica’s Sleng Teng riddim in 1985.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Casio MT-40 Drumpattern.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Casio_MT-40_Drumpattern.mp3",
+    "lic": "Public domain",
+    "artist": "drum pattern: Casio; recording: Maximilian Schönherr"
+   }
+  ]
+ },
+ {
+  "id": "hr16",
+  "name": "Alesis HR-16",
+  "year": 1987,
+  "kind": "Drum machine",
+  "fact": "A cheap 16-bit drum machine full of real drum samples.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "213898",
+    "title": "90bpm hr16a bouncing drums pattern",
+    "url": "https://cdn.freesound.org/previews/213/213898_862453-hq.mp3",
+    "lic": "CC0",
+    "artist": "Garzul"
+   }
+  ]
+ },
+ {
+  "id": "vl1",
+  "name": "Casio VL-1 (VL-Tone)",
+  "year": 1979,
+  "kind": "Home keyboard / toy",
+  "fact": "A calculator with a keyboard: the beat of Trio’s Da Da Da.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Casio vl1 rock1.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Casio_vl1_rock1.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": "Havelbaude"
+   },
+   {
+    "type": "commons",
+    "title": "Casio vl1 music.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Casio_vl1_music.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Havelbaude"
+   }
+  ]
+ },
+ {
+  "id": "sk1",
+  "name": "Casio SK-1",
+  "year": 1985,
+  "kind": "Home keyboard / toy",
+  "fact": "A toy keyboard that could sample: hip-hop producers loved it.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "510519",
+    "title": "SK1 Drum Patterns REEL Remaster 2x",
+    "url": "https://cdn.freesound.org/previews/510/510519_8514599-hq.mp3",
+    "lic": "CC0",
+    "artist": "dualmono"
+   }
+  ]
+ },
+ {
+  "id": "omnichord",
+  "name": "Suzuki Omnichord",
+  "year": 1981,
+  "kind": "Home keyboard / toy",
+  "fact": "Press a chord button, stroke the strum plate: an electronic autoharp.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Omnichord Strummed Sonic Strings.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Omnichord_Strummed_Sonic_Strings.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": "InDimension"
+   },
+   {
+    "type": "commons",
+    "title": "Omnichord Chords.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Omnichord_Chords.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": "InDimension"
+   },
+   {
+    "type": "commons",
+    "title": "Omnichord Rhythm Pattern Rock 1.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Omnichord_Rhythm_Pattern_Rock_1.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": "InDimension"
+   }
+  ]
+ },
+ {
+  "id": "stylophone",
+  "name": "Stylophone",
+  "year": 1967,
+  "kind": "Home keyboard / toy",
+  "fact": "Touch a metal keyboard with a stylus: Bowie used it on Space Oddity.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Notes on a stylophone.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Notes_on_a_stylophone.ogg",
+    "lic": "CC0",
+    "artist": "sisterray"
+   },
+   {
+    "type": "freesound",
+    "id": "66366",
+    "title": "stylophone.mp3",
+    "url": "https://cdn.freesound.org/previews/66/66366_913882-hq.mp3",
+    "lic": "CC0",
+    "artist": "sisterray"
+   }
+  ]
+ },
+ {
+  "id": "optigan",
+  "name": "Optigan",
+  "year": 1971,
+  "kind": "Home keyboard / toy",
+  "fact": "An organ that played optical discs like film soundtracks.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "522914",
+    "title": "Optigan Drums MG Reel.wav",
+    "url": "https://cdn.freesound.org/previews/522/522914_7700251-hq.mp3",
+    "lic": "CC0",
+    "artist": "makenoisemusic"
+   }
+  ]
+ },
+ {
+  "id": "rhodes",
+  "name": "Fender Rhodes",
+  "year": 1965,
+  "kind": "Electric piano / organ",
+  "fact": "Hammers hit metal tines: the bell-like electric piano of soul and jazz fusion.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "42981",
+    "title": "rhodes loop 1.aif",
+    "url": "https://cdn.freesound.org/previews/42/42981_7037-hq.mp3",
+    "lic": "CC BY",
+    "artist": "tim.kahn"
+   },
+   {
+    "type": "freesound",
+    "id": "219400",
+    "title": "Random Rhodes Riff ",
+    "url": "https://cdn.freesound.org/previews/219/219400_1166831-hq.mp3",
+    "lic": "CC BY",
+    "artist": "SouthernUK"
+   },
+   {
+    "type": "freesound",
+    "id": "65762",
+    "title": "C_S Rhodes Mark II G1.aif",
+    "url": "https://cdn.freesound.org/previews/65/65762_7037-hq.mp3",
+    "lic": "CC BY",
+    "artist": "tim.kahn"
+   }
+  ]
+ },
+ {
+  "id": "wurlitzer",
+  "name": "Wurlitzer electric piano",
+  "year": 1955,
+  "kind": "Electric piano / organ",
+  "fact": "Hammers hit steel reeds: grittier than a Rhodes, Ray Charles’ What’d I Say.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Wurlitzer EP200.mp3",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/66/Wurlitzer_EP200.mp3",
+    "lic": "CC BY-SA 4.0",
+    "artist": "Ritchie333"
+   },
+   {
+    "type": "freesound",
+    "id": "411470",
+    "title": "I don't beleve (wurlitzer)",
+    "url": "https://cdn.freesound.org/previews/411/411470_1137749-hq.mp3",
+    "lic": "CC0",
+    "artist": "EKVelika"
+   },
+   {
+    "type": "freesound",
+    "id": "516868",
+    "title": "World of Wurli",
+    "url": "https://cdn.freesound.org/previews/516/516868_1983047-hq.mp3",
+    "lic": "CC0",
+    "artist": "FrenchSam"
+   }
+  ]
+ },
+ {
+  "id": "clavinet",
+  "name": "Hohner Clavinet",
+  "year": 1964,
+  "kind": "Electric piano / organ",
+  "fact": "Rubber pads hit strings: the funky clavinet of Stevie Wonder’s Superstition.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Hohner Clavinet D6.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Hohner_Clavinet_D6.ogg",
+    "lic": "Copyrighted free use",
+    "artist": "Markus Ruffing."
+   },
+   {
+    "type": "freesound",
+    "id": "168578",
+    "title": "Wah clavinet funky",
+    "url": "https://cdn.freesound.org/previews/168/168578_1137749-hq.mp3",
+    "lic": "CC0",
+    "artist": "EKVelika"
+   }
+  ]
+ },
+ {
+  "id": "hammond",
+  "name": "Hammond organ + Leslie",
+  "year": 1935,
+  "kind": "Electric piano / organ",
+  "fact": "Spinning tonewheels into a rotating speaker: gospel, soul and rock organ.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Hammond Organ - Model A Medley.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Hammond_Organ_-_Model_A_Medley.ogg",
+    "lic": "CC BY 3.0",
+    "artist": "Organgrinder010 (Nathaniel C. Wilcox)"
+   },
+   {
+    "type": "commons",
+    "title": "LeslieCabinetSlowFastSlow.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/LeslieCabinetSlowFastSlow.ogg",
+    "lic": "Public domain",
+    "artist": ""
+   },
+   {
+    "type": "freesound",
+    "id": "158628",
+    "title": "Hammond Tonewheel Organ",
+    "url": "https://cdn.freesound.org/previews/158/158628_2843367-hq.mp3",
+    "lic": "CC BY",
+    "artist": "MrAuralization"
+   }
+  ]
+ },
+ {
+  "id": "voxcont",
+  "name": "Vox Continental",
+  "year": 1962,
+  "kind": "Electric piano / organ",
+  "fact": "A bright combo organ in a red-and-black case: 60s garage rock.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Vox Continental.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Vox_Continental.ogg",
+    "lic": "CC BY-SA 4.0",
+    "artist": "Ritchie333"
+   }
+  ]
+ },
+ {
+  "id": "univibe",
+  "name": "Shin-Ei Uni-Vibe",
+  "year": 1968,
+  "kind": "Effect unit",
+  "fact": "A guitar pedal built to imitate a rotating speaker: Jimi Hendrix at Woodstock.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Original Shin-Ei Univibe demo with Stratocaster on clean amp (with spring reverb).ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Original_Shin-Ei_Univibe_demo_with_Stratocaster_on_clean_amp_%28with_spring_reverb%29.ogg",
+    "lic": "CC BY 3.0",
+    "artist": "Fret Junkies"
+   }
+  ]
+ },
+ {
+  "id": "spaceecho",
+  "name": "Roland Space Echo",
+  "year": 1974,
+  "kind": "Effect unit",
+  "fact": "A tape loop with several playback heads: the echo of dub reggae.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "8626",
+    "title": "space echo 1.aif",
+    "url": "https://cdn.freesound.org/previews/8/8626_7037-hq.mp3",
+    "lic": "CC BY",
+    "artist": "tim.kahn"
+   },
+   {
+    "type": "freesound",
+    "id": "8627",
+    "title": "space echo 2.aif",
+    "url": "https://cdn.freesound.org/previews/8/8627_7037-hq.mp3",
+    "lic": "CC BY",
+    "artist": "tim.kahn"
+   }
+  ]
+ },
+ {
+  "id": "nes",
+  "name": "Nintendo NES sound chip",
+  "year": 1983,
+  "kind": "Video-game sound chip",
+  "fact": "Two pulse waves, a triangle and noise: the sound of Super Mario.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Chiptune3.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Chiptune3.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Joseph.elkhouri"
+   },
+   {
+    "type": "freesound",
+    "id": "32875",
+    "title": "NES 80 bpm.WAV",
+    "url": "https://cdn.freesound.org/previews/32/32875_229160-hq.mp3",
+    "lic": "CC BY",
+    "artist": "Brotherprovisional"
+   },
+   {
+    "type": "freesound",
+    "id": "32874",
+    "title": "NES 160 bpm.WAV",
+    "url": "https://cdn.freesound.org/previews/32/32874_229160-hq.mp3",
+    "lic": "CC BY",
+    "artist": "Brotherprovisional"
+   }
+  ]
+ },
+ {
+  "id": "atari2600",
+  "name": "Atari 2600 sound chip",
+  "year": 1977,
+  "kind": "Video-game sound chip",
+  "fact": "A chip that could barely play in tune: crunchy early video-game sound.",
+  "sources": [
+   {
+    "type": "freesound",
+    "id": "320524",
+    "title": "Atari 2600 Synthcart Beat 89.88 bpm",
+    "url": "https://cdn.freesound.org/previews/320/320524_5415774-hq.mp3",
+    "lic": "CC BY",
+    "artist": "kev_durr"
+   },
+   {
+    "type": "freesound",
+    "id": "126242",
+    "title": "Yar's Revenge.wav",
+    "url": "https://cdn.freesound.org/previews/126/126242_2108068-hq.mp3",
+    "lic": "CC BY",
+    "artist": "dal_kas"
+   }
+  ]
+ },
+ {
+  "id": "alphajuno",
+  "name": "Roland Alpha Juno",
+  "year": 1985,
+  "kind": "Analog poly synth",
+  "fact": "Its “What the” patch became the Hoover sound of early-90s rave.",
+  "sources": [
+   {
+    "type": "commons",
+    "title": "Juno Hoover What The patch.ogg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Juno_Hoover_What_The_patch.ogg",
+    "lic": "CC BY-SA 3.0",
+    "artist": "Djnebula1"
+   }
+  ]
+ }
+]

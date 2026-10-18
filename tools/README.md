@@ -21,4 +21,6 @@ Rules that matter:
 - Commons rate-limits hard (HTTP 429). `commons.py` sleeps between requests; run one script at a time.
 - Bump the `?v=N` cache-buster in index.html after changing data/content.js.
 
-Preset Archeologist samples (`audio/presets/`) were cut by hand; their sources are listed in `audio/presets/CREDITS.txt`.
+| `python3 tools/presets/build.py` | Preset Archeologist: `audio/presets/<machine>-<n>.mp3` from `tools/presets/picks.json` (Wikimedia Commons + Freesound CC0/CC BY recordings of each machine), CREDITS.txt, `window.PRESETS`. Same incremental scheme as the Atlas (`built.json`, `drop`). |
+
+Freesound search pages can be read without an account; a sound's preview is `cdn.freesound.org/previews/…-hq.mp3`. Only use sounds whose title names the machine, and CC0 / CC BY only.

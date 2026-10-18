@@ -1,19 +1,937 @@
 Preset Archeologist — sound credits
+Every clip is a short, level-matched excerpt (adapted: trimmed) of a real recording of the machine.
+CC BY / CC BY-SA works are credited as their licences require and shared under the same licence.
 
-808-*.wav   Roland TR-808 one-shots sampled directly from a TR-808 by Michael Fischer (Technopolis).
-            Distributed as a free sample set ("ABSOLUTELY FREE!"), via machines.hyperreal.org /
-            the npm package @fluid-music/tr-808. Files: BD5075, CP, CB, CH, OH25.
+808-*.wav   Roland TR-808 one-shots sampled directly from a TR-808 by Michael Fischer (Technopolis), free sample set
+            ("ABSOLUTELY FREE!"), via machines.hyperreal.org / the npm package @fluid-music/tr-808.
 
-tb303.mp3   Excerpt (54–64 s) of "The Sound of Roland TB-303 for Wikipedia" by I speak so quietly.
-            https://commons.wikimedia.org/wiki/File:The_Sound_of_Roland_TB-303_for_Wikipedia.ogg
-            Licence: CC BY-SA 4.0 — https://creativecommons.org/licenses/by-sa/4.0/
-            Changes: trimmed, faded, loudness-normalised, re-encoded to MP3. This excerpt is shared under CC BY-SA 4.0.
+audio/presets/minimoog-1.mp3
+  Badass Minimoog bass C4
+  Author: Garzul
+  Licence: CC0
+  Source: https://freesound.org/s/213900/
+  Excerpt: 10.0 s from 0.0 s of 10.0 s
 
-juno60.mp3  Excerpt (0–9 s) of "JUNO-60 PWM Strings" by Raymangold22.
-            https://commons.wikimedia.org/wiki/File:JUNO-60_PWM_Strings.ogg
-            Licence: CC0 1.0 (public domain dedication).
+audio/presets/minimoog-3.mp3
+  Minimoog bass
+  Author: Garzul
+  Licence: CC0
+  Source: https://freesound.org/s/213656/
+  Excerpt: 6.48 s from 0.0 s of 6.5 s
 
-hoover.mp3  Excerpt (9.5–18.5 s) of "Juno Hoover What The patch" by Djnebula1.
-            https://commons.wikimedia.org/wiki/File:Juno_Hoover_What_The_patch.ogg
-            Licence: CC BY-SA 3.0 — https://creativecommons.org/licenses/by-sa/3.0/
-            Changes: trimmed, faded, loudness-normalised, re-encoded to MP3. This excerpt is shared under CC BY-SA 3.0.
+audio/presets/minimoog-5.mp3
+  minimoog_vibrating_G-4
+  Author: Garzul
+  Licence: CC0
+  Source: https://freesound.org/s/266813/
+  Excerpt: 5.0 s from 0.0 s of 5.0 s
+
+audio/presets/minimoog-7.mp3
+  MiniMoog16
+  Author: gaijinbuzz
+  Licence: CC0
+  Source: https://freesound.org/s/689109/
+  Excerpt: 4.99 s from 0.0 s of 5.0 s
+
+audio/presets/juno60-1.mp3
+  JUNO-60 PWM Strings
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJUNO-60_PWM_Strings.ogg
+  Excerpt: 10.0 s from 24.25 s of 50.3 s
+
+audio/presets/juno60-2.mp3
+  JUNO-60 PWM Strings
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJUNO-60_PWM_Strings.ogg
+  Excerpt: 10.0 s from 6.5 s of 50.3 s
+
+audio/presets/juno60-3.mp3
+  JUNO-60 Manual PWM
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJUNO-60_Manual_PWM.ogg
+  Excerpt: 10.0 s from 77.25 s of 110.7 s
+
+audio/presets/juno60-4.mp3
+  JUNO-60 Manual PWM
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJUNO-60_Manual_PWM.ogg
+  Excerpt: 10.0 s from 40.75 s of 110.7 s
+
+audio/presets/juno60-5.mp3
+  JUNO-60 Resonance Sweep
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJUNO-60_Resonance_Sweep.ogg
+  Excerpt: 10.0 s from 3.0 s of 21.0 s
+
+audio/presets/jupiter4-1.mp3
+  JP-4 Bass Arpeggio
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJP-4_Bass_Arpeggio.ogg
+  Excerpt: 10.0 s from 167.75 s of 233.6 s
+
+audio/presets/jupiter4-2.mp3
+  JP-4 Bass Arpeggio
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJP-4_Bass_Arpeggio.ogg
+  Excerpt: 10.0 s from 200.25 s of 233.6 s
+
+audio/presets/jupiter4-3.mp3
+  JP-4 Bass Arpeggio
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJP-4_Bass_Arpeggio.ogg
+  Excerpt: 10.0 s from 49.5 s of 233.6 s
+
+audio/presets/jupiter8-1.mp3
+  J8 / Jupiter 8 - Citylights PD - Amin9 chord
+  Author: voxlab
+  Licence: CC0
+  Source: https://freesound.org/s/624728/
+  Excerpt: 10.0 s from 1.0 s of 20.2 s
+
+audio/presets/jupiter8-3.mp3
+  Roland_Jupiter-8_Bass_130bpm
+  Author: Snapper4298
+  Licence: CC BY
+  Source: https://freesound.org/s/735156/
+  Excerpt: 7.38 s from 0.0 s of 7.4 s
+
+audio/presets/jupiter8-5.mp3
+  120bpm_Jupiter8_AcidResLoop
+  Author: Snapper4298
+  Licence: CC BY
+  Source: https://freesound.org/s/760724/
+  Excerpt: 10.0 s from 24.5 s of 54.0 s
+
+audio/presets/jupiter8-6.mp3
+  120bpm_Jupiter8_AcidResLoop
+  Author: Snapper4298
+  Licence: CC BY
+  Source: https://freesound.org/s/760724/
+  Excerpt: 10.0 s from 3.0 s of 54.0 s
+
+audio/presets/sh101-1.mp3
+  Resonance Sweeps - Roland SH-101 Synthesizer
+  Author: freezegelman
+  Licence: CC0
+  Source: https://freesound.org/s/418381/
+  Excerpt: 10.0 s from 1.75 s of 24.0 s
+
+audio/presets/tb303-1.mp3
+  The Sound of Roland TB-303 for Wikipedia
+  Author: I speak so quietly
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AThe_Sound_of_Roland_TB-303_for_Wikipedia.ogg
+  Excerpt: 10.0 s from 71.5 s of 128.0 s
+
+audio/presets/tb303-2.mp3
+  The Sound of Roland TB-303 for Wikipedia
+  Author: I speak so quietly
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AThe_Sound_of_Roland_TB-303_for_Wikipedia.ogg
+  Excerpt: 10.0 s from 34.25 s of 128.0 s
+
+audio/presets/tb303-3.mp3
+  Overdriven TB303 Patterns varying resonance
+  Author: Djnebula1
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOverdriven_TB303_Patterns_varying_resonance.ogg
+  Excerpt: 10.0 s from 24.75 s of 38.5 s
+
+audio/presets/tb303-4.mp3
+  Overdriven TB303 Patterns varying resonance
+  Author: Djnebula1
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOverdriven_TB303_Patterns_varying_resonance.ogg
+  Excerpt: 10.0 s from 2.25 s of 38.5 s
+
+audio/presets/ms20-1.mp3
+  KorgMS20 Scale Sonology Esmuc
+  Author: unknown
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AKorgMS20_Scale_Sonology_Esmuc.ogg
+  Excerpt: 10.0 s from 19.75 s of 63.8 s
+
+audio/presets/ms20-3.mp3
+  chiara_korg_ms20_analog_bass_2
+  Author: beatmad
+  Licence: CC BY
+  Source: https://freesound.org/s/155504/
+  Excerpt: 10.0 s from 0.75 s of 15.0 s
+
+audio/presets/ms20-3.mp3
+  korg ms 20 baff base
+  Author: wildegans
+  Licence: CC0
+  Source: https://freesound.org/s/161505/
+  Excerpt: 10.0 s from 3.5 s of 43.2 s
+
+audio/presets/ms20-4.mp3
+  korg ms 20 baff base
+  Author: wildegans
+  Licence: CC0
+  Source: https://freesound.org/s/161505/
+  Excerpt: 10.0 s from 28.0 s of 43.2 s
+
+audio/presets/odyssey-1.mp3
+  ARP Odyssey wind
+  Author: eon_polyphonic
+  Licence: CC0
+  Source: https://freesound.org/s/152317/
+  Excerpt: 10.0 s from 13.75 s of 32.2 s
+
+audio/presets/odyssey-3.mp3
+  ARP Odyssey glide
+  Author: eon_polyphonic
+  Licence: CC0
+  Source: https://freesound.org/s/152320/
+  Excerpt: 5.96 s from 0.0 s of 6.0 s
+
+audio/presets/odyssey-5.mp3
+  ARP Odyssey sawtooth pulse
+  Author: eon_polyphonic
+  Licence: CC0
+  Source: https://freesound.org/s/152321/
+  Excerpt: 7.92 s from 0.0 s of 7.9 s
+
+audio/presets/odyssey-7.mp3
+  ARP Odyssey
+  Author: andreasflorin
+  Licence: CC0
+  Source: https://freesound.org/s/529674/
+  Excerpt: 4.8 s from 0.0 s of 4.8 s
+
+audio/presets/arp2600-1.mp3
+  ARP2600 - 1950Computer C
+  Author: Paper Jam
+  Licence: CC BY
+  Source: https://freesound.org/s/79100/
+  Excerpt: 10.0 s from 1.0 s of 18.1 s
+
+audio/presets/arp2600-3.mp3
+  ARP2600 - CE_Baujolpif
+  Author: Paper Jam
+  Licence: CC BY
+  Source: https://freesound.org/s/79102/
+  Excerpt: 10.0 s from 0.75 s of 16.4 s
+
+audio/presets/proone-1.mp3
+  Sequential Circuits Pro One - Saw sequencer with filter
+  Author: druidbloke
+  Licence: CC0
+  Source: https://freesound.org/s/167424/
+  Excerpt: 10.0 s from 37.25 s of 52.1 s
+
+audio/presets/proone-2.mp3
+  Sequential Circuits Pro One - Saw sequencer with filter
+  Author: druidbloke
+  Licence: CC0
+  Source: https://freesound.org/s/167424/
+  Excerpt: 10.0 s from 15.5 s of 52.1 s
+
+audio/presets/proone-3.mp3
+  Pro One Sound Texture 1.1
+  Author: allofdrab
+  Licence: CC0
+  Source: https://freesound.org/s/184952/
+  Excerpt: 10.0 s from 61.25 s of 187.4 s
+
+audio/presets/proone-4.mp3
+  Pro One Sound Texture 1.1
+  Author: allofdrab
+  Licence: CC0
+  Source: https://freesound.org/s/184952/
+  Excerpt: 10.0 s from 96.0 s of 187.4 s
+
+audio/presets/oberheim-1.mp3
+  Oberheim Panned Voices
+  Author: Analogist
+  Licence: CC0
+  Source: https://freesound.org/s/453056/
+  Excerpt: 10.0 s from 11.25 s of 125.7 s
+
+audio/presets/oberheim-2.mp3
+  Oberheim Panned Voices
+  Author: Analogist
+  Licence: CC0
+  Source: https://freesound.org/s/453056/
+  Excerpt: 10.0 s from 27.25 s of 125.7 s
+
+audio/presets/oberheim-3.mp3
+  Oberheim Panned Voices
+  Author: Analogist
+  Licence: CC0
+  Source: https://freesound.org/s/453056/
+  Excerpt: 10.0 s from 71.25 s of 125.7 s
+
+audio/presets/polysix-1.mp3
+  Polysix chug
+  Author: alchemical
+  Licence: CC0
+  Source: https://freesound.org/s/22385/
+  Excerpt: 9.69 s from 0.0 s of 9.7 s
+
+audio/presets/polysix-3.mp3
+  Warm Polysix
+  Author: Upright
+  Licence: CC0
+  Source: https://freesound.org/s/242482/
+  Excerpt: 10.0 s from 0.0 s of 13.0 s
+
+audio/presets/cs15-1.mp3
+  YAMAHA CS15D BASS SAMPLE CHAIN X24
+  Author: SONICUPRISING
+  Licence: CC0
+  Source: https://freesound.org/s/387396/
+  Excerpt: 10.0 s from 19.75 s of 40.0 s
+
+audio/presets/cs15-2.mp3
+  YAMAHA CS15D BASS SAMPLE CHAIN X24
+  Author: SONICUPRISING
+  Licence: CC0
+  Source: https://freesound.org/s/387396/
+  Excerpt: 10.0 s from 2.25 s of 40.0 s
+
+audio/presets/dx7-1.mp3
+  DX7 SynthWave Chords
+  Author: ValentinSosnitskiy
+  Licence: CC0
+  Source: https://freesound.org/s/554256/
+  Excerpt: 10.0 s from 12.25 s of 46.8 s
+
+audio/presets/dx7-2.mp3
+  DX7 SynthWave Chords
+  Author: ValentinSosnitskiy
+  Licence: CC0
+  Source: https://freesound.org/s/554256/
+  Excerpt: 10.0 s from 28.25 s of 46.8 s
+
+audio/presets/dx7-3.mp3
+  Korg Volca fm 2 - Demo using Yamaha DX7 presets
+  Author: Attosaur
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AKorg_Volca_fm_2_-_Demo_using_Yamaha_DX7_presets.flac
+  Excerpt: 10.0 s from 52.0 s of 130.6 s
+
+audio/presets/dx7-4.mp3
+  Korg Volca fm 2 - Demo using Yamaha DX7 presets
+  Author: Attosaur
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AKorg_Volca_fm_2_-_Demo_using_Yamaha_DX7_presets.flac
+  Excerpt: 10.0 s from 101.5 s of 130.6 s
+
+audio/presets/d50-1.mp3
+  D-50 Pizzagogo - Patch
+  Author: User:W. B. Jaeger
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AD-50_Pizzagogo_-_Patch.wav
+  Excerpt: 10.0 s from 0.75 s of 14.2 s
+
+audio/presets/m1-1.mp3
+  KorgM1 Sonology Esmuc
+  Author: unknown
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AKorgM1_Sonology_Esmuc.flac
+  Excerpt: 10.0 s from 13.0 s of 32.3 s
+
+audio/presets/m1-3.mp3
+  M1 Classic Organ
+  Author: Cloud-10
+  Licence: CC0
+  Source: https://freesound.org/s/680995/
+  Excerpt: 2.65 s from 0.0 s of 2.7 s
+
+audio/presets/jx3p-1.mp3
+  Roland jx3p demo
+  Author: No machine-readable author provided. Ziggystar assumed (based on copyright claim
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3ARoland_jx3p_demo.ogg
+  Excerpt: 10.0 s from 2.25 s of 38.6 s
+
+audio/presets/jx3p-2.mp3
+  Roland jx3p demo
+  Author: No machine-readable author provided. Ziggystar assumed (based on copyright claim
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3ARoland_jx3p_demo.ogg
+  Excerpt: 10.0 s from 22.5 s of 38.6 s
+
+audio/presets/jv1080-1.mp3
+  JV-1080 black rain
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJV-1080_black_rain.ogg
+  Excerpt: 10.0 s from 13.5 s of 26.4 s
+
+audio/presets/jv1080-3.mp3
+  JV-1080 spaced voxx
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJV-1080_spaced_voxx.ogg
+  Excerpt: 10.0 s from 16.5 s of 60.5 s
+
+audio/presets/jv1080-4.mp3
+  JV-1080 spaced voxx
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJV-1080_spaced_voxx.ogg
+  Excerpt: 10.0 s from 44.0 s of 60.5 s
+
+audio/presets/jv1080-5.mp3
+  JV-1080 raggertronic
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJV-1080_raggertronic.ogg
+  Excerpt: 10.0 s from 18.25 s of 112.6 s
+
+audio/presets/jv1080-6.mp3
+  JV-1080 raggertronic
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AJV-1080_raggertronic.ogg
+  Excerpt: 10.0 s from 34.25 s of 112.6 s
+
+audio/presets/solina-1.mp3
+  ARP-Solina Demo Akkords clean+modulated
+  Author: MFbay
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3AARP-Solina_Demo_Akkords_clean%2Bmodulated.ogg
+  Excerpt: 10.0 s from 3.25 s of 45.2 s
+
+audio/presets/solina-2.mp3
+  ARP-Solina Demo Akkords clean+modulated
+  Author: MFbay
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3AARP-Solina_Demo_Akkords_clean%2Bmodulated.ogg
+  Excerpt: 10.0 s from 24.75 s of 45.2 s
+
+audio/presets/solina-3.mp3
+  ARP-Solina ViolaViolinHorn modulated Akkord
+  Author: MFbay
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3AARP-Solina_ViolaViolinHorn_modulated_Akkord.ogg
+  Excerpt: 10.0 s from 18.25 s of 41.2 s
+
+audio/presets/solina-4.mp3
+  ARP-Solina ViolaViolinHorn modulated Akkord
+  Author: MFbay
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3AARP-Solina_ViolaViolinHorn_modulated_Akkord.ogg
+  Excerpt: 10.0 s from 2.25 s of 41.2 s
+
+audio/presets/solina-5.mp3
+  Solina Chords
+  Author: Analogist
+  Licence: CC0
+  Source: https://freesound.org/s/450989/
+  Excerpt: 10.0 s from 87.5 s of 128.0 s
+
+audio/presets/polymoog-1.mp3
+  Vox Humana Polymoog
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AVox_Humana_Polymoog.ogg
+  Excerpt: 10.0 s from 3.75 s of 61.6 s
+
+audio/presets/polymoog-2.mp3
+  Vox Humana Polymoog
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AVox_Humana_Polymoog.ogg
+  Excerpt: 10.0 s from 38.5 s of 61.6 s
+
+audio/presets/polymoog-3.mp3
+  Vox Humana Polymoog
+  Author: Raymangold22
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3AVox_Humana_Polymoog.ogg
+  Excerpt: 10.0 s from 19.75 s of 61.6 s
+
+audio/presets/syntorchestra-1.mp3
+  Syntorchestra Demo
+  Author: Jupiter80
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3ASyntorchestra_Demo.wav
+  Excerpt: 10.0 s from 2.0 s of 16.0 s
+
+audio/presets/mellotron-1.mp3
+  Reverb Cello Mellotron Riff
+  Author: f-r-a-g-i-l-e
+  Licence: CC0
+  Source: https://freesound.org/s/496742/
+  Excerpt: 10.0 s from 7.75 s of 25.3 s
+
+audio/presets/mellotron-3.mp3
+  MellotronC
+  Author: spaceman102
+  Licence: CC0
+  Source: https://freesound.org/s/622092/
+  Excerpt: 5.0 s from 0.0 s of 5.0 s
+
+audio/presets/fairlight-1.mp3
+  Fairlight CMI
+  Author: ZoeVixen
+  Licence: CC0
+  Source: https://freesound.org/s/419058/
+  Excerpt: 10.0 s from 19.0 s of 92.5 s
+
+audio/presets/fairlight-2.mp3
+  Fairlight CMI
+  Author: ZoeVixen
+  Licence: CC0
+  Source: https://freesound.org/s/419058/
+  Excerpt: 10.0 s from 60.5 s of 92.5 s
+
+audio/presets/fairlight-3.mp3
+  Fairlight CMI
+  Author: ZoeVixen
+  Licence: CC0
+  Source: https://freesound.org/s/419058/
+  Excerpt: 10.0 s from 44.5 s of 92.5 s
+
+audio/presets/tr808-1.mp3
+  808patterns 01
+  Author: Theofanis Siassios
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3A808patterns_01.ogg
+  Excerpt: 10.0 s from 37.5 s of 53.5 s
+
+audio/presets/tr808-2.mp3
+  808patterns 01
+  Author: Theofanis Siassios
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3A808patterns_01.ogg
+  Excerpt: 10.0 s from 3.0 s of 53.5 s
+
+audio/presets/tr808-3.mp3
+  808acctrig 01
+  Author: Theofanis Siassios
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3A808acctrig_01.ogg
+  Excerpt: 10.0 s from 8.25 s of 20.8 s
+
+audio/presets/tr909-1.mp3
+  TR-909 House Beat
+  Author: Thejames428
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3ATR-909_House_Beat.wav
+  Excerpt: 8.02 s from 0.0 s of 8.0 s
+
+audio/presets/tr909-3.mp3
+  909 house pattern
+  Author: Christian Carville
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3A909_house_pattern.ogg
+  Excerpt: 8.09 s from 0.0 s of 8.1 s
+
+audio/presets/tr909-5.mp3
+  TR-909 sound example
+  Author: TBergman
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3ATR-909_sound_example.ogg
+  Excerpt: 10.0 s from 1.25 s of 16.1 s
+
+audio/presets/tr909-7.mp3
+  TR-909
+  Author: The original uploader was Sylvain87 at French Wikipedia.
+  Licence: CC BY 1.0
+  Source: https://commons.wikimedia.org/wiki/File%3ATR-909.ogg
+  Excerpt: 10.0 s from 22.0 s of 60.2 s
+
+audio/presets/tr909-8.mp3
+  TR-909
+  Author: The original uploader was Sylvain87 at French Wikipedia.
+  Licence: CC BY 1.0
+  Source: https://commons.wikimedia.org/wiki/File%3ATR-909.ogg
+  Excerpt: 10.0 s from 38.0 s of 60.2 s
+
+audio/presets/tr707-1.mp3
+  SevenOSeven Dry
+  Author: drriquet
+  Licence: CC0
+  Source: https://freesound.org/s/130028/
+  Excerpt: 8.0 s from 0.0 s of 8.0 s
+
+audio/presets/tr606-1.mp3
+  TR-606 (Modified) - Series 2 - Beat 10
+  Author: vdb4f
+  Licence: CC0
+  Source: https://freesound.org/s/159052/
+  Excerpt: 3.56 s from 0.0 s of 3.6 s
+
+audio/presets/cr78-1.mp3
+  CR-78 Presets Rock-1A - Disco-2B
+  Author: Wexstun
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3ACR-78_Presets_Rock-1A_-_Disco-2B.ogg
+  Excerpt: 10.0 s from 51.5 s of 104.7 s
+
+audio/presets/cr78-2.mp3
+  CR-78 Presets Rock-1A - Disco-2B
+  Author: Wexstun
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3ACR-78_Presets_Rock-1A_-_Disco-2B.ogg
+  Excerpt: 10.0 s from 33.75 s of 104.7 s
+
+audio/presets/cr78-3.mp3
+  CR-78 Presets Waltz - Rhumba
+  Author: Wexstun
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3ACR-78_Presets_Waltz_-_Rhumba.ogg
+  Excerpt: 10.0 s from 146.75 s of 191.4 s
+
+audio/presets/linndrum-1.mp3
+  Linn Drum Cassette A
+  Author: Uberproduktion
+  Licence: CC0
+  Source: https://freesound.org/s/702852/
+  Excerpt: 10.0 s from 174.5 s of 296.0 s
+
+audio/presets/linndrum-2.mp3
+  Linn Drum Cassette A
+  Author: Uberproduktion
+  Licence: CC0
+  Source: https://freesound.org/s/702852/
+  Excerpt: 10.0 s from 228.75 s of 296.0 s
+
+audio/presets/linndrum-3.mp3
+  dr_linn 130 dry_20190309 Klang Raum Wort
+  Author: KlangRaumWort
+  Licence: CC0
+  Source: https://freesound.org/s/462950/
+  Excerpt: 7.4 s from 0.0 s of 7.4 s
+
+audio/presets/mt40-1.mp3
+  Casio MT-40 Drumpattern
+  Author: drum pattern: Casio; recording: Maximilian Schönherr
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3ACasio_MT-40_Drumpattern.mp3
+  Excerpt: 10.0 s from 7.0 s of 19.4 s
+
+audio/presets/hr16-1.mp3
+  90bpm hr16a bouncing drums pattern
+  Author: Garzul
+  Licence: CC0
+  Source: https://freesound.org/s/213898/
+  Excerpt: 10.0 s from 0.0 s of 10.7 s
+
+audio/presets/vl1-1.mp3
+  Casio vl1 rock1
+  Author: Havelbaude
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3ACasio_vl1_rock1.ogg
+  Excerpt: 10.0 s from 3.75 s of 42.7 s
+
+audio/presets/vl1-2.mp3
+  Casio vl1 rock1
+  Author: Havelbaude
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3ACasio_vl1_rock1.ogg
+  Excerpt: 10.0 s from 27.5 s of 42.7 s
+
+audio/presets/vl1-3.mp3
+  Casio vl1 music
+  Author: Havelbaude
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3ACasio_vl1_music.ogg
+  Excerpt: 10.0 s from 49.75 s of 68.0 s
+
+audio/presets/vl1-4.mp3
+  Casio vl1 music
+  Author: Havelbaude
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3ACasio_vl1_music.ogg
+  Excerpt: 10.0 s from 20.75 s of 68.0 s
+
+audio/presets/sk1-1.mp3
+  SK1 Drum Patterns REEL Remaster 2x
+  Author: dualmono
+  Licence: CC0
+  Source: https://freesound.org/s/510519/
+  Excerpt: 10.0 s from 3.25 s of 37.4 s
+
+audio/presets/sk1-2.mp3
+  SK1 Drum Patterns REEL Remaster 2x
+  Author: dualmono
+  Licence: CC0
+  Source: https://freesound.org/s/510519/
+  Excerpt: 10.0 s from 21.25 s of 37.4 s
+
+audio/presets/omnichord-1.mp3
+  Omnichord Strummed Sonic Strings
+  Author: InDimension
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOmnichord_Strummed_Sonic_Strings.ogg
+  Excerpt: 10.0 s from 2.0 s of 18.3 s
+
+audio/presets/omnichord-3.mp3
+  Omnichord Chords
+  Author: InDimension
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOmnichord_Chords.ogg
+  Excerpt: 10.0 s from 3.0 s of 15.9 s
+
+audio/presets/omnichord-5.mp3
+  Omnichord Rhythm Pattern Rock 1
+  Author: InDimension
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOmnichord_Rhythm_Pattern_Rock_1.ogg
+  Excerpt: 10.0 s from 5.5 s of 20.9 s
+
+audio/presets/stylophone-1.mp3
+  Notes on a stylophone
+  Author: sisterray
+  Licence: CC0
+  Source: https://commons.wikimedia.org/wiki/File%3ANotes_on_a_stylophone.ogg
+  Excerpt: 10.0 s from 16.5 s of 34.1 s
+
+audio/presets/stylophone-3.mp3
+  stylophone
+  Author: sisterray
+  Licence: CC0
+  Source: https://freesound.org/s/66366/
+  Excerpt: 10.0 s from 16.5 s of 34.1 s
+
+audio/presets/optigan-1.mp3
+  Optigan Drums MG Reel
+  Author: makenoisemusic
+  Licence: CC0
+  Source: https://freesound.org/s/522914/
+  Excerpt: 10.0 s from 2.0 s of 34.1 s
+
+audio/presets/optigan-2.mp3
+  Optigan Drums MG Reel
+  Author: makenoisemusic
+  Licence: CC0
+  Source: https://freesound.org/s/522914/
+  Excerpt: 10.0 s from 19.75 s of 34.1 s
+
+audio/presets/rhodes-1.mp3
+  rhodes loop 1
+  Author: tim.kahn
+  Licence: CC BY
+  Source: https://freesound.org/s/42981/
+  Excerpt: 10.0 s from 0.0 s of 13.7 s
+
+audio/presets/rhodes-3.mp3
+  Random Rhodes Riff 
+  Author: SouthernUK
+  Licence: CC BY
+  Source: https://freesound.org/s/219400/
+  Excerpt: 6.34 s from 0.0 s of 6.3 s
+
+audio/presets/rhodes-5.mp3
+  C_S Rhodes Mark II G1
+  Author: tim.kahn
+  Licence: CC BY
+  Source: https://freesound.org/s/65762/
+  Excerpt: 10.0 s from 1.5 s of 25.6 s
+
+audio/presets/wurlitzer-1.mp3
+  Wurlitzer EP200
+  Author: Ritchie333
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AWurlitzer_EP200.mp3
+  Excerpt: 10.0 s from 30.5 s of 52.1 s
+
+audio/presets/wurlitzer-2.mp3
+  Wurlitzer EP200
+  Author: Ritchie333
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AWurlitzer_EP200.mp3
+  Excerpt: 10.0 s from 14.5 s of 52.1 s
+
+audio/presets/wurlitzer-3.mp3
+  I don't beleve (wurlitzer)
+  Author: EKVelika
+  Licence: CC0
+  Source: https://freesound.org/s/411470/
+  Excerpt: 10.0 s from 27.25 s of 56.1 s
+
+audio/presets/wurlitzer-4.mp3
+  I don't beleve (wurlitzer)
+  Author: EKVelika
+  Licence: CC0
+  Source: https://freesound.org/s/411470/
+  Excerpt: 10.0 s from 6.75 s of 56.1 s
+
+audio/presets/wurlitzer-5.mp3
+  World of Wurli
+  Author: FrenchSam
+  Licence: CC0
+  Source: https://freesound.org/s/516868/
+  Excerpt: 10.0 s from 0.0 s of 10.1 s
+
+audio/presets/clavinet-1.mp3
+  Hohner Clavinet D6
+  Author: Markus Ruffing.
+  Licence: Copyrighted free use
+  Source: https://commons.wikimedia.org/wiki/File%3AHohner_Clavinet_D6.ogg
+  Excerpt: 10.0 s from 15.25 s of 101.0 s
+
+audio/presets/clavinet-2.mp3
+  Hohner Clavinet D6
+  Author: Markus Ruffing.
+  Licence: Copyrighted free use
+  Source: https://commons.wikimedia.org/wiki/File%3AHohner_Clavinet_D6.ogg
+  Excerpt: 10.0 s from 59.0 s of 101.0 s
+
+audio/presets/clavinet-3.mp3
+  Wah clavinet funky
+  Author: EKVelika
+  Licence: CC0
+  Source: https://freesound.org/s/168578/
+  Excerpt: 10.0 s from 6.5 s of 27.0 s
+
+audio/presets/hammond-1.mp3
+  Hammond Organ - Model A Medley
+  Author: Organgrinder010 (Nathaniel C. Wilcox)
+  Licence: CC BY 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AHammond_Organ_-_Model_A_Medley.ogg
+  Excerpt: 10.0 s from 116.75 s of 206.6 s
+
+audio/presets/hammond-2.mp3
+  Hammond Organ - Model A Medley
+  Author: Organgrinder010 (Nathaniel C. Wilcox)
+  Licence: CC BY 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AHammond_Organ_-_Model_A_Medley.ogg
+  Excerpt: 10.0 s from 69.75 s of 206.6 s
+
+audio/presets/hammond-3.mp3
+  LeslieCabinetSlowFastSlow
+  Author: unknown
+  Licence: Public domain
+  Source: https://commons.wikimedia.org/wiki/File%3ALeslieCabinetSlowFastSlow.ogg
+  Excerpt: 10.0 s from 2.0 s of 26.5 s
+
+audio/presets/hammond-5.mp3
+  Hammond Tonewheel Organ
+  Author: MrAuralization
+  Licence: CC BY
+  Source: https://freesound.org/s/158628/
+  Excerpt: 10.0 s from 1.25 s of 23.4 s
+
+audio/presets/voxcont-1.mp3
+  Vox Continental
+  Author: Ritchie333
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AVox_Continental.ogg
+  Excerpt: 10.0 s from 27.0 s of 40.8 s
+
+audio/presets/voxcont-2.mp3
+  Vox Continental
+  Author: Ritchie333
+  Licence: CC BY-SA 4.0
+  Source: https://commons.wikimedia.org/wiki/File%3AVox_Continental.ogg
+  Excerpt: 10.0 s from 9.5 s of 40.8 s
+
+audio/presets/univibe-1.mp3
+  Original Shin-Ei Univibe demo with Stratocaster on clean amp (with spring reverb)
+  Author: Fret Junkies
+  Licence: CC BY 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOriginal_Shin-Ei_Univibe_demo_with_Stratocaster_on_clean_amp_%28with_spring_reverb%29.ogg
+  Excerpt: 10.0 s from 573.75 s of 846.6 s
+
+audio/presets/univibe-2.mp3
+  Original Shin-Ei Univibe demo with Stratocaster on clean amp (with spring reverb)
+  Author: Fret Junkies
+  Licence: CC BY 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOriginal_Shin-Ei_Univibe_demo_with_Stratocaster_on_clean_amp_%28with_spring_reverb%29.ogg
+  Excerpt: 10.0 s from 752.25 s of 846.6 s
+
+audio/presets/univibe-3.mp3
+  Original Shin-Ei Univibe demo with Stratocaster on clean amp (with spring reverb)
+  Author: Fret Junkies
+  Licence: CC BY 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AOriginal_Shin-Ei_Univibe_demo_with_Stratocaster_on_clean_amp_%28with_spring_reverb%29.ogg
+  Excerpt: 10.0 s from 441.75 s of 846.6 s
+
+audio/presets/spaceecho-1.mp3
+  space echo 1
+  Author: tim.kahn
+  Licence: CC BY
+  Source: https://freesound.org/s/8626/
+  Excerpt: 8.72 s from 0.0 s of 8.7 s
+
+audio/presets/spaceecho-3.mp3
+  space echo 2
+  Author: tim.kahn
+  Licence: CC BY
+  Source: https://freesound.org/s/8627/
+  Excerpt: 10.0 s from 0.0 s of 11.5 s
+
+audio/presets/nes-1.mp3
+  Chiptune3
+  Author: Joseph.elkhouri
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AChiptune3.ogg
+  Excerpt: 10.0 s from 31.75 s of 57.2 s
+
+audio/presets/nes-2.mp3
+  Chiptune3
+  Author: Joseph.elkhouri
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AChiptune3.ogg
+  Excerpt: 10.0 s from 9.0 s of 57.2 s
+
+audio/presets/nes-3.mp3
+  NES 80 bpm
+  Author: Brotherprovisional
+  Licence: CC BY
+  Source: https://freesound.org/s/32875/
+  Excerpt: 10.0 s from 33.5 s of 51.0 s
+
+audio/presets/nes-4.mp3
+  NES 80 bpm
+  Author: Brotherprovisional
+  Licence: CC BY
+  Source: https://freesound.org/s/32875/
+  Excerpt: 10.0 s from 15.5 s of 51.0 s
+
+audio/presets/nes-5.mp3
+  NES 160 bpm
+  Author: Brotherprovisional
+  Licence: CC BY
+  Source: https://freesound.org/s/32874/
+  Excerpt: 9.38 s from 0.0 s of 9.4 s
+
+audio/presets/atari2600-1.mp3
+  Atari 2600 Synthcart Beat 89.88 bpm
+  Author: kev_durr
+  Licence: CC BY
+  Source: https://freesound.org/s/320524/
+  Excerpt: 10.0 s from 0.0 s of 10.7 s
+
+audio/presets/atari2600-3.mp3
+  Yar's Revenge
+  Author: dal_kas
+  Licence: CC BY
+  Source: https://freesound.org/s/126242/
+  Excerpt: 5.15 s from 0.0 s of 5.2 s
+
+audio/presets/alphajuno-1.mp3
+  Juno Hoover What The patch
+  Author: Djnebula1
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AJuno_Hoover_What_The_patch.ogg
+  Excerpt: 10.0 s from 26.5 s of 61.5 s
+
+audio/presets/alphajuno-2.mp3
+  Juno Hoover What The patch
+  Author: Djnebula1
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AJuno_Hoover_What_The_patch.ogg
+  Excerpt: 10.0 s from 9.0 s of 61.5 s
+
+audio/presets/alphajuno-3.mp3
+  Juno Hoover What The patch
+  Author: Djnebula1
+  Licence: CC BY-SA 3.0
+  Source: https://commons.wikimedia.org/wiki/File%3AJuno_Hoover_What_The_patch.ogg
+  Excerpt: 10.0 s from 43.0 s of 61.5 s

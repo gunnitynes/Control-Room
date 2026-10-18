@@ -367,7 +367,11 @@ function playSample(buf,dest,{gain=.9,maxDur=12,offset=0}={}){const ac=audio(),s
   offset=Math.max(0,Math.min(offset,buf.duration-1));const end=t+Math.min(buf.duration-offset,maxDur);g.gain.setValueAtTime(gain,end-.25);g.gain.linearRampToValueAtTime(0,end);s.connect(g).connect(dest||AU.music);s.start(t,offset);s.stop(end+.02);return songHandle(ac,[s],g);}
 function playMachine(id,dest){
   const P=(window.PRESETS||[]).find(x=>x.id===id);
-  if(P&&P.kit){ // real one-shots, played as an 808 groove by the sequencer
+  if(P&&P.kit)return play808(P.kit,dest);
+  return playMachineSrc(P,id,dest);}
+const KIT808={bd:'audio/presets/808-bd5075.wav',cp:'audio/presets/808-cp.wav',cb:'audio/presets/808-cb.wav',ch:'audio/presets/808-ch.wav',oh:'audio/presets/808-oh25.wav'};
+// the real TR-808 one-shots played as a groove by the sequencer (falls back to the browser 808)
+function play808(kit=KIT808,dest){const id='tr808';const P={kit};{
     const h={r:null,stopped:false,stop(f){h.stopped=true;if(h.r)h.r.stop(f);AU.live.delete(h);}};AU.live.add(h);const names=Object.keys(P.kit);
     Promise.all(names.map(n=>sampleReady(P.kit[n]))).then(bufs=>{if(h.stopped)return;const K=Object.fromEntries(names.map((n,i)=>[n,bufs[i]]));
       const r=rig(dest||AU.music,{rt:.9});['k','s','h','cb'].forEach(n=>r.strip(n,{gain:n==='h'?.7:1,send:.05,pan:n==='h'?.25:n==='cb'?-.2:0}));h.r=r;const ac=r.ac;
@@ -377,6 +381,8 @@ function playMachine(id,dest){
         {pat:P_('x.x.x.x.x.x.x.o.x.x.x.x.x.x.x.o.',.7),play:(t,v)=>hit(v>.5?K.ch:K.oh,r.strips.h.in,t,v)},
         {pat:P_('..x.....x.x.......x.....x.......'),play:t=>hit(K.cb,r.strips.cb.in,t,.6)}]});}).catch(()=>{if(!h.stopped)h.r=MACHINES[id](dest||AU.music);});
     return h;}
+}
+function playMachineSrc(P,id,dest){
   if(P&&P.src){const h={inner:null,stopped:false,stop(f){h.stopped=true;if(h.inner)h.inner.stop(f);AU.live.delete(h);}};AU.live.add(h);
     sampleReady(P.src).then(buf=>{if(!h.stopped)h.inner=playSample(buf,dest);}).catch(()=>{if(!h.stopped)h.inner=MACHINES[id](dest||AU.music);});return h;}
   return MACHINES[id](dest||AU.music);
