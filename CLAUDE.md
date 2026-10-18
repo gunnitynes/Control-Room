@@ -16,11 +16,12 @@ css/style.css       all styles (tokens on :root, light + night theme)
 data/               content anyone may edit: quiz-questions.js, vault-questions.js, content.js
 js/core.js          helpers, game registry, host room + menu + setup, roundGame framework, phone shell, boot
 js/audio.js         WebAudio engine: buses, drums (DR), voices (VO), rig/seq sequencer, sample loading, Telephone synth
+js/assets.js        Constraint Generator files: seeded recipes → MIDI (written byte by byte) or WAV (offline render); also loaded by CADCAST/go
 js/games-brain.js   Know your stuff: The Quiz (+ Studio Vault bank), Shortcut Showdown, Translation Grid
 js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
 js/games-make.js    Make something: Constraint Generator, Genre Cross-Pollinator, Soundabout Roundabout,
                     Metaphor Translation, and Parameter Telephone (shown under Train your ears, slot 10)
-js/games-atlas.js   The grand finale: The Ear Atlas
+js/games-atlas.js   The Ear Atlas (in Know your stuff, after The Translation Grid)
 audio/              demo song, eras/, atlas/ (piano, inst, world), presets/; each set has a CREDITS.txt
 meterlab/           copy of Meter Lab with an ?embed mode exposing window.MLAPI
 tools/              scripts that build the audio clips from Wikimedia Commons (see tools/README.md)
@@ -47,6 +48,13 @@ Phones and the host keep old files otherwise.
 - Setup options: `choices` (segmented), `type:'multi'`, `type:'step'` (+/− with min/max/step/unit),
   `show:v=>bool` to hide an option; `setupExtra(v)` / `setupBind(st, redraw)` add custom setup panels.
 - The phone **notebook**: the host calls `logAdd(player, {kind, game, title, text})`.
+- Round clock: one main timer per phase (`mainTimer`); the teacher pauses it by clicking the ring or pressing P
+  (`g.pause`, phones get `{t:'clock'}`). A game option `auto` (seconds) counts down from the reveal to the next round.
+- Constraint Generator: missions = task (per file kind) + rule + evolution, from `CONSTRAINT_BRAIN` in content.js.
+  Files are recipes `{kind, seed, bpm, key}` built by `ASSETS.make` on the student's computer (CADCAST/go, paired via
+  Control Room); the host sends them with `pcSend(player, msg)`. No answer counts as "busy"; students can sit out.
+- Phones: tapping the logo opens Add to Home Screen (manifest.webmanifest, sw.js, icons/). The splash shows the join
+  QR as art (`artQR`, error correction H; check scannability with jsQR after changing it).
 - Teacher-uploaded clips (Chronologist decades, Ear Atlas songs) live in IndexedDB on the host only
   (`clipDB`, `MYCLIPS`; songs use `dec:-1`). They are never uploaded anywhere.
 - Class list + attendance: see `integrations/attendance/README.md`.

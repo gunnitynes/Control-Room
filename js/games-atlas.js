@@ -1,5 +1,5 @@
 /* ====================================================================
-   THE GRAND FINALE — THE EAR ATLAS
+   THE EAR ATLAS (Know your stuff, next to The Translation Grid)
    One game, eight kinds of question about what you hear:
    tempo · note · chord · interval · tuning (played on a sampled Steinway and soft drums)
    instrument · where in the world (real recordings, data/content.js → ATLAS)
@@ -113,7 +113,7 @@ function atKeys({mark=null,counts=null,sel=null,tag='div'}={}){
 
 /* ---------- the game ---------- */
 game(roundGame({
-  id:'atlas',group:'final',name:'The Ear Atlas',tag:'One giant guessing game: tempo, notes, chords, tuning, instruments of the world, where music comes from, and your own songs.',
+  id:'atlas',group:'brain',name:'The Ear Atlas',tag:'One giant guessing game: tempo, notes, chords, tuning, instruments of the world, where music comes from, and your own songs.',
   how:['Every round asks something different about what you hear: the tempo, a note, a chord, an instrument, a place on the map, a song.','Answer on your phone: tap the tempo, play the note on a keyboard, or pick one of four.','Real recordings from all over the world, a real Steinway, real drums. Fast right answers score more.'],
   badges:['Scored','Listening','8 kinds of question'],speed:.3,okAt:.95,closeAt:.35,yesWord:'Golden ears!',noWord:'Not this time',
   icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="var(--green)" stroke="var(--ink)" stroke-width="3.5"/><ellipse cx="32" cy="32" rx="11" ry="26" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M6 32 H58" stroke="var(--ink)" stroke-width="3"/><path d="M38 6 Q60 18 50 44" fill="none" stroke="var(--red)" stroke-width="5"/><circle cx="50" cy="46" r="6" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/></svg>`,

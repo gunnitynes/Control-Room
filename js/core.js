@@ -44,6 +44,23 @@ const newCode=()=>[...Array(4)].map(()=>CODE_ABC[Math.floor(Math.random()*CODE_A
 const peerId=c=>'controlroom-v1-'+c.toLowerCase();
 const joinURL=code=>location.origin+location.pathname+'?room='+code;
 function drawQR(box,code,size){if(!box)return;needQR().then(()=>{box.innerHTML='';new QRCode(box,{text:joinURL(code),width:size,height:size,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}).catch(()=>{box.textContent=code;});}
+/* a Bauhaus QR: the same scannable code (error correction H, 30 %), drawn as circles and squares in ink and blue,
+   red/blue/ink finder eyes, a yellow sun behind (light, so it reads as background) and a little room badge in the middle */
+function qrMatrix(text){const d=document.createElement('div');const q=new QRCode(d,{text,width:64,height:64,correctLevel:QRCode.CorrectLevel.H});const m=q._oQRCode,n=m.getModuleCount(),M=[];
+  for(let r=0;r<n;r++){const row=[];for(let c=0;c<n;c++)row.push(m.isDark(r,c));M.push(row);}return M;}
+function artQR(text,label=''){const M=qrMatrix(text),n=M.length,Q=4,W=n+Q*2,inF=(r,c)=>(r<7&&c<7)||(r<7&&c>=n-7)||(r>=n-7&&c<7);
+  const mid=(n-1)/2,hole=Math.max(2,Math.round(n*.11)),inHole=(r,c)=>Math.abs(r-mid)<=hole&&Math.abs(c-mid)<=hole;
+  const hash=(r,c)=>((r*73856093)^(c*19349663))>>>0;let dots='';
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++){if(!M[r][c]||inF(r,c)||inHole(r,c))continue;const h=hash(r,c),x=c+Q,y=r+Q,col=h%11===0?'var(--red)':h%5===0?'var(--blue)':'var(--ink)';
+    dots+=h%4===0?`<rect x="${x+.06}" y="${y+.06}" width=".88" height=".88" fill="${col}"/>`:`<circle cx="${x+.5}" cy="${y+.5}" r=".47" fill="${col}"/>`;}
+  const eye=(r,c,col)=>{const x=c+Q,y=r+Q;return `<rect x="${x}" y="${y}" width="7" height="7" fill="var(--ink)"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3" fill="${col}"/>`;};
+  const cx=mid+Q+.5,bw=hole*2+1;
+  return `<svg class="artqr" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scan to join">
+    <rect width="${W}" height="${W}" fill="#fff"/><circle cx="${W*.86}" cy="${W*.84}" r="${W*.3}" fill="var(--yel)" opacity=".55"/>
+    ${dots}${eye(0,0,'var(--red)')}${eye(0,n-7,'var(--blue)')}${eye(n-7,0,'var(--ink)')}
+    <rect x="${cx-bw/2}" y="${cx-bw/2}" width="${bw}" height="${bw}" fill="var(--yel)" stroke="var(--ink)" stroke-width=".5"/>
+    <text x="${cx}" y="${cx+.1}" text-anchor="middle" dominant-baseline="middle" font-family="Archivo,Arial Narrow,sans-serif" font-weight="900" font-size="${bw*.42}" fill="var(--ink)">${esc(label)}</text></svg>`;}
+function splashQR(){const box=$('#spqr');if(!box||!G.code)return;needQR().then(()=>{box.innerHTML=artQR(joinURL(G.code),G.code);const c=$('#spcode');if(c)c.textContent=G.code;}).catch(()=>{});}
 function showBigQR(code){
   let ov=$('#qrbig');if(!ov){ov=el('div','qrbig');ov.id='qrbig';ov.setAttribute('role','dialog');document.body.appendChild(ov);ov.onclick=()=>ov.remove();}
   ov.innerHTML=`<div><figure id="qrbigImg"></figure><b>${esc(code)}</b><small>Scan to join · click anywhere to close</small></div>`;drawQR($('#qrbigImg'),code,720);
@@ -66,7 +83,6 @@ const GROUPS=[
   {id:'brain',name:'Know your stuff',short:'Know',sub:'Fast answers on your phone, big points',col:'--blue'},
   {id:'ears',name:'Train your ears',short:'Ears',sub:'The room listens, the phones answer',col:'--red'},
   {id:'make',name:'Make something',sub:'Creative sprints, generators and party games',short:'Make',col:'--yel'},
-  {id:'final',name:'The grand finale',sub:'One giant guessing game for every ear',short:'Finale',col:'--green'},
 ];
 const GAMES=[];
 function game(g){g.col=g.col||(GROUPS.find(x=>x.id===g.group)||{}).col;GAMES.push(g);return g;}
@@ -98,7 +114,7 @@ async function openRoom(code){
   return new Promise(res=>{
     const tryOpen=left=>{
       G.code=code||newCode();const peer=new Peer(peerId(G.code),{debug:0});G.peer=peer;
-      peer.on('open',()=>{G.status='';saveRoom();if(!G.splash)render();res(true);});
+      peer.on('open',()=>{G.status='';saveRoom();if(!G.splash)render();else splashQR();res(true);});
       peer.on('error',e=>{
         if(e.type==='unavailable-id'&&left>0){peer.destroy();if(code)setTimeout(()=>tryOpen(left-1),1500);else tryOpen(left-1);return;}
         if(e.type==='peer-unavailable')return;
@@ -164,7 +180,15 @@ function cadcastPair(conn,m){
     c.on('open',()=>{told=true;c.send({t:'paired',name:p.name,desk:cadcastDesk()});setTimeout(()=>{try{c.close();}catch(e){}},4000);});c.on('error',()=>{});};
   tell();setTimeout(()=>{if(!told)tell();},3000);
   reply({ok:true,name:p.name});toast(p.name+'’s computer is paired with CADCAST');
+  if(G.view==='play'&&G.game&&G.game.onPair)setTimeout(()=>{try{G.game.onPair(p);}catch(e){}},1500);
 }
+// the student's paired computer (the most recent pairing) and a lasting connection to it, for sending missions and files
+function pcFor(p){const a=store.get('cadcast.allow',{});let best=null;for(const [pc,v] of Object.entries(a))if(v.pid===p.id&&(!best||v.at>best.at))best={pc,at:v.at};return best?best.pc:null;}
+const PCC=new Map();
+function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)return false;let e=PCC.get(pc);
+  if(!e||e.dead){const conn=G.peer.connect('cadcast-pc-'+pc,{serialization:'json',reliable:true});e={conn,q:[],dead:false};PCC.set(pc,e);
+    conn.on('open',()=>{e.q.forEach(m=>{try{conn.send(m);}catch(x){}});e.q=[];});conn.on('close',()=>{e.dead=true;});conn.on('error',()=>{e.dead=true;});}
+  if(e.conn.open){try{e.conn.send(msg);}catch(x){e.q.push(msg);}}else e.q.push(msg);return true;}
 function resetPoints(){if(!confirm('Reset everyone’s total points to zero?'))return;players().forEach(p=>{p.total=0;p.gp=0;});saveRoom();render();syncAll();}
 function uniqueName(name,id,max=30){
   name=String(name||'').replace(/\s+/g,' ').trim().slice(0,max)||'Player';let n=name,k=2;
@@ -243,11 +267,12 @@ function rSplash(app){
   app.className='splash';
   app.innerHTML=`<canvas id="poster"></canvas><div class="sptt"><div class="kick">Production class · a sister to Meter Lab</div><h1>Control<br><i>Room</i></h1>
     <p>${GAMES.length} games for one room. The big screen asks, the phones answer.</p><button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
+    <aside class="spjoin" id="spjoin"><div class="spqr" id="spqr"><div class="spwait">opening the room…</div></div><div class="spcap"><b>Scan to join</b><span>room <em id="spcode">····</em></span></div></aside>
 `;
   const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
   const enter=()=>{if(!G.splash)return;G.splash=false;POSTER=null;removeEventListener('keydown',key);try{audio();}catch(e){}sfx.open();render();};
   const key=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();enter();}};
-  app.onclick=enter;addEventListener('keydown',key);
+  app.onclick=enter;addEventListener('keydown',key);$('#spjoin').onclick=e=>{e.stopPropagation();if(G.code)showBigQR(G.code);};splashQR();
 }
 function posterSize(){if(!POSTER)return;const r=POSTER.c.getBoundingClientRect(),d=devicePixelRatio||1;POSTER.c.width=r.width*d;POSTER.c.height=r.height*d;POSTER.ctx.setTransform(d,0,0,d,0,0);POSTER.w=r.width;POSTER.h=r.height;}
 function posterDraw(now){
@@ -413,19 +438,21 @@ function roundGame(spec){
   g.topInfo=()=>{const s=G.gs;if(!s)return g.tag;if(s.phase==='end')return 'Final results';return `Round ${Math.min(s.i+1,s.rounds.length)} of ${s.rounds.length}`+(g.roundInfo?' · '+g.roundInfo(cur(),s.opts):'');};
   g.start=opts=>{
     const rounds=g.build(opts);if(!rounds.length)throw new Error('No rounds to play with these settings');
-    G.gs={opts,rounds,i:-1,done:-1,phase:'prep',ans:new Map(),res:new Map(),T:0,openAt:0,prepEnd:0,openEnd:0,prevOrder:[],lastTick:0};
+    G.gs={opts,rounds,i:-1,done:-1,phase:'prep',ans:new Map(),res:new Map(),T:0,openAt:0,prepEnd:0,openEnd:0,prevOrder:[],lastTick:0,paused:false,tmr:0,nextT:0,nextEnd:0};
     goRound(0,true);
   };
+  // one main timer per phase (prep → open → reveal → next), so the teacher can pause it from the ring
+  function mainTimer(ms,fn){const s=G.gs;clearTimeout(s.tmr);s.tmrFn=fn;s.tmrEnd=now()+ms;s.tmr=setTimeout(()=>{if(G.gs===s&&!s.paused)fn();},ms);}
   function goRound(i,first){
-    const s=G.gs;clearLater();g.leave&&g.leave();s.i=i;s.ans=new Map();s.res=new Map();s.phase='prep';
+    const s=G.gs;clearLater();clearTimeout(s.tmr);s.paused=false;s.nextT=0;g.leave&&g.leave();s.i=i;s.ans=new Map();s.res=new Map();s.phase='prep';
     const ms=typeof g.prepMs==='function'?g.prepMs(cur(),s.opts):g.prepMs;s.prepEnd=now()+ms;s.prepMsTot=ms;
     g.onPrep&&g.onPrep(cur(),s.opts);
-    if(ms>0)later(()=>{if(G.gs===s&&s.phase==='prep'&&s.i===i)open();},ms);else{open(first);return;}
+    if(ms>0)mainTimer(ms,()=>{if(s.phase==='prep'&&s.i===i)open();});else{open(first);return;}
     if(!first){render();syncAll();}
   }
   function open(first){
     const s=G.gs;s.phase='open';s.T=(g.secs?g.secs(s.opts,cur()):20)*1000;s.openAt=now();s.openEnd=s.T?s.openAt+s.T:0;s.lastTick=0;
-    const i=s.i;if(s.T)later(()=>{if(G.gs===s&&s.phase==='open'&&s.i===i)reveal();},s.T);
+    const i=s.i;if(s.T)mainTimer(s.T,()=>{if(s.phase==='open'&&s.i===i)reveal();});
     g.onOpen&&g.onOpen(cur(),s.opts);sfx.open();if(!first){render();syncAll();}
   }
   function answer(p,d){
@@ -434,7 +461,7 @@ function roundGame(spec){
     if(online().length&&online().every(x=>s.ans.has(x.id)))later(()=>{if(G.gs===s&&s.phase==='open'&&s.i===d.i)reveal();},900);
   }
   function reveal(){
-    const s=G.gs;if(s.phase!=='open')return;clearLater();const r=cur();s.prevOrder=rankBy('gp').list.map(p=>p.id);let accSum=0,n=0;
+    const s=G.gs;if(s.phase!=='open')return;clearLater();clearTimeout(s.tmr);s.paused=false;const r=cur();s.prevOrder=rankBy('gp').list.map(p=>p.id);let accSum=0,n=0;
     players().forEach(p=>{
       const a=s.ans.get(p.id);let res=a?(g.score(r,a.a,{ms:a.ms,T:s.T,opts:s.opts})||{acc:0}):{acc:0,note:'No answer this time'};
       const acc=clamp(+res.acc||0,0,1),ok=!!a&&acc>=g.okAt,sf=s.T&&a?1-g.speed*clamp(a.ms/s.T,0,1):1;
@@ -444,8 +471,16 @@ function roundGame(spec){
       if(a){accSum+=acc;n++;}
     });
     s.done=s.i;s.phase='reveal';g.onReveal&&g.onReveal(r,s.opts);sfx.reveal(n?100*accSum/n:0);
+    // optional countdown to the next question (the game's "auto" option, in seconds)
+    s.nextT=(+s.opts.auto||0)*1000;if(s.nextT){const i=s.i;s.nextEnd=now()+s.nextT;mainTimer(s.nextT,()=>{if(s.phase==='reveal'&&s.i===i)g.next();});}
     render();syncAll();saveRoom();
   }
+  // click the ring (or press P): pause / resume whichever clock is running
+  g.pause=()=>{const s=G.gs;if(!s)return;const can=s.phase==='prep'||(s.phase==='open'&&s.T)||(s.phase==='reveal'&&s.nextT);if(!can&&!s.paused)return;
+    if(!s.paused){s.paused=true;s.pauseAt=now();clearTimeout(s.tmr);s.pauseLeft=Math.max(0,s.tmrEnd-now());}
+    else{const d=now()-s.pauseAt;s.paused=false;s.prepEnd+=d;if(s.openEnd)s.openEnd+=d;s.openAt+=d;if(s.nextEnd)s.nextEnd+=d;mainTimer(s.pauseLeft,s.tmrFn);}
+    if(s.phase==='open'&&s.T){const left=Math.max(0,s.openEnd-(s.paused?s.pauseAt:now()));online().forEach(p=>{try{p.conn.send({t:'clock',left,paused:s.paused});}catch(e){}});}
+    toast(s.paused?'Paused. Click the ring to carry on.':'Running again');sfx.tick&&sfx.tick(1);};
   g.next=()=>{
     const s=G.gs;if(!s)return;
     if(s.phase==='prep')open();
@@ -487,12 +522,16 @@ function roundGame(spec){
         +(best&&best.res&&best.res.pts>0?`<div class="fast"><span class="lab">Top score this round</span><b>${esc(best.p.name)}</b><span class="lab">+${best.res.pts}${best.res.note?' · '+esc(best.res.note):''}</span></div>`:`<div class="fast"><span class="lab">Nobody scored</span><b>Stump the room ✓</b></div>`);
     }else si.innerHTML=`<div class="stat"><b id="nAns">${s.ans.size}<span>/${online().length}</span></b><span>answered</span></div><p class="fine">${s.phase==='prep'?(g.prepSide?g.prepSide(r,s.opts):'Get ready…'):(g.openSide?g.openSide(r,s.opts):'Revealed when everyone has answered'+(s.T?' or the clock runs out.':'.'))}</p>`;
     $('#bNext').onclick=g.next;if($('#bAlt'))$('#bAlt').onclick=due?g.skip:g.toBoard;if(g.replay)$('#bReplay').onclick=()=>g.replay(r,s.phase,s.opts);if($('#bStopA'))$('#bStopA').onclick=()=>{try{g.leave&&g.leave();}catch(e){}AU_stopAll();toast('Sound stopped');};
-    ring($('#ring'),t=>{
+    const rc=$('#ring');if(rc){rc.style.cursor='pointer';rc.title='Click to pause or resume the clock (P)';rc.onclick=g.pause;}
+    ring($('#ring'),t0=>{const t=s.paused?s.pauseAt:t0;
       const beads=players().map(p=>{const a=s.ans.has(p.id),on=p.conn&&p.conn.open,rs=s.res.get(p.id);
         return {f:s.phase==='reveal'?(rs?{yes:'--green',close:'--yel',no:'--red',none:''}[rs.cls]:''):a?'--ink':'',big:a,a:on?1:.3};});
+      if(s.paused&&s.phase!=='reveal'){const fr=s.phase==='prep'?(s.prepMsTot?clamp((s.prepEnd-t)/s.prepMsTot,0,1):0):(s.T?Math.max(0,s.openEnd-t)/s.T:1);return {frac:fr,label:'❚❚',sub:'paused · click',beads};}
       if(s.phase==='prep'){const fr=s.prepMsTot?1-clamp((s.prepEnd-t)/s.prepMsTot,0,1):1;const rb=$('#readbar');if(rb)rb.style.transform=`scaleX(${1-fr})`;return {frac:fr,label:g.prepLabel||'READY',sub:g.prepSub||'get set',beads};}
       if(s.phase==='open'){if(s.openEnd){const left=Math.max(0,s.openEnd-t),sec=Math.ceil(left/1000);if(left>0&&sec<=5&&sec!==s.lastTick){s.lastTick=sec;sfx.tick(sec);}return {frac:left/s.T,hot:left<5000,label:String(sec),sub:'seconds',beads};}return {frac:1,label:'∞',sub:'no clock',beads};}
-      const rl=g.ringLabel?g.ringLabel(r):{label:'✓',fill:'--green'};return {frac:0,label:rl.label,sub:rl.sub||'',fill:rl.fill,beads};
+      const rl=g.ringLabel?g.ringLabel(r):{label:'✓',fill:'--green'};
+      if(s.nextT){const left=Math.max(0,s.nextEnd-t);return {frac:left/s.nextT,label:rl.label,sub:s.paused?'paused · click':`next in ${Math.ceil(left/1000)} s`,fill:rl.fill,beads};}
+      return {frac:0,label:rl.label,sub:rl.sub||'',fill:rl.fill,beads};
     });
   };
   g.pstate=p=>{
@@ -559,6 +598,7 @@ function pData(m){
   if(!m||typeof m!=='object'||m.t==='pong')return;
   if(m.t==='log'){const had=(PL.log||[]).length;PL.log=Array.isArray(m.log)?m.log:[];const b=$('.nbcount');if(b){b.textContent=PL.log.length;if(PL.log.length>had){const n=$('#nbBtn');if(n){n.classList.remove('ping');void n.offsetWidth;n.classList.add('ping');}}}if($('#nb'))openNotebook();return;}
   if(m.t==='names'){PL.names=m;if(!PL.joined)pRender();return;}
+  if(m.t==='clock'){if(PL.timer){PL.timer.end=now()+(+m.left||0);PL.timer.frozen=m.paused?(+m.left||0):null;}return;}
   if(m.t==='taken'){PL.joined=false;PL.st=null;store.del('proom');PL.status=m.name+' is already in the room on another phone. Tell your teacher if that isn’t you.';pRender();return;}
   if(m.t==='kick'){PL.kicked=true;PL.st={view:'kicked',why:m.why};try{PL.conn.close();}catch(e){}pRender();return;}
   if(m.t!=='st')return;
@@ -575,6 +615,7 @@ function pRender(){
   const top=`<header class="ptop">${logo()}${PL.joined&&s&&s.view!=='kicked'?`<button class="nbbtn" id="nbBtn" aria-label="Your notebook">${NB_ICON}<b class="nbcount">${(PL.log||[]).length}</b></button><div class="who"><span>${esc(PL.name)}</span><b class="pscore">${s.total||0}</b></div>`:''}</header>`;
   app.innerHTML=top+`<main class="pbody" id="pbody"></main>`;
   if($('#nbBtn'))$('#nbBtn').onclick=openNotebook;
+  const lg=$('.ptop .logo');if(lg){lg.onclick=openInstall;if(!isStandalone())lg.insertAdjacentHTML('beforeend','<i class="appbadge" aria-label="Add to home screen">＋</i>');}
   const body=$('#pbody');PL.key='';PL.timer=null;PL.clock=null;
   if(!PL.joined&&PL.names&&PL.names.names.length&&!PL.typing){
     const L=PL.names.names.slice().sort((a,b)=>a.n.localeCompare(b.n));
@@ -638,6 +679,26 @@ async function pairPage(){
       show(`<div class="paircheck">✓</div><h2>Your computer is now</h2><div class="pairname">${esc(m.name)}</div>`,'<p>It connects to the teacher’s patch bay by itself. You can close this tab.</p>','ok');
       setTimeout(()=>{try{peer.destroy();}catch(e){}},2000);});});
 }
+/* ---------- Add to Home Screen (tap the logo on a phone) ---------- */
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.__bip=e;});
+if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+function openInstall(){
+  let ov=$('#inst');if(!ov){ov=el('div','nb inst');ov.id='inst';document.body.appendChild(ov);}
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const icon=`<div class="insticon"><img src="icons/icon-192.png" alt=""></div>`;
+  let body;
+  if(isStandalone())body=`${icon}<h2>You’re in the app</h2><p>Control Room is on your home screen. Open it from there next lesson.</p>`;
+  else if(window.__bip)body=`${icon}<h2>Put it on your home screen</h2><p>One tap next lesson, full screen, no browser bars.</p><button class="big go" id="instGo">Add Control Room</button>`;
+  else if(ios)body=`${icon}<h2>Put it on your home screen</h2><ol class="inststeps"><li><span class="ig">${SHARE_ICON}</span>Tap <b>Share</b> in Safari’s bar</li><li><span class="ig">${ADD_ICON}</span>Choose <b>Add to Home Screen</b></li><li><span class="ig ok">✓</span>Tap <b>Add</b></li></ol><div class="instarrow" aria-hidden="true">↓</div>`;
+  else body=`${icon}<h2>Put it on your home screen</h2><ol class="inststeps"><li><span class="ig">⋮</span>Open your browser’s <b>menu</b></li><li><span class="ig">${ADD_ICON}</span>Choose <b>Add to Home screen</b> or <b>Install app</b></li></ol>`;
+  ov.innerHTML=`<div class="nbpanel instpanel"><header><span class="lab">Control Room app</span><button class="ghost" id="instX">Close</button></header><div class="instbody">${body}</div></div>`;
+  $('#instX').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  if($('#instGo'))$('#instGo').onclick=async()=>{const e=window.__bip;window.__bip=null;e.prompt();const r=await e.userChoice.catch(()=>({}));
+    $('.instbody').innerHTML=r.outcome==='accepted'?`${icon}<h2 class="instdone">Added ✓</h2><p>Find Control Room on your home screen.</p>`:`${icon}<h2>Maybe later</h2><p>Tap the logo any time to add it.</p>`;};
+}
+const SHARE_ICON='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 12v8h14v-8"/></svg>';
+const ADD_ICON='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
 const NB_ICON='<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="2" width="16" height="18" fill="var(--yel)" stroke="var(--ink)" stroke-width="2"/><path d="M7 2v18M10 7h6M10 11h6M10 15h4" stroke="var(--ink)" stroke-width="2"/></svg>';
 const NB_KINDS=[['brief','Briefs & styles','◆'],['rules','Rules you wrote','✎'],['pick','Picks you kept','●'],['card','Cards you were dealt','▲'],['team','Teams & chains','■'],['finish','Results','★'],['star','Milestones','★']];
 function openNotebook(){
@@ -653,7 +714,7 @@ function openNotebook(){
 }
 function pFrame(){
   const c=PL.clock;if(c){const left=Math.max(0,c.end-now());$$('.pclk').forEach(e=>e.textContent=fmtClock(left));$$('.pclkbar i').forEach(e=>e.style.width=(100*left/c.T)+'%');}
-  const t=PL.timer;if(t){const left=Math.max(0,t.end-now()),b=$('#pBar'),l=$('#pLeft');if(b)b.style.width=(100*left/t.T)+'%';if(l)l.textContent=Math.ceil(left/1000)+' s';}
+  const t=PL.timer;if(t){const left=t.frozen!=null?t.frozen:Math.max(0,t.end-now()),b=$('#pBar'),l=$('#pLeft');if(b)b.style.width=(100*left/t.T)+'%';if(l)l.textContent=t.frozen!=null?'paused':Math.ceil(left/1000)+' s';}
   const s=PL.st;if(s&&s.view==='play'){const g=gameById(s.g);if(g&&g.pframe)try{g.pframe($('#pbody'),s.s);}catch(e){}}
 }
 
@@ -662,6 +723,7 @@ function boot(){
   document.addEventListener('keydown',e=>{
     if(ROLE!=='host'||G.splash||e.target.closest('input,textarea,select'))return;
     if(e.key==='Escape'){const o=$('#qrbig');if(o)o.remove();return;}
+    if((e.key==='p'||e.key==='P')&&G.view==='play'&&G.game&&G.game.pause){G.game.pause();return;}
     if((e.key==='q'||e.key==='Q')&&G.code){const o=$('#qrbig');o?o.remove():showBigQR(G.code);return;}
     if(e.key===' '||e.key==='ArrowRight'||(e.key==='Enter'&&e.target.tagName!=='BUTTON')){
       if(G.view==='setup'){e.preventDefault();startGame(G.game);}
@@ -681,6 +743,7 @@ function boot(){
     const u=QS.get('room');PL.code=(u||store.get('proom','')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
     if(u&&PL.name&&store.get('proom','')===PL.code){PL.joined=true;pConnect();}
     else if(u&&PL.code.length===4)pConnect(); // connect first, so the class list can arrive before the student picks a name
+    else if(!u&&isStandalone()&&PL.code.length===4)pConnect(); // opened from the home screen: try the last room
     pRender();
   }
   requestAnimationFrame(frame);

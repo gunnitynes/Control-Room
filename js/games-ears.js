@@ -211,7 +211,8 @@ game(roundGame(mcSpec({
   onPrep(r){this.sound(r);},leave:stopAud,
   replay(r){this.sound(r);},
   public:r=>({opts:r.opts.map(E=>adsrSVG(E)),html:true,kind:'env'}),
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><h2 class="qtext">Which envelope is this?</h2>${mcTiles({...r,opts:r.opts},{...ctx,phase:ctx.phase==='prep'?'open':ctx.phase},{optHTML:E=>adsrSVG(E)})}</div>`;},
+  // the shapes show while it plays; class env-open stops them animating in a second time when answers open
+  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc env-${ctx.phase}"><h2 class="qtext">Which envelope is this?</h2>${mcTiles({...r,opts:r.opts},{...ctx,phase:ctx.phase==='prep'?'open':ctx.phase},{optHTML:E=>adsrSVG(E)})}</div>`;},
   reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><h2 class="qtext"><span class="hl">${esc(r.E.name)}</span> · A ${r.E.a}s · D ${r.E.d}s · S ${Math.round(r.E.s*100)}% · R ${r.E.r}s${r.fz?` <span class="songtag">the sound: the song frozen at ${Math.floor(r.fz.at/60)}:${pad2(Math.floor(r.fz.at%60))} (${esc(r.fz.name.toLowerCase())})</span>`:''}</h2>${mcTiles(r,ctx,{optHTML:E=>adsrSVG(E)+`<small>${esc(E.name)}</small>`})}</div>`;animateBars(m);},
 })));
 

@@ -121,13 +121,122 @@ function soloPlayer(root,st){
       const dur=700+j*350;j++;requestAnimationFrame(()=>{const h=strip.firstChild.getBoundingClientRect().height;strip.style.transition=`transform ${dur}ms cubic-bezier(.12,.6,.2,1.02)`;strip.style.transform=`translateY(${-h*(strip.children.length-1)}px)`;});
       setTimeout(()=>papi.vibe(8),dur);});}
 }
-game(slotGame({
-  id:'constraints',group:'make',name:'Constraint Generator',tag:'Three reels, one brief for the whole room: tool, source, structure.',
-  how:['Everyone spins on their own phone: tap to spin the three reels — tool, source, structure.','After each spin, keep one result. Three spins, so you end up with your own three rules.','The big screen shows everyone’s brief. Start the sprint and make something under your rules.'],
-  icon:`<svg viewBox="0 0 64 64">${[0,1,2].map(i=>`<rect x="${4+i*18}" y="10" width="16" height="36" fill="var(${COLS[i]})" stroke="var(--ink)" stroke-width="3"/>`).join('')}<rect x="2" y="50" width="56" height="8" fill="var(--ink)"/><line x1="60" y1="8" x2="60" y2="34" stroke="var(--ink)" stroke-width="3"/><circle cx="60" cy="8" r="4" fill="var(--red)" stroke="var(--ink)" stroke-width="2"/></svg>`,
-  options:[{key:'mode',label:'Spinning',choices:[['solo','Everyone spins','3 spins each, keep one per spin'],['room','Whole room','one shared brief, phones tap together']],def:'solo'},{key:'mins',label:'Default sprint length',choices:durChoices,def:20}],
-  reels:()=>[{key:'tool',title:'Tool',items:CONSTRAINTS.tool},{key:'source',title:'Source material',items:CONSTRAINTS.source},{key:'structure',title:'Structure',items:CONSTRAINTS.structure}],
-}));
+/* =====================================================================
+   CONSTRAINT GENERATOR — quick-fire studio missions
+   Every round each student gets a mission: a task built around a fresh file (MIDI or audio, made by
+   js/assets.js), a rule, and from round 2 an evolution of what they made before. Files land on their
+   computer's CADCAST page (gunnitynes.github.io/CADCAST/go); phones carry the card, Done and Busy.
+   No answer is "busy", never a fail: everyone plays as much or as little as they like.
+   The trail of rounds per student is their lineage, shown between rounds and at the end.
+   ===================================================================== */
+const CG_GLYPH={midi:`<svg viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>${[4,10,16,22,28,34].map(x=>`<rect x="${x}" y="1" width="4" height="15" fill="var(--ink)"/>`).join('')}</svg>`,
+  audio:`<svg viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><path d="M4 14 ${[...Array(16)].map((_,i)=>`L${6+i*2} ${14+Math.sin(i*1.3)*(i%3?9:4)}`).join(' ')} L36 14" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>`};
+const CG_RULE_COL={hands:'--red',ears:'--blue',tools:'--yel',time:'--green',space:'--blue',voice:'--red'};
+function cgFill(t,m){return String(t).replace(/\{asset\}/g,`the ${m.label.toLowerCase()}`).replace(/\{bpm\}/g,m.bpm).replace(/\{key\}/g,m.key).replace(/(^|[.!?]\s+)([a-z])/g,(_,a,b)=>a+b.toUpperCase());}
+// the mini piano roll for a MIDI mission card (built from the same recipe as the file)
+const CG_AUDIO={
+  beat:[...Array(16)].map((_,i)=>`<rect x="${6+i*7}" y="${i%4===0?6:i%2?24:14}" width="4" height="${i%4===0?28:i%2?10:20}" fill="var(--ink)"/>`).join(''),
+  texture:`<path d="M2 20 ${[...Array(30)].map((_,i)=>`Q${4+i*4} ${20+Math.sin(i*.8)*(4+i*.4)} ${6+i*4} 20`).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.4"/>`,
+  hit:`<path d="M8 20 L12 3 L14 37 L17 8 L20 32 ${[...Array(20)].map((_,i)=>`L${22+i*5} ${20+(i%2?1:-1)*14*Math.exp(-i/5)}`).join(' ')} L118 20" fill="none" stroke="var(--ink)" stroke-width="2.4"/>`,
+  riser:`<path d="M2 20 ${[...Array(58)].map((_,i)=>`L${4+i*2} ${20+(i%2?1:-1)*(1+i*.3)}`).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="1.8"/><path d="M8 36 L112 4" stroke="var(--red)" stroke-width="3"/>`,
+  chop:[...Array(8)].map((_,i)=>`<rect x="${4+i*14.5}" y="${8+(i*7)%10}" width="11" height="${24-(i*7)%10}" fill="${i%3?'var(--ink)':'var(--red)'}"/>`).join(''),
+};
+function cgRoll(m){if(ASSETS.K[m.kind]&&ASSETS.K[m.kind].audio)return `<svg viewBox="0 0 120 40" class="cgroll"><rect width="120" height="40" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>${CG_AUDIO[m.kind]||''}</svg>`;
+  if(!ASSETS.K[m.kind])return CG_GLYPH.midi;try{const o=ASSETS.K[m.kind].build(ASSETS.rng(m.seed),ASSETS.KEYS.find(k=>k.name===m.key)||ASSETS.KEYS[0],m.bpm);
+  const ns=o.notes,lo=Math.min(...ns.map(n=>n.n)),hi=Math.max(...ns.map(n=>n.n)),W=120,H=40,X=t=>2+(W-4)*t/o.beats,Y=n=>H-4-(H-8)*(hi===lo?.5:(n-lo)/(hi-lo));
+  return `<svg viewBox="0 0 ${W} ${H}" class="cgroll"><rect width="${W}" height="${H}" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>${ns.map(n=>`<rect x="${X(n.t).toFixed(1)}" y="${(Y(n.n)-2).toFixed(1)}" width="${Math.max(1.5,X(n.t+n.d)-X(n.t)).toFixed(1)}" height="4" fill="var(--ink)"/>`).join('')}</svg>`;}catch(e){return CG_GLYPH.midi;}}
+game({
+  id:'constraints',group:'make',name:'Constraint Generator',tag:'Quick-fire studio missions: a task, a rule and a fresh file every round. Your track evolves round by round.',
+  how:['Every round your phone deals you a mission: a task, a rule, and a file made for you (MIDI or audio) that lands on your computer.','A few minutes to make it happen with your computer, interface and controller. Tap Done, or don’t: no answer just means busy.','From round two each mission grows out of the last one. Your rounds become a lineage on the big screen.'],
+  badges:['Sprint','No score','Files for everyone'],kind:'free',
+  icon:`<svg viewBox="0 0 64 64"><rect x="6" y="20" width="52" height="34" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle cx="20" cy="12" r="8" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="28" y="4" width="14" height="14" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><polygon points="52,4 60,18 44,18" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/>${[12,20,28,36,44].map(x=>`<rect x="${x}" y="24" width="5" height="16" fill="var(--ink)"/>`).join('')}</svg>`,
+  options:[
+    {key:'mins',label:'Each round',type:'step',min:2,max:15,step:1,def:4,unit:'min'},
+    {key:'rounds',label:'Rounds',type:'step',min:1,max:20,step:1,def:5,unit:n=>n===1?'round':'rounds'},
+    {key:'files',type:'multi',label:'Files',choices:[['midi','MIDI','chords, bass, drums, arps, melodies'],['audio','Audio','beats, textures, one-shots, risers, song chops']],def:['midi','audio'],sub:v=>v.files.join(' + ')||'none'},
+    {key:'groove',label:'Groove',choices:[['room','Shared','same BPM and key for everyone'],['own','Own','everyone gets their own']],def:'room'},
+  ],
+  check:v=>v.files.length?'':'Pick MIDI, audio or both',
+  note:'Files arrive on each student’s computer: they open gunnitynes.github.io/CADCAST/go and scan its code with their phone (the same pairing CADCAST uses). Without that, the phone offers the file as a download.',
+  topInfo(){const s=G.gs;return !s?this.tag:{brief:'Ready',deal:`Dealing round ${s.round}`,work:`Round ${s.round} of ${s.o.rounds}`,between:`After round ${s.round}`,done:'The lineage'}[s.phase];},
+  start(o){const groove={bpm:pick(CONSTRAINT_BRAIN.tempos),key:pick(ASSETS.KEYS).name};G.gs={o,phase:'brief',round:0,groove,lines:new Map(),now:new Map(),out:new Set(),dealT:0};},
+  kinds(){const o=G.gs.o;return [...(o.files.includes('midi')?ASSETS.MIDI_KINDS:[]),...(o.files.includes('audio')?ASSETS.AUDIO_KINDS:[])];},
+  mission(p){const s=G.gs,B=CONSTRAINT_BRAIN,line=s.lines.get(p.id)||[],prev=[...line].reverse().find(x=>x.status!=='rest')||null;
+    const kinds=this.kinds().filter(k=>!prev||k!==prev.kind),kind=pick(kinds.length?kinds:this.kinds());
+    const gro=s.o.groove==='own'?(line[0]?{bpm:line[0].bpm,key:line[0].key}:{bpm:pick(B.tempos),key:pick(ASSETS.KEYS).name}):s.groove;
+    const cats=Object.keys(B.rules).filter(c=>!prev||c!==prev.cat),cat=pick(cats);
+    const m={round:s.round,kind,label:ASSETS.K[kind].label,seed:Math.floor(Math.random()*2**31),bpm:gro.bpm,key:gro.key,cat,status:'working',note:'',at:Date.now()};
+    const done=line.filter(x=>x.status==='done').length,last=s.round>=s.o.rounds;
+    m.lead=cgFill(last&&done?pick(B.finale):done?pick(B.evolve):pick(B.start),m);
+    m.task=cgFill(pick(B.task[kind]),m);m.rule=cgFill(pick(B.rules[cat]),m);
+    m.recipe={kind,seed:m.seed,bpm:m.bpm,key:m.key,round:s.round,who:p.name};
+    return m;},
+  give(p){const s=G.gs,m=this.mission(p);s.now.set(p.id,m);const line=s.lines.get(p.id)||[];line.push(m);s.lines.set(p.id,line);
+    logAdd(p,{kind:'card',game:this.name,title:`Round ${m.round} · ${m.label}`,text:`${m.lead}\n${m.task}\nRule: ${m.rule}`});this.toPc(p);return m;},
+  toPc(p){const s=G.gs,m=s.now.get(p.id);if(m&&s.phase==='work')pcSend(p,{t:'mission',m:{round:m.round,rounds:s.o.rounds,lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,recipe:m.recipe,ends:s.pcEnds}});},
+  onPair(p){this.toPc(p);},
+  go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
+    if(ph==='deal'){s.round++;s.now=new Map();sfx.whoosh&&sfx.whoosh();
+      online().forEach(p=>{if(s.out.has(p.id)){const line=s.lines.get(p.id)||[];line.push({round:s.round,status:'rest',kind:null});s.lines.set(p.id,line);}else this.give(p);});
+      later(()=>{if(G.gs===s&&s.phase==='deal')this.go('work');},2600);}
+    if(ph==='work'){startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('between');});s.pcEnds=Date.now()+s.o.mins*60000;s.now.forEach((m,id)=>{const p=G.players.get(id);if(p)this.toPc(p);});}
+    if(ph==='between'){s.now.forEach((m,id)=>{if(m.status==='working')m.status='busy';});s.now.forEach((m,id)=>{const p=G.players.get(id);if(p)pcSend(p,{t:'mission-end',round:m.round});});}
+    if(ph==='done'){sfx.fanfare();players().forEach(p=>{const L=(s.lines.get(p.id)||[]).filter(x=>x.status==='done');if(L.length)logAdd(p,{kind:'finish',game:this.name,text:`Your lineage: ${L.length} round${L.length>1?'s':''} · ${L.map(x=>x.label).join(' → ')}`});});}
+    render();syncAll();},
+  next(){const s=G.gs;({brief:()=>this.go('deal'),deal:()=>this.go('work'),work:()=>this.go('between'),between:()=>this.go(s.round<s.o.rounds?'deal':'done'),done:()=>exitGame(true)})[s.phase]();},
+  frame(){clockFrame();},
+  act(p,d){const s=G.gs,m=s.now.get(p.id);
+    if(d.t==='out'){if(d.on)s.out.add(p.id);else s.out.delete(p.id);sync(p);render();return;}
+    if(d.t==='in'&&s.phase==='work'&&!m){s.out.delete(p.id);this.give(p);sfx.vote();sync(p);render();return;}
+    if(!m||s.phase!=='work'&&s.phase!=='between')return;
+    if(d.t==='done'){m.status='done';m.note=String(d.note||'').slice(0,90);sfx.vote();if(m.note)logAdd(p,{kind:'card',game:this.name,title:`Round ${m.round} · what I made`,text:m.note});
+      sync(p);render();if(s.phase==='work'&&[...s.now.values()].every(x=>x.status!=='working'))later(()=>{if(G.gs===s&&s.phase==='work')this.go('between');},1500);}
+    if(d.t==='busy'){m.status='busy';sync(p);render();}},
+  render(st){
+    const s=G.gs,o=s.o,P=id=>(G.players.get(id)||{name:'?'}).name;
+    const groove=`<div class="cggroove"><span><b>${s.groove.bpm}</b> BPM</span><span><b>${esc(s.groove.key)}</b></span><span>${o.mins} min rounds</span><span>round <b>${Math.max(1,s.round)}</b> / ${o.rounds}</span></div>`;
+    const machine=(spin)=>`<div class="cgmachine ${spin?'spin':''}"><i class="m1"></i><i class="m2"></i><i class="m3"></i></div>`;
+    const lineage=()=>{const ids=[...s.lines.keys()];if(!ids.length)return '<p class="fine">No missions yet.</p>';
+      return `<div class="cglin">${ids.map((id,j)=>{const L=s.lines.get(id);return `<div class="cgrow c${j%4}"><b>${esc(P(id))}</b><div class="cgnodes">${L.map(m=>`<div class="cgnode st-${m.status} ${m.kind&&ASSETS.K[m.kind]&&ASSETS.K[m.kind].audio?'au':'mi'}" title="${esc(m.task||'')}"><i>${m.round}</i>${m.status==='rest'?'<span>sat out</span>':`<span>${esc(m.label)}</span>${m.note?`<em>${esc(m.note)}</em>`:''}`}</div>`).join('<s></s>')}</div></div>`;}).join('')}</div>`;};
+    let body='';
+    if(s.phase==='brief')body=`<div class="cgbrief">${machine(false)}<div><span class="lab">The constraint machine</span><h2>Missions, files, fast rounds</h2>
+      <p>Everyone gets a task, a rule and a fresh file every ${o.mins} minutes. ${o.groove==='room'?'The whole room shares one groove:':'Everyone gets their own groove.'}</p>${o.groove==='room'?groove:''}
+      <ol class="cgsteps"><li>On your computer open <b>gunnitynes.github.io/CADCAST/go</b> and scan its code with your phone: your files land there.</li><li>Tap <b>Done</b> when you’ve made it happen. No tap is fine: you’re busy.</li><li>Sit out any round from your phone, come back whenever.</li></ol></div></div>`;
+    else if(s.phase==='deal')body=`<div class="cgdeal">${machine(true)}<h2>Round ${s.round}</h2><p>Dealing ${s.now.size} mission${s.now.size===1?'':'s'}…</p></div>`;
+    else if(s.phase==='work'){const ms=[...s.now.entries()];const done=ms.filter(([,m])=>m.status==='done').length;
+      body=`<div class="cgtop">${groove}<div class="cgclock">${clockHTML('mid')}<span><b id="cgDone">${done}</b> of ${ms.length} done</span></div></div>
+        <div class="cgwall">${ms.map(([id,m],j)=>`<div class="cgcard c${j%4} st-${m.status}" style="--tilt:${((j*37)%7-3)*.6}deg"><div class="cgch"><b>${esc(P(id))}</b><span>${esc(m.label)}</span></div>
+          <div class="cgasset">${cgRoll(m)}</div><p>${esc(m.task)}</p><span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span>${m.status==='done'?'<i class="cgstamp">Done</i>':m.status==='busy'?'<i class="cgstamp busy">Busy</i>':''}</div>`).join('')||'<p class="fine">Everyone is sitting this one out.</p>'}</div>`;}
+    else if(s.phase==='between'||s.phase==='done')body=`<div class="cgafter"><div class="cgtop"><div><span class="lab">${s.phase==='done'?'The family tree':`After round ${s.round} of ${o.rounds}`}</span><h2>${s.phase==='done'?'Every track’s lineage':'Lineage so far'}</h2></div>${groove}</div>${lineage()}</div>`;
+    const lbl={brief:'Deal round 1',deal:'Start the clock',work:'End this round',between:s.round<o.rounds?`Deal round ${s.round+1}`:'Show the family tree',done:'Back to the menu'}[s.phase];
+    st.innerHTML=`<div class="cg ph-${s.phase}">${body}<div class="dfoot"><span class="fine">${s.out.size?`${s.out.size} sitting out next round`:''}</span><button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
+    $('#bNext').onclick=()=>this.next();},
+  pstate(p){const s=G.gs,m=s.now.get(p.id),L=s.lines.get(p.id)||[];
+    return {k:s.phase+s.round+(m?m.status+m.seed:'')+(s.out.has(p.id)?'o':''),ph:s.phase,round:s.round,rounds:s.o.rounds,out:s.out.has(p.id),pc:!!pcFor(p),groove:s.o.groove==='room'?s.groove:null,
+      m:m?{lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,status:m.status,note:m.note,recipe:m.recipe}:null,
+      line:L.map(x=>({round:x.round,label:x.label||'',status:x.status,note:x.note||''})),clock:pClock()};},
+  player(root,st){pClockStart(st.clock);
+    const out=`<label class="cgout"><input type="checkbox" id="pOut" ${st.out?'checked':''}> Sit out ${st.ph==='work'||st.ph==='deal'?'the next round':'next round'}</label>`;
+    const lineHTML=st.line.length?`<div class="cgmyline">${st.line.map(x=>`<span class="st-${x.status}" title="${esc(x.note)}">${x.round}</span>`).join('')}</div>`:'';
+    if(st.ph==='brief'){root.innerHTML=`<div class="pcol2"><h2 class="pbigt">Get your computer ready</h2><p>Open <b>gunnitynes.github.io/CADCAST/go</b> on your computer and scan its code with this phone. Your files will land there.</p>
+      <p class="cgpc ${st.pc?'ok':''}">${st.pc?'✓ Your computer is paired':'Computer not paired yet'}</p>${st.groove?`<p class="lab">The room’s groove: ${st.groove.bpm} BPM · ${esc(st.groove.key)}</p>`:''}${out}</div>`;}
+    else if(st.ph==='deal')root.innerHTML=`<div class="pcenter dots"><div class="cgmachine spin small"><i class="m1"></i><i class="m2"></i><i class="m3"></i></div><h2>Round ${st.round}</h2><p>${st.out?'You’re sitting this one out.':'Your mission is coming…'}</p></div>`;
+    else if(st.ph==='work'&&!st.m)root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}<h2 class="pbigt">${st.out?'Sitting out':'No mission yet'}</h2><p>Jump in whenever you like.</p><button class="big go" id="pIn">Deal me in</button>${lineHTML}</div>`;
+    else if(st.m){const m=st.m;
+      root.innerHTML=`<div class="pcol2 cgp">${st.ph==='work'?pClockHTML(st.clock):''}<div class="cgmission"><span class="lab">Round ${st.round} of ${st.rounds} · ${esc(m.label)}</span><p class="cglead">${esc(m.lead)}</p><h2>${esc(m.task)}</h2>
+        <span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>
+        <div class="cgfile"><span>${esc(m.recipe.key)} · ${m.recipe.bpm} BPM</span>${st.pc?'<b>✓ The file is on your computer</b>':'<button class="ghost" id="pGet">Get the file on this phone</button>'}</div>
+        ${m.status==='done'?`<p class="cgdone">✓ Done${m.note?`: ${esc(m.note)}`:''}</p>`:st.ph==='work'?`<input class="prule" id="pNote" maxlength="90" placeholder="What did you make? (optional)"><button class="big go" id="pDone">Done</button><button class="ghost" id="pBusy">${m.status==='busy'?'Marked busy':'Busy this round'}</button>`:`<p class="cgdone busy">${m.status==='busy'?'Busy this round: that’s fine.':''}</p>`}
+        ${lineHTML}${out}</div>`;}
+    else root.innerHTML=`<div class="pcol2"><h2 class="pbigt">${st.ph==='done'?'Your lineage':'Between rounds'}</h2>${lineHTML||'<p>Nothing yet.</p>'}${st.line.map(x=>x.note?`<p class="fine">R${x.round} · ${esc(x.label)}: ${esc(x.note)}</p>`:'').join('')}${st.ph!=='done'?out:''}</div>`;
+    const o=$('#pOut',root);if(o)o.onchange=()=>papi.send({t:'out',on:o.checked});
+    const i=$('#pIn',root);if(i)i.onclick=()=>papi.send({t:'in'});
+    const dn=$('#pDone',root);if(dn)dn.onclick=()=>{papi.send({t:'done',note:($('#pNote',root)||{}).value||''});papi.vibe([20,30,20]);};
+    const b=$('#pBusy',root);if(b)b.onclick=()=>papi.send({t:'busy'});
+    const g=$('#pGet',root);if(g)g.onclick=async()=>{g.disabled=true;g.textContent='Making the file…';try{const f=await ASSETS.make(st.m.recipe);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([f.bytes],{type:f.mime}));a.download=f.name;document.body.appendChild(a);a.click();a.remove();g.textContent='✓ '+f.name;}catch(e){g.textContent='Could not make it: '+e.message;}};
+  },
+});
+
 /* portmanteau: "Doo-wop" × "Hardstyle" → "Doo-style" */
 function mash(a,b){const P=window.GENRE_PARTS||{a:{},b:{}};
   const head=P.a[a]||(w=>{const m=w.match(/^[^aeiouy]*[aeiouy]+[^aeiouy]?/i);return m?m[0]:w.slice(0,3);})(a.replace(/[^A-Za-z ]/g,'').split(' ')[0]);

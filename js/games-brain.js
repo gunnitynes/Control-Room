@@ -47,6 +47,7 @@ game(roundGame(mcSpec({
     {key:'cats',type:'multi',label:'Categories',show:v=>v.bank!=='vault',choices:CATS.map(c=>[c.id,c.name,c.sub+' · '+c.qs.length]),def:CATS.map(c=>c.id),sub:v=>`${v.cats.length} of ${CATS.length}`},
     {key:'vols',type:'multi',label:'Volumes',show:v=>v.bank==='vault',choices:Object.keys(VAULT).map(k=>[k,'Volume '+k,VAULT[k].length+' questions']),def:Object.keys(VAULT),sub:v=>`${v.vols.length} of ${Object.keys(VAULT).length}`},
     {key:'n',label:'Questions',choices:[[10,'10','qs'],[15,'15','qs'],[20,'20','qs'],[30,'30','qs'],[0,'ALL','of them']],def:15},
+    {key:'auto',label:'Next question',choices:[[0,'Manual','you click Next'],[6,'6','seconds'],[10,'10','seconds'],[15,'15','seconds']],def:10,help:'After the answer shows, the next question starts by itself. Click the ring (or press P) to pause any clock.'},
     {key:'secs',label:'Answer time',choices:[[10,'10','seconds'],[20,'20','seconds'],[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:20,help:'Faster right answers score more: 1000 points at once, sliding to 500 at the buzzer, +100 for every answer in a streak (up to +500).'},
   ],
   check:v=>v.bank==='vault'?(v.vols.length?'':'Pick at least one volume'):(v.cats.length?'':'Pick at least one category'),
@@ -54,7 +55,9 @@ game(roundGame(mcSpec({
   prepText:()=>({big:'Eyes up',small:'Read the question on the big screen. The answers appear here in a moment.'}),
   secs:o=>o.secs,build:o=>o.bank==='vault'?buildVaultDeck(o):buildQuizDeck(o),roundInfo:r=>r.vol?'Studio Vault · Vol. '+r.vol:catOf(r.cat).name,
   stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc">${r.vol?`<div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div>`:''}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal">${r.vol?`<div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div>`:''}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;animateBars(m);},
+  // the reveal: the question shrinks to a line, the right answer takes its place, big
+  reveal:(m,r,ctx)=>{const ans=r.opts[r.c];m.innerHTML=`<div class="mc reveal">${r.vol?`<div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div>`:''}<p class="qsmall">${esc(r.text)}</p>
+    <div class="bigans c${r.c}${ans.length>60?' long':ans.length>32?' mid':''}">${shape(r.c,64,'var(--ink)','var(--paper)')}<span>${esc(ans)}</span></div>${mcTiles(r,ctx)}</div>`;animateBars(m);},
 })));
 
 /* ---------- THE STUDIO VAULT · audio history & production trivia ---------- */
@@ -138,7 +141,7 @@ function VIS(key){
 }
 game(roundGame({
   id:'translate',group:'brain',name:'The Translation Grid',tag:'Match the idea to what it looks like — or to what it feels like.',
-  how:['Four audio ideas on the left, four pictures or analogies on the right.','On your phone, tap an idea, then tap its partner. Lines connect them.','Every correct pair scores. Speed adds a little on top.'],
+  how:['Four audio ideas go up on the big screen, each with its colour and shape.','Your phone deals four cards, pictures or analogies, one at a time. Tap the shape of the idea each card belongs to.','Every correct pair scores. The reveal draws the lines. Speed adds a little on top.'],
   badges:['Scored','Matching'],speed:.3,okAt:.99,closeAt:.5,
   icon:`<svg viewBox="0 0 64 64"><rect x="4" y="6" width="18" height="12" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><rect x="4" y="26" width="18" height="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><rect x="4" y="46" width="18" height="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle cx="52" cy="12" r="7" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle cx="52" cy="32" r="7" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><circle cx="52" cy="52" r="7" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M22 12 L45 32 M22 32 L45 52 M22 52 L45 12" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
@@ -153,9 +156,11 @@ game(roundGame({
     const mode=o.mode==='mix'?(i%2?'a':'v'):o.mode;const right=shuffle([0,1,2,3]);out.push({mode,items,right});}return out;},
   roundInfo:r=>r.mode==='v'?'pictures':'analogies',
   rightHTML:(r,k)=>{const it=r.items[r.right[k]];return r.mode==='v'?VIS(it.v):`<span class="anal">“${esc(it.a)}”</span>`;},
+  // the big screen keeps the ideas; the pictures / analogies go to the phones
   stage(m,r,ctx){
-    m.innerHTML=`<div class="tgrid ${ctx.phase==='prep'?'':'open'}"><div class="tcol">${r.items.map((it,i)=>`<div class="tl"><b>${i+1}</b><span>${esc(it.c)}</span></div>`).join('')}</div>
-      <div class="tcol">${r.right.map((_,k)=>`<div class="tr c${k}">${shape(k,26)}${this.rightHTML(r,k)}</div>`).join('')}</div></div>`;
+    m.innerHTML=`<div class="tgbig ph-${ctx.phase}"><p class="lab">${ctx.phase==='prep'?'Study the four ideas':'Match each card on your phone to one of these'}</p>
+      <div class="tgconcepts">${r.items.map((it,i)=>`<div class="tgc c${i}">${shape(i,72,'var(--ink)','var(--c)')}<b>${esc(it.c)}</b></div>`).join('')}</div>
+      <p class="fine">The ${r.mode==='v'?'pictures':'analogies'} are on your phones.</p></div>`;
   },
   reveal(m,r,ctx){
     const n=Math.max(1,ctx.list.length);
@@ -171,23 +176,21 @@ game(roundGame({
   score:(r,a)=>{let ok=0;a.forEach((k,i)=>{if(r.right[k]===i)ok++;});return {acc:ok/4,note:`${ok} of 4 pairs right`};},
   publicReveal:r=>({pairs:r.items.map((_,i)=>r.right.indexOf(i))}),
   revealSide:(r,ctx)=>{const n=ctx.list.length,perfect=ctx.list.filter(x=>x.res&&x.res.acc===1).length;return `<div class="stat"><b>${perfect}</b><span>perfect grids of ${n}</span></div>`;},
+  // phone: one card at a time, big; tap the shape of the idea it belongs to. pair[idea] = card
   input(root,pub,submit){
-    const pair=[null,null,null,null];let sel=null;
-    root.innerHTML=`<div class="pmatch"><svg class="plines"></svg><div class="pcol">${pub.left.map((c,i)=>`<button class="pl" data-i="${i}"><b>${i+1}</b><span>${esc(c)}</span></button>`).join('')}</div>
-      <div class="pcol">${pub.right.map((x,k)=>`<button class="pr c${k}${pub.mode==='a'?' anal':''}" data-k="${k}">${pub.mode==='v'?x:`<span>${esc(x)}</span>`}</button>`).join('')}</div></div>
-      <button class="big go pdone" disabled>Lock in</button>`;
-    const draw=()=>{const sv=$('.plines',root),box=$('.pmatch',root).getBoundingClientRect();sv.setAttribute('viewBox',`0 0 ${box.width} ${box.height}`);
-      sv.innerHTML=pair.map((k,i)=>{if(k==null)return '';const a=$(`.pl[data-i="${i}"]`,root).getBoundingClientRect(),b=$(`.pr[data-k="${k}"]`,root).getBoundingClientRect();
-        return `<line x1="${a.right-box.left}" y1="${a.top+a.height/2-box.top}" x2="${b.left-box.left}" y2="${b.top+b.height/2-box.top}" stroke="var(${COLS[k]})" stroke-width="5" stroke-linecap="round"/>`;}).join('');
-      $$('.pl',root).forEach(b=>{const i=+b.dataset.i;b.classList.toggle('sel',sel===i);b.style.setProperty('--pc',pair[i]!=null?`var(${COLS[pair[i]]})`:'var(--paper)');b.classList.toggle('done',pair[i]!=null);});
-      $$('.pr',root).forEach(b=>b.classList.toggle('used',pair.includes(+b.dataset.k)));
-      $('.pdone',root).disabled=pair.some(x=>x==null);};
-    $$('.pl',root).forEach(b=>b.onclick=()=>{sel=+b.dataset.i;draw();});
-    $$('.pr',root).forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(sel==null){sel=pair.findIndex(x=>x==null);if(sel<0)return;}
-      const j=pair.indexOf(k);if(j>=0)pair[j]=null;pair[sel]=k;sel=pair.findIndex(x=>x==null);if(sel<0)sel=null;papi.vibe(15);draw();});
-    $('.pdone',root).onclick=()=>submit(pair.slice());
-    sel=0;requestAnimationFrame(draw);
+    const n=pub.right.length,pair=Array(n).fill(null);let k=0;
+    const owner=kk=>pair.indexOf(kk),nextOpen=()=>{for(let j=1;j<=n;j++){const kk=(k+j)%n;if(owner(kk)<0)return kk;}return k;};
+    const draw=()=>{const done=pair.every(x=>x!=null);
+      root.innerHTML=`<div class="tgphone"><div class="tgstrip">${pub.right.map((_,kk)=>{const i=owner(kk);return `<button class="tgdot ${kk===k?'cur':''} ${i>=0?'set c'+i:''}" data-k="${kk}" aria-label="Card ${kk+1}">${i>=0?shape(i,20,'var(--ink)','var(--c)'):kk+1}</button>`;}).join('')}</div>
+        <div class="tgcard ${pub.mode==='v'?'vis':'anal'}"><span class="lab">Card ${k+1} of ${n}</span>${pub.mode==='v'?pub.right[k]:`<b>“${esc(pub.right[k])}”</b>`}</div>
+        <p class="lab tgq">Which idea on the big screen?</p>
+        <div class="tgpick">${pair.map((by,i)=>`<button class="tgp c${i} ${by===k?'on':''} ${by!=null&&by!==k?'used':''}" data-i="${i}" aria-label="Idea ${i+1}">${shape(i,44,'var(--ink)','var(--c)')}</button>`).join('')}</div>
+        <button class="big go plock" ${done?'':'disabled'}>${done?'Lock in':`${pair.filter(x=>x!=null).length} of ${n} matched`}</button></div>`;
+      $$('.tgdot',root).forEach(b=>b.onclick=()=>{k=+b.dataset.k;draw();});
+      $$('.tgp',root).forEach(b=>b.onclick=()=>{const i=+b.dataset.i,prev=owner(k);if(prev>=0)pair[prev]=null;pair[i]=k;papi.vibe(15);k=nextOpen();draw();});
+      $('.plock',root).onclick=()=>{if(pair.every(x=>x!=null))submit(pair.slice());};};
+    draw();
   },
-  locked:(box,mine)=>{box.innerHTML=`<p class="lab">Your pairs</p><div class="pairs">${mine.map((k,i)=>`<span><b>${i+1}</b>→${shape(k,22)}</span>`).join('')}</div>`;},
-  pReveal:(box,st)=>{box.innerHTML=`<div class="pairs">${st.rv.pairs.map((k,i)=>`<span class="${st.mine&&st.mine[i]===k?'ok':'bad'}"><b>${i+1}</b>→${shape(k,22)}</span>`).join('')}</div>`;},
+  locked:(box,mine)=>{box.innerHTML=`<p class="lab">Your matches</p><div class="pairs">${mine.map((k,i)=>({k,i})).sort((a,b)=>a.k-b.k).map(({k,i})=>`<span><b>Card ${k+1}</b>→${shape(i,22)}</span>`).join('')}</div>`;},
+  pReveal:(box,st)=>{box.innerHTML=`<div class="pairs">${st.rv.pairs.map((k,i)=>({k,i})).sort((a,b)=>a.k-b.k).map(({k,i})=>`<span class="${st.mine&&st.mine[i]===k?'ok':'bad'}"><b>Card ${k+1}</b>→${shape(i,22)}</span>`).join('')}</div>`;},
 }));

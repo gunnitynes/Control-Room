@@ -393,9 +393,14 @@ function playGroove(g,{bars=4,countIn=true,onStep,dest}={}){
 }
 
 /* ---------- envelope tones (Envelope Sculptor) ---------- */
-function playEnvelope(E,dest){const ac=audio(),r=rig(dest,{rt:.6});r.strip('e',{gain:1,send:.04});const t=ac.currentTime+.08,g=gn(ac,0),f=bq(ac,'lowpass',2600,.8);
-  const end=adsr(g,t,{a:E.a,d:E.d,s:E.s,r:E.r,len:E.hold,peak:.5});[0,-1200,7].forEach(dt=>{const o=osc(ac,dt<0?'square':'sawtooth',hz(57));o.detune.value=dt;o.connect(f);o.start(t);o.stop(end);});
-  f.connect(g).connect(r.strips.e.in);r.dur=end-t;return r;}
+// Envelope Sculptor's voice: a warm open fifth (A–E–A), soft detuned voices and a vibrato that blooms in.
+// The filter stays fixed so only the loudness moves, and the room is short so it doesn't blur the release.
+function playEnvelope(E,dest){const ac=audio(),r=rig(dest,{rt:.9,damp:.6});r.strip('e',{gain:1,send:.05});
+  const t=ac.currentTime+.08,g=gn(ac,0),f=bq(ac,'lowpass',2300,.5),end=adsr(g,t,{a:E.a,d:E.d,s:E.s,r:E.r,len:E.hold,peak:.7});
+  const lfo=osc(ac,'sine',5.1),lg=gn(ac,0);lfo.connect(lg);lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(6,t+.7);   // ±6 cents
+  [57,64,69].forEach((n,k)=>[[-5,'triangle',.24],[6,'sawtooth',.07]].forEach(([dt,type,v])=>{const o=osc(ac,type,hz(n));o.detune.value=dt;lg.connect(o.detune);
+    const vg=gn(ac,v*(k===1?.85:1));o.connect(vg).connect(f);o.start(t);o.stop(end+.05);}));
+  lfo.start(t);lfo.stop(end+.1);f.connect(g).connect(r.strips.e.in);r.dur=end-t;return r;}
 
 /* ---------- decaying spaces (Decay Guessr) ---------- */
 const DECAY_SRC={
