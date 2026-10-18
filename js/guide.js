@@ -58,4 +58,7 @@ function guideHTML(){
   </div>`;
 }
 function openGuide(){let ov=$('#guideov');if(!ov){ov=el('div','guideov');ov.id='guideov';document.body.appendChild(ov);}
-  ov.innerHTML=`<button class="ghost guideX" id="guideX">Close</button>${guideHTML()}`;ov.scrollTop=0;$('#guideX').onclick=()=>ov.remove();}
+  ov.innerHTML=`<button class="guideX" id="guideX" aria-label="Close the guide">✕</button>${guideHTML()}`;ov.scrollTop=0;
+  // the phone's back gesture closes the guide instead of leaving the room
+  history.pushState({guide:1},'');const close=()=>{removeEventListener('popstate',close);ov.remove();};
+  addEventListener('popstate',close);$('#guideX').onclick=()=>history.back();}

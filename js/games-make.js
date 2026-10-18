@@ -455,8 +455,8 @@ game({
   badges:['Scored','Sound design','Uses phone speakers'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="16" cy="20" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M16 20 L22 12" stroke="var(--red)" stroke-width="4"/><circle cx="48" cy="44" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M48 44 L40 50" stroke="var(--blue)" stroke-width="4"/><path d="M26 26 Q40 22 40 34" fill="none" stroke="var(--ink)" stroke-width="3" stroke-dasharray="4 4"/></svg>`,
   options:[{key:'gens',label:'Generations',choices:[[3,'3','make + 2 copies'],[4,'4'],[5,'5']],def:3},{key:'csecs',label:'Design time',choices:[[60,'1','min'],[90,'1.5','min'],[120,'2','min']],def:90},{key:'rsecs',label:'Recreate time',choices:[[120,'2','min'],[180,'3','min'],[240,'4','min']],def:180},
-    {key:'test',label:'Test mode',choices:[[0,'Off','real players only'],[1,'Bots','two bots join the chain']],def:0}],
-  note:'Students listen on their own phones, so ask everyone to put headphones on before you start. Play loops until pressed again, and every knob turn is heard at once. Needs at least two players, or turn on Test mode: two bots join the chain so you can try it with one phone.',
+    {key:'test',label:'Test mode',choices:[[0,'Off','real students only'],[1,'Bots','two bots join the chain']],def:0}],
+  note:'Students listen on their own phones, so ask everyone to put headphones on before you start. Play loops until pressed again, and every knob turn is heard at once. Needs at least two students, or turn on Test mode: two bots join the chain so you can try it with one phone.',
   check:v=>online().length>=2||(v&&v.test&&online().length>=1)?'':'At least two phones need to be in the room (or turn on Test mode)',
   topInfo(){const s=G.gs;return !s?this.tag:s.phase==='brief'?'Ready':s.phase==='create'?'Generation 1 · design':s.phase==='recreate'?`Generation ${s.r+1} of ${s.gens} · recreate`:s.phase==='reveal'?`Chain ${s.c+1} of ${s.N}`:'Final';},
   start(o){const bots=o.test?['Bot Moog','Bot Buchla']:[],botNames={};bots.forEach((n,i)=>botNames['bot:'+i]=n);
@@ -498,7 +498,7 @@ game({
         <div class="gens">${ch.map((g,k)=>`<div class="gen ${k?'':'orig'}"><span class="lab">${k?'Copy '+k:'Original'}</span><b>${esc(P(g.by))}${g.auto?' <em>(auto)</em>':''}</b>${patchBars(g.p,k?o.p:null)}<p class="fine">${k?`drift from original ${Math.round(patchDist(g.p,o.p)*100)}% · copy accuracy ${Math.round((g.acc||0)*100)}%`:'the starting sound'}</p></div>`).join('<i class="garrow">→</i>')}</div>
         <div class="dfoot"><button class="ghost" id="bPlay">▶ Play the chain, first to last</button><span></span><button class="big go" id="bNext">${s.c+1<s.N?'Next chain':'Final standings'} <small>SPACE</small></button></div></div>`;
       $('#bPlay').onclick=()=>this.playChain();$('#bNext').onclick=()=>this.next();later(()=>this.playChain(),600);return;}
-    const head={brief:`<h2>Design a sound</h2><p>Everyone gets an eight-knob synth on their phone. ${s.N} players → ${s.N} chains, ${s.gens} generations each.</p>`,
+    const head={brief:`<h2>Design a sound</h2><p>Everyone gets an eight-knob synth on their phone. ${s.N} students → ${s.N} chains, ${s.gens} generations each.</p>`,
       create:`<span class="lab">Generation 1 · design your patch</span>${clockHTML('huge')}`,
       recreate:`<span class="lab">Generation ${s.r+1} of ${s.gens} · recreate by ear, then twist ONE knob</span>${clockHTML('huge')}`}[s.phase];
     st.innerHTML=`<div class="tele dots"><div class="rtop">${head}</div>${s.phase!=='brief'?`<div class="stat center"><b id="nSubs">${s.subs.size}</b><span>of ${s.N} sent on</span></div>`:''}

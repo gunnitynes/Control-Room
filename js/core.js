@@ -203,7 +203,7 @@ async function lobbyRoom(){const id=lobbyId();if(!id)return null;try{await needP
     p.on('open',()=>{const c=p.connect(id,{serialization:'json',reliable:true});c.on('open',()=>c.send({t:'room?'}));c.on('data',m=>{if(m&&m.t==='room'&&m.code)fin(String(m.code).toUpperCase());});});});}
 function resetPoints(){if(!confirm('Reset everyone’s total points to zero?'))return;players().forEach(p=>{p.total=0;p.gp=0;});saveRoom();render();syncAll();}
 function uniqueName(name,id,max=30){
-  name=String(name||'').replace(/\s+/g,' ').trim().slice(0,max)||'Player';let n=name,k=2;
+  name=String(name||'').replace(/\s+/g,' ').trim().slice(0,max)||'Student';let n=name,k=2;
   const taken=s=>players().some(p=>p.id!==id&&p.name.toLowerCase()===s.toLowerCase());
   while(taken(n))n=name+' '+(k++);return n;
 }
@@ -252,9 +252,10 @@ function liveUpdate(){
 function topBar(){
   const g=G.game,inG=G.view!=='menu'&&G.view!=='vote'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
-    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:`<div class="cat"><div><b>Main menu</b><span>${GAMES.length} games · pick one</span></div></div>`;
-  const room=G.code&&G.view!=='menu'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button><div><b>${G.code}</b><span>join any time</span></div></div>`:'';
-  return `<header class="top">${logo()}<div class="tmid">${mid}</div><div class="tright">${room}<div class="count"><b id="nOn">${online().length}</b><span>online</span></div>
+    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
+  const room=G.code?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${G.view!=='menu'?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
+  return `<header class="top">${logo()}<div class="tmid">${mid}</div><div class="tright">${room}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div>
+    ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote on the next game">Vote</button>`:''}
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
     <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
     ${G.view!=='menu'?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
@@ -270,6 +271,7 @@ function render(){
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
+  if($('#bVote'))$('#bVote').onclick=voteGames;
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
   home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
@@ -315,24 +317,18 @@ function rMenu(st){
   const ps=players(),tot=rankBy('total');
   st.innerHTML=`<div class="menu">
     <aside class="roomp">
-      <span class="lab mut">Scan to join · one room for the whole lesson</span>
-      <button class="qr" id="roomQR" aria-label="Show the join QR full screen"></button>
-      <div class="code">${G.code||'····'}</div>
-      <div class="url">${G.code?esc(joinURL(G.code).replace(/^https?:\/\//,'')):esc(G.status||'Opening the room…')}</div>
       ${(window.ATTENDANCE||{}).url?`<div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join('')}</select></label>
         <span class="fine">${ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>`:''}
-      <div class="rhead2"><b>${ps.length}</b><span>${ps.length===1?'player':'players'} in the room</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button><a class="ghost" href="?guide" target="_blank" rel="noopener">Guide</a></div>
     </aside>
-    <section class="games"><button class="votebn" id="bVote"><span class="vbshapes">${shape(0,40,'var(--ink)','var(--red)')}${shape(1,40,'var(--ink)','var(--blue)')}${shape(2,40,'var(--ink)','var(--yel)')}</span><span class="vbt"><small>Let the room decide</small><b>Vote on the next game</b></span><span class="vbgo">Open the ballot →</span></button>${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b><span>${esc(gr.sub)}</span></div>
+    <section class="games">${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b><span>${esc(gr.sub)}</span></div>
       <div class="gtiles">${GAMES.filter(g=>g.group===gr.id).map(g=>`<button class="gt" data-g="${g.id}" style="--c:var(${g.col})"><span class="no">${numOf(g)}</span><span class="ico">${g.icon||''}</span><strong>${esc(g.name)}</strong><p>${esc(g.tag)}</p><span class="meta">${(g.badges||[]).map(b=>`<span>${esc(b)}</span>`).join('')}</span></button>`).join('')}</div></div>`).join('')}</section>
   </div>`;
-  if(G.code){drawQR($('#roomQR'),G.code,480);$('#roomQR').onclick=()=>showBigQR(G.code);}
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
-  $('#bVote').onclick=voteGames;$('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
+  $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
   if($('#selCls'))$('#selCls').onchange=e=>attSetClass(e.target.value);
 }
 
