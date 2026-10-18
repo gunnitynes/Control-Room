@@ -241,12 +241,28 @@ game(roundGame(mcSpec({
 const ML={frame:null,ready:false,want:null};
 function mlFrame(){
   if(ML.frame&&ML.frame.isConnected)return ML.frame;
-  const f=el('iframe','mlframe');f.src='meterlab/index.html?embed';f.setAttribute('allow','autoplay');f.title='Meter Lab';f.hidden=true;
+  const f=el('iframe','mlframe');f.src='meterlab/index.html?embed&v=2';f.setAttribute('allow','autoplay');f.title='Meter Lab';f.hidden=true;
   f.onload=()=>{const t=setInterval(()=>{const api=f.contentWindow&&f.contentWindow.MLAPI;if(api){clearInterval(t);ML.ready=true;api.theme(document.documentElement.dataset.theme==='night');if(ML.want){const w=ML.want;ML.want=null;w(api);}}},100);};
   document.body.appendChild(f);ML.frame=f;return f;
 }
 function mlApi(fn){const f=mlFrame();const api=ML.ready&&f.contentWindow&&f.contentWindow.MLAPI;if(api)fn(api);else ML.want=fn;}
-function mlPlace(){const f=ML.frame,slot=$('#mlslot');if(!f)return;if(!slot){f.hidden=true;return;}const b=slot.getBoundingClientRect();f.hidden=false;Object.assign(f.style,{left:b.left+'px',top:b.top+'px',width:b.width+'px',height:b.height+'px'});}
+// the figure is a fixed frame laid over its slot; clip it to the part of the slot its scrolling panel shows
+function mlPlace(){const f=ML.frame,slot=$('#mlslot');if(!f)return;if(!slot){f.hidden=true;return;}const b=slot.getBoundingClientRect();
+  const box=(slot.closest('.mlres,#rgm,.stage')||document.body).getBoundingClientRect();
+  const t=Math.max(0,box.top-b.top),bt=Math.max(0,b.bottom-box.bottom),l=Math.max(0,box.left-b.left),rt=Math.max(0,b.right-box.right);
+  f.hidden=b.height-t-bt<30||b.width-l-rt<30;
+  Object.assign(f.style,{left:b.left+'px',top:b.top+'px',width:b.width+'px',height:b.height+'px',clipPath:`inset(${t}px ${rt}px ${bt}px ${l}px)`});}
+// Question styles: HEAR it (sound + the listening booth), SEE it (the moving figure with its labels hidden, no sound),
+// HEAR + SEE (both). The figure tells the rhythm as shapes: hops, arcs, wheels, a necklace, a drum score.
+const MLSTYLE={hear:{tag:'Hear it',word:'LISTEN',big:'Listen',small:'Feel the groove on the big speakers. The answers open in a moment.'},
+  see:{tag:'See it',word:'WATCH',big:'Watch',small:'No sound this time: read the moving figure on the big screen.'},
+  both:{tag:'Hear + see',word:'LOOK',big:'Watch and listen',small:'The figure moves with the sound. Use both.'}};
+const MLSEE={meter:'Count the hops: one per beat. Then count the dots inside a hop: 2 means simple, 3 means compound.',
+  grouping:'Read the hops: short blue hops are 2s, tall red hops are 3s. Read them left to right.',
+  poly:'Count how many times each ball crosses its arc before they meet again.',
+  polymeter:'Count the teeth on the wheel: one tooth per step. The dark teeth are the hits.',
+  pattern:'Read the necklace: count the beads around the ring and the gaps between the big ones.',
+  swing:'Watch where the shapes land against the dashed rings: on the rings is straight, late is swung.'};
 const mlOptHTML=o=>o.mini?`<span class="mlmini">${[...o.mini].map(c=>`<i class="${c==='1'?'on':''}"></i>`).join('')}</span>`:`<b class="mlbig">${esc(o.big)}</b>${o.small?`<small>${esc(o.small)}</small>`:''}`;
 game(roundGame({
   id:'meterlab',group:'ears',name:'Meter Lab',tag:'The rhythm lab: hear a groove, name its meter, grouping, polyrhythm, pattern or swing.',
@@ -255,41 +271,46 @@ game(roundGame({
   icon:`<svg viewBox="0 0 64 64"><circle cx="20" cy="40" r="14" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="34" y="8" width="24" height="24" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><path d="M36 58 L58 58 L47 38Z" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 q8 -8 16 0 t16 0" fill="none" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
     {key:'topics',type:'multi',label:'Topics',choices:[['meter','Meter','time signatures, beats, simple or compound'],['grouping','Grouping','additive bars: 2s and 3s'],['poly','Polyrhythm','two voices, two ratios'],['polymeter','Polymeter','loops of different lengths'],['pattern','Pattern','Euclidean and famous rhythms'],['swing','Swing','straight, swung, early or late']],def:['meter','grouping','poly','polymeter','pattern','swing'],sub:v=>`${v.topics.length} of 6`},
+    {key:'style',label:'Question style',choices:[['mix','Mixed','hear, see, both'],['hear','Hear it','sound only'],['see','See it','read the figure, no sound'],['both','Hear + see','figure and sound']],def:'mix',help:'See it shows Meter Lab’s moving figure (the hops, the arcs, the wheels, the necklace, the drum score) with its labels hidden: students read the rhythm from the shapes.'},
     {key:'level',label:'Level',choices:[[1,'I','warm-up'],[2,'II','groove'],[3,'III','odd']],def:1},
-    {key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10']],def:8},
+    {key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10'],[12,'12'],[16,'16']],def:8},
     {key:'secs',label:'Answer time',choices:[[20,'20','seconds'],[30,'30','seconds'],[0,'OFF','no clock']],def:30},
   ],
   check:v=>v.topics.length?'':'Pick at least one topic',
   note:'Powered by Meter Lab (meterlab/index.html). <a href="meterlab/" target="_blank" rel="noopener">Open the full Meter Lab workstation</a> in a new tab for teaching.',
   prepMs:5000,prepLabel:'LISTEN',prepSub:'to the groove',
-  prepText:()=>({big:'Listen',small:'Feel the groove on the big speakers. The answers open in a moment.'}),
+  prepText:r=>{const m=MLSTYLE[(r&&r.style)||'hear'];return {big:m.big,small:m.small};},
   secs:o=>o.secs,
-  build:o=>[...Array(o.n)].map(()=>({q:null})),
+  build:o=>{let deck=[];return [...Array(o.n)].map(()=>{if(!deck.length)deck=o.style&&o.style!=='mix'?[o.style]:shuffle(['hear','see','both']);return {q:null,style:deck.pop()};});},
   // questions come from Meter Lab itself, so each round asks for one as it starts
   onPrep(r,o){mlApi(api=>{if(!r.q){const q=api.question(o.level,o.topics);let opts=q.options;
       if(opts.length>4){const right=opts.find(x=>x.id===q.answer);opts=shuffle([right,...shuffle(opts.filter(x=>x!==right)).slice(0,3)]);}
       r.q=q;r.opts=opts;r.c=opts.findIndex(x=>x.id===q.answer);}
-    api.listen('LISTEN');api.play();render();syncAll();});},
+    const st=r.style||'hear';this.prepLabel=MLSTYLE[st].word;this.prepSub=st==='hear'?'to the groove':st==='see'?'the figure':'and listen';
+    if(st==='hear')api.listen('LISTEN');else api.see();api.mute(st==='see');api.play();render();syncAll();});},
   leave(){mlApi(api=>api.stop());},
-  stop(){mlApi(api=>api.stop());if(ML.frame)ML.frame.hidden=true;},
+  stop(){mlApi(api=>{api.stop();api.mute(false);});if(ML.frame)ML.frame.hidden=true;},
   // after the reveal: the sound stops and a results window comes up; the teacher moves on
-  replay(r,ph){const s=G.gs;if(ph==='reveal'&&s.mlWin){s.mlWin=false;render();}mlApi(api=>api.play());},replayLabel:'Play the groove',
-  onReveal(){G.gs.mlWin=true;mlApi(api=>{api.stop();api.reveal();});},
+  replay(r,ph){mlApi(api=>{api.mute(ph!=='reveal'&&r.style==='see');api.play();});},replayLabel:'Hear the groove',
+  // the reveal: the sound stops, the answer's own figure keeps moving (labels on) next to the results
+  onReveal(){G.gs.mlWin=true;mlApi(api=>{api.mute(true);api.reveal();api.play();});},
   frame(){mlPlace();},resize(){mlPlace();},
   roundInfo:r=>r.q?(MLTOPIC[r.q.topic]||r.q.topic):'',
   stage(m,r,ctx){const q=r.q;
-    m.innerHTML=`<div class="mlwrap"><div class="mlhead"><span class="dawtag">Meter Lab · ${esc(q?MLTOPIC[q.topic]:'loading')}</span><h2 class="qtext">${q?esc(q.prompt):'Loading Meter Lab…'}</h2>${q&&ctx.phase!=='prep'?`<p class="fine">${esc(q.hint)}</p>`:''}</div>
+    const st=r.style||'hear';
+    m.innerHTML=`<div class="mlwrap st-${st}"><div class="mlhead"><span class="dawtag">Meter Lab · ${esc(q?MLTOPIC[q.topic]:'loading')}</span><span class="mlstyle s-${st}">${esc(MLSTYLE[st].tag)}</span><h2 class="qtext">${q?esc(q.prompt):'Loading Meter Lab…'}</h2>${q&&ctx.phase!=='prep'?`<p class="fine">${esc(st==='hear'?q.hint:MLSEE[q.topic]||q.hint)}</p>`:''}</div>
       <div class="mlslot" id="mlslot"></div>${q?mcTiles({opts:r.opts,c:r.c},ctx,{optHTML:mlOptHTML}):''}</div>`;mlPlace();},
   reveal(m,r,ctx){const q=r.q;if(!q){m.innerHTML='';return;}const s=G.gs;
     if(s.mlWin){
       const ps=players().map(p=>({p,res:s.res.get(p.id)||{cls:'none',pts:0}}));const got=ps.filter(x=>x.res.cls==='yes').sort((a,b)=>b.res.pts-a.res.pts),miss=ps.filter(x=>x.res.cls!=='yes');
       const right=r.opts[r.c];const chip=x=>`<li class="c${x.p.sh}">${shape(x.p.sh,20,'var(--ink)','var(--c)')}<span>${esc(x.p.name)}</span>${x.res.pts?`<em>+${x.res.pts}</em>`:x.res.cls==='none'?'<em>no answer</em>':''}</li>`;
-      m.innerHTML=`<div class="mlres"><div class="mlrhead"><span class="dawtag">Meter Lab · ${esc(MLTOPIC[q.topic])} · results</span><h2 class="qtext">${esc(q.prompt)}</h2></div>
-        <div class="mlanswer"><span class="lab">The answer</span><div class="tile c${r.c} yes">${shape(r.c,40)}<div class="tx">${mlOptHTML(right)}</div></div><p class="mlexplain">${q.explain}</p></div>
+      m.innerHTML=`<div class="mlres"><div class="mlrhead"><span class="dawtag">Meter Lab · ${esc(MLTOPIC[q.topic])} · ${esc(MLSTYLE[r.style||'hear'].tag)} · results</span><h2 class="qtext">${esc(q.prompt)}</h2></div>
+        <div class="mlrbody"><div class="mlrleft"><div class="mlanswer"><span class="lab">The answer</span><div class="tile c${r.c} yes">${shape(r.c,40)}<div class="tx">${mlOptHTML(right)}</div></div><p class="mlexplain">${q.explain}</p></div>
+          <div class="mlslot mlrfig" id="mlslot"></div></div>
         <div class="mlcols"><div class="mlcol ok"><h3><b>${got.length}</b> got it</h3><ul>${got.map(chip).join('')||'<li class="none">Nobody this time</li>'}</ul></div>
-          <div class="mlcol no"><h3><b>${miss.length}</b> missed it</h3><ul>${miss.map(chip).join('')||'<li class="none">Everyone got it ✓</li>'}</ul></div></div>
-        <div class="frow"><button class="ghost" id="bFigure">▶ Show it in Meter Lab (with sound)</button></div></div>`;
-      $('#bFigure').onclick=()=>{s.mlWin=false;render();mlApi(api=>api.play());};mlPlace();return;}
+          <div class="mlcol no"><h3><b>${miss.length}</b> missed it</h3><ul>${miss.map(chip).join('')||'<li class="none">Everyone got it ✓</li>'}</ul></div></div></div>
+        <div class="frow"><button class="ghost" id="bFigure">▶ Hear it with the figure</button></div></div>`;
+      $('#bFigure').onclick=()=>mlApi(api=>{api.mute(false);api.play();});mlPlace();return;}
     m.innerHTML=`<div class="mlwrap reveal mc"><div class="mlhead"><span class="dawtag">Meter Lab · ${esc(MLTOPIC[q.topic])}</span><h2 class="qtext">${esc(q.prompt)}</h2><p class="mlexplain">${q.explain}</p></div>
       <div class="mlslot" id="mlslot"></div>${mcTiles({opts:r.opts,c:r.c},ctx,{optHTML:mlOptHTML})}</div>`;animateBars(m);mlPlace();},
   public:r=>({opts:r.q?r.opts.map(mlOptHTML):[],html:true,kind:'ml'}),

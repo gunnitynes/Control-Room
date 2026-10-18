@@ -808,20 +808,20 @@ function sBounce(x,W,H,I,P){
     x.save();if(faded)x.globalAlpha=0.22;
     if(ri>0)ln(x,0,top,W,top,PAL.ink,3);
     const fs=Math.min(band*0.36,108),cy=top+band*0.5-6;
-    tx(x,String(r.sig[0]),g/2,cy-6,{f:`900 ${fs}px Archivo`,st:'extra-condensed',c:col,al:'center'});
+    tx(x,P.hide?'?':String(r.sig[0]),g/2,cy-6,{f:`900 ${fs}px Archivo`,st:'extra-condensed',c:col,al:'center'});
     x.fillStyle=PAL.ink;x.fillRect(g/2-fs*0.34,cy-1,fs*0.68,5);
-    tx(x,String(r.sig[1]),g/2,cy+8+fs*0.72,{f:`900 ${fs}px Archivo`,st:'extra-condensed',c:col,al:'center'});
-    tx(x,r.name.toUpperCase(),x0,top+28,{f:'700 12px "Space Mono"'});
+    tx(x,P.hide?'?':String(r.sig[1]),g/2,cy+8+fs*0.72,{f:`900 ${fs}px Archivo`,st:'extra-condensed',c:col,al:'center'});
+    if(!P.hide)tx(x,r.name.toUpperCase(),x0,top+28,{f:'700 12px "Space Mono"'});
     if(I.tap===r.L)tag(x,`YOU TAP · ${r.beats} BEATS`,x1,top+28,'right');
-    if(r.info)tx(x,r.info,x0,top+46,{f:'400 11px "Space Mono"',c:PAL.ink2});
+    if(r.info&&!P.hide)tx(x,r.info,x0,top+46,{f:'400 11px "Space Mono"',c:PAL.ink2});
     const B=r.beats,dv=r.div,n=B*dv,base=gy-19,hA=Math.max(30,Math.min(band*0.5,band-118,base-top-(r.info?84:66)));
     for(let k=0;k<B;k++){const xa=x0+wl*k/B,xb=x0+wl*(k+1)/B;hop(x,xa,xb,base,hA,PAL.ink3,1.5,[3,7]);
-      tx(x,String(k+1),(xa+xb)/2,base-hA-12,{f:`900 ${Math.round(Math.min(28,band*0.12))}px Archivo`,st:'condensed',c:PAL.ink3,al:'center'});}
+      if(!P.hide)tx(x,String(k+1),(xa+xb)/2,base-hA-12,{f:`900 ${Math.round(Math.min(28,band*0.12))}px Archivo`,st:'condensed',c:PAL.ink3,al:'center'});}
     ln(x,x0-10,gy,x1+10,gy,PAL.ink,3);
     for(let i=0;i<n;i++){const X=x0+wl*i/n,head=i%dv===0,gl=rph==null?0:Math.exp(-wrap1(rph-i/n)*rD*8),s=1+gl*0.7;
       if(i===0)sq(x,X,gy,20*s,col,PAL.ink,2.5);else if(head)dot(x,X,gy,9.5*s,col,PAL.ink,2.5);else dot(x,X,gy,5.5*s,PAL.paper,PAL.ink,2);
       if(head&&I.tap===r.L)tapRing(x,X,gy,17);
-      tx(x,r.syl[i%dv],X,gy+30,{f:`${head?'700':'400'} 12px "Space Mono"`,c:head?PAL.ink:PAL.ink2,al:'center'});}
+      if(!P.hide)tx(x,r.syl[i%dv],X,gy+30,{f:`${head?'700':'400'} 12px "Space Mono"`,c:head?PAL.ink:PAL.ink2,al:'center'});}
     let bx=x0,by=base,q=0;
     if(rph!=null){const bp=rph*B,k=Math.floor(bp),u=bp-k;bx=x0+wl*rph;by=base-hA*4*u*(1-u);q=u<0.07?1-u/0.07:u>0.95?(u-0.95)/0.05:0;
       for(let j=1;j<11;j++){const pj=rph-j*0.0045;if(pj<0)break;const bq=pj*B,uq=bq-Math.floor(bq);dot(x,x0+wl*pj,base-hA*4*uq*(1-uq),17*(1-j/12),hexA(col,0.12));}
@@ -836,8 +836,8 @@ function sBounce(x,W,H,I,P){
 /* 02 · The hop: long beats are long, high hops */
 function sHops(x,W,H,I,P){
   const g=P.g,N=g.reduce((a,b)=>a+b,0),x0=40,x1=W-40,wl=x1-x0,gy=H-112,maxP=Math.max(...g),hMax=Math.max(40,Math.min(H*0.5,gy-90)),base=gy-19;
-  watermark(x,g.join('+'),W,H,H*0.4);
-  tx(x,P.label||'',x0,58,{f:'700 12px "Space Mono"'});
+  if(!P.hide)watermark(x,g.join('+'),W,H,H*0.4);
+  if(!P.hide)tx(x,P.label||'',x0,58,{f:'700 12px "Space Mono"'});
   let acc=0;const starts=[];
   const cN=I.ph==null?-1:I.ph*N;
   g.forEach((p,gi)=>{const xa=x0+wl*acc/N,xb=x0+wl*(acc+p)/N;starts.push(acc);
@@ -845,11 +845,11 @@ function sHops(x,W,H,I,P){
     hop(x,xa,xb,base,h,on?col:PAL.ink3,on?3:1.5,on?null:[3,7]);
     const by=on?gy+38:gy+44;
     x.fillStyle=col;x.fillRect(xa+3,by,xb-xa-6,36);x.lineWidth=3;x.strokeStyle=PAL.ink;x.strokeRect(xa+3,by,xb-xa-6,36);
-    tx(x,p===2?'S':p===3?'L':String(p),(xa+xb)/2,by+26,{f:'900 22px Archivo',st:'condensed',c:p>=4?'#161514':p===1?PAL.paper:'#fff',al:'center'});
+    if(!P.hide)tx(x,p===2?'S':p===3?'L':String(p),(xa+xb)/2,by+26,{f:'900 22px Archivo',st:'condensed',c:p>=4?'#161514':p===1?PAL.paper:'#fff',al:'center'});
     for(let s=0;s<p;s++){const X=x0+wl*(acc+s)/N,gl=flAt((acc+s)/N,I,8),k=1+gl*0.7;
       if(s===0){if(gi===0)sq(x,X,gy,20*k,col,PAL.ink,2.5);else dot(x,X,gy,10*k,col,PAL.ink,2.5);}else dot(x,X,gy,5.5*k,PAL.paper,PAL.ink,2);
       if(I.tap==='B'||(I.tap==='A'&&s===0))tapRing(x,X,gy,16);
-      tx(x,P.syl[gi][s],X,gy+28,{f:`${s===0?'700':'400'} 12px "Space Mono"`,c:s===0?PAL.ink:PAL.ink2,al:'center'});}
+      if(!P.hide)tx(x,P.syl[gi][s],X,gy+28,{f:`${s===0?'700':'400'} 12px "Space Mono"`,c:s===0?PAL.ink:PAL.ink2,al:'center'});}
     acc+=p;});
   ln(x,x0-10,gy,x1+10,gy,PAL.ink,3);
   if(I.tap){const nar=W<560;tag(x,I.tap==='A'?`YOU TAP · GROUP STARTS · ${g.length}${nar?'':' PER BAR'}`:`YOU TAP · EVERY PULSE · ${N}${nar?'':' PER BAR'}`,nar?x0:x1,nar?84:58,nar?'left':'right');}
@@ -865,14 +865,14 @@ function sHops(x,W,H,I,P){
 /* 03 · The arcs: each layer's ball crosses its arc n times per cycle, striking the floor at each end */
 function sArcs(x,W,H,I,P){
   const showGrid=P.Lc<=48,gridH=showGrid?90:16,Fy=H-gridH-34,cx=W/2,Rmax=Math.max(60,Math.min(W*0.43,Fy-44));
-  watermark(x,P.ratio,W,H,Fy*0.52,'condensed');
+  if(!P.hide)watermark(x,P.ratio,W,H,Fy*0.52,'condensed');
   ln(x,cx-Rmax-40,Fy,cx+Rmax+40,Fy,PAL.ink,3);
   const nL=P.layers.length;
   P.layers.forEach((l,i)=>{
     const r=Rmax*(1-i*(nL===3?0.3:0.4)),col=LCOL(l.L),gl=flT(l.times,I,7);
     x.save();x.beginPath();x.arc(cx,Fy,r,Math.PI,TAU);x.strokeStyle=hexA(col,0.3+gl*0.6);x.lineWidth=3+gl*6;x.stroke();x.restore();
     sq(x,cx-r,Fy,12,col,PAL.ink,2);sq(x,cx+r,Fy,12,col,PAL.ink,2);
-    tx(x,`${l.L} · ${l.n}`,cx-r,Fy+24,{f:'700 11px "Space Mono"',al:'center'});
+    if(!P.hide)tx(x,`${l.L} · ${l.n}`,cx-r,Fy+24,{f:'700 11px "Space Mono"',al:'center'});
     if(I.tap===l.L){tapRing(x,cx-r,Fy,15);tapRing(x,cx+r,Fy,15);tag(x,'YOU TAP',cx+r,Fy+24,'center');}
     let bx=cx-r,by=Fy;
     if(I.ph!=null){
@@ -885,7 +885,7 @@ function sArcs(x,W,H,I,P){
   });
   if(showGrid){
     const gx0=40,gx1=W-40,cw=(gx1-gx0)/P.Lc,y0=H-gridH+8,cur=I.ph==null?-1:Math.floor(I.ph*P.Lc);
-    tx(x,`COMMON GRID · ${P.Lc} CELLS`,gx0,y0-2,{f:'700 10px "Space Mono"',c:PAL.ink2});
+    if(!P.hide)tx(x,`COMMON GRID · ${P.Lc} CELLS`,gx0,y0-2,{f:'700 10px "Space Mono"',c:PAL.ink2});
     P.layers.forEach((l,i)=>{const yy=y0+6+i*11;for(let c=0;c<P.Lc;c++)if(c%(P.Lc/l.n)===0){x.fillStyle=LCOL(l.L);x.fillRect(gx0+c*cw+1,yy,Math.max(1,cw-2),7);}});
     const yA=y0+10+nL*11;
     for(let c=0;c<P.Lc;c++){const hs=P.layers.filter(l=>c%(P.Lc/l.n)===0);x.fillStyle=hs.length>1?PAL.ink:hs.length?LCOL(hs[0].L):hexA(PAL.ink,0.07);x.fillRect(gx0+c*cw+1,yA,Math.max(1,cw-2),24);
@@ -915,20 +915,20 @@ function sGears(x,W,H,I,P){
     tops.push([cxx,py-15]);
     if(I.tap===l.L)tag(x,'YOU TAP',cxx,py-22,'center');
     const pass=I.ph==null?0:Math.floor(I.ph*P.L/l.n)+1;
-    tx(x,`LOOP ${l.L} · ${l.n} STEPS`,cxx,cy+r+30,{f:'700 11px "Space Mono"',al:'center'});
-    tx(x,I.ph==null?`${P.L/l.n} passes per cycle`:`pass ${pass} of ${P.L/l.n}`,cxx,cy+r+46,{f:'400 11px "Space Mono"',c:PAL.ink2,al:'center'});
+    tx(x,P.hide?`LOOP ${l.L}`:`LOOP ${l.L} · ${l.n} STEPS`,cxx,cy+r+30,{f:'700 11px "Space Mono"',al:'center'});
+    if(!P.hide)tx(x,I.ph==null?`${P.L/l.n} passes per cycle`:`pass ${pass} of ${P.L/l.n}`,cxx,cy+r+46,{f:'400 11px "Space Mono"',c:PAL.ink2,al:'center'});
   });
   const ag=I.ph==null?0:Math.exp(-I.ph*I.D*2.5);
   if(ag>0.04&&tops.length>1){x.save();x.globalAlpha*=ag;x.strokeStyle=PAL.red;x.lineWidth=4;x.beginPath();tops.forEach(([X,Y],i)=>i?x.lineTo(X,Y-6):x.moveTo(X,Y-6));x.stroke();x.restore();
     tx(x,'ALL LOOPS ALIGN',20,H-18,{f:'900 22px Archivo',st:'expanded',c:PAL.red,a:ag});}
-  tx(x,`STEP ${I.ph==null?0:Math.floor(I.ph*P.L)+1} / ${P.L}`,W-20,H-18,{f:'700 12px "Space Mono"',al:'right'});
+  if(!P.hide)tx(x,`STEP ${I.ph==null?0:Math.floor(I.ph*P.L)+1} / ${P.L}`,W-20,H-18,{f:'700 12px "Space Mono"',al:'right'});
 }
 
 /* 05 · The necklace: hits as beads, the polygon shows how even they are */
 function sNeck(x,W,H,I,P){
   const cx=W/2,cy=H/2+4,R=Math.min(W*0.46,H*0.43),radii={A:R,B:R*0.7,C:R*0.42};
   const g=I.ph==null?-1:Math.floor(I.ph*P.Lc);
-  watermark(x,P.mark||'',W,H,H/2,'condensed');
+  if(!P.hide)watermark(x,P.mark||'',W,H,H/2,'condensed');
   P.rings.forEach(rg=>{
     const r=radii[rg.L],col=LCOL(rg.L);x.save();if(!rg.on)x.globalAlpha=0.12;
     dot(x,cx,cy,r,null,PAL.ink,1.5);
@@ -964,8 +964,8 @@ function sSwing(x,W,H,I,P){
   for(let p=0;p<16/pu;p++){const xa=x0+wl*p*pu/16,xb=x0+wl*(p+1)*pu/16,xm=xa+(xb-xa)*sw;x.fillStyle=PAL.red;x.fillRect(xa+1,py,xm-xa-1,22);x.fillStyle=PAL.blue;x.fillRect(xm,py,xb-xm-1,22);}
   {const xa=x0,xb=x0+wl*pu/16;ln(x,(xa+xb)/2,py-6,(xa+xb)/2,py+28,PAL.ink,2,[3,3]);}
   const ratio=sw/(1-sw),rs=Math.abs(sw-0.5)<0.001?'1 : 1':Math.abs(ratio-2)<0.03?'2 : 1':Math.abs(ratio-3)<0.03?'3 : 1':`${ratio.toFixed(2)} : 1`;
-  tx(x,`${P.su===16?'16TH':'8TH'} PAIRS · LONG ${fmt1(sw*100)}% : SHORT ${fmt1(100-sw*100)}% · RATIO ${rs}`,x0,py+44,{f:'700 11px "Space Mono"'});
-  if(P.ab)tx(x,`BAR ${shown+1} · ${Math.abs(sw-0.5)<0.001?'STRAIGHT':'SWUNG'}`,W/2,28,{f:'900 20px Archivo',st:'expanded',c:Math.abs(sw-0.5)<0.001?PAL.ink:PAL.red,al:'center'});
+  if(!P.hide)tx(x,`${P.su===16?'16TH':'8TH'} PAIRS · LONG ${fmt1(sw*100)}% : SHORT ${fmt1(100-sw*100)}% · RATIO ${rs}`,x0,py+44,{f:'700 11px "Space Mono"'});
+  if(P.ab)tx(x,P.hide?`BAR ${shown+1}`:`BAR ${shown+1} · ${Math.abs(sw-0.5)<0.001?'STRAIGHT':'SWUNG'}`,W/2,28,{f:'900 20px Archivo',st:'expanded',c:Math.abs(sw-0.5)<0.001?PAL.ink:PAL.red,al:'center'});
   if(I.ph!=null){const X=x0+wl*((I.ph*bars)%1);ln(x,X,top-12,X,top+laneH*4+4,PAL.ink,3);}
 }
 
@@ -2697,6 +2697,9 @@ if(new URLSearchParams(location.search).has('embed')){
     stop(){setPlaying(false);},
     reveal(){if(!arc.q)return;arc.done=true;arc.scene=arc.q.scene;arc.P=arc.q.P;},
     listen(word){arc.scene='listen';arc.P={word:word||'LISTEN'};},
+    // the question's own figure with its answer labels hidden: students read the shapes
+    see(){if(!arc.q)return;arc.scene=arc.q.scene;arc.P={...arc.q.P,hide:true};},
+    mute(on){ensureAudio();if(master)master.gain.setTargetAtTime(on?0:0.8,AC.currentTime,0.02);},
     theme(night){if(night)document.documentElement.dataset.theme='night';else delete document.documentElement.dataset.theme;readColors();},
   };
   try{parent.postMessage({ml:'ready'},'*');}catch(e){}
