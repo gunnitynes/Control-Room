@@ -7,7 +7,7 @@ They need `python3` with `numpy`, `ffmpeg`, and `curl`. Downloads are cached in 
 |---|---|
 | `python3 tools/eras/build.py` | Sample Chronologist: `audio/eras/*.mp3`, its CREDITS.txt, `ERA_DECADES[*].clips` in data/content.js |
 | `python3 tools/atlas/piano.py` | Ear Atlas piano: `audio/atlas/piano/C2…C6.mp3` (University of Iowa EMS Steinway) |
-| `python3 tools/atlas/build.py` | Ear Atlas instruments + places: `audio/atlas/{inst,world}/*.mp3`, CREDITS.txt, `window.ATLAS` |
+| `python3 tools/atlas/build.py` | Ear Atlas instruments + places: `audio/atlas/{inst,world}/*.mp3`, CREDITS.txt, `window.ATLAS`. Only builds clips that don't exist yet (`--force` rebuilds); each pick can list `more` recordings, and each recording gives 2–3 different 10 s excerpts. `tools/atlas/built.json` remembers what was cut from where, so old downloads are never needed again. |
 | `python3 tools/atlas/worldmap.py` | the dot map in `tools/atlas/worldmap.json` (Natural Earth 110m land) |
 
 What gets used is decided in the `picks.json` next to each script, with the exact Commons file, licence and author.

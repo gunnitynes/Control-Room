@@ -45,8 +45,8 @@ def download(url, name):
         return dest
     for attempt in range(6):
         r = subprocess.run(['curl', '-sL', '-o', dest, '-w', '%{http_code}', '-A', UA, url], capture_output=True, text=True)
-        if r.stdout == '200' and os.path.getsize(dest) > 1000:
-            time.sleep(3)
+        if r.stdout == '200' and os.path.getsize(dest) > 1000 and not open(dest, 'rb').read(15).lower().startswith(b'<!doctype html'):
+            time.sleep(1)
             return dest
         print('  retrying', name, r.stdout, flush=True)
         time.sleep(20 * (attempt + 1))

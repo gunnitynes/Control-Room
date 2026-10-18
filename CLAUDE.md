@@ -21,7 +21,8 @@ js/games-brain.js   Know your stuff: The Quiz (+ Studio Vault bank), Shortcut Sh
 js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
 js/games-make.js    Make something: Constraint Generator, Genre Cross-Pollinator, Soundabout Roundabout,
                     Metaphor Translation, and Parameter Telephone (shown under Train your ears, slot 10)
-js/games-atlas.js   The Ear Atlas (in Know your stuff, after The Translation Grid)
+js/games-atlas.js   The Ear Atlas (in Know your stuff): 12 question types; recordings in window.ATLAS (built by tools/atlas/build.py);
+                    plays the clips this browser has heard least first (localStorage atlas.seen)
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
 audio/              demo song, eras/, atlas/ (piano, inst, world), presets/; each set has a CREDITS.txt

@@ -11,7 +11,15 @@
    "artist": "Xavier-Serra",
    "desc": "This is xavier serra piano audio sound",
    "mime": "audio/wav",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Piano-phrase.wav"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Piano-phrase.wav",
+   "more": [
+    {
+     "title": "Bach, JS - Minuet in G (Piano Performance by eldüendesüarez).wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/39/Bach%2C_JS_-_Minuet_in_G_%28Piano_Performance_by_eld%C3%BCendes%C3%BCarez%29.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Bach, JS"
+    }
+   ]
   },
   {
    "id": "violin",
@@ -24,7 +32,24 @@
    "artist": "Vicond",
    "desc": "Partita_2_(Gigue)_J.S.Bach_.ogg",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Partita_2_%28Gigue%29_J.S.Bach.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Partita_2_%28Gigue%29_J.S.Bach.ogg",
+   "more": [
+    {
+     "title": "Bach Partita 3 for Violin Prelude 01.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/39/Bach_Partita_3_for_Violin_Prelude_01.wav",
+     "lic": "Public domain",
+     "artist": "Bach"
+    },
+    {
+     "title": "Minstrel Boy 2.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Minstrel_Boy_2.ogg",
+     "lic": "CC0",
+     "artist": "Endersslay"
+    }
+   ],
+   "drop": [
+    "violin-3.mp3"
+   ]
   },
   {
    "id": "cello",
@@ -37,7 +62,15 @@
    "artist": "Fopseh",
    "desc": "This recording was made to be released into the Public Domain so anyone may use it freely.",
    "date": "2024-12-21",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Bach_Cello_Suite_1_Prelude_%28BWV_1007%29_Played_by_Chris.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Bach_Cello_Suite_1_Prelude_%28BWV_1007%29_Played_by_Chris.ogg",
+   "more": [
+    {
+     "title": "IMSLP173149-PMLP164349-Bach BWV1007 CelloSuite1 03 darjac.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/IMSLP173149-PMLP164349-Bach_BWV1007_CelloSuite1_03_darjac.ogg",
+     "lic": "CC BY 3.0",
+     "artist": "Darrell Jacobi"
+    }
+   ]
   },
   {
    "id": "harp",
@@ -50,7 +83,27 @@
    "artist": "",
    "desc": "Cwrw da - A track by Robin Huw Bowen. From the 2009 album Traddodiad Canu Gwerin Cymru",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Cwrw_Da_-_Robin_Huw_Bowen.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Cwrw_Da_-_Robin_Huw_Bowen.ogg",
+   "more": [
+    {
+     "title": "01 La Nueva Alianza.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/01_La_Nueva_Alianza.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "WBDelgadoL"
+    },
+    {
+     "title": "Y Fwyalchen - Robin Huw Bowen.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Y_Fwyalchen_-_Robin_Huw_Bowen.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": ""
+    },
+    {
+     "title": "Trnecek op 77.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Trnecek_op_77.ogg",
+     "lic": "CC0",
+     "artist": "פרוגנתודון"
+    }
+   ]
   },
   {
    "id": "aguitar",
@@ -63,7 +116,15 @@
    "artist": "RyGuy",
    "desc": "Sample of the sounds which can be made by an acoustic guitar.",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/6/67/AcousticGuitarSample.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/67/AcousticGuitarSample.ogg",
+   "more": [
+    {
+     "title": "Jason Shaw - SOLO ACOUSTIC GUITAR.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Jason_Shaw_-_SOLO_ACOUSTIC_GUITAR.ogg",
+     "lic": "CC BY 3.0 us",
+     "artist": "Jason Shaw"
+    }
+   ]
   },
   {
    "id": "eguitar",
@@ -76,7 +137,21 @@
    "artist": "Skimel",
    "desc": "Audio example of double tracking with saturated electric guitars playing chords. Guitar : Aria Pro II, humbucker bridge pickup. Amp : Bluguitar Amp1 (tube amp), channel 3. Cab sim added in Amplitube.",
    "date": "2020-03-05",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Double_tracked_distorted_electric_guitar_playing_chords.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Double_tracked_distorted_electric_guitar_playing_chords.ogg",
+   "more": [
+    {
+     "title": "Electric guitar lick in the style of Chuck Berry.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Electric_guitar_lick_in_the_style_of_Chuck_Berry.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Include.aliment"
+    },
+    {
+     "title": "Treble booster (Rangemaster clone) into clean amp - increasing the gain.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/Treble_booster_%28Rangemaster_clone%29_into_clean_amp_-_increasing_the_gain.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Skimel"
+    }
+   ]
   },
   {
    "id": "bass",
@@ -102,7 +177,21 @@
    "artist": "Traditional; arr. by Dock Boggs",
    "desc": "The traditional banjo tune Danville Girl, performed by Dock Boggs",
    "date": "recorded 1927; issued same yea",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/DanvilleGirl.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/DanvilleGirl.ogg",
+   "more": [
+    {
+     "title": "Happy Days In Dixie 1905.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Happy_Days_In_Dixie_1905.ogg",
+     "lic": "Public domain",
+     "artist": "Arranged by Reuben R. Brooks, also known as Ruby Brooks"
+    },
+    {
+     "title": "Stars And Stripes Forever March 1902.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Stars_And_Stripes_Forever_March_1902.ogg",
+     "lic": "Public domain",
+     "artist": "Arranged by Reuben R. Brooks, also known as Ruby Brooks"
+    }
+   ]
   },
   {
    "id": "mandolin",
@@ -115,7 +204,21 @@
    "artist": "StephanDo",
    "desc": "Ein Beispiel für Mandolinenmusik. Alle anderen in diesem Musikstück zu hörenden Instrumentenklänge wurden am Computer produziert.",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/MandolinenDemo.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/MandolinenDemo.ogg",
+   "more": [
+    {
+     "title": "Schneewalzer.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Schneewalzer.ogg",
+     "lic": "CC0",
+     "artist": "StephanDo"
+    },
+    {
+     "title": "Estellita Waltz played by Samuel Siegel and Roy Butin.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Estellita_Waltz_played_by_Samuel_Siegel_and_Roy_Butin.ogg",
+     "lic": "Public domain",
+     "artist": "Samuel Siegel and Roy Butin (Life time: Siegel 1875-1948, Butin 1877-1943)"
+    }
+   ]
   },
   {
    "id": "ukulele",
@@ -128,7 +231,15 @@
    "artist": "GrodziskiePiłki",
    "desc": "melodia grana na ukulele sopranowym na lekcji muzyki przez ucznia klasy 8",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Melodia_na_ukulele.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Melodia_na_ukulele.ogg",
+   "more": [
+    {
+     "title": "Luau, Hawaiian Ukulele Music.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Luau%2C_Hawaiian_Ukulele_Music.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Mikecolemusic"
+    }
+   ]
   },
   {
    "id": "trumpet",
@@ -141,7 +252,15 @@
    "artist": "Orgelputzer",
    "desc": "Originaltitel;The Prince of Denmark's March oder Rondeau, bekannt als Trumpet Voluntary",
    "date": "2023-01-20",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Clarke_Trumpet_Voluntary.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Clarke_Trumpet_Voluntary.ogg",
+   "more": [
+    {
+     "title": "Flaggenparade der deutschen Bundeswehr, Trompetensignal (Studio).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Flaggenparade_der_deutschen_Bundeswehr%2C_Trompetensignal_%28Studio%29.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "DrTrumpet"
+    }
+   ]
   },
   {
    "id": "trombone",
@@ -180,7 +299,21 @@
    "artist": "ChickSR",
    "desc": "\"The lick\" in C minor played on tenor saxophone",
    "mime": "audio/wav",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Lick_Tenor_Sax.wav"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Lick_Tenor_Sax.wav",
+   "more": [
+    {
+     "title": "Laverne 1910 Henton.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Laverne_1910_Henton.ogg",
+     "lic": "Public domain",
+     "artist": "H. Benne Henton &amp; unknown Band"
+    },
+    {
+     "title": "Afineromance by JulesGrandgagnage.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/32/Afineromance_by_JulesGrandgagnage.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Composition by Jerome Kernperformance by J.G.G. (Jules Grandgagnage)"
+    }
+   ]
   },
   {
    "id": "clarinet",
@@ -232,7 +365,15 @@
    "artist": "Arthur Grossman",
    "desc": "Armin Schibler - Op 90 Monologe for Bassoon &amp; Piano",
    "date": "",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Armin_Schibler_-_Bassoon_pieces.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Armin_Schibler_-_Bassoon_pieces.ogg",
+   "more": [
+    {
+     "title": "Robert Rønnes - Trio for 3 Bassoons.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Robert_R%C3%B8nnes_-_Trio_for_3_Bassoons.ogg",
+     "lic": "CC BY-SA 2.0",
+     "artist": "Arthur Grossman"
+    }
+   ]
   },
   {
    "id": "accordion",
@@ -245,7 +386,15 @@
    "artist": "Aufführung: Akkordeonorchester Hof (aohof) / Komponist: Johann Strauss Sohn",
    "desc": "Das Akkordeonorchester Hof spielt die Tritsch-Tratsch Polka von Johann Strauss (Sohn) auf dem Jahreskonzert des Akkordeonorchesters Hof am 08.05.2010 in der Göstrahalle Köditz unter der Leitung von To",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Akkordeonorchester_Hof_-_Tritsch-Tratsch_Polka_-_audio.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Akkordeonorchester_Hof_-_Tritsch-Tratsch_Polka_-_audio.ogg",
+   "more": [
+    {
+     "title": "Polka - SMV - SVA BB 1961 06.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Polka_-_SMV_-_SVA_BB_1961_06.wav",
+     "lic": "CC0",
+     "artist": ""
+    }
+   ]
   },
   {
    "id": "harmonica",
@@ -258,7 +407,15 @@
    "artist": "US Army",
    "desc": "America's Army 3 - Jail Harmonica Blues",
    "mime": "audio/mpeg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/%22Jail_Harmonica_Blues%22_from_the_America%27s_Army_3_soundtrack.mp3"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/%22Jail_Harmonica_Blues%22_from_the_America%27s_Army_3_soundtrack.mp3",
+   "more": [
+    {
+     "title": "Harmonica 02.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Harmonica_02.ogg",
+     "lic": "Public domain",
+     "artist": "mastermesh"
+    }
+   ]
   },
   {
    "id": "organ",
@@ -271,7 +428,21 @@
    "artist": "BastienM",
    "desc": "\"Suite du Premier Ton\", from Louis-Nicolas Clérambault's Premier Livre d’Orgue. Bass trumpet and high cornet. Registration: 8' and 4' principals on the positif, 8' trumpet on the great organ, and corn",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Cl%C3%A9rambault-Basse_et_Dessus.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Cl%C3%A9rambault-Basse_et_Dessus.ogg",
+   "more": [
+    {
+     "title": "Bach, Toccata und Fuge d-moll BWV 565, Norbert Schenk.mp3",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Bach%2C_Toccata_und_Fuge_d-moll_BWV_565%2C_Norbert_Schenk.mp3",
+     "lic": "CC BY 4.0",
+     "artist": "Norbert Schenk"
+    },
+    {
+     "title": "Thaxted (Holst).oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Thaxted_%28Holst%29.oga",
+     "lic": "CC BY-SA 4.0",
+     "artist": "L293D"
+    }
+   ]
   },
   {
    "id": "harpsichord",
@@ -284,7 +455,21 @@
    "artist": "Recorded by John Sankey",
    "desc": "Sonata by Domenico Scarlatti. Recorded by John Sankey. Converted from MIDI to WAV by Wikimedia user StewartIM.",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Scarlatti_K_002.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Scarlatti_K_002.ogg",
+   "more": [
+    {
+     "title": "Domenico Zipoli - Gavotte - b minor.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Domenico_Zipoli_-_Gavotte_-_b_minor.ogg",
+     "lic": "CC BY-SA 2.0",
+     "artist": "Martha Goldstein"
+    },
+    {
+     "title": "Rameau - Musette de la Suite en Mi.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Rameau_-_Musette_de_la_Suite_en_Mi.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Richard D Siegel"
+    }
+   ]
   },
   {
    "id": "marimba",
@@ -297,7 +482,21 @@
    "artist": "Bigfall00",
    "desc": "Marimbalax",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Exemple_marimba.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Exemple_marimba.ogg",
+   "more": [
+    {
+     "title": "Chiapanecas marimba.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Chiapanecas_marimba.ogg",
+     "lic": "Public domain",
+     "artist": "Musica: Bulmaro Lopez Fernandez. Letra: Juan Arozamena Sánchez."
+    },
+    {
+     "title": "El Saapo Zapateado Chiapaneco.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/El_Saapo_Zapateado_Chiapaneco.ogg",
+     "lic": "Public domain",
+     "artist": "Author Unknown (Anonymous). Popular song."
+    }
+   ]
   },
   {
    "id": "xylophone",
@@ -323,7 +522,21 @@
    "artist": "Krol111",
    "desc": "Wibrafůn",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Vibraphone_music.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Vibraphone_music.ogg",
+   "more": [
+    {
+     "title": "Vibes Cm7.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Vibes_Cm7.ogg",
+     "lic": "CC BY 2.5",
+     "artist": "Serolillo"
+    },
+    {
+     "title": "F scale on vibraphone.oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/F_scale_on_vibraphone.oga",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Why? I Ask"
+    }
+   ]
   },
   {
    "id": "timpani",
@@ -336,7 +549,18 @@
    "artist": "DrTrumpet",
    "desc": "Timpani roll with different mallets",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Paukenwirbel_auf_einer_Wiener_Pauke_mit_acht_verschiedenen_Schlegeln.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Paukenwirbel_auf_einer_Wiener_Pauke_mit_acht_verschiedenen_Schlegeln.ogg",
+   "more": [
+    {
+     "title": "Timpani 64-c-p5.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Timpani_64-c-p5.wav",
+     "lic": "CC0",
+     "artist": "spt3125"
+    }
+   ],
+   "drop": [
+    "timpani-3.mp3"
+   ]
   },
   {
    "id": "bagpipes",
@@ -349,7 +573,15 @@
    "artist": "Composition: traditional; Performance: Sandy Jones (bagpipe), Scott Gunn (bagpip",
    "desc": "\"Amazing Grace\" performed by bagpipe soloist Sandy Jones and Scott Gunn as well as the Pipe Bands of the United States Air Force Reserve Band and the United States Air Force Band. Track 19 from Glorious Past, Boundless Future (2002).",
    "date": "2002",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Amazing_Grace_%28bagpipe%29_-_Pipe_Band_-_United_States_Air_Force_Reserve_Band.mp3"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Amazing_Grace_%28bagpipe%29_-_Pipe_Band_-_United_States_Air_Force_Reserve_Band.mp3",
+   "more": [
+    {
+     "title": "Skye Boat Song.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Skye_Boat_Song.ogg",
+     "lic": "CC BY-SA 2.0",
+     "artist": "Lyrics by Sir Harold Boulton, Bart. (1859 - 1935) [Not included in this recordin"
+    }
+   ]
   },
   {
    "id": "sitar",
@@ -362,7 +594,21 @@
    "artist": "Tito Dutta",
    "desc": "Sitar sound, playing Yaman",
    "date": "2011-10-05",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/Sitar_sample_yaman.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/Sitar_sample_yaman.ogg",
+   "more": [
+    {
+     "title": "Raga Tilanga.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Raga_Tilanga.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    },
+    {
+     "title": "RanjitMakkuniRagaKaushiKanra.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/RanjitMakkuniRagaKaushiKanra.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "TheRealRanjitMakkuni"
+    }
+   ]
   },
   {
    "id": "koto",
@@ -375,7 +621,15 @@
    "artist": "Torsodog",
    "desc": "A woman plays a 13-string Koto.",
    "date": "2006-05-24",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Koto_performance.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Koto_performance.ogg",
+   "more": [
+    {
+     "title": "Kojonotsuki.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Kojonotsuki.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "ContributorQ"
+    }
+   ]
   },
   {
    "id": "shamisen",
@@ -401,7 +655,15 @@
    "artist": "Araki Kodō III (1879–1935)",
    "desc": "A honkyoku piece entitled Shika no Tōne played on a shakuhachi. Published as Victor 13029.",
    "date": "between 1925 and 1937date QS:P",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Shikanotoone.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Shikanotoone.ogg",
+   "more": [
+    {
+     "title": "Shikanotoone new.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Shikanotoone_new.ogg",
+     "lic": "Public domain",
+     "artist": "derivative work: Torsodog (talk) Shikanotoone.ogg: Araki Kodō III (1879–1935)"
+    }
+   ]
   },
   {
    "id": "erhu",
@@ -414,7 +676,15 @@
    "artist": "Originally composed and performed by 阿炳 (Abing), record by: David290, performed ",
    "desc": "Erquan Yingyue or Er Quan Ying Yue or The Moon reflecting in Erquan Pool or The Moon reflecting in the Second Spring played with an Erhu",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/%E4%BA%8C%E6%B3%89%E6%98%A0%E6%9C%88.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/%E4%BA%8C%E6%B3%89%E6%98%A0%E6%9C%88.ogg",
+   "more": [
+    {
+     "title": "江河水.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/%E6%B1%9F%E6%B2%B3%E6%B0%B4.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Folk tune, re-arranged by 黃海懷, record by: David290, performed by :Zhang Peijian"
+    }
+   ]
   },
   {
    "id": "pipa",
@@ -479,7 +749,25 @@
    "artist": "User:Worldmaster0",
    "desc": "",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Kalimba.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Kalimba.ogg",
+   "more": [
+    {
+     "title": "Kalimba de coco.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Kalimba_de_coco.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Luisalvaz"
+    },
+    {
+     "title": "Kalimba Sample.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Kalimba_Sample.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Obmuc"
+    }
+   ],
+   "drop": [
+    "kalimba-5.mp3",
+    "kalimba-6.mp3"
+   ]
   },
   {
    "id": "djembe",
@@ -492,7 +780,21 @@
    "artist": "Michi Henning",
    "desc": "Sound sample of a djembe at medium pitch, illustrating the three basic sounds (bass, tone, slap). The sample starts with a binary call, plays three cycles of the accompaniment pattern, and ends with a",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Djembe_accompaniment.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Djembe_accompaniment.ogg",
+   "more": [
+    {
+     "title": "Ceramic Djembe.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Ceramic_Djembe.wav",
+     "lic": "CC0",
+     "artist": "RutgerMuller"
+    },
+    {
+     "title": "Djembee2.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Djembee2.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Dennis Ruigrok at Dutch Wikipedia"
+    }
+   ]
   },
   {
    "id": "balafon",
@@ -505,7 +807,21 @@
    "artist": "KONE IF",
    "desc": "Audio recording of the balafon, an iconic melodic percussion instrument from West Africa. Composed of wooden slats arranged on a frame and calabashes serving as resonators, the balafon produces sounds that are warm, vibrant, and harmonious.",
    "date": "2026-02-25",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Le_son_du_balafon_traditionnel.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Le_son_du_balafon_traditionnel.ogg",
+   "more": [
+    {
+     "title": "Le son du balafon de Néba Solo 1.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Le_son_du_balafon_de_N%C3%A9ba_Solo_1.ogg",
+     "lic": "CC BY 4.0",
+     "artist": "KONE IF"
+    },
+    {
+     "title": "Le son de balafon sénoufo.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Le_son_de_balafon_s%C3%A9noufo.ogg",
+     "lic": "CC BY 4.0",
+     "artist": "KONE IF"
+    }
+   ]
   },
   {
    "id": "didgeridoo",
@@ -518,7 +834,21 @@
    "artist": "Cassa342",
    "desc": "This is sound of australian aboriginal instrument Didgeridoo",
    "date": "2020-01-18",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Didgeridoo_sound.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Didgeridoo_sound.ogg",
+   "more": [
+    {
+     "title": "Hangklang Didgeridoospiel.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/02/Hangklang_Didgeridoospiel.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Hangklang"
+    },
+    {
+     "title": "Hidden Tribe - Didgeridoo 1 Live.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Hidden_Tribe_-_Didgeridoo_1_Live.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Nikita Malov"
+    }
+   ]
   },
   {
    "id": "theremin",
@@ -531,7 +861,15 @@
    "artist": "Effebit",
    "desc": "Etherwave Epro by Moog played in the high range. Theremenist: Fabio Pesce",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Theremin_puccini_high.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Theremin_puccini_high.ogg",
+   "more": [
+    {
+     "title": "Theremin walking bass.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Theremin_walking_bass.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Effebit"
+    }
+   ]
   },
   {
    "id": "hang",
@@ -544,7 +882,15 @@
    "artist": "Michael Paschko (Ixkeys) www.hangblog.org",
    "desc": "2nd generation Hang (2007) played vertically using the Helmholtz Resonance of the body as bass tone",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Hang_2007_vertical.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Hang_2007_vertical.ogg",
+   "more": [
+    {
+     "title": "Hang 2005 horizontal.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Hang_2005_horizontal.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Michael Paschko (Ixkeys) www.hangblog.org"
+    }
+   ]
   },
   {
    "id": "duduk",
@@ -557,7 +903,15 @@
    "artist": "איליה מעזיה",
    "desc": "Sound of Armenian Duduk. By I.Mazia",
    "date": "2018-02-20",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Sound_of_Armenian_Duduk.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Sound_of_Armenian_Duduk.ogg",
+   "more": [
+    {
+     "title": "SERGO.TEL - April - duduk-improvisation2.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/SERGO.TEL_-_April_-_duduk-improvisation2.ogg",
+     "lic": "CC BY 3.0",
+     "artist": "SERGO.TEL"
+    }
+   ]
   },
   {
    "id": "hurdy",
@@ -583,7 +937,21 @@
    "artist": "Manoochehr Sadeghi &amp; Hossein Dehlavi",
    "desc": "Concertino for Santur and Orchestra by Hossein Dehlavi and Manoochehr Sadeghi Music was composed by Hossein Dehlavi &amp; Faramarz Payvar. The Santur lead was played by Manoochehr Sadeghi. It was also",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Sadeghi-Dehlavi-Concertino_for_Santur.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Sadeghi-Dehlavi-Concertino_for_Santur.ogg",
+   "more": [
+    {
+     "title": "Santur by Mohammad R Azadehfar.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Santur_by_Mohammad_R_Azadehfar.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Mohammad R Azadehfar"
+    },
+    {
+     "title": "Abul Chap Paravaneh.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Abul_Chap_Paravaneh.ogg",
+     "lic": "Public domain",
+     "artist": "Parvaneh Poem: Saadi Shirazi Cithares: Habib Samaey"
+    }
+   ]
   },
   {
    "id": "bandoneon",
@@ -635,7 +1003,1240 @@
    "artist": "Hinnerk R Hinnerk Rümenapf",
    "desc": "Bodhrán sound example (simple improvisation)",
    "date": "2009-02-22",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bodhran-improvisation_hinnerk-ruemenapf.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bodhran-improvisation_hinnerk-ruemenapf.ogg",
+   "more": [
+    {
+     "title": "Bodhrán.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/02/Bodhr%C3%A1n.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Leah Ní Chaiside"
+    }
+   ]
+  },
+  {
+   "id": "nyckelharpa",
+   "name": "Nyckelharpa",
+   "family": "Bowed strings",
+   "origin": "Sweden, 1300s",
+   "fact": "A keyed fiddle: wooden keys press the strings, and extra strings ring along in sympathy.",
+   "title": "Gärdebylåten - SMV - SVA BA 0006 11.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/80/G%C3%A4rdebyl%C3%A5ten_-_SMV_-_SVA_BA_0006_11.wav",
+   "lic": "CC0",
+   "artist": "",
+   "more": [
+    {
+     "title": "Laxvalsen - SMV - SVA BA 0018 06.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Laxvalsen_-_SMV_-_SVA_BA_0018_06.wav",
+     "lic": "CC0",
+     "artist": ""
+    }
+   ]
+  },
+  {
+   "id": "sarangi",
+   "name": "Sarangi",
+   "family": "Bowed strings",
+   "origin": "North India and Nepal",
+   "fact": "Played with the fingernails against the strings, it is said to sound closest to the human voice.",
+   "title": "Sarangi Music by Balaram Gandarbha.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Sarangi_Music_by_Balaram_Gandarbha.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Krish Dulal"
+  },
+  {
+   "id": "kemenche",
+   "name": "Kemençe",
+   "family": "Bowed strings",
+   "origin": "Turkey and Greece",
+   "fact": "A small pear-shaped fiddle held upright on the knee, played with the nails pressing the strings sideways.",
+   "title": "Husseyni Saz Semayissi .ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Husseyni_Saz_Semayissi_.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author"
+  },
+  {
+   "id": "rebab",
+   "name": "Rebab",
+   "family": "Bowed strings",
+   "origin": "Java, Indonesia",
+   "fact": "A two-string spike fiddle that leads the melody in a gamelan.",
+   "title": "Rebab ing Borobudur.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Rebab_ing_Borobudur.ogg",
+   "lic": "CC BY 4.0",
+   "artist": "RTB45",
+   "more": [
+    {
+     "title": "Rebab Laras Salendro koleksi Jurusan Karawitan ISBI Bandung.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Rebab_Laras_Salendro_koleksi_Jurusan_Karawitan_ISBI_Bandung.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Salomo Christian Hutajulu"
+    }
+   ]
+  },
+  {
+   "id": "gusle",
+   "name": "Gusle",
+   "family": "Bowed strings",
+   "origin": "The Balkans",
+   "fact": "One horsehair string and a singer: Balkan epic poems were kept alive for centuries with it.",
+   "title": "Bolani Dojcin.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Bolani_Dojcin.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "VVVladimir",
+   "more": [
+    {
+     "title": "Marko Kraljević i Musa Kesedžija (dio).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Marko_Kraljevi%C4%87_i_Musa_Kesed%C5%BEija_%28dio%29.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "VVVladimir"
+    }
+   ]
+  },
+  {
+   "id": "gadulka",
+   "name": "Gadulka",
+   "family": "Bowed strings",
+   "origin": "Bulgaria",
+   "fact": "A pear-shaped fiddle with three playing strings and up to ten that ring in sympathy.",
+   "title": "Ot D - Marko Todorka zalubi - melodia gadulka.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Ot_D_-_Marko_Todorka_zalubi_-_melodia_gadulka.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Gerganoff"
+  },
+  {
+   "id": "gamba",
+   "name": "Viola da gamba",
+   "family": "Bowed strings",
+   "origin": "Europe, 1500s",
+   "fact": "Held between the legs (gamba means leg), with frets like a guitar.",
+   "title": "Allegro from 27 Pieces for Solo Viola da Gamba by Carl Friedrich Abel.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Allegro_from_27_Pieces_for_Solo_Viola_da_Gamba_by_Carl_Friedrich_Abel.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Phillipwserna"
+  },
+  {
+   "id": "bouzouki",
+   "name": "Irish bouzouki",
+   "family": "Plucked strings",
+   "origin": "Ireland, from Greece in the 1960s",
+   "fact": "A Greek instrument rebuilt with a flat back for Irish folk bands.",
+   "title": "The Mountain Road - Medium - Bouzouki.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e5/The_Mountain_Road_-_Medium_-_Bouzouki.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "SoylentGreen"
+  },
+  {
+   "id": "tar",
+   "name": "Tar",
+   "family": "Plucked strings",
+   "origin": "Iran, Armenia and the Caucasus",
+   "fact": "Its body is carved from mulberry wood and covered with a thin lamb-skin membrane.",
+   "title": "Сари гялин (Девушка с гор). Армянская народная мелодия. Семён Каспаров (соло на таре).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/%D0%A1%D0%B0%D1%80%D0%B8_%D0%B3%D1%8F%D0%BB%D0%B8%D0%BD_%28%D0%94%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B0_%D1%81_%D0%B3%D0%BE%D1%80%29._%D0%90%D1%80%D0%BC%D1%8F%D0%BD%D1%81%D0%BA%D0%B0%D1%8F_%D0%BD%D0%B0%D1%80%D0%BE%D0%B4%D0%BD%D0%B0%D1%8F_%D0%BC%D0%B5%D0%BB%D0%BE%D0%B4%D0%B8%D1%8F._%D0%A1%D0%B5%D0%BC%D1%91%D0%BD_%D0%9A%D0%B0%D1%81%D0%BF%D0%B0%D1%80%D0%BE%D0%B2_%28%D1%81%D0%BE%D0%BB%D0%BE_%D0%BD%D0%B0_%D1%82%D0%B0%D1%80%D0%B5%29.ogg",
+   "lic": "Public domain",
+   "artist": "Сари гялин (Девушка с гор). Армянская народная мелодия. Семён Каспаров (соло на "
+  },
+  {
+   "id": "veena",
+   "name": "Saraswati veena",
+   "family": "Plucked strings",
+   "origin": "South India",
+   "fact": "The instrument of Saraswati, goddess of music: 24 frets set in wax and two gourd resonators.",
+   "title": "Kiravani-L Ramakrishnan.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Kiravani-L_Ramakrishnan.ogg",
+   "lic": "CC0",
+   "artist": "L Ramakrishnan",
+   "more": [
+    {
+     "title": "Viriboni, rendered on the Veena.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Viriboni%2C_rendered_on_the_Veena.ogg",
+     "lic": "CC0",
+     "artist": "Smt. Pushpa Srivatsan"
+    }
+   ]
+  },
+  {
+   "id": "guqin",
+   "name": "Guqin",
+   "family": "Plucked strings",
+   "origin": "China, about 3000 years",
+   "fact": "Seven strings and no frets: a scholar’s instrument, played softly for yourself.",
+   "title": "Liu Shui.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Liu_Shui.ogg",
+   "lic": "CC BY 2.5",
+   "artist": "No machine-readable author provided. CharlieHuang~commonswiki assumed (based on ",
+   "more": [
+    {
+     "title": "Pingsha Luoyan.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Pingsha_Luoyan.ogg",
+     "lic": "CC BY 2.5",
+     "artist": "No machine-readable author provided. CharlieHuang~commonswiki assumed (based on "
+    }
+   ]
+  },
+  {
+   "id": "theorbo",
+   "name": "Theorbo",
+   "family": "Plucked strings",
+   "origin": "Italy, about 1600",
+   "fact": "A giant lute with a neck up to two metres long, for deep bass notes.",
+   "title": "Thomas Mace theorbo.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Thomas_Mace_theorbo.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Ttocserp",
+   "more": [
+    {
+     "title": "Capona.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/Capona.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "No machine-readable author provided. Pugnari assumed (based on copyright claims)"
+    }
+   ]
+  },
+  {
+   "id": "zither",
+   "name": "Concert zither",
+   "family": "Plucked strings",
+   "origin": "Austria and Bavaria",
+   "fact": "Laid flat on a table: five melody strings over frets and up to forty open strings for chords.",
+   "title": "Selection from Carmen - Zither solo ZS V78-0914.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Selection_from_Carmen_-_Zither_solo_ZS_V78-0914.wav",
+   "lic": "CC0",
+   "artist": ""
+  },
+  {
+   "id": "valiha",
+   "name": "Valiha",
+   "family": "Plucked strings",
+   "origin": "Madagascar",
+   "fact": "A tube zither: strings stretched around a bamboo tube, the national instrument of Madagascar.",
+   "title": "NyAntsalySombambisambySodina.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/NyAntsalySombambisambySodina.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Kaluvau",
+   "more": [
+    {
+     "title": "OldMalagasyFolkSongDiavolanaSteelStringValiha.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/04/OldMalagasyFolkSongDiavolanaSteelStringValiha.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Kaluvau"
+    },
+    {
+     "title": "Old Lullaby - Iny Hono Izy Ravorona - Take Him-Her With You O Bird (Bamboo Valiha).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Old_Lullaby_-_Iny_Hono_Izy_Ravorona_-_Take_Him-Her_With_You_O_Bird_%28Bamboo_Valiha%29.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Kaluvau"
+    }
+   ]
+  },
+  {
+   "id": "kantele",
+   "name": "Kantele",
+   "family": "Plucked strings",
+   "origin": "Finland and Karelia",
+   "fact": "In the Kalevala epic the first kantele was made from the jawbone of a giant pike.",
+   "title": "DIY kantele sample raw.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/DIY_kantele_sample_raw.ogg",
+   "lic": "CC0",
+   "artist": "Olli Niemitalo"
+  },
+  {
+   "id": "qanun",
+   "name": "Qanun",
+   "family": "Plucked strings",
+   "origin": "The Arab world and Turkey",
+   "fact": "A trapezoid zither with 26 courses; little levers retune each string by fractions of a semitone.",
+   "title": "ArabicQanunSample.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/ArabicQanunSample.ogg",
+   "lic": "CC BY-SA 2.5",
+   "artist": "Ariel Qassis",
+   "more": [
+    {
+     "title": "TurkishKanunSample.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/97/TurkishKanunSample.ogg",
+     "lic": "CC BY-SA 2.5",
+     "artist": "Ariel Qassis"
+    }
+   ]
+  },
+  {
+   "id": "bandura",
+   "name": "Bandura",
+   "family": "Plucked strings",
+   "origin": "Ukraine",
+   "fact": "Up to 65 strings, played by the blind kobzar minstrels who sang Ukraine’s epic dumy.",
+   "title": "Hnat Honcharenko - Kozachok Polianka.flac",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Hnat_Honcharenko_-_Kozachok_Polianka.flac",
+   "lic": "Public domain",
+   "artist": "Folklore material",
+   "more": [
+    {
+     "title": "Hnat Honcharenko - Popadia.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Hnat_Honcharenko_-_Popadia.flac",
+     "lic": "Public domain",
+     "artist": "Folklore material"
+    }
+   ]
+  },
+  {
+   "id": "cimbalom",
+   "name": "Cimbalom",
+   "family": "Hammered strings",
+   "origin": "Hungary",
+   "fact": "A big hammered dulcimer with a damper pedal, the star of Hungarian and Roma bands.",
+   "title": "\"Gypsy Rag\" by Gypsy Countess Verona (1916).oga",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e1/%22Gypsy_Rag%22_by_Gypsy_Countess_Verona_%281916%29.oga",
+   "lic": "Public domain",
+   "artist": "Veronica Mikova"
+  },
+  {
+   "id": "autoharp",
+   "name": "Autoharp",
+   "family": "Plucked strings",
+   "origin": "USA and Germany, 1880s",
+   "fact": "Press a bar and felt pads mute every string not in the chord, then strum.",
+   "title": "Angel Band - Autoharp.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Angel_Band_-_Autoharp.ogg",
+   "lic": "CC BY 2.5",
+   "artist": "Chiacomo"
+  },
+  {
+   "id": "cguitar",
+   "name": "Classical guitar",
+   "family": "Plucked strings",
+   "origin": "Spain",
+   "fact": "Nylon strings and a wide neck, plucked with the fingers rather than a pick.",
+   "title": "Romanza A Barrios Agustín Barrios 1644 1923 Odeón 952-B (ITLq955nU08).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Romanza_A_Barrios_Agust%C3%ADn_Barrios_1644_1923_Ode%C3%B3n_952-B_%28ITLq955nU08%29.ogg",
+   "lic": "Public domain",
+   "artist": "Agustín Pío Barrios",
+   "more": [
+    {
+     "title": "Divagación chopiniana García Célebre concertista de guitarra Agustín Barrios 344z 1912 Atlanta (uxY-XDQ4zB4).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Divagaci%C3%B3n_chopiniana_Garc%C3%ADa_C%C3%A9lebre_concertista_de_guitarra_Agust%C3%ADn_Barrios_344z_1912_Atlanta_%28uxY-XDQ4zB4%29.ogg",
+     "lic": "Public domain",
+     "artist": "Agustín Pío Barrios"
+    }
+   ]
+  },
+  {
+   "id": "pedalsteel",
+   "name": "Pedal steel guitar",
+   "family": "Plucked strings · electric",
+   "origin": "USA, 1940s",
+   "fact": "Pedals and knee levers bend strings while a steel bar slides: the cry of country music.",
+   "title": "Pedal steel guitar demo.opus",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/Pedal_steel_guitar_demo.opus",
+   "lic": "CC BY 3.0",
+   "artist": "BEAG music",
+   "more": [
+    {
+     "title": "Sound of steel guitar (pedal).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Sound_of_steel_guitar_%28pedal%29.ogg",
+     "lic": "CC0",
+     "artist": "Eagledj"
+    }
+   ]
+  },
+  {
+   "id": "piccolo",
+   "name": "Piccolo",
+   "family": "Woodwind",
+   "origin": "Europe",
+   "fact": "Half the length of a flute and an octave higher: the highest voice in the orchestra.",
+   "title": "Gramophone-gc-49005-3079e.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Gramophone-gc-49005-3079e.ogg",
+   "lic": "Public domain",
+   "artist": "Carl Flisch"
+  },
+  {
+   "id": "panflute",
+   "name": "Pan flute",
+   "family": "Woodwind",
+   "origin": "Worldwide: the Andes, Romania, Oceania",
+   "fact": "A row of closed pipes, one note each: you blow across the top like a bottle.",
+   "title": "Tanö Niha Mbanua Somasido - Instrumental.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Tan%C3%B6_Niha_Mbanua_Somasido_-_Instrumental.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Slaia"
+  },
+  {
+   "id": "bansuri",
+   "name": "Bansuri",
+   "family": "Woodwind",
+   "origin": "India",
+   "fact": "A bamboo flute with no keys; Krishna is often shown playing one.",
+   "title": "Indian Folk Classical Flute Music (2).wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Indian_Folk_Classical_Flute_Music_%282%29.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "MayankSingh33",
+   "more": [
+    {
+     "title": "Carnatic flute.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Carnatic_flute.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Bansuri.arvind"
+    }
+   ]
+  },
+  {
+   "id": "dizi",
+   "name": "Dizi",
+   "family": "Woodwind",
+   "origin": "China",
+   "fact": "A bamboo flute with an extra hole covered by a thin membrane that buzzes.",
+   "title": "DiZi Chinese Flute Sample.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a5/DiZi_Chinese_Flute_Sample.ogg",
+   "lic": "CC0",
+   "artist": "Gorgoroth6669"
+  },
+  {
+   "id": "zurna",
+   "name": "Zurna",
+   "family": "Woodwind (double reed)",
+   "origin": "Turkey, the Balkans and the Middle East",
+   "fact": "A loud double-reed horn, made to be heard outdoors over a big davul drum.",
+   "title": "Hale Makame (1930).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Hale_Makame_%281930%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "Dawoola and Zurna Live.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Dawoola_and_Zurna_Live.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Assyrio"
+    }
+   ]
+  },
+  {
+   "id": "whistle",
+   "name": "Tin whistle",
+   "family": "Woodwind",
+   "origin": "Ireland and Britain",
+   "fact": "Six holes and a fipple like a recorder: cheap, tiny and everywhere in Irish music.",
+   "title": "Danny Boy tin whistle by JGrandgagnage.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Danny_Boy_tin_whistle_by_JGrandgagnage.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Jules Grandgagnage",
+   "more": [
+    {
+     "title": "Dancing Willow - Demo-CD 2007 03 - The old grey goose.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Dancing_Willow_-_Demo-CD_2007_03_-_The_old_grey_goose.ogg",
+     "lic": "CC BY 3.0",
+     "artist": "trad."
+    }
+   ]
+  },
+  {
+   "id": "tulnic",
+   "name": "Tulnic",
+   "family": "Brass (wooden horn)",
+   "origin": "Romania",
+   "fact": "A long wooden horn like an alphorn, once used by shepherds to call across the mountains.",
+   "title": "Anica Drăgoi - A porcilor (Tulnic).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Anica_Dr%C4%83goi_-_A_porcilor_%28Tulnic%29.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Anica Drăgoi"
+  },
+  {
+   "id": "ocarina",
+   "name": "Ocarina",
+   "family": "Woodwind",
+   "origin": "Italy, 1850s (and ancient Mesoamerica)",
+   "fact": "A sealed clay vessel flute: the pitch depends on how much of the holes you open, not where.",
+   "title": "Ocarina de barro (impro).wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/96/Ocarina_de_barro_%28impro%29.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Luis Alvaz",
+   "more": [
+    {
+     "title": "Ocarina de agua 2.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Ocarina_de_agua_2.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Luis Alvaz"
+    }
+   ]
+  },
+  {
+   "id": "cornet",
+   "name": "Cornet",
+   "family": "Brass",
+   "origin": "France, 1820s",
+   "fact": "Like a trumpet but with a rounder, softer sound: the star of brass bands.",
+   "title": "Method for the Cornet45. First Studies by Jean-Baptiste Arban.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Method_for_the_Cornet45._First_Studies_by_Jean-Baptiste_Arban.ogg",
+   "lic": "Public domain",
+   "artist": "Michael Firbank",
+   "more": [
+    {
+     "title": "Method for the Cornet8. First Studies by Jean-Baptiste Arban.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Method_for_the_Cornet8._First_Studies_by_Jean-Baptiste_Arban.ogg",
+     "lic": "Public domain",
+     "artist": "Michael Firbank"
+    }
+   ]
+  },
+  {
+   "id": "flugelhorn",
+   "name": "Flugelhorn",
+   "family": "Brass",
+   "origin": "Germany",
+   "fact": "A wider tube than a trumpet gives it a warm, dark, mellow sound.",
+   "title": "Short flugelhorn excerpt.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Short_flugelhorn_excerpt.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Ovinus Real"
+  },
+  {
+   "id": "contrabassoon",
+   "name": "Contrabassoon",
+   "family": "Woodwind (double reed)",
+   "origin": "Europe",
+   "fact": "Nearly six metres of tube folded up: the lowest instrument in the orchestra.",
+   "title": "Contra2.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/59/Contra2.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Kat Walsh. Uploaded by Mindspillage at en.wikipedia"
+  },
+  {
+   "id": "sopsax",
+   "name": "Soprano saxophone",
+   "family": "Woodwind (brass body!)",
+   "origin": "Belgium, 1840s",
+   "fact": "Usually straight like a clarinet: the high, piercing member of the sax family.",
+   "title": "Georg Philipp Telemann - Fantasia No 11 - Soprano saxophone - David Hernando Vitores.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Georg_Philipp_Telemann_-_Fantasia_No_11_-_Soprano_saxophone_-_David_Hernando_Vitores.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Georg Philipp Telemann"
+  },
+  {
+   "id": "harmonium",
+   "name": "Harmonium",
+   "family": "Free reed · keyboard",
+   "origin": "France, 1840s; now India",
+   "fact": "Pump air with your feet or hand and metal reeds sing: the sound of Indian devotional music.",
+   "title": "César Franck-Harmonium-5e pièce en do.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/C%C3%A9sar_Franck-Harmonium-5e_pi%C3%A8ce_en_do.ogg",
+   "lic": "Public domain",
+   "artist": "César Franck",
+   "more": [
+    {
+     "title": "Music For A Found Harmonium.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/20/Music_For_A_Found_Harmonium.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Morrigandagda"
+    }
+   ]
+  },
+  {
+   "id": "melodica",
+   "name": "Melodica",
+   "family": "Free reed",
+   "origin": "Germany, 1950s",
+   "fact": "A keyboard you blow into: the dub reggae classic.",
+   "title": "Melodica rakesofkildare.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/Melodica_rakesofkildare.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Melodicas"
+  },
+  {
+   "id": "concertina",
+   "name": "Concertina",
+   "family": "Free reed",
+   "origin": "England and Germany, 1830s",
+   "fact": "A small hexagonal squeezebox with buttons at each end.",
+   "title": "Scotch reels (Prince, 1909).mp3",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Scotch_reels_%28Prince%2C_1909%29.mp3",
+   "lic": "Public domain",
+   "artist": "Alexander Prince"
+  },
+  {
+   "id": "tarogato",
+   "name": "Tárogató",
+   "family": "Woodwind (single reed)",
+   "origin": "Hungary",
+   "fact": "A wooden instrument with a single reed, like a clarinet crossed with a soprano sax.",
+   "title": "Anker-9911-06965.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Anker-9911-06965.ogg",
+   "lic": "Public domain",
+   "artist": "Carl Flisch"
+  },
+  {
+   "id": "darbuka",
+   "name": "Darbuka",
+   "family": "Percussion",
+   "origin": "The Middle East and North Africa",
+   "fact": "A goblet drum: deep “doum” in the middle, sharp “tek” at the edge.",
+   "title": "Darbuka.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Darbuka.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Cassa342"
+  },
+  {
+   "id": "cajon",
+   "name": "Cajón",
+   "family": "Percussion",
+   "origin": "Peru",
+   "fact": "A wooden box you sit on and slap: born in Afro-Peruvian music, now in every flamenco band.",
+   "title": "Base de compás por bulerías de Jerez (palmas y caja).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Base_de_comp%C3%A1s_por_buler%C3%ADas_de_Jerez_%28palmas_y_caja%29.ogg",
+   "lic": "CC0",
+   "artist": "Santiago Sanchez Cifuentes"
+  },
+  {
+   "id": "bongos",
+   "name": "Bongos",
+   "family": "Percussion",
+   "origin": "Cuba",
+   "fact": "Two small drums joined together, the high one is the “hembra” (female).",
+   "title": "Bongo sound.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Bongo_sound.wav",
+   "lic": "CC0",
+   "artist": "MarleneAyni"
+  },
+  {
+   "id": "gong",
+   "name": "Gong",
+   "family": "Percussion",
+   "origin": "East and Southeast Asia",
+   "fact": "A bronze disc that blooms after you hit it: the sound keeps growing for a moment.",
+   "title": "Gong or bell vibrant.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Gong_or_bell_vibrant.ogg",
+   "lic": "Public domain",
+   "artist": "stephan"
+  },
+  {
+   "id": "carillon",
+   "name": "Carillon (tower bells)",
+   "family": "Tuned percussion",
+   "origin": "The Low Countries, 1500s",
+   "fact": "Dozens of bells in a tower, played from a keyboard with the fists.",
+   "title": "Twinkle Twinkle Little Star on the Netherlands Carillon.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/26/Twinkle_Twinkle_Little_Star_on_the_Netherlands_Carillon.ogg",
+   "lic": "Public domain",
+   "artist": "National Park Service",
+   "more": [
+    {
+     "title": "Höxter Glockenspiel Ein Männlein steht im Walde.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/H%C3%B6xter_Glockenspiel_Ein_M%C3%A4nnlein_steht_im_Walde.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Psychogerd"
+    },
+    {
+     "title": "Luksemburgo, katedralo dNS, kariljono, 1.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/93/Luksemburgo%2C_katedralo_dNS%2C_kariljono%2C_1.ogg",
+     "lic": "CC0",
+     "artist": "Renardo la vulpo"
+    }
+   ]
+  },
+  {
+   "id": "tubular",
+   "name": "Tubular bells",
+   "family": "Tuned percussion",
+   "origin": "Europe, 1880s",
+   "fact": "Brass tubes hit with a mallet: the orchestra’s church bells.",
+   "title": "Johann Georg Ebeling - Ich steh an deiner Krippen hier (Tubular bells and Angelic choir).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Johann_Georg_Ebeling_-_Ich_steh_an_deiner_Krippen_hier_%28Tubular_bells_and_Angelic_choir%29.ogg",
+   "lic": "Public domain",
+   "artist": "Pracchia-78",
+   "more": [
+    {
+     "title": "Gustav Theodore Holst - In the Bleak Midwinter - (A Christmas Carol).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Gustav_Theodore_Holst_-_In_the_Bleak_Midwinter_-_%28A_Christmas_Carol%29.ogg",
+     "lic": "Public domain",
+     "artist": "Pracchia-78"
+    }
+   ]
+  },
+  {
+   "id": "celesta",
+   "name": "Celesta",
+   "family": "Keyboard",
+   "origin": "France, 1886",
+   "fact": "Hammers hit steel plates: Tchaikovsky smuggled one from Paris for the Sugar Plum Fairy.",
+   "title": "Dance of the Sugar Plum Fairies (ISRC USUAN1100270).oga",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Dance_of_the_Sugar_Plum_Fairies_%28ISRC_USUAN1100270%29.oga",
+   "lic": "CC BY 3.0",
+   "artist": "Pyotr Ilyich Tchaikovsky / Kevin MacLeod"
+  },
+  {
+   "id": "gender",
+   "name": "Gendér wayang",
+   "family": "Tuned percussion",
+   "origin": "Bali, Indonesia",
+   "fact": "Bronze keys over bamboo resonators, played in pairs tuned a little apart so the sound shimmers.",
+   "title": "Gamelan gender Wayang ensemble accompanying Balinese Wayang puppetry.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Gamelan_gender_Wayang_ensemble_accompanying_Balinese_Wayang_puppetry.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Prateek Pattanaik"
+  },
+  {
+   "id": "angklung",
+   "name": "Angklung",
+   "family": "Tuned percussion",
+   "origin": "West Java, Indonesia",
+   "fact": "Bamboo tubes in a frame that rattle one note when shaken: each player holds a note or two.",
+   "title": "Manuk dadali (angklung).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/Manuk_dadali_%28angklung%29.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Spider9385"
+  },
+  {
+   "id": "talkingdrum",
+   "name": "Talking drum",
+   "family": "Percussion",
+   "origin": "West Africa",
+   "fact": "Squeeze the cords and the pitch bends, so the drum can copy the tones of speech.",
+   "title": "The sound of the talking drum when its been played.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/The_sound_of_the_talking_drum_when_its_been_played.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Bamidele S. Ajayi"
+  },
+  {
+   "id": "taiko",
+   "name": "Taiko",
+   "family": "Percussion",
+   "origin": "Japan",
+   "fact": "Huge barrel drums played with a whole-body movement: in old Japan they marked village borders by sound.",
+   "title": "02 Taiko2 (short).oga",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/97/02_Taiko2_%28short%29.oga",
+   "lic": "CC0",
+   "artist": "English: Scott Harding's Taiko performed live by the Singapore Wind Symphony's P",
+   "more": [
+    {
+     "title": "Drums and flute at Sanja Matsuri.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Drums_and_flute_at_Sanja_Matsuri.ogg",
+     "lic": "CC BY 3.0",
+     "artist": "Torsodog"
+    }
+   ]
+  },
+  {
+   "id": "singingbowl",
+   "name": "Singing bowl",
+   "family": "Percussion",
+   "origin": "The Himalayas",
+   "fact": "Rub the rim and it sings, strike it and it rings for a minute.",
+   "title": "Small tibetan singing bowl.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/17/Small_tibetan_singing_bowl.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Cassa342",
+   "more": [
+    {
+     "title": "The sound of a singing bowl.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/The_sound_of_a_singing_bowl.wav",
+     "lic": "CC BY 4.0",
+     "artist": "Valera N. Trubin"
+    }
+   ]
+  },
+  {
+   "id": "jawharp",
+   "name": "Jaw harp (khomus)",
+   "family": "Plucked idiophone",
+   "origin": "Siberia and worldwide",
+   "fact": "A metal tongue twanged in front of the mouth: your mouth is the filter.",
+   "title": "Klangdemonstration einer jakutischen Maultrommel.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Klangdemonstration_einer_jakutischen_Maultrommel.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "DrTrumpet, Roland Bades (declaration of consent)",
+   "more": [
+    {
+     "title": "Munniharppua.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Munniharppua.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "ElectricToothpaste"
+    }
+   ]
+  },
+  {
+   "id": "berimbau",
+   "name": "Berimbau",
+   "family": "Percussion (musical bow)",
+   "origin": "Brazil, from Angola",
+   "fact": "A musical bow with a gourd: it leads the game of capoeira.",
+   "title": "Iúna.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/10/I%C3%BAna.ogg",
+   "lic": "Public domain",
+   "artist": "Djino",
+   "more": [
+    {
+     "title": "Santa maria.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Santa_maria.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Djino"
+    }
+   ]
+  },
+  {
+   "id": "cuica",
+   "name": "Cuíca",
+   "family": "Percussion (friction drum)",
+   "origin": "Brazil",
+   "fact": "A stick inside the drum is rubbed with a wet cloth: the laughing voice of samba.",
+   "title": "Cuica.Cuica.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Cuica.Cuica.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Pearl Drums"
+  },
+  {
+   "id": "udu",
+   "name": "Udu",
+   "family": "Percussion",
+   "origin": "Nigeria",
+   "fact": "A clay pot with a hole in its side: slap the hole for a deep, liquid “bloop”.",
+   "title": "Udu Sound 99.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Udu_Sound_99.wav",
+   "lic": "CC BY 4.0",
+   "artist": "ultradust"
+  },
+  {
+   "id": "dhol",
+   "name": "Dhol",
+   "family": "Percussion",
+   "origin": "Punjab, India and Pakistan",
+   "fact": "A big double-headed drum hung from the shoulder: the heartbeat of bhangra.",
+   "title": "DHOL BEAT.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/DHOL_BEAT.wav",
+   "lic": "CC BY 3.0",
+   "artist": "Johnny Kalsi"
+  },
+  {
+   "id": "chenda",
+   "name": "Chenda",
+   "family": "Percussion",
+   "origin": "Kerala, India",
+   "fact": "A tall cylinder drum played with sticks, loud enough for temple festivals with elephants.",
+   "title": "Chendamelam of Kerala 002.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Chendamelam_of_Kerala_002.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Shagil Kannur"
+  },
+  {
+   "id": "kazoo",
+   "name": "Kazoo",
+   "family": "Membranophone (voice)",
+   "origin": "USA, 1840s",
+   "fact": "You hum, not blow: a paper membrane buzzes along with your voice.",
+   "title": "Advance Australia Fair on Kazoo.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Advance_Australia_Fair_on_Kazoo.wav",
+   "lic": "Public domain",
+   "artist": "",
+   "more": [
+    {
+     "title": "NoiseCollector KazooA.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/NoiseCollector_KazooA.wav",
+     "lic": "CC BY 3.0",
+     "artist": "NoiseCollector"
+    }
+   ]
+  },
+  {
+   "id": "agogo",
+   "name": "Agogô",
+   "family": "Percussion",
+   "origin": "Brazil, from West Africa",
+   "fact": "Two or three cone-shaped bells, high and low, that play the samba’s cowbell pattern.",
+   "title": "Agogo.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Agogo.ogg",
+   "lic": "Public domain",
+   "artist": "Freddythehat at English Wikipedia"
+  },
+  {
+   "id": "caxixi",
+   "name": "Caxixi",
+   "family": "Percussion",
+   "origin": "Brazil and West Africa",
+   "fact": "A woven basket rattle filled with seeds, often shaken by the berimbau player.",
+   "title": "Caxixi.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Caxixi.ogg",
+   "lic": "Public domain",
+   "artist": "http://en.wikipedia.org/wiki/User:Freddythehat"
+  },
+  {
+   "id": "guiro",
+   "name": "Güiro",
+   "family": "Percussion",
+   "origin": "Cuba and Puerto Rico",
+   "fact": "A notched gourd scraped with a stick: the scratchy rasp of salsa and cumbia.",
+   "title": "Guiro.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Guiro.ogg",
+   "lic": "Public domain",
+   "artist": "Freddythehat at English Wikipedia"
+  },
+  {
+   "id": "maracas",
+   "name": "Maracas",
+   "family": "Percussion",
+   "origin": "Latin America and the Caribbean",
+   "fact": "A pair of shakers, once gourds filled with seeds.",
+   "title": "Maracas.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/10/Maracas.ogg",
+   "lic": "Public domain",
+   "artist": ""
+  },
+  {
+   "id": "triangle",
+   "name": "Triangle",
+   "family": "Percussion",
+   "origin": "Europe",
+   "fact": "A steel bar bent into a triangle with one corner left open, so it rings without one clear pitch.",
+   "title": "LatinTriangle.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/LatinTriangle.ogg",
+   "lic": "Public domain",
+   "artist": "http://en.wikipedia.org/wiki/User:Freddythehat"
+  },
+  {
+   "id": "tambourine",
+   "name": "Tambourine",
+   "family": "Percussion",
+   "origin": "The Middle East and Europe",
+   "fact": "Little cymbals (jingles) set into a frame: shake it or hit it.",
+   "title": "Headless tambourine.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/03/Headless_tambourine.wav",
+   "lic": "CC0",
+   "artist": "Michielderoo"
+  },
+  {
+   "id": "slitdrum",
+   "name": "Slit drum",
+   "family": "Percussion",
+   "origin": "Africa, Asia and Oceania",
+   "fact": "A hollowed log with a slit: each lip of the slit gives a different note.",
+   "title": "Satch Hoyt, Slit Drum, Brücke-Museum Berlin, 65053.mp3",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Satch_Hoyt%2C_Slit_Drum%2C_Br%C3%BCcke-Museum_Berlin%2C_65053.mp3",
+   "lic": "CC BY-SA 4.0",
+   "artist": ""
+  },
+  {
+   "id": "washboard",
+   "name": "Washboard",
+   "family": "Percussion",
+   "origin": "USA, 1900s",
+   "fact": "A laundry tool played with thimbles: the rhythm section of jug bands and zydeco.",
+   "title": "WWS Washboard.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/WWS_Washboard.ogg",
+   "lic": "CC BY 4.0",
+   "artist": "Work With Sounds / Konrad Gutkowski"
+  },
+  {
+   "id": "saw",
+   "name": "Musical saw",
+   "family": "Bowed idiophone",
+   "origin": "Europe and the USA",
+   "fact": "A real handsaw, bent and bowed: the eerie wobble comes from shaking the blade.",
+   "title": "Zaagfragment.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Zaagfragment.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Original uploader was Pijnack at nl.wikipedia",
+   "fam": "Percussion"
+  },
+  {
+   "id": "glassharmonica",
+   "name": "Glass harmonica",
+   "family": "Friction idiophone",
+   "origin": "USA, 1761 (Benjamin Franklin)",
+   "fact": "Spinning glass bowls touched with wet fingers. Mozart wrote for it.",
+   "title": "Stars-GlassArmonica.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Stars-GlassArmonica.ogg",
+   "lic": "CC BY-SA 2.5",
+   "artist": "William Zeitler",
+   "more": [
+    {
+     "title": "W. A. Mozart - Adagio for glass harmonica K 617.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/W._A._Mozart_-_Adagio_for_glass_harmonica_K_617.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Wolfgang Amadeus Mozart"
+    }
+   ]
+  },
+  {
+   "id": "windchimes",
+   "name": "Wind chimes",
+   "family": "Percussion",
+   "origin": "East Asia",
+   "fact": "Tubes or rods tuned to a chord, played by the wind.",
+   "title": "Windglockenspiel.Koshi.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Windglockenspiel.Koshi.ogg",
+   "lic": "CC0",
+   "artist": "Membeth.",
+   "more": [
+    {
+     "title": "Windchime.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Windchime.ogg",
+     "lic": "Public domain",
+     "artist": "stephan"
+    }
+   ]
+  },
+  {
+   "id": "clavichord",
+   "name": "Clavichord",
+   "family": "Keyboard",
+   "origin": "Europe, 1400s",
+   "fact": "A brass blade touches the string and stays there, so you can make a note wobble (Bebung).",
+   "title": "Thema KV331Clavichord.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Thema_KV331Clavichord.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Metzner",
+   "more": [
+    {
+     "title": "Jean Perrichon - Volte.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Jean_Perrichon_-_Volte.ogg",
+     "lic": "CC BY-SA 2.0",
+     "artist": "Joan Benson"
+    }
+   ]
+  },
+  {
+   "id": "hammond",
+   "name": "Hammond organ",
+   "family": "Keyboard · electric",
+   "origin": "USA, 1935",
+   "fact": "Spinning tonewheels make the sound; a rotating Leslie speaker makes it swirl.",
+   "title": "Hammond Organ - Model A Medley.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Hammond_Organ_-_Model_A_Medley.ogg",
+   "lic": "CC BY 3.0",
+   "artist": "Organgrinder010 (Nathaniel C. Wilcox)",
+   "more": [
+    {
+     "title": "In The Pot by Michael Huber.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/In_The_Pot_by_Michael_Huber.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Michael Huber, Schweiz, MHM Michael Huber Musik"
+    }
+   ]
+  },
+  {
+   "id": "musicbox",
+   "name": "Music box",
+   "family": "Plucked idiophone",
+   "origin": "Switzerland, 1790s",
+   "fact": "Pins on a turning cylinder pluck the teeth of a steel comb.",
+   "title": "Lullaby wound up clock guten abend gute nacht.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Lullaby_wound_up_clock_guten_abend_gute_nacht.ogg",
+   "lic": "Public domain",
+   "artist": "stephan",
+   "more": [
+    {
+     "title": "God Save the Tsar! and Hail, Pennsylvania! music box.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/God_Save_the_Tsar%21_and_Hail%2C_Pennsylvania%21_music_box.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    }
+   ]
+  },
+  {
+   "id": "toypiano",
+   "name": "Toy piano",
+   "family": "Keyboard",
+   "origin": "Germany, 1870s",
+   "fact": "Little hammers hit metal rods instead of strings: John Cage wrote a whole suite for it.",
+   "title": "Pop Goes the Weasel on Toy Piano.mp3",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Pop_Goes_the_Weasel_on_Toy_Piano.mp3",
+   "lic": "CC BY 3.0",
+   "artist": "Kevin MacLeod",
+   "more": [
+    {
+     "title": "YMCA-toy-piano.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/YMCA-toy-piano.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Fort123"
+    }
+   ]
+  },
+  {
+   "id": "playerpiano",
+   "name": "Player piano",
+   "family": "Keyboard",
+   "origin": "USA, 1890s",
+   "fact": "A punched paper roll and air pressure play the keys by themselves.",
+   "title": "At Sundown - Piano Roll.opus",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/At_Sundown_-_Piano_Roll.opus",
+   "lic": "Public domain",
+   "artist": "Walter Donaldson and played by Earl Brooks",
+   "more": [
+    {
+     "title": "\"Sweet Persimmons\" (1903), by Pauline Brutting Story played on a player piano.oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/0d/%22Sweet_Persimmons%22_%281903%29%2C_by_Pauline_Brutting_Story_played_on_a_player_piano.oga",
+     "lic": "Public domain",
+     "artist": "Pauline Brutting Story"
+    }
+   ]
+  },
+  {
+   "id": "throat",
+   "name": "Throat singing",
+   "family": "Voice",
+   "origin": "Tuva and Mongolia",
+   "fact": "One singer, two notes at once: a low drone and a whistling overtone melody above it.",
+   "title": "Throat singing - Tuvan Chylandyk style.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/Throat_singing_-_Tuvan_Chylandyk_style.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Giovanni Bortoluzzi",
+   "more": [
+    {
+     "title": "Overtone singing sample.oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Overtone_singing_sample.oga",
+     "lic": "CC BY-SA 3.0",
+     "artist": ""
+    }
+   ]
+  },
+  {
+   "id": "yodel",
+   "name": "Yodel",
+   "family": "Voice",
+   "origin": "The Alps (and country music)",
+   "fact": "Flipping fast between chest voice and head voice.",
+   "title": "The original German yodel ZS V78-0637.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/The_original_German_yodel_ZS_V78-0637.wav",
+   "lic": "CC0",
+   "artist": "",
+   "more": [
+    {
+     "title": "T for Texas.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/T_for_Texas.ogg",
+     "lic": "Public domain",
+     "artist": "Jimmie Rodgers (1897 – 1933)"
+    }
+   ]
+  },
+  {
+   "id": "kulning",
+   "name": "Kulning",
+   "family": "Voice",
+   "origin": "Sweden and Norway",
+   "fact": "A high herding call that carries for kilometres across the mountains to call the cattle home.",
+   "title": "Get- och fårlock - SMV - SVA BB 5293 24.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Get-_och_f%C3%A5rlock_-_SMV_-_SVA_BB_5293_24.wav",
+   "lic": "CC0",
+   "artist": "",
+   "more": [
+    {
+     "title": "Kauklåt - SMV - SVA BB 5335 28.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Kaukl%C3%A5t_-_SMV_-_SVA_BB_5335_28.wav",
+     "lic": "CC0",
+     "artist": ""
+    }
+   ]
+  },
+  {
+   "id": "drumkit",
+   "name": "Drum kit",
+   "family": "Percussion",
+   "origin": "USA, 1910s",
+   "fact": "One player, many drums and cymbals, with a foot pedal for the bass drum.",
+   "title": "4 cavacha variations.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/4_cavacha_variations.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "DejiJJ"
+  },
+  {
+   "id": "snare",
+   "name": "Snare drum",
+   "family": "Percussion",
+   "origin": "Europe",
+   "fact": "Wires (the snares) under the bottom head buzz against it: the crack in every backbeat.",
+   "title": "Kevin MacLeod assorted rimshots - 13-second roll.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Kevin_MacLeod_assorted_rimshots_-_13-second_roll.wav",
+   "lic": "CC BY 3.0",
+   "artist": "Kevin MacLeod"
+  },
+  {
+   "id": "calliope",
+   "name": "Steam calliope",
+   "family": "Keyboard · wind",
+   "origin": "USA, 1855",
+   "fact": "Steam whistles played from a keyboard, loud enough to be heard for miles from a riverboat.",
+   "title": "Margie on JBS steam calliope.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Margie_on_JBS_steam_calliope.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Calliopeman316 (talk)",
+   "more": [
+    {
+     "title": "Water Queen by Homer Denney (1906).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Water_Queen_by_Homer_Denney_%281906%29.ogg",
+     "lic": "Public domain",
+     "artist": "Homer Denney"
+    }
+   ]
+  },
+  {
+   "id": "biniou",
+   "name": "Biniou",
+   "family": "Woodwind (bagpipe)",
+   "origin": "Brittany, France",
+   "fact": "A tiny, very high bagpipe that always plays in a pair with the bombarde.",
+   "title": "La Gavotte de Gumen-sur-Scorff (1927).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/La_Gavotte_de_Gumen-sur-Scorff_%281927%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author"
+  },
+  {
+   "id": "shuvyr",
+   "name": "Shuvyr (Mari bagpipe)",
+   "family": "Woodwind (bagpipe)",
+   "origin": "The Mari people, Russia",
+   "fact": "Its bag is made from a cow’s bladder, with two chanters played together.",
+   "title": "Mari Bagpipe - Erik Juzykain.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Mari_Bagpipe_-_Erik_Juzykain.wav",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Cseremisz Elian"
+  },
+  {
+   "id": "natflute",
+   "name": "Native American flute",
+   "family": "Woodwind",
+   "origin": "North America",
+   "fact": "A flute with two chambers: a block on top directs the air, like a recorder.",
+   "title": "Native-American-flute©Marc-Lautenbacher music Guy-Simard flute.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Native-American-flute%C2%A9Marc-Lautenbacher_music_Guy-Simard_flute.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Marc-Lautenbacher"
+  },
+  {
+   "id": "banhu",
+   "name": "Banhu",
+   "family": "Bowed strings",
+   "origin": "Northern China",
+   "fact": "A fiddle with a wooden soundboard instead of snakeskin: bright and piercing, for opera bands.",
+   "title": "Banhu.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Banhu.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Francesc Fort"
+  },
+  {
+   "id": "zhongruan",
+   "name": "Zhongruan",
+   "family": "Plucked strings",
+   "origin": "China",
+   "fact": "A round “moon” lute with a long neck, the tenor voice of the Chinese orchestra.",
+   "title": "Zhongruan.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/Zhongruan.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Francesc Fort"
+  },
+  {
+   "id": "lute",
+   "name": "Lute",
+   "family": "Plucked strings",
+   "origin": "Europe, from the Arabic oud",
+   "fact": "The guitar of the Renaissance: John Dowland made it famous.",
+   "title": "Dowland I saw my lady weep performed by David Solomons.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Dowland_I_saw_my_lady_weep_performed_by_David_Solomons.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "",
+   "more": [
+    {
+     "title": "Flow, my tears.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flow%2C_my_tears.ogg",
+     "lic": "CC BY 2.5",
+     "artist": "Self"
+    }
+   ]
   }
  ],
  "world": [
@@ -651,7 +2252,30 @@
    "artist": "Juan Maglio (died 1934)",
    "desc": "\"La gaucha Manuela\", tango, by Juan Maglio (Pacho) Cuartet. Maglio (bandoneon), Luciano Rios (guitar), Jose \"Pepino\" Bonano (violin), and Carlos \"Hernani\" Macchi (flute). Recorded 1912.",
    "date": "1912",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/8/89/JuanMaglio_Pacho-LaGauchaManuela-%281912%29.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/89/JuanMaglio_Pacho-LaGauchaManuela-%281912%29.ogg",
+   "more": [
+    {
+     "title": "LAMENTO PAMPEANO - TANGO - JUAN CARLOS COBIÁN & LUIS SEPÚLVEDA - 1929.opus",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/LAMENTO_PAMPEANO_-_TANGO_-_JUAN_CARLOS_COBI%C3%81N_%26_LUIS_SEP%C3%9ALVEDA_-_1929.opus",
+     "lic": "Public domain",
+     "artist": "JUAN CARLOS COBIÁN",
+     "style": "Tango from Buenos Aires, 1929"
+    },
+    {
+     "title": "El Irresistible by Lorenzo Logatti (1914, Tango piano).opus",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/El_Irresistible_by_Lorenzo_Logatti_%281914%2C_Tango_piano%29.opus",
+     "lic": "Public domain",
+     "artist": "Lorenzo Logatti",
+     "style": "Early Argentine tango, 1914"
+    },
+    {
+     "title": "Gardel-Razzano-El carretero (1922).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Gardel-Razzano-El_carretero_%281922%29.ogg",
+     "lic": "Public domain",
+     "artist": "Arturo de Nava (1876-1932)",
+     "style": "Carlos Gardel and José Razzano: an Argentine folk song, 1922"
+    }
+   ]
   },
   {
    "id": "brazil",
@@ -665,7 +2289,30 @@
    "artist": "Francisco Alves",
    "desc": "Aquarela do Brasil - Francisco Alves 1939",
    "date": "1939",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/%22Aquarela_do_Brasil%22_%281939%29%2C_by_Francisco_Alves.mp3"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/%22Aquarela_do_Brasil%22_%281939%29%2C_by_Francisco_Alves.mp3",
+   "more": [
+    {
+     "title": "Samba de fato 1932.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Samba_de_fato_1932.ogg",
+     "lic": "Public domain",
+     "artist": "Pixinguinha e Cícero de Almeida",
+     "style": "Samba from Rio de Janeiro, by Pixinguinha, 1932"
+    },
+    {
+     "title": "1 x 0 Pixinguinha e Benedito.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/1_x_0_Pixinguinha_e_Benedito.ogg",
+     "lic": "Public domain",
+     "artist": "Pixinguinha e Benedito Lacerda",
+     "style": "Choro, Rio’s instrumental music: Pixinguinha and Benedito Lacerda"
+    },
+    {
+     "title": "Magoado (João Pernambuco) - João Pernambuco 1930.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Magoado_%28Jo%C3%A3o_Pernambuco%29_-_Jo%C3%A3o_Pernambuco_1930.ogg",
+     "lic": "Public domain",
+     "artist": "João Pernambuco",
+     "style": "Choro on the guitar: João Pernambuco, 1930"
+    }
+   ]
   },
   {
    "id": "mexico",
@@ -679,7 +2326,30 @@
    "artist": "Score is traditional, performance by Los Hijos de la Malinche of Jaltipan, Verac",
    "desc": "Traditional Mexican piece El Pájaro Carpintero (Son jarocho of Sotovento Veracruz, FONATECA classification FN10010189313_01] performed by Los Hijos de la Malinche of Jaltipan, Veracruz [1] [Noé González Molina, Alberto de Jesus Nazario, Jul",
    "date": "2016-09-30",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/El_P_jaro_Carpintero_441.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5f/El_P_jaro_Carpintero_441.ogg",
+   "more": [
+    {
+     "title": "Las Poblanas. Son jarocho.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Las_Poblanas._Son_jarocho.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Koffermejia",
+     "style": "Son jarocho from Veracruz: jaranas, harp and stamping feet"
+    },
+    {
+     "title": "Figura del son de la Guacamaya en requinto jarocho.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Figura_del_son_de_la_Guacamaya_en_requinto_jarocho.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Koffermejia",
+     "style": "Son jarocho on the requinto, from Veracruz"
+    },
+    {
+     "title": "Morena por mayor.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Morena_por_mayor.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Koffermejia",
+     "style": "Son jarocho from Veracruz: the Baxin family"
+    }
+   ]
   },
   {
    "id": "colombia",
@@ -693,7 +2363,37 @@
    "artist": "Cristianmarquez (Murga la Bomboná)",
    "desc": "Performances of \"Cachirí\" (original of Luis \"Chato\" Guerrero) by a traditional murga of the \"Blacks and Whites' Carnival\" (Spanish: Carnaval de Negros y Blancos) in San Juan de Pasto in south-western Colombia, a great ce",
    "date": "2004",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Cachiri.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Cachiri.ogg",
+   "more": [
+    {
+     "title": "Flor de Romero..ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Flor_de_Romero..ogg",
+     "lic": "Public domain",
+     "artist": "Ministerio de Cultura de Colombia. Composer: Álvaro Romero Sánchez",
+     "style": "Bambuco from the Andes of Colombia"
+    },
+    {
+     "title": "La Guayabita.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/La_Guayabita.ogg",
+     "lic": "Public domain",
+     "artist": "Ministerio de Cultura de Colombia",
+     "style": "Juga from Colombia’s Pacific coast"
+    },
+    {
+     "title": "Zumbaquezumba.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Zumbaquezumba.ogg",
+     "lic": "Public domain",
+     "artist": "Ministerio de Cultura de Colombia",
+     "style": "Joropo from the Colombian plains"
+    },
+    {
+     "title": "Jorge Áñez Avendaño and Alcides Briceño performing \"Coplas del Terruño\" in December 1927.mp3",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Jorge_%C3%81%C3%B1ez_Avenda%C3%B1o_and_Alcides_Brice%C3%B1o_performing_%22Coplas_del_Terru%C3%B1o%22_in_December_1927.mp3",
+     "lic": "Public domain",
+     "artist": "Jorge Áñez Avendaño (1892–1952), Alcides Briceño, and the Orquesta Colombiana (p",
+     "style": "A Colombian bambuco duo, 1922"
+    }
+   ]
   },
   {
    "id": "usa",
@@ -707,7 +2407,44 @@
    "artist": "traditional tune, no author",
    "desc": "The traditional country song Columbus Stockade Blues, performed by Cliff Carlisle",
    "date": "recorded 1930",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/ColumbusStockadeBlues.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/ColumbusStockadeBlues.ogg",
+   "more": [
+    {
+     "title": "Charlie Patton - Down the Dirt Road Blues.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Charlie_Patton_-_Down_the_Dirt_Road_Blues.ogg",
+     "lic": "Public domain",
+     "artist": "Charlie Patton (1891–1934)",
+     "style": "Delta blues from Mississippi: Charley Patton, 1929"
+    },
+    {
+     "title": "FootprintsInTheSnow.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/FootprintsInTheSnow.ogg",
+     "lic": "Public domain",
+     "artist": "traditional tune, no author",
+     "style": "Old-time country from the Appalachians"
+    },
+    {
+     "title": "Cochran Field Singers - My Lord Is Writin'.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Cochran_Field_Singers_-_My_Lord_Is_Writin%27.ogg",
+     "lic": "Public domain",
+     "artist": "Cochran Field Singers",
+     "style": "A gospel quartet from the American South"
+    },
+    {
+     "title": "Swing Low, Sweet Chariot - Fisk Jubilee Singers (1909).mp3",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Swing_Low%2C_Sweet_Chariot_-_Fisk_Jubilee_Singers_%281909%29.mp3",
+     "lic": "Public domain",
+     "artist": "Written by Wallace Willis; recorded by the Fisk Jubilee Singers",
+     "style": "A spiritual: the Fisk Jubilee Singers, 1909"
+    },
+    {
+     "title": "Margie - Original Dixieland Jazz Band.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/47/Margie_-_Original_Dixieland_Jazz_Band.flac",
+     "lic": "Public domain",
+     "artist": "",
+     "style": "New Orleans jazz: the Original Dixieland Jazz Band, 1920"
+    }
+   ]
   },
   {
    "id": "hawaii",
@@ -721,7 +2458,23 @@
    "artist": "Ferera &amp; Paaluhi",
    "desc": "Frank John Ferreira (1885-1951) was a steel guitarist born in Honolulu of Portuguese parents. Also known as “Palakiko,” Ferera (as his name was usually spelt) left the islands at the age of 15 and established himself as a musician and Vaude",
    "date": "1925-06-25",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Palakiko_%26_Paaluhi_%28Ferera_%26_Paaluhi%29_-_Hawaiian_Hotel.mp3"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Palakiko_%26_Paaluhi_%28Ferera_%26_Paaluhi%29_-_Hawaiian_Hotel.mp3",
+   "more": [
+    {
+     "title": "Aloha oe waltz medley.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Aloha_oe_waltz_medley.ogg",
+     "lic": "Public domain",
+     "artist": "William Smith and Walter K. Kolomoku.",
+     "style": "Hawaiian steel guitar duet on a wax cylinder"
+    },
+    {
+     "title": "HawaiianEchoes.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/HawaiianEchoes.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Frank Ferera and Helen Louise, Hawaiian guitar, 1910s"
+    }
+   ]
   },
   {
    "id": "spain",
@@ -735,7 +2488,16 @@
    "artist": "FranciscoKeep DJ Producciones",
    "desc": "Flamenco music sample Title: Flamenco sample by FRANCISCOKEEP Author: FRANCISCOKEEP Year: 2011 License: CC BY 3.0 (you can check it on the author's page on SoundCloud)",
    "date": "2011-09-10",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flamenco_sample_by_FRANCISCOKEEP.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flamenco_sample_by_FRANCISCOKEEP.ogg",
+   "more": [
+    {
+     "title": "\"La Farruca\" interpretada por El Mochuelo - restaurado.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/47/%22La_Farruca%22_interpretada_por_El_Mochuelo_-_restaurado.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "El Mochuelo (singer)",
+     "style": "Flamenco: La Farruca, sung by El Mochuelo on a wax cylinder"
+    }
+   ]
   },
   {
    "id": "portugal",
@@ -763,7 +2525,23 @@
    "artist": "Endersslay",
    "desc": "Played by Endersslay on violin.",
    "mime": "application/ogg",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Star_of_the_county_down.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Star_of_the_county_down.ogg",
+   "more": [
+    {
+     "title": "The Rose Tree.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/The_Rose_Tree.ogg",
+     "lic": "CC BY 3.0",
+     "artist": "User 'peakfiddler' on YouTube at https://www.youtube.com/user/peakfiddler/about",
+     "style": "An Irish air, The Rose Tree"
+    },
+    {
+     "title": "Dancing Willow - Demo-CD 2007 01 - The wind that shakes that Barley.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Dancing_Willow_-_Demo-CD_2007_01_-_The_wind_that_shakes_that_Barley.ogg",
+     "lic": "CC BY 3.0",
+     "artist": "trad.",
+     "style": "An Irish reel: The Wind That Shakes the Barley"
+    }
+   ]
   },
   {
    "id": "scotland",
@@ -791,7 +2569,16 @@
    "artist": "",
    "desc": "Inspelningen är en del av arbetsmaterialet till Jan Lings doktorsavhandling Nyckelharpan - Studier i ett folkligt musikinstrument (1967). Läs mer hos Musikverket. Dokumentatör: Jan Ling (Q5959106)",
    "date": "",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Polska_-_SMV_-_MMF7_0654_06.wav"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Polska_-_SMV_-_MMF7_0654_06.wav",
+   "more": [
+    {
+     "title": "Polska - SMV - MMF7 0660 01.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Polska_-_SMV_-_MMF7_0660_01.wav",
+     "lic": "CC0",
+     "artist": "",
+     "style": "A Swedish polska on the nyckelharpa"
+    }
+   ]
   },
   {
    "id": "alps",
@@ -805,7 +2592,23 @@
    "artist": "George P. Watson",
    "desc": "",
    "date": "",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Alpine_specialty_by_George_P._Watson.mp3"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Alpine_specialty_by_George_P._Watson.mp3",
+   "more": [
+    {
+     "title": "Einzug der Greifler in Bulle.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Einzug_der_Greifler_in_Bulle.ogg",
+     "lic": "CC BY-SA 2.5",
+     "artist": "Paul Lüönd",
+     "style": "Swiss folk band music: the Mosibuebä"
+    },
+    {
+     "title": "Klausenmelodie.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Klausenmelodie.ogg",
+     "lic": "Public domain",
+     "artist": "Basel",
+     "style": "The Klaus song of Küssnacht, Switzerland"
+    }
+   ]
   },
   {
    "id": "sardinia",
@@ -847,7 +2650,23 @@
    "artist": "Moscow Patriarchal Choir of the Russian Orthodox Church",
    "desc": "Velichanie_Obikhod (Song of Praise)",
    "date": "2012-11-28",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/01_Velichanie_Obihod_grind_Moscow_Patriarchal_Choir.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/01_Velichanie_Obihod_grind_Moscow_Patriarchal_Choir.ogg",
+   "more": [
+    {
+     "title": "PDP-CH - Feodor Chaliapin - The Song of the Volga Boatmen - Russian folk song - Fyodor Keneman - Gramophone-db1103-2-022051.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/PDP-CH_-_Feodor_Chaliapin_-_The_Song_of_the_Volga_Boatmen_-_Russian_folk_song_-_Fyodor_Keneman_-_Gramophone-db1103-2-022051.flac",
+     "lic": "Public domain",
+     "artist": "",
+     "style": "Feodor Chaliapin sings the Song of the Volga Boatmen"
+    },
+    {
+     "title": "02 Carju Nebesnyj znamennyj raspev grind Moscow Patriarchal Choir.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/02_Carju_Nebesnyj_znamennyj_raspev_grind_Moscow_Patriarchal_Choir.ogg",
+     "lic": "CC0",
+     "artist": "\"Old Russian Chant\" (Drevnerusskij raspev), a choir of the Moscow Patriarchate o",
+     "style": "Znamenny chant: a Russian Orthodox choir"
+    }
+   ]
   },
   {
    "id": "georgia",
@@ -889,7 +2708,23 @@
    "artist": "Ustād Gadā Mohammad, an Afghān musician from the city of Herāt, specialized in p",
    "desc": "Ustad Gada Mohammad - Rababa",
    "date": "",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Ustad_Gada_Mohammad_-_Rababa.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Ustad_Gada_Mohammad_-_Rababa.ogg",
+   "more": [
+    {
+     "title": "Baz karé man va mashough beh peygham oftad .ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/13/Baz_kar%C3%A9_man_va_mashough_beh_peygham_oftad_.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "A traditional Afghan song: Mirza Nazar Khan"
+    },
+    {
+     "title": "Mohammad Dīn Zākhel - Waro Waro Kēzhda Qadumūna Āshnā.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Mohammad_D%C4%ABn_Z%C4%81khel_-_Waro_Waro_K%C4%93zhda_Qadum%C5%ABna_%C4%80shn%C4%81.ogg",
+     "lic": "Public domain",
+     "artist": "Ustād Mohammad Dīn Zākhel, a master of Pashto Folk Music",
+     "style": "A Pashto song: Mohammad Din Zakhel"
+    }
+   ]
   },
   {
    "id": "india",
@@ -903,7 +2738,37 @@
    "artist": "TheRealRanjitMakkuni",
    "desc": "Live Sitar composition Improvisation, Raga Sri, Ranjit Makkui &amp; Mithilesh Jha",
    "date": "2003-08-01",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/RagaSri_%2C_Ranjit_Makkuni.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/RagaSri_%2C_Ranjit_Makkuni.ogg",
+   "more": [
+    {
+     "title": "Sohini Qawwali.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Sohini_Qawwali.ogg",
+     "lic": "Public domain",
+     "artist": "Imdad Khan (d. 1920)",
+     "style": "Raga Sohini on the sitar, Imdad Khan, 1904"
+    },
+    {
+     "title": "Desh - Tejas Mallela.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Desh_-_Tejas_Mallela.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Tejas Mallela",
+     "style": "An elaboration of raga Desh"
+    },
+    {
+     "title": "Evvare Ramayya Nee Sari-Gangeyabhushani-Adi-Tyagaraja~Ramakrishnan Murthy-R K Shriramkumar-K Arun Prakash.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Evvare_Ramayya_Nee_Sari-Gangeyabhushani-Adi-Tyagaraja~Ramakrishnan_Murthy-R_K_Shriramkumar-K_Arun_Prakash.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Ramakrishnan Murthy, accompanied by Shri. RK Shriramkumar - violin, and Shri. K ",
+     "style": "Carnatic music from South India: a song by Tyagaraja"
+    },
+    {
+     "title": "Art song from Meerut Raga Bhairavi (1931).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/df/Art_song_from_Meerut_Raga_Bhairavi_%281931%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Hindustani art song in raga Bhairavi, 1931"
+    }
+   ]
   },
   {
    "id": "tuva",
@@ -931,7 +2796,30 @@
    "artist": "Unknown authorUnknown author",
    "desc": "19th century Chinese drama. Disc 6 of the set Musik des Orients compiled by E.M. Von Hornbostel and published in Berlin by Lindström A.G. [1] [2]",
    "date": "1931",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/3/39/Hsi-pi_Tso_fang_Tsao_%281931%29.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/39/Hsi-pi_Tso_fang_Tsao_%281931%29.ogg",
+   "more": [
+    {
+     "title": "Kun-ch'ü P'i-p'a-chi (1931).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Kun-ch%27%C3%BC_P%27i-p%27a-chi_%281931%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Kunqu, classical Chinese opera, 1931"
+    },
+    {
+     "title": "Pang-tse Nan-tien-men (1931).oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Pang-tse_Nan-tien-men_%281931%29.oga",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Chinese opera with the bangzi clapper, 1931"
+    },
+    {
+     "title": "Chanting at Lingyin Temple, Hangzhou.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Chanting_at_Lingyin_Temple%2C_Hangzhou.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "LouiseBrown1981",
+     "style": "Buddhist monks chanting at Lingyin Temple, Hangzhou"
+    }
+   ]
   },
   {
    "id": "korea",
@@ -945,7 +2833,16 @@
    "artist": "한국저작권위원회",
    "desc": "Doraji Taryeong",
    "date": "2022-01-06",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Doraji_Taryeong.wav"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Doraji_Taryeong.wav",
+   "more": [
+    {
+     "title": "Song Mangab - Jingukmyeongsan.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Song_Mangab_-_Jingukmyeongsan.ogg",
+     "lic": "Public domain",
+     "artist": "Singer: Song Mangab",
+     "style": "Pansori: the singer Song Mangab, 1930s"
+    }
+   ]
   },
   {
    "id": "japan",
@@ -959,7 +2856,37 @@
    "artist": "Unknown authorUnknown author",
    "desc": "Japanese traditional song. Disc 2 of the set Musik des Orients compiled by E.M. Von Hornbostel and published in Berlin by Lindström A.G. [1] [2]",
    "date": "1931",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/Ha-uta_Umenimo_haru_%281931%29.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/Ha-uta_Umenimo_haru_%281931%29.ogg",
+   "more": [
+    {
+     "title": "Matsumae--Oiwake (1931).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Matsumae--Oiwake_%281931%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Oiwake, a Japanese folk song from Hokkaido, 1931"
+    },
+    {
+     "title": "Naga-uta Urashima (1931).oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/44/Naga-uta_Urashima_%281931%29.oga",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Nagauta: kabuki song with shamisen, 1931"
+    },
+    {
+     "title": "Koromogo-e (c. 1930).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Koromogo-e_%28c._1930%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Court music from the Imperial Household, around 1930"
+    },
+    {
+     "title": "Heart Sutra.oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Heart_Sutra.oga",
+     "lic": "CC BY 3.0",
+     "artist": "kennymiyoshi(現在チャンネルは非公開)",
+     "style": "The Heart Sutra, chanted by a Zen priest"
+    }
+   ]
   },
   {
    "id": "indonesia",
@@ -973,7 +2900,37 @@
    "artist": "RTB45",
    "desc": "A recording of Javanese Gamelan music performed by the court musicians of the Royal Palace of the Sultan of Yogyakarta, Excerpt 1. Kraton Ngayogyakarta Hadiningrat, Yogyakarta, Java Indonesia. Recorded using PCM-D50.",
    "date": "2014-11-06",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/Gamelan_angka_1_Kraton_Ngayogyakarta.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/Gamelan_angka_1_Kraton_Ngayogyakarta.ogg",
+   "more": [
+    {
+     "title": "Gamelan angka 2 Kraton Ngayogyakarta.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Gamelan_angka_2_Kraton_Ngayogyakarta.ogg",
+     "lic": "CC BY 4.0",
+     "artist": "RTB45",
+     "style": "Court gamelan from the Kraton (palace) of Yogyakarta, Java"
+    },
+    {
+     "title": "Ketawang Sekar Teja Slendro Manyura.oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Ketawang_Sekar_Teja_Slendro_Manyura.oga",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Dandung Adityo Argo Prasetyo Karawitan Marta Yogiswara",
+     "style": "Javanese gamelan in the slendro tuning"
+    },
+    {
+     "title": "Ketawang Mijil Wigaringtyas Pelog Nem.oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Ketawang_Mijil_Wigaringtyas_Pelog_Nem.oga",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Dandung Adityo Argo Prasetyo Karawitan Marta Yogiswara",
+     "style": "Javanese gamelan in the pelog tuning"
+    },
+    {
+     "title": "Gamelan Pelog Kinanti madumurti (1931).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Gamelan_Pelog_Kinanti_madumurti_%281931%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "Javanese gamelan, 1931"
+    }
+   ]
   },
   {
    "id": "ghana",
@@ -987,7 +2944,16 @@
    "artist": "Ibn Shiraz",
    "desc": "Drumming and Singing in Northern Ghana",
    "date": "2021-02-03",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Drumming_and_Singing_in_Northern_Ghana.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Drumming_and_Singing_in_Northern_Ghana.ogg",
+   "more": [
+    {
+     "title": "PDP-CH - Osei Nyantakyi and his Band - Mini Siki Daho - Ashima High Life - Opika-2007-part-27153-21.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/PDP-CH_-_Osei_Nyantakyi_and_his_Band_-_Mini_Siki_Daho_-_Ashima_High_Life_-_Opika-2007-part-27153-21.flac",
+     "lic": "Public domain",
+     "artist": "",
+     "style": "Highlife from 1950s Ghana: guitar band music"
+    }
+   ]
   },
   {
    "id": "mali",
@@ -1001,7 +2967,1224 @@
    "artist": "KONE IF",
    "desc": "Enregistrement sonore du balafon de Néba Solo, musicien sénoufo de renommée internationale. Le balafon, instrument traditionnel d’Afrique de l’Ouest composé de lames de bois et de calebasses résonatrices, produit des sonorités à la fois pro",
    "date": "2026-02-25",
-   "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Le_son_du_balafon_de_Neba_Solo.ogg"
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Le_son_du_balafon_de_Neba_Solo.ogg",
+   "more": [
+    {
+     "title": "Mako Diara, chanson laudative - Amenata Sako, chant solo.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Mako_Diara%2C_chanson_laudative_-_Amenata_Sako%2C_chant_solo.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author",
+     "style": "A griot praise song, recorded in Paris in 1931"
+    }
+   ]
+  },
+  {
+   "id": "nicaragua",
+   "place": "Nicaragua",
+   "region": "Americas",
+   "lat": 12.1,
+   "lon": -86.3,
+   "style": "Son nica, a traditional dance tune from Nicaragua",
+   "title": "Son nicaraguense.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Son_nicaraguense.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Koffermejia"
+  },
+  {
+   "id": "jamaica",
+   "place": "Jamaica",
+   "region": "Americas",
+   "lat": 18.0,
+   "lon": -76.8,
+   "style": "Mento, Jamaica’s folk music before ska and reggae: banjo, rumba box and hand drums",
+   "title": "Take Her To Jamaica, Mento.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Take_Her_To_Jamaica%2C_Mento.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Gasybeaugosse2020",
+   "more": [
+    {
+     "title": "Healin' in the Balmyard, Mento.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Healin%27_in_the_Balmyard%2C_Mento.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Gasybeaugosse2020"
+    },
+    {
+     "title": "Gal a Gully, Matilda, Mento.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/02/Gal_a_Gully%2C_Matilda%2C_Mento.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Lord Composer &amp; The Silver Seas Hotel Orchestra"
+    }
+   ]
+  },
+  {
+   "id": "trinidad",
+   "place": "Trinidad and Tobago",
+   "region": "Americas",
+   "lat": 10.65,
+   "lon": -61.5,
+   "style": "Calypso and string-band music from Port of Spain",
+   "title": "Lovey's Trinidad String Band - Trinidad (Trinidad paseo) - 1912.mp3",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Lovey%27s_Trinidad_String_Band_-_Trinidad_%28Trinidad_paseo%29_-_1912.mp3",
+   "lic": "Public domain",
+   "artist": "Lovey's Trinidad String Band (Musical group) Lovey (leader) Lovey (instrumentali",
+   "more": [
+    {
+     "title": "Deliso, Calypso.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Deliso%2C_Calypso.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Gasybeaugosse2020"
+    },
+    {
+     "title": "It's the Rhythm We Want, Calypso.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/It%27s_the_Rhythm_We_Want%2C_Calypso.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Gasybeaugosse2020"
+    },
+    {
+     "title": "Baby by Sam Manning (1924).mp3",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Baby_by_Sam_Manning_%281924%29.mp3",
+     "lic": "Public domain",
+     "artist": "Sam Manning",
+     "style": "Calypso from Trinidad: Sam Manning, 1924"
+    }
+   ]
+  },
+  {
+   "id": "haiti",
+   "place": "Haiti",
+   "region": "Americas",
+   "lat": 18.5,
+   "lon": -72.3,
+   "style": "Brass bands playing at funerals in Port-au-Prince",
+   "title": "Félix Blume - Death in Haiti - Bonus Disc - 01 Maestro Walter's Brass Band - SI JE PARLAIS.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/59/F%C3%A9lix_Blume_-_Death_in_Haiti_-_Bonus_Disc_-_01_Maestro_Walter%27s_Brass_Band_-_SI_JE_PARLAIS.ogg",
+   "lic": "CC BY 3.0",
+   "artist": "Félix Blume",
+   "more": [
+    {
+     "title": "Félix Blume - Death in Haiti - Bonus Disc - 14 Maestro Midouin's Brass Band - LA SEMENCE D'ICI BAS.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/F%C3%A9lix_Blume_-_Death_in_Haiti_-_Bonus_Disc_-_14_Maestro_Midouin%27s_Brass_Band_-_LA_SEMENCE_D%27ICI_BAS.ogg",
+     "lic": "CC BY 3.0",
+     "artist": "Félix Blume"
+    }
+   ]
+  },
+  {
+   "id": "peru",
+   "place": "Peru",
+   "region": "Americas",
+   "lat": -13.5,
+   "lon": -72.0,
+   "style": "Huayno and the Cusco harp, music of the Andes",
+   "title": "La Ñusta - Huaynito - Velarde y Medina - Lima 23 Septiembre 1913.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/La_%C3%91usta_-_Huaynito_-_Velarde_y_Medina_-_Lima_23_Septiembre_1913.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "03 Pirhuayani.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/03_Pirhuayani.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "WBDelgadoL"
+    },
+    {
+     "title": "06 Marinera Cusqueña.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/06_Marinera_Cusque%C3%B1a.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "WBDelgadoL"
+    }
+   ]
+  },
+  {
+   "id": "chile",
+   "place": "Chile",
+   "region": "Americas",
+   "lat": -33.4,
+   "lon": -70.6,
+   "style": "Cueca, the national dance of Chile",
+   "title": "Una gran canción para Michelle.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Una_gran_canci%C3%B3n_para_Michelle.ogg",
+   "lic": "CC BY-SA 3.0 cl",
+   "artist": "Comando de Michelle Bachelet"
+  },
+  {
+   "id": "venezuela",
+   "place": "Venezuela",
+   "region": "Americas",
+   "lat": 10.5,
+   "lon": -66.9,
+   "style": "Joropo from the plains (llanos), led by the llanero harp",
+   "title": "Alma Llanera - Instrumental al arpa.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Alma_Llanera_-_Instrumental_al_arpa.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "Nacional joropo - Lionel Belasco Orchestra.mp3",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Nacional_joropo_-_Lionel_Belasco_Orchestra.mp3",
+     "lic": "Public domain",
+     "artist": "Lionel Belasco"
+    }
+   ]
+  },
+  {
+   "id": "firstnations",
+   "place": "Canada (First Nations)",
+   "region": "Americas",
+   "lat": 46.8,
+   "lon": -71.3,
+   "style": "A pow-wow drum and singers in Wendake, Quebec",
+   "title": "AUDIO First Nations Pow-Wow Drums and singers stereo.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/3/31/AUDIO_First_Nations_Pow-Wow_Drums_and_singers_stereo.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Marc-Lautenbacher"
+  },
+  {
+   "id": "tahiti",
+   "place": "Tahiti",
+   "region": "Oceania",
+   "lat": -17.6,
+   "lon": -149.4,
+   "style": "A traditional Tahitian song, recorded in 1950",
+   "title": "Ute (1950).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Ute_%281950%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author"
+  },
+  {
+   "id": "newzealand",
+   "place": "Aotearoa New Zealand",
+   "region": "Oceania",
+   "lat": -36.8,
+   "lon": 175.0,
+   "style": "Māori waiata (songs) by a kapa haka group",
+   "title": "Māori waiata from Waiheke Island.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/M%C4%81ori_waiata_from_Waiheke_Island.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Countrymike"
+  },
+  {
+   "id": "png",
+   "place": "Papua New Guinea",
+   "region": "Oceania",
+   "lat": -5.0,
+   "lon": 145.0,
+   "style": "A song of the ujangong mask dance, on a wax cylinder from the early 1900s",
+   "title": "Ujangong.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/59/Ujangong.ogg",
+   "lic": "Public domain",
+   "artist": "Traditional song"
+  },
+  {
+   "id": "papua",
+   "place": "Papua (New Guinea, Indonesia)",
+   "region": "Oceania",
+   "lat": -2.5,
+   "lon": 140.7,
+   "style": "Sajojo, a folk song from Papua",
+   "title": "Papua - Sajojo.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Papua_-_Sajojo.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Duoviotheo"
+  },
+  {
+   "id": "philippines",
+   "place": "Philippines (Mindanao)",
+   "region": "Asia",
+   "lat": 7.2,
+   "lon": 124.2,
+   "style": "Kulintang: a row of tuned gongs with drums, from Mindanao",
+   "title": "Sinulog a Kamamatuan Ver. 1.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Sinulog_a_Kamamatuan_Ver._1.ogg",
+   "lic": "CC BY-SA 2.5",
+   "artist": "",
+   "more": [
+    {
+     "title": "Tagunggo Ver. 1.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Tagunggo_Ver._1.ogg",
+     "lic": "CC BY-SA 2.5",
+     "artist": ""
+    }
+   ]
+  },
+  {
+   "id": "vietnam",
+   "place": "Vietnam",
+   "region": "Asia",
+   "lat": 10.8,
+   "lon": 106.7,
+   "style": "Cải lương, the folk opera of southern Vietnam, around 1928",
+   "title": "Xử án Bàng Quí Phi (c. 1928).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/X%E1%BB%AD_%C3%A1n_B%C3%A0ng_Qu%C3%AD_Phi_%28c._1928%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author"
+  },
+  {
+   "id": "cambodia",
+   "place": "Cambodia",
+   "region": "Asia",
+   "lat": 11.6,
+   "lon": 104.9,
+   "style": "Khmer classical dance music, and the music of Kun Khmer boxing",
+   "title": "Khmer classical dance song.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/09/Khmer_classical_dance_song.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "CommonsDara",
+   "more": [
+    {
+     "title": "Kun Khmer fight music.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Kun_Khmer_fight_music.wav",
+     "lic": "CC0",
+     "artist": "Kke802"
+    }
+   ]
+  },
+  {
+   "id": "nepal",
+   "place": "Nepal",
+   "region": "Asia",
+   "lat": 27.7,
+   "lon": 85.3,
+   "style": "A song by Mitrasen Thapa Magar, a pioneer of Nepali folk song",
+   "title": "Bhayoun Badnam Hera - Master Mitrasen Thapa Magar.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Bhayoun_Badnam_Hera_-_Master_Mitrasen_Thapa_Magar.ogg",
+   "lic": "Public domain",
+   "artist": "Mitrasen Thapa Magar",
+   "more": [
+    {
+     "title": "बाँसुरीको धुन Basuri.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/50/%E0%A4%AC%E0%A4%BE%E0%A4%81%E0%A4%B8%E0%A5%81%E0%A4%B0%E0%A5%80%E0%A4%95%E0%A5%8B_%E0%A4%A7%E0%A5%81%E0%A4%A8_Basuri.ogg",
+     "lic": "CC0",
+     "artist": "Learnerktm",
+     "style": "Bansuri flute tunes from Nepal"
+    }
+   ]
+  },
+  {
+   "id": "iran",
+   "place": "Iran",
+   "region": "Middle East",
+   "lat": 35.7,
+   "lon": 51.4,
+   "style": "Persian classical music: santur, setar and voice in the dastgah modes",
+   "title": "Chour I Selim Khan.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Chour_I_Selim_Khan.ogg",
+   "lic": "Public domain",
+   "artist": "Selim Khan Poet: Saadi Shirazi",
+   "more": [
+    {
+     "title": "Mahoor Paravaneh.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/Mahoor_Paravaneh.ogg",
+     "lic": "Public domain",
+     "artist": "Parvaneh Poem: Saadi Shirazi Cithares: Habib Samaey"
+    },
+    {
+     "title": "Dokhtaran-e Quchan- دختران قوچان.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Dokhtaran-e_Quchan-_%D8%AF%D8%AE%D8%AA%D8%B1%D8%A7%D9%86_%D9%82%D9%88%DA%86%D8%A7%D9%86.ogg",
+     "lic": "CC0",
+     "artist": "Arya tabibzadeh"
+    }
+   ]
+  },
+  {
+   "id": "syria",
+   "place": "Syria",
+   "region": "Middle East",
+   "lat": 36.2,
+   "lon": 37.1,
+   "style": "A song from Aleppo, recorded in 1908",
+   "title": "Bouchraka Ya Kalbi (c.1908).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Bouchraka_Ya_Kalbi_%28c.1908%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author"
+  },
+  {
+   "id": "egypt",
+   "place": "Egypt",
+   "region": "Middle East",
+   "lat": 30.0,
+   "lon": 31.2,
+   "style": "Egyptian art music in the maqam modes, 1910s–1930s",
+   "title": "Baschrav Kuzum Maqam Hijaz part 1 (1931).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Baschrav_Kuzum_Maqam_Hijaz_part_1_%281931%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "Art-song Maqam Sika (1931).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/0/04/Art-song_Maqam_Sika_%281931%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    },
+    {
+     "title": "Aldahre Kata Awsali (c. 1914).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Aldahre_Kata_Awsali_%28c._1914%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    }
+   ]
+  },
+  {
+   "id": "algeria",
+   "place": "Algeria",
+   "region": "Africa",
+   "lat": 35.7,
+   "lon": -0.6,
+   "style": "Bedoui from Oran: reed flute and voice, the rural roots of raï",
+   "title": "Goul El Si Mohamed (algerian bedoui rai music).oga",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/10/Goul_El_Si_Mohamed_%28algerian_bedoui_rai_music%29.oga",
+   "lic": "Public domain",
+   "artist": "Cheikh Ben Guenoun (songwriter) Cheikh Madani [1888-1954] (singer)",
+   "more": [
+    {
+     "title": "Goul El Si Mohamed 2 (algerian bedoui rai music).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Goul_El_Si_Mohamed_2_%28algerian_bedoui_rai_music%29.ogg",
+     "lic": "Public domain",
+     "artist": "Cheikh Ben Guenoun (songwriter) Cheikh Madani [1888-1954] (singer)"
+    }
+   ]
+  },
+  {
+   "id": "morocco",
+   "place": "Morocco",
+   "region": "Africa",
+   "lat": 34.0,
+   "lon": -6.8,
+   "style": "The Andalusi nūba: music brought from Muslim Spain, played by a Moroccan orchestra",
+   "title": "1 Sallu ya 'ibad.flac",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/1_Sallu_ya_%27ibad.flac",
+   "lic": "CC BY 4.0",
+   "artist": "Carl Davila",
+   "more": [
+    {
+     "title": "2 Rubba laylin.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/2_Rubba_laylin.flac",
+     "lic": "CC BY 4.0",
+     "artist": "Carl Davila"
+    },
+    {
+     "title": "8 Qad tala shawqi.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/20/8_Qad_tala_shawqi.flac",
+     "lic": "CC BY 4.0",
+     "artist": "Carl Davila"
+    }
+   ]
+  },
+  {
+   "id": "madagascar",
+   "place": "Madagascar",
+   "region": "Africa",
+   "lat": -18.9,
+   "lon": 47.5,
+   "style": "Malagasy songs on the valiha tube zither",
+   "title": "KingRadamaIIFalifalySteelStringValiha.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/KingRadamaIIFalifalySteelStringValiha.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Kaluvau",
+   "more": [
+    {
+     "title": "OldMalagasyFolkSongMandihizaRahitsikitsikaSteelStringValiha.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/OldMalagasyFolkSongMandihizaRahitsikitsikaSteelStringValiha.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Kaluvau"
+    }
+   ]
+  },
+  {
+   "id": "ivorycoast",
+   "place": "Côte d’Ivoire",
+   "region": "Africa",
+   "lat": 9.45,
+   "lon": -5.6,
+   "style": "Senufo balafon music and the sanza thumb piano from the north",
+   "title": "Souake - solo de sanza, Côte d'Ivoire Face A.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/Souake_-_solo_de_sanza%2C_C%C3%B4te_d%27Ivoire_Face_A.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "Chant des femmes Sénoufo avec balafon lors d’un funérailles traditionnel.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Chant_des_femmes_S%C3%A9noufo_avec_balafon_lors_d%E2%80%99un_fun%C3%A9railles_traditionnel.ogg",
+     "lic": "CC BY 4.0",
+     "artist": "KONE IF"
+    },
+    {
+     "title": "Enregistrement sonore de Néba Solo au festival Nangnerki.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Enregistrement_sonore_de_N%C3%A9ba_Solo_au_festival_Nangnerki.ogg",
+     "lic": "CC BY 4.0",
+     "artist": "KONE IF"
+    }
+   ]
+  },
+  {
+   "id": "greece",
+   "place": "Greece",
+   "region": "Europe",
+   "lat": 37.98,
+   "lon": 23.7,
+   "style": "Rebetiko, the urban blues of Greece, 1930s",
+   "title": "Neo Hasapaki, Rebetiko.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/Neo_Hasapaki%2C_Rebetiko.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Gasybeaugosse2020",
+   "more": [
+    {
+     "title": "Tha Se Klepso, Rebetiko.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Tha_Se_Klepso%2C_Rebetiko.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Gasybeaugosse2020"
+    },
+    {
+     "title": "Fevgo Kori.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Fevgo_Kori.ogg",
+     "lic": "Public domain",
+     "artist": "Charles Scheuplein as Recordist &amp; Estudiantina Melizianos as Vocal Group"
+    },
+    {
+     "title": "Ο Επιτάφιος του Σεῖκιλου - Epitaph of Seikilos.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/%CE%9F_%CE%95%CF%80%CE%B9%CF%84%CE%AC%CF%86%CE%B9%CE%BF%CF%82_%CF%84%CE%BF%CF%85_%CE%A3%CE%B5%E1%BF%96%CE%BA%CE%B9%CE%BB%CE%BF%CF%85_-_Epitaph_of_Seikilos.ogg",
+     "lic": "CC BY-SA 2.5",
+     "artist": "Marcus Harvey, User:Byz",
+     "style": "The Epitaph of Seikilos: the oldest complete song we know, ancient Greece"
+    },
+    {
+     "title": "Byzantine Ecclesiastical Hymn part1.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Byzantine_Ecclesiastical_Hymn_part1.ogg",
+     "lic": "CC0",
+     "artist": "Unknown authorUnknown author",
+     "style": "Byzantine chant of the Greek Orthodox church"
+    }
+   ]
+  },
+  {
+   "id": "naples",
+   "place": "Naples, Italy",
+   "region": "Europe",
+   "lat": 40.85,
+   "lon": 14.27,
+   "style": "Canzone napoletana and the tarantella",
+   "title": "A canzone 'e Santa Lucia (1931).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/A_canzone_%27e_Santa_Lucia_%281931%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "Elvira Donnarumma - Sturnellata napulitana.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Elvira_Donnarumma_-_Sturnellata_napulitana.ogg",
+     "lic": "Public domain",
+     "artist": "Elvira Donnarumma (voice) (1883-1933) - words by Alessandro Cassese (1876-1916) "
+    },
+    {
+     "title": "ICBSA Ricci - Celebre tarantella.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/ICBSA_Ricci_-_Celebre_tarantella.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": ""
+    },
+    {
+     "title": "Torna-a-surriento-Enrico-Caruso.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Torna-a-surriento-Enrico-Caruso.ogg",
+     "lic": "Public domain",
+     "artist": "Enrico Caruso (1873-1921)",
+     "style": "Enrico Caruso sings Torna a Surriento"
+    }
+   ]
+  },
+  {
+   "id": "paris",
+   "place": "Paris, France",
+   "region": "Europe",
+   "lat": 48.85,
+   "lon": 2.35,
+   "style": "Bal musette: accordion dance music from 1930s Paris",
+   "title": "Joinville-musette (1935, Gramophone K 7624).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Joinville-musette_%281935%2C_Gramophone_K_7624%29.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Marcel Bertal et Louis Maubon",
+   "more": [
+    {
+     "title": "Si tu n'étais pas là (Fréhel).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Si_tu_n%27%C3%A9tais_pas_l%C3%A0_%28Fr%C3%A9hel%29.ogg",
+     "lic": "Public domain",
+     "artist": "music composed by Gaston Claret, lyrics by Pierre Bayle performed by Fréhel, ori",
+     "style": "Chanson réaliste: Fréhel"
+    }
+   ]
+  },
+  {
+   "id": "brittany",
+   "place": "Brittany, France",
+   "region": "Europe",
+   "lat": 48.4,
+   "lon": -4.5,
+   "style": "Breton dance music and kan ha diskan, call-and-response singing",
+   "title": "En tu all da Bariz, gavotte du Bas-Léon.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/En_tu_all_da_Bariz%2C_gavotte_du_Bas-L%C3%A9on.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Centre Breton d'Art Populaire",
+   "more": [
+    {
+     "title": "Chant en duo An disput Joëlle hag Agnès.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/14/Chant_en_duo_An_disput_Jo%C3%ABlle_hag_Agn%C3%A8s.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "Centre Breton d'Art Populaire"
+    }
+   ]
+  },
+  {
+   "id": "poland",
+   "place": "Poland (Kurpie)",
+   "region": "Europe",
+   "lat": 53.3,
+   "lon": 21.2,
+   "style": "Kurpie folk song, sung by Weronika Zyśk",
+   "title": "Weronika Zyśk Wolkowe, A na boru sosna.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Weronika_Zy%C5%9Bk_Wolkowe%2C_A_na_boru_sosna.wav",
+   "lic": "CC BY 4.0",
+   "artist": "BartoszZebrowski",
+   "more": [
+    {
+     "title": "Weronika Zyśk Wolkowe, Jidźta modre łocy spać.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Weronika_Zy%C5%9Bk_Wolkowe%2C_Jid%C5%BAta_modre_%C5%82ocy_spa%C4%87.wav",
+     "lic": "CC BY 4.0",
+     "artist": "BartoszZebrowski"
+    }
+   ]
+  },
+  {
+   "id": "vienna",
+   "place": "Vienna, Austria",
+   "region": "Europe",
+   "lat": 48.2,
+   "lon": 16.37,
+   "style": "Wienerlied, the Viennese song, with its yodel-like “Dudler”",
+   "title": "Agnes Palmisano Trio – Wann i morgens früh aufsteh (Tiroler Volkslied nach Beethoven) Live 2025.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Agnes_Palmisano_Trio_%E2%80%93_Wann_i_morgens_fr%C3%BCh_aufsteh_%28Tiroler_Volkslied_nach_Beethoven%29_Live_2025.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "DrTrumpet",
+   "more": [
+    {
+     "title": "Agnes Palmisano Trio – I und mei Bua (aus „Drei Paar Schuhe“) Live Brigittenau 2025.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Agnes_Palmisano_Trio_%E2%80%93_I_und_mei_Bua_%28aus_%E2%80%9EDrei_Paar_Schuhe%E2%80%9C%29_Live_Brigittenau_2025.ogg",
+     "lic": "CC BY-SA 4.0",
+     "artist": "DrTrumpet"
+    }
+   ]
+  },
+  {
+   "id": "bosnia",
+   "place": "Bosnia and Herzegovina",
+   "region": "Europe",
+   "lat": 43.86,
+   "lon": 18.41,
+   "style": "Sevdalinka, the slow love songs of Bosnia",
+   "title": "Sevdah - (Floete) Sto te Nema.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Sevdah_-_%28Floete%29_Sto_te_Nema.ogg",
+   "lic": "CC BY-SA 4.0",
+   "artist": "BerinHader",
+   "more": [
+    {
+     "title": "Sevdah - (Gitarre) Zute Dunje.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Sevdah_-_%28Gitarre%29_Zute_Dunje.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "BerinHader"
+    }
+   ]
+  },
+  {
+   "id": "estonia",
+   "place": "Estonia",
+   "region": "Europe",
+   "lat": 57.8,
+   "lon": 27.5,
+   "style": "Regilaul, the ancient Estonian runo song: a leader sings, the group answers",
+   "title": "Miks õled sillmistä sinine.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Miks_%C3%B5led_sillmist%C3%A4_sinine.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "betawikiversity:User:Timo~betawikiversity",
+   "more": [
+    {
+     "title": "Mõrrsija nuttab.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/M%C3%B5rrsija_nuttab.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "betawikiversity:User:Timo~betawikiversity"
+    }
+   ]
+  },
+  {
+   "id": "latvia",
+   "place": "Latvia",
+   "region": "Europe",
+   "lat": 56.95,
+   "lon": 24.1,
+   "style": "Rīga dimd, a Latvian folk song",
+   "title": "Rīga dimd latviešu tautas dziesma22469.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/R%C4%ABga_dimd_latvie%C5%A1u_tautas_dziesma22469.wav",
+   "lic": "Public domain",
+   "artist": ""
+  },
+  {
+   "id": "wales",
+   "place": "Wales",
+   "region": "Europe",
+   "lat": 51.5,
+   "lon": -3.2,
+   "style": "A Welsh male voice choir",
+   "title": "Calon Lan - London Welsh Male Voice Choir.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/06/Calon_Lan_-_London_Welsh_Male_Voice_Choir.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "",
+   "more": [
+    {
+     "title": "Gwahoddiad - London Welsh Male Voice Choir.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Gwahoddiad_-_London_Welsh_Male_Voice_Choir.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": ""
+    }
+   ]
+  },
+  {
+   "id": "klezmer",
+   "place": "Jewish Eastern Europe (klezmer)",
+   "region": "Europe",
+   "lat": 49.0,
+   "lon": 28.0,
+   "style": "Klezmer: Jewish dance music from Eastern Europe, recorded by immigrants in New York",
+   "title": "Der Terk in America.mp3",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Der_Terk_in_America.mp3",
+   "lic": "Public domain",
+   "artist": "",
+   "more": [
+    {
+     "title": "Der Iyd in Jerusaleim.mp3",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Der_Iyd_in_Jerusaleim.mp3",
+     "lic": "Public domain",
+     "artist": ""
+    }
+   ]
+  },
+  {
+   "id": "yemen",
+   "place": "Yemen",
+   "region": "Middle East",
+   "lat": 15.35,
+   "lon": 44.2,
+   "style": "Sanaani song from Sana’a and Tihami song from the coast",
+   "title": "صنعاء الحنين - Sana’a’s Nostalgia.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/%D8%B5%D9%86%D8%B9%D8%A7%D8%A1_%D8%A7%D9%84%D8%AD%D9%86%D9%8A%D9%86_-_Sana%E2%80%99a%E2%80%99s_Nostalgia.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Hussein Moheb (Singer) &amp; Mohamed al-Ghoom from the Heritage Symphonies organ",
+   "more": [
+    {
+     "title": "غزل تهامي - Tihama’s Romance.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/%D8%BA%D8%B2%D9%84_%D8%AA%D9%87%D8%A7%D9%85%D9%8A_-_Tihama%E2%80%99s_Romance.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Heritage Symphonies"
+    }
+   ]
+  },
+  {
+   "id": "azerbaijan",
+   "place": "Azerbaijan",
+   "region": "Asia",
+   "lat": 40.4,
+   "lon": 49.9,
+   "style": "Mugham: Azerbaijani modal improvisation for voice, tar and kamancha",
+   "title": "Arazbari by Jabbar Karyagdi.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Arazbari_by_Jabbar_Karyagdi.ogg",
+   "lic": "Public domain",
+   "artist": "folk song",
+   "more": [
+    {
+     "title": "Heyrati mugam.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Heyrati_mugam.ogg",
+     "lic": "Public domain",
+     "artist": "folk song"
+    },
+    {
+     "title": "Karabakh Shikestesi music.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Karabakh_Shikestesi_music.ogg",
+     "lic": "Public domain",
+     "artist": "folk song"
+    }
+   ]
+  },
+  {
+   "id": "sapmi",
+   "place": "Sápmi (Sámi)",
+   "region": "Europe",
+   "lat": 66.0,
+   "lon": 17.9,
+   "style": "Joik: a Sámi song that doesn’t describe a person, animal or place, it IS them",
+   "title": "1. Gammelripkallen 2. Tjädern - SMV - SVA CYL 0389.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/1._Gammelripkallen_2._Tj%C3%A4dern_-_SMV_-_SVA_CYL_0389.wav",
+   "lic": "CC0",
+   "artist": "",
+   "more": [
+    {
+     "title": "1. Till renkalvar - SMV - SVA CYL 0294.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/1._Till_renkalvar_-_SMV_-_SVA_CYL_0294.wav",
+     "lic": "CC0",
+     "artist": ""
+    }
+   ]
+  },
+  {
+   "id": "somalia",
+   "place": "Somalia",
+   "region": "Africa",
+   "lat": 2.05,
+   "lon": 45.3,
+   "style": "The Waaberi band, Somalia’s national band",
+   "title": "\"Oktoobar Waa Tee Waa Tuma-\" (What's October, what is it-)- Hoboladda Waaberi.oga",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/%22Oktoobar_Waa_Tee_Waa_Tuma-%22_%28What%27s_October%2C_what_is_it-%29-_Hoboladda_Waaberi.oga",
+   "lic": "Public domain",
+   "artist": "Taariikh Archive"
+  },
+  {
+   "id": "uruguay",
+   "place": "Uruguay",
+   "region": "Americas",
+   "lat": -34.9,
+   "lon": -56.2,
+   "style": "A payador: a singer improvising with guitar, recorded in 1908",
+   "title": "PDP-UY - Arturo de Nava, baritone solo with guitar - Tango de los negros - Victor-62206a-f87.flac",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/PDP-UY_-_Arturo_de_Nava%2C_baritone_solo_with_guitar_-_Tango_de_los_negros_-_Victor-62206a-f87.flac",
+   "lic": "Public domain",
+   "artist": ""
+  },
+  {
+   "id": "panama",
+   "place": "Panama",
+   "region": "Americas",
+   "lat": 8.5,
+   "lon": -80.4,
+   "style": "Panamanian cumbia and bullarengue from the festivals of Coclé",
+   "title": "Cumbia Panameña.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Cumbia_Paname%C3%B1a.ogg",
+   "lic": "Public domain",
+   "artist": "Edición hecha por: Panama1519, Interpretada por Jose Augusto Broce",
+   "more": [
+    {
+     "title": "Bullarengue Panamá.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Bullarengue_Panam%C3%A1.ogg",
+     "lic": "Public domain",
+     "artist": "Panama1519"
+    },
+    {
+     "title": "La aparición.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/La_aparici%C3%B3n.ogg",
+     "lic": "Public domain",
+     "artist": "Carlos Eleta"
+    }
+   ]
+  },
+  {
+   "id": "titicaca",
+   "place": "Lake Titicaca (Aymara)",
+   "region": "Americas",
+   "lat": -15.8,
+   "lon": -69.8,
+   "style": "Sikuri: big panpipe bands of the Aymara around Lake Titicaca",
+   "title": "Interpretación del tema \"29 de setiembre\" ejecución adornada con sikus Malta - Sonido conjunto de Ira y Arka.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Interpretaci%C3%B3n_del_tema_%2229_de_setiembre%22_ejecuci%C3%B3n_adornada_con_sikus_Malta_-_Sonido_conjunto_de_Ira_y_Arka.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Abel Christian Apaza Amanqui",
+   "more": [
+    {
+     "title": "Interpretación del tema \"Mula Lunthata\" ejecutada con sikus Bajo Malta - Sonido conjunto de Ira y Arka.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Interpretaci%C3%B3n_del_tema_%22Mula_Lunthata%22_ejecutada_con_sikus_Bajo_Malta_-_Sonido_conjunto_de_Ira_y_Arka.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Abel Christian Apaza Amanqui"
+    }
+   ]
+  },
+  {
+   "id": "southafrica",
+   "place": "South Africa",
+   "region": "Africa",
+   "lat": -26.2,
+   "lon": 28.0,
+   "style": "Kwela: penny-whistle jive from the townships",
+   "title": "John Bartmann - A Kwela Fella.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/61/John_Bartmann_-_A_Kwela_Fella.ogg",
+   "lic": "CC0",
+   "artist": "John Bartmann"
+  },
+  {
+   "id": "wayuu",
+   "place": "La Guajira (Wayuu)",
+   "region": "Americas",
+   "lat": 11.5,
+   "lon": -72.5,
+   "style": "Jayeechi: Wayuu song from La Guajira, sung in Wayuunaiki",
+   "title": "Jayeechi 01.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Jayeechi_01.ogg",
+   "lic": "CC0",
+   "artist": "Leonardy Fernandez",
+   "more": [
+    {
+     "title": "Jayeechi 03.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Jayeechi_03.ogg",
+     "lic": "CC0",
+     "artist": "Leonardy Fernandez"
+    }
+   ]
+  },
+  {
+   "id": "tunisia",
+   "place": "Tunisia",
+   "region": "Africa",
+   "lat": 36.8,
+   "lon": 10.2,
+   "style": "Tunisian art song in the maqam Mezmum, 1931",
+   "title": "Art-song Maqam Mezmum (1931).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/28/Art-song_Maqam_Mezmum_%281931%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author"
+  },
+  {
+   "id": "bali",
+   "place": "Bali, Indonesia",
+   "region": "Asia",
+   "lat": -8.4,
+   "lon": 115.2,
+   "style": "Balinese gamelan, recorded in 1931: fast, shimmering, interlocking bronze",
+   "title": "Gamelan Gong Lagu Kebiar (1931).ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Gamelan_Gong_Lagu_Kebiar_%281931%29.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "Gamelan Djoged Tjedjing-Kereman (1931).oga",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/4/46/Gamelan_Djoged_Tjedjing-Kereman_%281931%29.oga",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    },
+    {
+     "title": "Djanger Putih putih saput anduk (1931).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Djanger_Putih_putih_saput_anduk_%281931%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    },
+    {
+     "title": "Gamelan Anklung Berong Pengetjet (1931).ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Gamelan_Anklung_Berong_Pengetjet_%281931%29.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    }
+   ]
+  },
+  {
+   "id": "congo",
+   "place": "Congo",
+   "region": "Africa",
+   "lat": -4.3,
+   "lon": 15.3,
+   "style": "A song in Lingala from Congo, recorded in Paris in 1931",
+   "title": "Lem'Boumga B.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Lem%27Boumga_B.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author. Éditeur : Gouvernement général de l'Afrique Equato",
+   "more": [
+    {
+     "title": "Ngoma Ya Kurema, chant de rameurs.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Ngoma_Ya_Kurema%2C_chant_de_rameurs.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    }
+   ]
+  },
+  {
+   "id": "mozambique",
+   "place": "Mozambique",
+   "region": "Africa",
+   "lat": -25.0,
+   "lon": 33.6,
+   "style": "Songs of soldiers from southern Mozambique with marimbas (timbila), recorded in 1931",
+   "title": "Chirillo, chant de lamentations - choeur des soldats landins, accompagnement de marimba.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/87/Chirillo%2C_chant_de_lamentations_-_choeur_des_soldats_landins%2C_accompagnement_de_marimba.ogg",
+   "lic": "Public domain",
+   "artist": "Unknown authorUnknown author",
+   "more": [
+    {
+     "title": "Munguenya, chant de travail - choeur des soldats landins, accompagnement de marimba.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Munguenya%2C_chant_de_travail_-_choeur_des_soldats_landins%2C_accompagnement_de_marimba.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    },
+    {
+     "title": "Inkouai, provocations guerrières - choeur des soldats landins, accompagnement de marimba.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Inkouai%2C_provocations_guerri%C3%A8res_-_choeur_des_soldats_landins%2C_accompagnement_de_marimba.ogg",
+     "lic": "Public domain",
+     "artist": "Unknown authorUnknown author"
+    }
+   ]
+  },
+  {
+   "id": "thailand",
+   "place": "Thailand",
+   "region": "Asia",
+   "lat": 13.75,
+   "lon": 100.5,
+   "style": "Thai music: an old Siamese song on wax cylinder, and a temple piphat ensemble",
+   "title": "Kham Hom - Sweet Words.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Kham_Hom_-_Sweet_Words.ogg",
+   "lic": "Public domain",
+   "artist": "Traditional song",
+   "more": [
+    {
+     "title": "Piphat in Wat Khung Taphao.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/2/27/Piphat_in_Wat_Khung_Taphao.ogg",
+     "lic": "CC BY-SA 3.0",
+     "artist": "ผู้สร้างสรรค์ผลงาน/ส่งข้อมูลเก็บในคลังข้อมูลเสรีวิกิมีเดียคอมมอนส์ - เทวประภาส ม"
+    }
+   ]
+  },
+  {
+   "id": "cameroon",
+   "place": "Cameroon",
+   "region": "Africa",
+   "lat": 5.95,
+   "lon": 10.15,
+   "style": "Four flutes for the lela celebration in Bali Nyonga, Cameroon, on a wax cylinder",
+   "title": "Music for the Lela Celebration.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/1/10/Music_for_the_Lela_Celebration.ogg",
+   "lic": "Public domain",
+   "artist": "Traditional song"
+  },
+  {
+   "id": "chumash",
+   "place": "California (Chumash)",
+   "region": "Americas",
+   "lat": 34.4,
+   "lon": -119.7,
+   "style": "A Chumash song sung by Fernando Librado, recorded on a wax cylinder",
+   "title": "Chumashan song.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Chumashan_song.wav",
+   "lic": "Public domain",
+   "artist": "Fernando Librado"
+  },
+  {
+   "id": "mecca",
+   "place": "Mecca, Saudi Arabia",
+   "region": "Middle East",
+   "lat": 21.4,
+   "lon": 39.8,
+   "style": "The call to prayer (adhan), recorded in Mecca in 1885: one of the oldest recordings anywhere",
+   "title": "Oldest recording of the Quran 1885.oga",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Oldest_recording_of_the_Quran_1885.oga",
+   "lic": "Public domain",
+   "artist": "Christiaan Snouck"
+  },
+  {
+   "id": "ukraine",
+   "place": "Ukraine",
+   "region": "Europe",
+   "lat": 49.8,
+   "lon": 24.0,
+   "style": "Ukrainian folk song on Filaret Kolessa’s phonograph cylinders",
+   "title": "Kolessa Phonograph Cylinder 01.flac",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Kolessa_Phonograph_Cylinder_01.flac",
+   "lic": "Public domain",
+   "artist": "Folklore material",
+   "more": [
+    {
+     "title": "Kolessa Phonograph Cylinder 13.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Kolessa_Phonograph_Cylinder_13.flac",
+     "lic": "Public domain",
+     "artist": "Folklore material"
+    }
+   ]
+  },
+  {
+   "id": "cuba",
+   "place": "Cuba",
+   "region": "Americas",
+   "lat": 23.1,
+   "lon": -82.4,
+   "style": "Danzón, the elegant dance music of Havana",
+   "title": "Flor De Yurumi, Danzón.flac",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Flor_De_Yurumi%2C_Danz%C3%B3n.flac",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Gasybeaugosse2020",
+   "more": [
+    {
+     "title": "Pensamiento, Danzón.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Pensamiento%2C_Danz%C3%B3n.flac",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Gasybeaugosse2020"
+    },
+    {
+     "title": "Lago Azul, Danzón.flac",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Lago_Azul%2C_Danz%C3%B3n.flac",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Gasybeaugosse2020"
+    }
+   ]
+  },
+  {
+   "id": "turkey",
+   "place": "Turkey",
+   "region": "Middle East",
+   "lat": 41.0,
+   "lon": 29.0,
+   "style": "Turkish folk songs (türkü), played by the band Turku",
+   "title": "Turku Nomads of the Silk Road - 01 - -Uskudara Gideriken.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Turku_Nomads_of_the_Silk_Road_-_01_-_-Uskudara_Gideriken.ogg",
+   "lic": "CC BY 4.0",
+   "artist": "Turku, Nomads of the Silk Road",
+   "more": [
+    {
+     "title": "Turku Nomads of the Silk Road - 04 - -Anadolu Kavagi.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Turku_Nomads_of_the_Silk_Road_-_04_-_-Anadolu_Kavagi.ogg",
+     "lic": "CC BY 4.0",
+     "artist": "Turku, Nomads of the Silk Road"
+    }
+   ]
+  },
+  {
+   "id": "nigeria",
+   "place": "Nigeria (Hausa)",
+   "region": "Africa",
+   "lat": 12.0,
+   "lon": 8.5,
+   "style": "Hausa royal music for an emir’s turbaning ceremony: long trumpets and drums",
+   "title": "Hausa traditional emirate turbening music 01.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Hausa_traditional_emirate_turbening_music_01.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Anasskoko",
+   "more": [
+    {
+     "title": "Hausa traditional emirate turbening music 03.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Hausa_traditional_emirate_turbening_music_03.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Anasskoko"
+    }
+   ]
+  },
+  {
+   "id": "tanzania",
+   "place": "Tanzania",
+   "region": "Africa",
+   "lat": -6.8,
+   "lon": 39.3,
+   "style": "A ngoma dance song from Tanzania",
+   "title": "Ngoma Traditional Dance Song- Tanzania.flac",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Ngoma_Traditional_Dance_Song-_Tanzania.flac",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Agness Abubakar Saidi"
+  },
+  {
+   "id": "tibet",
+   "place": "Tibet (Buddhist chant)",
+   "region": "Asia",
+   "lat": 29.65,
+   "lon": 91.1,
+   "style": "Tibetan Buddhist monks chanting, in a voice so deep it makes overtones",
+   "title": "Samuel Corwin - 09 - Tibetan Monks Chanting at Gyuto Branch Monastery House No 422 McLeod Ganj.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Samuel_Corwin_-_09_-_Tibetan_Monks_Chanting_at_Gyuto_Branch_Monastery_House_No_422_McLeod_Ganj.ogg",
+   "lic": "CC BY 4.0",
+   "artist": "Samuel Corwin"
+  },
+  {
+   "id": "gregorian",
+   "place": "Medieval Europe (Gregorian chant)",
+   "region": "Europe",
+   "lat": 41.9,
+   "lon": 12.45,
+   "style": "Gregorian chant: the plainsong of the medieval Church",
+   "title": "Improperia.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Improperia.ogg",
+   "lic": "Public domain",
+   "artist": "Membeth",
+   "more": [
+    {
+     "title": "Ecce.lignum.Crucis.ogg",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Ecce.lignum.Crucis.ogg",
+     "lic": "Public domain",
+     "artist": "Membeth"
+    }
+   ]
+  },
+  {
+   "id": "solomon",
+   "place": "Solomon Islands",
+   "region": "Oceania",
+   "lat": -9.4,
+   "lon": 160.0,
+   "style": "A song of a tribe from the Solomon Islands",
+   "title": "Solomon Island Song.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Solomon_Island_Song.ogg",
+   "lic": "Public domain",
+   "artist": "DasBee"
+  },
+  {
+   "id": "hopi",
+   "place": "Arizona (Hopi)",
+   "region": "Americas",
+   "lat": 35.8,
+   "lon": -110.5,
+   "style": "The Eagle Song of the Hopi, on an early phonograph recording",
+   "title": "Eagle Song of the Hopi Indians of AZ.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Eagle_Song_of_the_Hopi_Indians_of_AZ.ogg",
+   "lic": "Public domain",
+   "artist": "Traditional song"
+  },
+  {
+   "id": "cherokee",
+   "place": "Oklahoma (Cherokee)",
+   "region": "Americas",
+   "lat": 35.9,
+   "lon": -94.97,
+   "style": "A Cherokee stomp dance ceremony",
+   "title": "Cherokeestompdance.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/Cherokeestompdance.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Neddy1234"
+  },
+  {
+   "id": "bolivia",
+   "place": "Bolivia",
+   "region": "Americas",
+   "lat": -16.5,
+   "lon": -68.1,
+   "style": "Carnival coplas sung in Quechua and Spanish",
+   "title": "Comparsa mixta de Pampahasi cantando coplas bilingües quechua-castellano.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Comparsa_mixta_de_Pampahasi_cantando_coplas_biling%C3%BCes_quechua-castellano.wav",
+   "lic": "CC BY-SA 4.0",
+   "artist": "Elero19",
+   "more": [
+    {
+     "title": "Coplas en quechua de Chaco Vinto.wav",
+     "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/Coplas_en_quechua_de_Chaco_Vinto.wav",
+     "lic": "CC BY-SA 4.0",
+     "artist": "Elero19"
+    }
+   ]
+  },
+  {
+   "id": "huichol",
+   "place": "Mexico (Huichol / Wixárika)",
+   "region": "Americas",
+   "lat": 22.0,
+   "lon": -104.0,
+   "style": "Calling the water: a Huichol song recorded by Carl Lumholtz in 1898",
+   "title": "Llamar agua, Carl Lumholtz, 1898.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/6/67/Llamar_agua%2C_Carl_Lumholtz%2C_1898.ogg",
+   "lic": "Public domain",
+   "artist": "Carl Sofus Lumholtz"
+  },
+  {
+   "id": "israel",
+   "place": "Israel",
+   "region": "Middle East",
+   "lat": 32.08,
+   "lon": 34.78,
+   "style": "A Hebrew song sung by Yaffa Yarkoni",
+   "title": "Moshe.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/0/07/Moshe.ogg",
+   "lic": "CC BY-SA 3.0",
+   "artist": "Immanuel Zamir"
   }
  ]
 }
