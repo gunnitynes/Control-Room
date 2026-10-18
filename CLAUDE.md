@@ -62,6 +62,8 @@ Phones and the host keep old files otherwise.
 - Constraint Generator: missions = task (per file kind) + rule + evolution, from `CONSTRAINT_BRAIN` in content.js.
   Files are recipes `{kind, seed, bpm, key}` built by `ASSETS.make` on the student's computer (CADCAST/go, paired via
   Control Room); the host sends them with `pcSend(player, msg)`. No answer counts as "busy"; students can sit out.
+  Option `mode:'gen'` (Generator) skips rounds and the clock: Shared = one card for the room (New task / New rule /
+  New constraint), Own = one card per phone, rerolled from the phone (`{t:'roll'}`); files still go to paired computers.
 - Phones: tapping the logo opens Add to Home Screen (manifest.webmanifest, sw.js, icons/). The splash shows the join
   QR as art (`artQR`, error correction H; check scannability with jsQR after changing it).
 - Teacher-uploaded clips and photos (Chronologist decades, Ear Atlas songs, Metaphor Translation photos) live in IndexedDB on
