@@ -79,15 +79,22 @@ window.SHORTCUTS={
   ]},
 };
 
-/* ---------- Preset Archeologist: recreated in the browser by js/audio.js MACHINES ---------- */
+/* ---------- Preset Archeologist ----------
+   src: a real recording (audio/presets/); kit: real one-shots played in a groove;
+   neither: recreated in the browser by js/audio.js MACHINES. credit: shown on the reveal. */
 window.PRESETS=[
-  {id:'tr808',name:'Roland TR-808',year:1980,what:'Kick, clap, hats and cowbell',fact:'Its booming kick and cowbell flopped at first — then built hip-hop, Miami bass and trap.'},
+  {id:'tr808',name:'Roland TR-808',year:1980,what:'Kick, clap, hats and cowbell',fact:'Its booming kick and cowbell flopped at first — then built hip-hop, Miami bass and trap.',
+   kit:{bd:'audio/presets/808-bd5075.wav',cp:'audio/presets/808-cp.wav',cb:'audio/presets/808-cb.wav',ch:'audio/presets/808-ch.wav',oh:'audio/presets/808-oh25.wav'},
+   credit:'Real TR-808 one-shots sampled by Michael Fischer (Technopolis), free sample set'},
   {id:'tr909',name:'Roland TR-909',year:1983,what:'House groove with open hats',fact:'Analog kick, sampled hats: the drum machine of house and techno.'},
-  {id:'tb303',name:'Roland TB-303',year:1981,what:'Squelchy acid bassline',fact:'Sold as a bass accompanist, rescued from bargain bins to invent acid house.'},
+  {id:'tb303',name:'Roland TB-303',year:1981,what:'Squelchy acid bassline',fact:'Sold as a bass accompanist, rescued from bargain bins to invent acid house.',
+   src:'audio/presets/tb303.mp3',credit:'“The Sound of Roland TB-303 for Wikipedia” by I speak so quietly, Wikimedia Commons, CC BY-SA 4.0 (excerpt)'},
   {id:'dx7',name:'Yamaha DX7',year:1983,what:'FM electric piano chords',fact:'Its FM electric piano preset is on a staggering number of 80s ballads.'},
   {id:'minimoog',name:'Minimoog Model D',year:1970,what:'Gliding mono lead',fact:'Three oscillators and the ladder filter — the lead voice of funk, prog and G-funk.'},
-  {id:'juno106',name:'Roland Juno-106',year:1984,what:'Lush chorused pad',fact:'One oscillator plus that famous stereo chorus: instant lush pad.'},
-  {id:'alphajuno',name:'Roland Alpha Juno',year:1985,what:'The rave "Hoover"',fact:'Its "What the" patch became the Hoover sound of early-90s rave.'},
+  {id:'juno106',name:'Roland Juno-60',year:1982,what:'Swelling PWM string pad',fact:'One oscillator, pulse-width modulation and that famous chorus — the Juno sound, later carried on by the Juno-106.',
+   src:'audio/presets/juno60.mp3',credit:'“JUNO-60 PWM Strings” by Raymangold22, Wikimedia Commons, CC0 (excerpt)'},
+  {id:'alphajuno',name:'Roland Alpha Juno',year:1985,what:'The rave "Hoover"',fact:'Its "What the" patch became the Hoover sound of early-90s rave.',
+   src:'audio/presets/hoover.mp3',credit:'“Juno Hoover What The patch” by Djnebula1, Wikimedia Commons, CC BY-SA 3.0 (excerpt)'},
   {id:'simmons',name:'Simmons SDS-V',year:1981,what:'Electronic tom fill',fact:'Hexagonal pads and pew-pew toms: the sound of the 80s drum fill.'},
 ];
 window.PRESET_DECOYS=['Korg M1','LinnDrum LM-1','Sequential Prophet-5','Mellotron','E-mu SP-1200','Oberheim OB-Xa','Casio CZ-101','Fairlight CMI','Roland TR-606','Korg MS-20','ARP Odyssey','Akai MPC60'];
@@ -138,33 +145,67 @@ window.ENVELOPES=[
 
 /* ---------- Translation Grid: concept ↔ picture (v: drawn in js/games-brain.js) or ↔ analogy (a) ---------- */
 window.TRANSLATE=[
-  {c:'Low-pass filter',v:'lowpass',a:'Hearing a party through a closed wall'},
-  {c:'High-pass filter',v:'highpass',a:'A phone speaker that just can’t do bass'},
-  {c:'Bell boost',v:'bell',a:'Turning up one voice in a choir'},
-  {c:'Notch filter',v:'notch',a:'Cutting one hum out of an otherwise perfect room'},
-  {c:'Phase cancellation',v:'phase',a:'Two people pushing the same door from opposite sides'},
-  {c:'Soft clipping',v:'softclip',a:'A sponge pressed against the ceiling'},
-  {c:'Hard clipping',v:'hardclip',a:'Hitting your head on a concrete ceiling'},
-  {c:'Sidechain ducking',v:'duck',a:'Everyone lowers their voice whenever the boss walks in'},
-  {c:'Compression',v:'comp',a:'A parent turning the TV down when it’s loud and up when it’s quiet'},
-  {c:'Limiter',v:'limit',a:'A ceiling so low you have to stoop — but nobody bumps their head'},
-  {c:'Noise gate',v:'gate',a:'A bouncer who only lets you in once you’re loud enough'},
-  {c:'Comb filtering',v:'comb',a:'A choir where every other singer has been muted'},
-  {c:'Bitcrushing',v:'crush',a:'A photo blown up until you see the square pixels'},
+  {c:'Low-pass filter',v:'lowpass',a:'Music from the club next door: you hear the thump, never the cymbals'},
+  {c:'High-pass filter',v:'highpass',a:'A laptop speaker playing a bass-heavy track: all click, no boom'},
+  {c:'Bell boost',v:'bell',a:'A spotlight that makes one singer in the choir stand out'},
+  {c:'Notch filter',v:'notch',a:'Plucking one hair out with tweezers and leaving the rest'},
+  {c:'Phase cancellation',v:'phase',a:'Two identical waves meet exactly out of step and the water goes flat'},
+  {c:'Soft clipping',v:'softclip',a:'A pillow on the ceiling: you hit it, but it squashes gently'},
+  {c:'Hard clipping',v:'hardclip',a:'A guillotine slicing the top off every wave'},
+  {c:'Sidechain ducking',v:'duck',a:'The whole room goes quiet every time the kick drum speaks'},
+  {c:'Compression',v:'comp',a:'A friend who pulls you back when you shout and nudges you when you mumble'},
+  {c:'Limiter',v:'limit',a:'A height barrier at a car park: nothing taller gets through, no matter what'},
+  {c:'Noise gate',v:'gate',a:'A door that only opens when someone knocks loud enough'},
+  {c:'Comb filtering',v:'comb',a:'Two speakers a little out of time, scooping regular holes in the sound'},
+  {c:'Bitcrushing',v:'crush',a:'Zooming into a photo until it turns into blocky pixels'},
   {c:'Delay',v:'delay',a:'Shouting into a canyon and hearing yourself come back'},
-  {c:'Reverb',v:'reverb',a:'A cathedral remembering every footstep'},
-  {c:'Pre-delay',v:'predelay',a:'The pause before the crowd starts clapping'},
-  {c:'Tremolo',v:'tremolo',a:'Someone flicking the volume knob up and down'},
-  {c:'Vibrato',v:'vibrato',a:'A singer’s voice wobbling in pitch'},
-  {c:'Mono',v:'mono',a:'Everyone squeezed onto one chair in the middle'},
-  {c:'Wide stereo',v:'wide',a:'Stretching a banner across the whole stage'},
-  {c:'Swing',v:'swing',a:'Walking with a slight limp, every other step late'},
-  {c:'Pluck envelope',v:'pluckenv',a:'Plucking a rubber band'},
-  {c:'Pad envelope',v:'padenv',a:'Sunrise: slow to arrive, slow to leave'},
-  {c:'Square wave',v:'square',a:'A light switch flicking on and off'},
-  {c:'Sine wave',v:'sine',a:'A swing gently going back and forth'},
-  {c:'Sawtooth wave',v:'saw',a:'Slowly filling a glass, then tipping it out at once'},
+  {c:'Reverb',v:'reverb',a:'Clapping once in an empty church and hearing it hang in the air'},
+  {c:'Pre-delay',v:'predelay',a:'The tiny gap between the flash and the thunder'},
+  {c:'Tremolo',v:'tremolo',a:'A helicopter passing: the volume throbs in and out'},
+  {c:'Vibrato',v:'vibrato',a:'An opera singer holding a note that wavers up and down in pitch'},
+  {c:'Mono',v:'mono',a:'Every instrument standing in a single spotlight, dead centre'},
+  {c:'Wide stereo',v:'wide',a:'Musicians spread out from wall to wall around you'},
+  {c:'Swing',v:'swing',a:'Skipping instead of walking: long, short, long, short'},
+  {c:'Pluck envelope',v:'pluckenv',a:'Snapping a rubber band: instant hit, gone a moment later'},
+  {c:'Pad envelope',v:'padenv',a:'Sunrise: fades in slowly, lingers, fades out slowly'},
+  {c:'Square wave',v:'square',a:'A light switch: fully on, fully off, nothing in between'},
+  {c:'Sine wave',v:'sine',a:'A pendulum swinging smoothly back and forth'},
+  {c:'Sawtooth wave',v:'saw',a:'A ramp up, then a drop off a cliff, over and over'},
 ];
+
+/* ---------- Attendance: the class Google Sheet's Apps Script web app ("Class Attendance System").
+   The host lists its classes; phones pick their name from the chosen class and are checked in
+   on the sheet's MasterLog. Set url to '' to switch the class list off. ---------- */
+window.ATTENDANCE={url:'https://script.google.com/macros/s/AKfycbyf7HfaXossjes5l4Fz569eXIYkwx5NmLrOsX444GUlIUHNfqI5RWcsDar_WLf1Jhof/exec'};
+
+/* ---------- Sample Chronologist: real recordings by decade (audio/eras, credits in CREDITS.txt) ----------
+   clips are filled in below; decades with none use the teacher's own clips or the browser re-creation. */
+window.ERA_DECADES={
+  1900:{label:'1900s',tells:'Acoustic horn recording: no microphones, the band played into a big horn. Only a thin midrange, heavy surface hiss, no bass, almost no drums.',clips:[]},
+  1910:{label:'1910s',tells:'Still acoustic, but louder and cleaner discs: brass, banjo and tuba cut through the horn best, and the first jazz records appear. Thin, boxy and crackly.',clips:[]},
+  1920:{label:'1920s',tells:'Electrical recording arrives in 1925: microphones and amplifiers bring more bass and treble. Blues and hot jazz on 78s, still mono with surface noise.',clips:[]},
+  1930:{label:'1930s',tells:'The swing era on 78s: smoother microphones, an audible upright bass, crooners singing close to the mic. Warmer and fuller than the 1920s, still mono.',clips:[]},
+  1940:{label:'1940s',tells:'Late 78s and wartime V-Discs: clearer and fuller big bands and small groups. Magnetic tape reaches studios after the war. Mono, little reverb.',clips:[]},
+  1950:{label:'1950s',tells:'Magnetic tape: slapback echo, close-miked voice, twangy guitar, rock ’n’ roll and country. Cleaner, but still mono and midrange-heavy.',clips:[]},
+  1960:{label:'1960s',tells:'Multitrack tape and early stereo: drums hard left or right, plate and chamber reverb, tape saturation, tambourine everywhere.',clips:[]},
+  1970:{label:'1970s',tells:'Warm 24-track tape: dry close-miked drums, disco four-on-the-floor, string machines, wide but natural stereo.',clips:[]},
+  1980:{label:'1980s',tells:'Digital reverbs and drum machines: a gated snare, FM bass and bells, glossy chorus, a very bright top end.',clips:[]},
+  1990:{label:'1990s',tells:'Samplers and the CD: dusty 12-bit loops, boom-bap swing, grunge guitars, louder and louder masters.',clips:[]},
+  2000:{label:'2000s',tells:'The DAW era: full bandwidth, dead-silent digital background, laptop electronica, and the loudness war of brick-walled masters.',clips:[]},
+  2010:{label:'2010s',tells:'EDM and streaming: huge sub bass, sidechain pumping, dubstep wobbles and supersaws, ultra-wide stereo, very loud masters.',clips:[]},
+  2020:{label:'2020s',tells:'Bedroom production for streaming: slap house, cloud rap and lo-fi; sliding 808s, crisp hats, and vinyl crackle added on purpose.',clips:[]},
+};
+/*CLIPS*/
+window.ERA_DECADES[1900].clips=[{"src": "audio/eras/1900-billy-murray-you-re-a-grand-old-flag-ogg.mp3", "title": "Billy Murray – You’re a Grand Old Flag (1906)", "credit": "Billy Murray – “You’re a Grand Old Flag” (1906) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1900-ada-jones-and-billy-murray-shine-on-harv.mp3", "title": "Ada Jones & Billy Murray – Shine On, Harvest Moon (1909)", "credit": "Ada Jones & Billy Murray – “Shine On, Harvest Moon” (1909) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1900-tom-turpin-vess-l-ossman-the-buffalo-rag.mp3", "title": "Vess L. Ossman – The Buffalo Rag (1906)", "credit": "Vess L. Ossman – “The Buffalo Rag” (1906) · Public domain · Wikimedia Commons"}];
+window.ERA_DECADES[1910].clips=[{"src": "audio/eras/1910-arthur-collins-and-byron-harlan-alexande.mp3", "title": "Arthur Collins & Byron Harlan – Alexander’s Ragtime Band (1911)", "credit": "Arthur Collins & Byron Harlan – “Alexander’s Ragtime Band” (1911) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1910-at-the-jazz-band-ball-1918-sound-recordi.mp3", "title": "Original Dixieland Jass Band – At the Jazz Band Ball (1918)", "credit": "Original Dixieland Jass Band – “At the Jazz Band Ball” (1918) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1910-billy-murray-k-k-k-katy-ogg.mp3", "title": "Billy Murray – K-K-K-Katy (1918)", "credit": "Billy Murray – “K-K-K-Katy” (1918) · Public domain · Wikimedia Commons"}];
+window.ERA_DECADES[1920].clips=[{"src": "audio/eras/1920-mamie-smith-crazy-blues-ogg.mp3", "title": "Mamie Smith & Her Jazz Hounds – Crazy Blues (1920)", "credit": "Mamie Smith & Her Jazz Hounds – “Crazy Blues” (1920) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1920-king-oliver-s-creole-jazz-band-krooked-b.mp3", "title": "King Oliver’s Creole Jazz Band – Krooked Blues (1923)", "credit": "King Oliver’s Creole Jazz Band – “Krooked Blues” (1923) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1920-bessie-smith-and-louis-armstrong-the-st-.mp3", "title": "Bessie Smith & Louis Armstrong – St. Louis Blues (1925)", "credit": "Bessie Smith & Louis Armstrong – “St. Louis Blues” (1925) · Public domain · Wikimedia Commons"}];
+window.ERA_DECADES[1930].clips=[{"src": "audio/eras/1930-anchors-aweigh-paul-tremaine-orchestra-1.mp3", "title": "Paul Tremaine Orchestra – Anchors Aweigh (1930)", "credit": "Paul Tremaine Orchestra – “Anchors Aweigh” (1930) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1930-philharrisorch-thevamp1932-ogg.mp3", "title": "Phil Harris Orchestra – The Vamp (1932)", "credit": "Phil Harris Orchestra – “The Vamp” (1932) · CC0 · Wikimedia Commons"}, {"src": "audio/eras/1930-autopsy-on-schubert-by-larry-wagner-1937.mp3", "title": "Larry Wagner – Autopsy on Schubert (1937)", "credit": "Larry Wagner – “Autopsy on Schubert” (1937) · Public domain · Wikimedia Commons"}];
+window.ERA_DECADES[1940].clips=[{"src": "audio/eras/1940-intrigas-no-boteco-do-padilha-luis-ameri.mp3", "title": "Luis Americano – Intrigas no Boteco do Padilha (1940)", "credit": "Luis Americano – “Intrigas no Boteco do Padilha” (1940) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1940-v-disc-1944-duckworth-chant-ogg.mp3", "title": "V-Disc – Duckworth Chant (1944)", "credit": "V-Disc – “Duckworth Chant” (1944) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1940-smoke-on-the-water-1944-flac.mp3", "title": "Red Foley – Smoke on the Water (1944)", "credit": "Red Foley – “Smoke on the Water” (1944) · Public domain · Wikimedia Commons"}];
+window.ERA_DECADES[1950].clips=[{"src": "audio/eras/1950-johnny-cash-new-mexico-oga.mp3", "title": "Johnny Cash – New Mexico (1955)", "credit": "Johnny Cash – “New Mexico” (1955) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1950-george-jones-sings-i-m-ragged-but-i-m-ri.mp3", "title": "George Jones – I’m Ragged But I’m Right (1958)", "credit": "George Jones – “I’m Ragged But I’m Right” (1958) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/1950-terry-buter-c-h-r-i-s-t-m-a-s-ogg.mp3", "title": "Terry Buter – C-H-R-I-S-T-M-A-S (1956)", "credit": "Terry Buter – “C-H-R-I-S-T-M-A-S” (1956) · Public domain · Wikimedia Commons"}];
+window.ERA_DECADES[2000].clips=[{"src": "audio/eras/2000-cadillac-max-impact-united-states-air-fo.mp3", "title": "US Air Force Band, Max Impact – Cadillac (2008)", "credit": "US Air Force Band, Max Impact – “Cadillac” (2008) · Public domain · Wikimedia Commons"}, {"src": "audio/eras/2000-c418-mixes-03-incredibly-detailed-acid-t.mp3", "title": "C418 – Incredibly Detailed Acid Trip (2008)", "credit": "C418 – “Incredibly Detailed Acid Trip” (2008) · CC BY 3.0 · Wikimedia Commons"}, {"src": "audio/eras/2000-c418-bushes-and-marshmallows-05-i-believ.mp3", "title": "C418 – I Believe I Can Fly (2009)", "credit": "C418 – “I Believe I Can Fly” (2009) · CC BY 3.0 · Wikimedia Commons"}];
+window.ERA_DECADES[2010].clips=[{"src": "audio/eras/2010-skwrl-dubstep-violin-rework-ogg.mp3", "title": "skwrl – Dubstep Violin Rework (2013)", "credit": "skwrl – “Dubstep Violin Rework” (2013) · CC BY 3.0 · Wikimedia Commons"}, {"src": "audio/eras/2010-kirill-t-the-radiance-of-the-black-sun-d.mp3", "title": "Kirill-T – The Radiance of the Black Sun (2017)", "credit": "Kirill-T – “The Radiance of the Black Sun” (2017) · CC BY 3.0 · Wikimedia Commons"}, {"src": "audio/eras/2010-sappheiros-reminiscence-chillstep-opus.mp3", "title": "Sappheiros – Reminiscence (2016)", "credit": "Sappheiros – “Reminiscence” (2016) · CC BY 4.0 · Wikimedia Commons"}];
+window.ERA_DECADES[2020].clips=[{"src": "audio/eras/2020-soulker-memories-cloud-rap-instrumental-.mp3", "title": "Soulker – Memories (2021)", "credit": "Soulker – “Memories” (2021) · CC BY-SA 3.0 · Wikimedia Commons"}, {"src": "audio/eras/2020-i-need-u-deep-house-instrumental-vocal-d.mp3", "title": "OA beats – I Need U (2021)", "credit": "OA beats – “I Need U” (2021) · CC BY-SA 3.0 · Wikimedia Commons"}, {"src": "audio/eras/2020-raspberrymusic-lofi-hip-hop-upbeat-ogg.mp3", "title": "Raspberrymusic – Lofi Hip Hop Upbeat (2021)", "credit": "Raspberrymusic – “Lofi Hip Hop Upbeat” (2021) · CC BY 4.0 · Wikimedia Commons"}];
+/*END CLIPS*/
 
 /* ---------- Constraint Generator reels ---------- */
 window.CONSTRAINTS={

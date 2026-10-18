@@ -134,6 +134,7 @@ function seq(r,{bpm=100,len=16,loops=Infinity,swing=0,tracks,onStep,at=.08}){
   const iv=setInterval(tick,25);tick();
   const q={t0,sd,len,dur:total*sd,halt(){clearInterval(iv);}};r.seq=q;return q;
 }
+const P_=(s,v=1)=>[...s].map(c=>c==='x'?v:c==='o'?.4:null); // one-shot patterns: x hit, o accent-free (open hat)
 const P=(s,v=1)=>[...s].map(c=>c==='x'?v:c==='X'?1:c==='o'?.45:c==='-'?.25:null); // drum pattern strings
 
 /* ---------- drum voices (classic analog recipes) ---------- */
@@ -358,7 +359,28 @@ const MACHINES={
     seq(r,{bpm:110,len:16,loops:2,tracks:[{pat:[...Array(16)].map((_,s)=>s>=8&&s%1===0?{f:[420,380,320,280,240,200,170,140][s-8]}:null),play:(t,e)=>DR.tom(ac,r.strips.t.in,t,{f:e.f,v:1,dec:.4})},
       {pat:P('x.......x.......'),play:t=>DR.kick(ac,r.strips.k.in,t,{v:.8,dec:.3,f0:55})}]});return r;},
 };
-function playMachine(id,dest){return MACHINES[id](dest||AU.music);}
+/* a real recording of the machine wins: PRESETS[].src (audio/presets/…) is played
+   when it exists; otherwise the in-browser recreation above. */
+AU.smp={};
+function sampleReady(src){if(AU.smp[src])return AU.smp[src];return AU.smp[src]=fetch(src).then(r=>{if(!r.ok)throw new Error(r.status);return r.arrayBuffer();}).then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej))).catch(e=>{delete AU.smp[src];throw e;});}
+function playSample(buf,dest,{gain=.9,maxDur=12,offset=0}={}){const ac=audio(),s=ac.createBufferSource(),g=gn(ac,0),t=ac.currentTime+.04;s.buffer=buf;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+.01);
+  offset=Math.max(0,Math.min(offset,buf.duration-1));const end=t+Math.min(buf.duration-offset,maxDur);g.gain.setValueAtTime(gain,end-.25);g.gain.linearRampToValueAtTime(0,end);s.connect(g).connect(dest||AU.music);s.start(t,offset);s.stop(end+.02);return songHandle(ac,[s],g);}
+function playMachine(id,dest){
+  const P=(window.PRESETS||[]).find(x=>x.id===id);
+  if(P&&P.kit){ // real one-shots, played as an 808 groove by the sequencer
+    const h={r:null,stopped:false,stop(f){h.stopped=true;if(h.r)h.r.stop(f);AU.live.delete(h);}};AU.live.add(h);const names=Object.keys(P.kit);
+    Promise.all(names.map(n=>sampleReady(P.kit[n]))).then(bufs=>{if(h.stopped)return;const K=Object.fromEntries(names.map((n,i)=>[n,bufs[i]]));
+      const r=rig(dest||AU.music,{rt:.9});['k','s','h','cb'].forEach(n=>r.strip(n,{gain:n==='h'?.7:1,send:.05,pan:n==='h'?.25:n==='cb'?-.2:0}));h.r=r;const ac=r.ac;
+      const hit=(buf,d,t,v=1)=>{const s=ac.createBufferSource(),g=gn(ac,v);s.buffer=buf;s.connect(g).connect(d);s.start(t);};
+      seq(r,{bpm:100,len:32,loops:1,tracks:[{pat:P_('x.....x...x.....x.....x...x..x..'),play:t=>hit(K.bd,r.strips.k.in,t,1)},
+        {pat:P_('....x.......x.......x.......x...'),play:t=>hit(K.cp,r.strips.s.in,t,.8)},
+        {pat:P_('x.x.x.x.x.x.x.o.x.x.x.x.x.x.x.o.',.7),play:(t,v)=>hit(v>.5?K.ch:K.oh,r.strips.h.in,t,v)},
+        {pat:P_('..x.....x.x.......x.....x.......'),play:t=>hit(K.cb,r.strips.cb.in,t,.6)}]});}).catch(()=>{if(!h.stopped)h.r=MACHINES[id](dest||AU.music);});
+    return h;}
+  if(P&&P.src){const h={inner:null,stopped:false,stop(f){h.stopped=true;if(h.inner)h.inner.stop(f);AU.live.delete(h);}};AU.live.add(h);
+    sampleReady(P.src).then(buf=>{if(!h.stopped)h.inner=playSample(buf,dest);}).catch(()=>{if(!h.stopped)h.inner=MACHINES[id](dest||AU.music);});return h;}
+  return MACHINES[id](dest||AU.music);
+}
 
 /* ---------- groove patterns (Ghost Note) ---------- */
 const GROOVE_VOICE={kick:(ac,d,t)=>DR.kick(ac,d,t,{v:1,dec:.35}),snare:(ac,d,t)=>DR.snare(ac,d,t,{v:.9}),hat:(ac,d,t)=>DR.nhat(ac,d,t,{v:.8,dec:.05}),
@@ -382,9 +404,11 @@ const DECAY_SRC={
   hey:(ac,d,t)=>VO.vocal(ac,d,t,{n:57,len:.18,v:1,vowel:'e'}),
   chord:(ac,d,t)=>[57,60,64].forEach(n=>VO.pluck(ac,d,t,{n:n+12,v:.7,dec:.95,bright:.8})),
 };
-function playDecay({rt,src='clap',pre=.02,damp=.4,hits=3},dest){
+// time between hits: enough of the tail to judge it (about −50 dB), no more
+const decayGap=rt=>Math.max(.8,rt*.85+.15);
+function playDecay({rt,src='clap',pre=.02,damp=.4,hits=2,gap},dest){
   const ac=audio(),out=gn(ac,1);out.connect(dest||AU.music);const cv=ac.createConvolver();cv.buffer=makeIR(ac,rt,{pre,damp});const wet=gn(ac,2.4),dry=gn(ac,1.5),inp=gn(ac,1);
-  inp.connect(dry).connect(out);inp.connect(cv);cv.connect(wet).connect(out);const gap=Math.max(1.1,rt*1.05+.4),t0=ac.currentTime+.1;
+  inp.connect(dry).connect(out);inp.connect(cv);cv.connect(wet).connect(out);gap=gap||decayGap(rt);const t0=ac.currentTime+.1;
   const play=typeof src==='function'?src:DECAY_SRC[src];for(let i=0;i<hits;i++)play(ac,inp,t0+i*gap);
   const h={dur:gap*hits,stop(f=.08){const t=ac.currentTime;out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+f);setTimeout(()=>{try{out.disconnect();}catch(e){}},f*1000+500);AU.live.delete(h);}};AU.live.add(h);return h;
 }

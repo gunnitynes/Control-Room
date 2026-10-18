@@ -24,8 +24,21 @@ const durChoices=[[5,'5','min'],[10,'10','min'],[20,'20','min'],[30,'30','min'],
    ===================================================================== */
 function slotGame(spec){
   const g=Object.assign({kind:'free',badges:['Generator','No score']},spec);
-  g.topInfo=()=>{const s=G.gs;return !s?g.tag:s.phase==='sprint'?'Sprint running':s.spins?`Spin ${s.spins}`:'Pull the lever';};
-  g.start=o=>{G.gs={o,phase:'slots',reels:g.reels(o).map(r=>({...r,val:null,locked:false})),spinning:false,charge:0,spins:0,lastT:now()};};
+  g.topInfo=()=>{const s=G.gs;return !s?g.tag:s.phase==='sprint'?'Sprint running':s.phase==='solo'?'Everyone spins on their phone':s.spins?`Spin ${s.spins}`:'Phones tap to spin';};
+  g.start=o=>{const reels=g.reels(o).map(r=>({...r,val:null,locked:false}));
+    G.gs={o,phase:o.mode==='room'?'slots':'solo',reels,spinning:false,charge:0,spins:0,lastT:now(),ind:new Map()};};
+  /* ---- "everyone spins": each student has their own reels, max 3 spins, one lock after each spin ---- */
+  const maxSpins=()=>Math.min(3,G.gs.reels.length);
+  const me=p=>{const s=G.gs;let m=s.ind.get(p.id);if(!m){m={vals:s.reels.map(()=>null),locked:s.reels.map(()=>false),spins:0,need:'spin',seq:0};s.ind.set(p.id,m);}return m;};
+  g.soloAct=(p,d)=>{const s=G.gs;if(s.phase!=='solo'&&s.phase!=='sprint')return;const m=me(p);
+    if(d.t==='spin'&&m.need==='spin'){m.spins++;m.seq++;s.reels.forEach((r,k)=>{if(!m.locked[k])m.vals[k]=pick(r.items.filter(x=>x!==m.vals[k]));});sfx.spin();
+      if(m.spins>=maxSpins()){m.locked=m.locked.map(()=>true);m.need='done';}else m.need='lock';}
+    else if(d.t==='lock'&&m.need==='lock'){const k=d.k|0;if(k<0||k>=s.reels.length||m.locked[k]||!m.vals[k])return;m.locked[k]=true;sfx.vote();
+      logAdd(p,{kind:'pick',game:g.name,text:`Kept ${s.reels[k].title}: ${m.vals[k]}`});
+      if(m.locked.every(Boolean))m.need='done';else m.need='spin';}
+    else return;
+    if(m.need==='done'&&!m.logged){m.logged=true;sfx.land(0);logAdd(p,{kind:'brief',game:g.name,title:g.title?g.title(s.reels.map((r,k)=>({val:m.vals[k]}))):'',text:s.reels.map((r,k)=>`${r.title}: ${m.vals[k]}`).join('\n')});}
+    sync(p);if(G.view==='play')render();};
   const need=()=>Math.max(4,Math.round(online().length*1.5));
   g.spin=()=>{const s=G.gs;if(s.spinning||s.phase!=='slots')return;s.spinning=true;s.charge=0;s.spins++;
     const els=$$('.reel'),strips=[];
@@ -38,12 +51,28 @@ function slotGame(spec){
     const total=1300+(strips.length-1)*550+150;setTimeout(()=>{clearInterval(tk);s.spinning=false;if(G.gs===s){render();syncAll();}},Math.max(300,total));
     if(!strips.length){clearInterval(tk);s.spinning=false;}
   };
-  g.next=()=>{const s=G.gs;if(s.phase==='slots')g.spin();else if(s.phase==='sprint'){stopClock();s.phase='slots';render();syncAll();}};
-  g.act=(p,d)=>{const s=G.gs;if(d.t==='pull'&&s.phase==='slots'&&!s.spinning){s.charge+=1;sfx.spin();if(s.charge>=need())g.spin();else{const m=$('#charge');if(m)m.style.width=(100*s.charge/need())+'%';online().forEach(sync);}}};
+  g.next=()=>{const s=G.gs;if(s.phase==='slots')g.spin();else if(s.phase==='solo')g.sprint();else if(s.phase==='sprint'){stopClock();s.phase=s.o.mode==='room'?'slots':'solo';render();syncAll();}};
+  g.sprint=()=>{const s=G.gs;s.phase='sprint';sfx.whoosh();
+    if(s.o.mode==='room')online().forEach(p=>logAdd(p,{kind:'brief',game:g.name,title:g.title&&s.reels.every(r=>r.val)?g.title(s.reels):'',text:s.reels.map(r=>`${r.title}: ${r.val}`).join('\n')}));
+    startClock((s.o.mins||20)*60000,()=>{sfx.alarm();toast('Time! Pencils down.');syncAll();});render();syncAll();};
+  g.act=(p,d)=>{const s=G.gs;if(d.t==='spin'||d.t==='lock'){g.soloAct(p,d);return;}if(d.t==='pull'&&s.phase==='slots'&&!s.spinning){s.charge+=1;sfx.spin();if(s.charge>=need())g.spin();else{const m=$('#charge');if(m)m.style.width=(100*s.charge/need())+'%';online().forEach(sync);}}};
   g.frame=t=>{const s=G.gs;const dt=(t-s.lastT)/1000;s.lastT=t;if(s.charge>0&&!s.spinning){s.charge=Math.max(0,s.charge-dt*.6);const m=$('#charge');if(m)m.style.width=(100*s.charge/need())+'%';}clockFrame();};
   g.stop=()=>{};
   g.render=st=>{
     const s=G.gs,done=s.reels.every(r=>r.val);
+    if(s.o.mode!=='room'&&(s.phase==='solo'||s.phase==='sprint')){
+      const ps=players().filter(p=>s.ind.has(p.id)||(p.conn&&p.conn.open)),fin=ps.filter(p=>s.ind.has(p.id)&&s.ind.get(p.id).need==='done').length;
+      const card=p=>{const m=s.ind.get(p.id)||{vals:s.reels.map(()=>null),locked:s.reels.map(()=>false),spins:0,need:'spin'};const ttl=g.title&&m.need==='done'?g.title(s.reels.map((r,k)=>({val:m.vals[k]}))):'';
+        return `<div class="scard2 ${m.need}"><div class="sc2h">${shape(p.sh,20,'var(--ink)',`var(${COLS[p.sh]})`)}<b>${esc(p.name)}</b><em>${m.need==='done'?'✓ done':m.need==='lock'?'choosing…':`spin ${m.spins+1} of ${maxSpins()}`}</em></div>
+          ${ttl?`<div class="sc2t">${esc(ttl.split(' · ')[0])}</div>`:''}<ol>${s.reels.map((r,k)=>`<li class="c${k} ${m.locked[k]?'lk':m.vals[k]?'roll':''}"><span>${esc(r.title)}</span><b>${esc(m.vals[k]||'—')}</b></li>`).join('')}</ol></div>`;};
+      const sprint=s.phase==='sprint';
+      st.innerHTML=`<div class="solo dots"><div class="solohead">${sprint?`<span class="lab">${esc(g.name)} · everyone has their own brief</span>${clockHTML('mid')}`:`<div><h2>${fin===ps.length&&ps.length?'Everyone’s brief':'Spin on your phones'}</h2><p class="fine">Tap to spin · keep one result after each spin · ${maxSpins()} spins each. Finished: <b>${fin}</b> of ${ps.length}</p></div>`}</div>
+        <div class="sowall ${fin===ps.length&&ps.length?'final':''}">${ps.map(card).join('')||'<p class="empty">Waiting for phones…</p>'}</div>
+        <div class="dfoot">${sprint?`<button class="ghost" id="bBack">← Back to the spins</button><button class="ghost" id="bPlus">+5 min</button>`:`<div class="sprintgo"><span class="lab">Sprint</span><div class="seg" id="segD">${durChoices.map(([mm,l])=>`<button data-m="${mm}" aria-pressed="${(s.o.mins||20)===mm}">${l}<small>min</small></button>`).join('')}</div></div>`}<span></span>
+          ${sprint?'':`<button class="big go" id="bSprint">Start the sprint <small>SPACE</small></button>`}</div></div>`;
+      if(sprint){$('#bBack').onclick=()=>{stopClock();s.phase='solo';render();syncAll();};$('#bPlus').onclick=()=>extendClock(300000);}
+      else{$$('#segD button',st).forEach(b=>b.onclick=()=>{s.o.mins=+b.dataset.m;$$('#segD button',st).forEach(x=>x.setAttribute('aria-pressed',x===b));});$('#bSprint').onclick=g.sprint;}
+      return;}
     if(s.phase==='sprint'){st.innerHTML=`<div class="sprint dots"><div class="sprhead"><span class="lab">${esc(g.name)} · the brief</span>${clockHTML('huge')}</div>
       ${g.title&&done?`<h2 class="mashname">${esc(g.title(s.reels))}</h2>`:''}<div class="brief">${s.reels.map((r,k)=>`<div class="bcard c${k}"><span class="lab">${esc(r.title)}</span><b>${esc(r.val||'—')}</b></div>`).join('')}</div>
       <div class="frow"><button class="ghost" id="bBack">← Back to the slots</button><button class="ghost" id="bPlus">+5 min</button><span class="fine">Space ends the sprint</span></div></div>`;
@@ -51,31 +80,52 @@ function slotGame(spec){
     st.innerHTML=`<div class="slots dots"><div class="reels">${s.reels.map((r,k)=>`<div class="reel c${k} ${r.val?'landed':''}"><div class="rhead"><b>${pad2(k+1)}</b><span>${esc(r.title)}</span></div><div class="rwin"><div class="rstrip"><div class="ritem">${esc(r.val||'?')}</div></div></div>
         <button class="ghost rlock" data-k="${k}" aria-pressed="${r.locked}">${r.locked?'Locked':'Lock'}</button></div>`).join('')}</div>
       ${g.title&&done?`<h2 class="mashname">${esc(g.title(s.reels))}</h2>`:''}
-      <div class="slotbar"><div class="lever"><span class="lab">Phones pull the lever</span><i class="chargebar"><i id="charge" style="width:${100*s.charge/need()}%"></i></i><span class="fine">${need()} pulls spin the reels</span></div>
+      <div class="slotbar"><div class="lever"><span class="lab">Phones tap to spin</span><i class="chargebar"><i id="charge" style="width:${100*s.charge/need()}%"></i></i><span class="fine">${need()} taps spin the reels</span></div>
         <button class="big" id="bSpin">Spin <small>SPACE</small></button>
         <div class="sprintgo"><span class="lab">Sprint</span><div class="seg" id="segD">${durChoices.map(([m,l])=>`<button data-m="${m}" aria-pressed="${(s.o.mins||20)===m}">${l}<small>min</small></button>`).join('')}</div><button class="big go" id="bSprint" ${done?'':'disabled'}>Start sprint</button></div></div></div>`;
     $$('.rlock',st).forEach(b=>b.onclick=()=>{const r=s.reels[+b.dataset.k];r.locked=!r.locked;b.setAttribute('aria-pressed',r.locked);b.textContent=r.locked?'Locked':'Lock';});
     $('#bSpin').onclick=g.spin;
     $$('#segD button',st).forEach(b=>b.onclick=()=>{s.o.mins=+b.dataset.m;$$('#segD button',st).forEach(x=>x.setAttribute('aria-pressed',x===b));});
-    $('#bSprint').onclick=()=>{s.phase='sprint';sfx.whoosh();startClock((s.o.mins||20)*60000,()=>{sfx.alarm();toast('Time! Pencils down.');syncAll();});render();syncAll();};
+    $('#bSprint').onclick=g.sprint;
   };
-  g.pstate=p=>{const s=G.gs,done=s.reels.every(r=>r.val);return {k:s.phase+s.spins+(s.spinning?'s':''),ph:s.phase,spinning:s.spinning,reels:s.reels.map(r=>[r.title,r.val]),title:g.title&&done?g.title(s.reels):'',charge:Math.round(100*s.charge/need()),clock:pClock()};};
+  g.pstate=p=>{const s=G.gs,done=s.reels.every(r=>r.val);
+    if(s.o.mode!=='room'){const m=me(p);return {k:s.phase+m.seq+m.need+m.locked.filter(Boolean).length,ph:s.phase,solo:true,reels:s.reels.map((r,k)=>({t:r.title,v:m.vals[k],lk:m.locked[k],items:r.items})),
+      spins:m.spins,max:maxSpins(),need:m.need,seq:m.seq,title:g.title&&m.need==='done'?g.title(s.reels.map((r,k)=>({val:m.vals[k]}))):'',clock:pClock()};}
+    return {k:s.phase+s.spins+(s.spinning?'s':''),ph:s.phase,spinning:s.spinning,reels:s.reels.map(r=>[r.title,r.val]),title:g.title&&done?g.title(s.reels):'',charge:Math.round(100*s.charge/need()),clock:pClock()};};
   g.player=(root,st)=>{
+    if(st.solo){soloPlayer(root,st);return;}
     const cards=`<div class="pbrief">${st.reels.map(([t,v],k)=>`<div class="bcard c${k}"><span class="lab">${esc(t)}</span><b>${esc(v||'?')}</b></div>`).join('')}</div>`;
     if(st.ph==='sprint'){pClockStart(st.clock);root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}${st.title?`<h2 class="pmash">${esc(st.title)}</h2>`:''}${cards}<p class="fine">Make it. The clock is on the big screen too.</p></div>`;return;}
     root.innerHTML=`<div class="pcol2">${st.title?`<h2 class="pmash">${esc(st.title)}</h2>`:''}${cards}
-      <button class="leverbtn" ${st.spinning?'disabled':''}><span>${st.spinning?'Spinning…':'PULL'}</span><i class="pcharge"><i style="width:${st.charge}%"></i></i></button>
-      <p class="fine">Everyone pulls together — the more phones, the faster it spins.</p></div>`;
+      <button class="leverbtn" ${st.spinning?'disabled':''}><span>${st.spinning?'Spinning…':'TAP'}</span><i class="pcharge"><i style="width:${st.charge}%"></i></i></button>
+      <p class="fine">Everyone taps together — the more phones, the faster it spins.</p></div>`;
     const b=$('.leverbtn',root);b.onclick=()=>{papi.send({t:'pull'});papi.vibe(12);b.classList.remove('yank');void b.offsetWidth;b.classList.add('yank');};
   };
   g.pupdate=(root,st)=>{const c=$('.pcharge i',root);if(c)c.style.width=st.charge+'%';};
   return g;
 }
+/* the phone side of "everyone spins": reels roll (animated) to what the host rolled, then you keep one */
+function soloPlayer(root,st){
+  pClockStart(st.clock);let seen=PL.slotSeen||{seq:0,lk:st.reels.map(()=>false)};if(st.seq<seen.seq||seen.lk.length!==st.reels.length)seen={seq:0,lk:st.reels.map(()=>false)};const fresh=st.seq>seen.seq;const openBefore=fresh?(seen.seq?seen.lk.map(x=>!x):st.reels.map(()=>true)):null;
+  PL.slotSeen={seq:st.seq,lk:st.reels.map(r=>r.lk)};
+  const head=st.ph==='sprint'?pClockHTML(st.clock):`<p class="lab">Spin ${Math.min(st.spins+(st.need==='spin'?1:0),st.max)} of ${st.max}</p>`;
+  const msg={spin:st.spins?'Tap to spin the reels you haven’t kept':'Tap to spin your reels',lock:'Keep one — tap the result you want',done:'Your brief'}[st.need];
+  root.innerHTML=`<div class="pcol2 psolo">${head}${st.title?`<h2 class="pmash">${esc(st.title)}</h2>`:''}<p class="soloMsg">${esc(msg)}</p>
+    <div class="preels">${st.reels.map((r,k)=>`<button class="preel c${k} ${r.lk?'lk':''}" data-k="${k}" ${st.need==='lock'&&!r.lk?'':'disabled'}><span class="lab">${esc(r.t)}${r.lk?' · kept':''}</span><div class="pwin"><div class="pstrip"><b>${esc(r.v||'?')}</b></div></div>${st.need==='lock'&&!r.lk?'<em>Keep this</em>':''}</button>`).join('')}</div>
+    ${st.need==='spin'?'<button class="leverbtn small"><span>TAP</span></button>':st.need==='done'?`<p class="fine">${st.ph==='sprint'?'Make it!':'Look at the big screen. Your teacher starts the sprint.'}</p>`:''}</div>`;
+  const tap=$('.leverbtn',root);if(tap)tap.onclick=()=>{tap.disabled=true;tap.classList.add('yank');papi.send({t:'spin'});papi.vibe(15);};
+  $$('.preel',root).forEach(b=>b.onclick=()=>{if(b.disabled)return;papi.send({t:'lock',k:+b.dataset.k});papi.vibe(20);$$('.preel',root).forEach(x=>x.disabled=true);});
+  if(fresh){// roll each unkept reel to its new value, one after the other
+    let j=0;
+    st.reels.forEach((r,k)=>{if(!openBefore[k])return;const w=$$('.pwin',root)[k];if(!w)return;const strip=el('div','pstrip roll',[...shuffle(r.items).slice(0,12),r.v].map(v=>`<b>${esc(v)}</b>`).join(''));w.innerHTML='';w.appendChild(strip);
+      const dur=700+j*350;j++;requestAnimationFrame(()=>{const h=strip.firstChild.getBoundingClientRect().height;strip.style.transition=`transform ${dur}ms cubic-bezier(.12,.6,.2,1.02)`;strip.style.transform=`translateY(${-h*(strip.children.length-1)}px)`;});
+      setTimeout(()=>papi.vibe(8),dur);});}
+}
 game(slotGame({
   id:'constraints',group:'make',name:'Constraint Generator',tag:'Three reels, one brief for the whole room: tool, source, structure.',
-  how:['Phones pull the lever together — when the room has pulled enough, three reels spin.','Lock a reel you love and spin the others again.','Start the sprint: everyone makes something under the same three rules.'],
+  how:['Everyone spins on their own phone: tap to spin the three reels — tool, source, structure.','After each spin, keep one result. Three spins, so you end up with your own three rules.','The big screen shows everyone’s brief. Start the sprint and make something under your rules.'],
   icon:`<svg viewBox="0 0 64 64">${[0,1,2].map(i=>`<rect x="${4+i*18}" y="10" width="16" height="36" fill="var(${COLS[i]})" stroke="var(--ink)" stroke-width="3"/>`).join('')}<rect x="2" y="50" width="56" height="8" fill="var(--ink)"/><line x1="60" y1="8" x2="60" y2="34" stroke="var(--ink)" stroke-width="3"/><circle cx="60" cy="8" r="4" fill="var(--red)" stroke="var(--ink)" stroke-width="2"/></svg>`,
-  options:[{key:'mins',label:'Default sprint length',choices:durChoices,def:20}],
+  options:[{key:'mode',label:'Spinning',choices:[['solo','Everyone spins','3 spins each, keep one per spin'],['room','Whole room','one shared brief, phones tap together']],def:'solo'},{key:'mins',label:'Default sprint length',choices:durChoices,def:20}],
   reels:()=>[{key:'tool',title:'Tool',items:CONSTRAINTS.tool},{key:'source',title:'Source material',items:CONSTRAINTS.source},{key:'structure',title:'Structure',items:CONSTRAINTS.structure}],
 }));
 /* portmanteau: "Doo-wop" × "Hardstyle" → "Doo-style" */
@@ -83,9 +133,9 @@ function mash(a,b){const A=a.replace(/^\d{4}s /,'').split(/[\s-]/)[0],B=b.split(
   const tail=B.length>5?B.slice(Math.floor(B.length/2)-1):B;return (cut(A)+tail.toLowerCase()).replace(/^./,c=>c.toUpperCase());}
 game(slotGame({
   id:'genres',group:'make',name:'Genre Cross-Pollinator',tag:'Roll two genres that should never meet — and make them meet.',
-  how:['Phones pull the lever to spin Genre A and Genre B (plus optional extra reels).','The machine names your new hybrid.','Lock what you love, re-spin the rest, then start the sprint.'],
+  how:['Everyone spins on their own phone: Genre A, Genre B and any extra reels.','After each spin, keep one result — three spins, then the machine names your hybrid.','The big screen shows everyone’s hybrid. Start the sprint and make it.'],
   icon:`<svg viewBox="0 0 64 64"><circle cx="24" cy="32" r="18" fill="var(--red)" stroke="var(--ink)" stroke-width="3" opacity=".9"/><circle cx="40" cy="32" r="18" fill="var(--blue)" stroke="var(--ink)" stroke-width="3" style="mix-blend-mode:multiply"/><path d="M32 18 Q40 32 32 46 Q24 32 32 18" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/></svg>`,
-  options:[{key:'extra',label:'Extra reels',choices:[[0,'None','just A × B'],[1,'+ Tempo'],[2,'+ Setting'],[3,'+ Everything','tempo, setting, ingredient']],def:2},{key:'mins',label:'Default sprint length',choices:durChoices,def:20}],
+  options:[{key:'mode',label:'Spinning',choices:[['solo','Everyone spins','3 spins each, keep one per spin'],['room','Whole room','one shared brief, phones tap together']],def:'solo'},{key:'extra',label:'Extra reels',choices:[[0,'None','just A × B'],[1,'+ Tempo'],[2,'+ Setting'],[3,'+ Everything','tempo, setting, ingredient']],def:2},{key:'mins',label:'Default sprint length',choices:durChoices,def:20}],
   reels:o=>{const r=[{title:'Genre A',items:GENRES.a},{title:'Genre B',items:GENRES.b}];if(o.extra===1||o.extra===3)r.push({title:'Tempo',items:GENRES.tempo});if(o.extra>=2)r.push({title:'Setting',items:GENRES.setting});if(o.extra===3)r.push({title:'Secret ingredient',items:GENRES.ingredient});return r;},
   title:reels=>`${mash(reels[0].val,reels[1].val)} · ${reels[0].val} × ${reels[1].val}`,
 }));
@@ -106,7 +156,8 @@ game({
   ],
   topInfo(){const s=G.gs;return s?({brief:'Ready',sketch:'Sketching',rotate:'Rotate!',sabotage:`Sabotage ${s.round}`,rebuild:`Rebuild ${s.round}`,done:'Showcase'})[s.phase]:this.tag;},
   start(o){G.gs={o,phase:'brief',round:0,card:'',done:new Set(),used:new Set()};},
-  draw(){const s=G.gs,sev=s.o.sev==='climb'?['mild','brutal','chaos'][Math.min(2,s.round-1)]:s.o.sev;const deck=SABOTAGE[sev].filter(c=>!s.used.has(c));s.card=pick(deck.length?deck:SABOTAGE[sev]);s.used.add(s.card);s.sev=sev;s.done=new Set();sfx.card();},
+  draw(){const s=G.gs,sev=s.o.sev==='climb'?['mild','brutal','chaos'][Math.min(2,s.round-1)]:s.o.sev;const deck=SABOTAGE[sev].filter(c=>!s.used.has(c));s.card=pick(deck.length?deck:SABOTAGE[sev]);s.used.add(s.card);s.sev=sev;s.done=new Set();sfx.card();
+    online().forEach(p=>logAdd(p,{kind:'card',game:this.name,title:`Sabotage ${s.round} · ${sev}`,text:s.card}));},
   go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
     if(ph==='sketch')startClock(s.o.sketch*60000,()=>{sfx.alarm();this.go('rotate');});
     if(ph==='rotate'){s.round++;sfx.whoosh();startClock(30000,()=>this.go('sabotage'));}
@@ -164,13 +215,15 @@ game({
   onJoin(p){const s=G.gs;if(s.teams.some(t=>t.ids.includes(p.id)))return;const t=s.teams.slice().sort((a,b)=>a.ids.length-b.ids.length)[0];if(t){t.ids.push(p.id);s.legs=Math.max(s.legs,t.ids.length);}if(s.phase==='teams')render();sync(p);},
   teamOf(id){return G.gs.teams.findIndex(t=>t.ids.includes(id));},
   go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
-    if(ph==='leg'){s.leg++;s.twist=s.o.twist?pick(RELAY_TWISTS):'';startClock(s.o.leg*60000,()=>{sfx.swap();this.go(s.leg<s.legs?'switch':'vote');});}
+    if(ph==='leg'){s.leg++;s.twist=s.o.twist?pick(RELAY_TWISTS):'';
+      s.teams.forEach(t=>{if(s.leg===1)t.ids.forEach((id,k)=>logAdd(G.players.get(id),{kind:'team',game:this.name,title:t.name,text:`You run leg ${k+1} of ${t.ids.length} · with ${t.ids.filter(x=>x!==id).map(x=>(G.players.get(x)||{name:'?'}).name).join(', ')||'nobody'}`}));
+        const r=G.players.get(t.ids[s.leg-1]);if(r&&s.twist)logAdd(r,{kind:'card',game:this.name,title:`Leg ${s.leg} twist`,text:s.twist});});startClock(s.o.leg*60000,()=>{sfx.swap();this.go(s.leg<s.legs?'switch':'vote');});}
     if(ph==='switch')startClock(10000,()=>this.go('leg'));
     if(ph==='result')this.score();
     if(ph==='vote')sfx.fanfare();
     render();syncAll();},
   score(){const s=G.gs,tally=s.teams.map(()=>0);s.votes.forEach(t=>{if(tally[t]!=null)tally[t]++;});const max=Math.max(...tally);s.tally=tally;
-    s.teams.forEach((t,i)=>t.ids.forEach(id=>{const p=G.players.get(id);if(p)award(p,tally[i]*150+(tally[i]===max&&max>0?500:0)+100);}));saveRoom();},
+    s.teams.forEach((t,i)=>t.ids.forEach(id=>{const p=G.players.get(id);if(p){award(p,tally[i]*150+(tally[i]===max&&max>0?500:0)+100);logAdd(p,{kind:'finish',game:this.name,text:`${t.name}: ${tally[i]} vote${tally[i]===1?'':'s'}${tally[i]===max&&max>0?' · winning team':''}`});}}));saveRoom();},
   next(){const s=G.gs;({teams:()=>this.go('leg'),leg:()=>this.go(s.leg<s.legs?'switch':'vote'),switch:()=>this.go('leg'),vote:()=>this.go('result'),result:()=>exitGame(true)})[s.phase]();},
   frame(){clockFrame();},
   act(p,d){const s=G.gs;if(d.t==='vote'&&s.phase==='vote'){const t=+d.team;if(t===this.teamOf(p.id)||!s.teams[t])return;s.votes.set(p.id,t);sfx.vote();const e=$('#nVotes');if(e)e.textContent=s.votes.size;sync(p);}},
@@ -262,11 +315,11 @@ game({
     if(ph==='result')this.score();
     render();syncAll();},
   score(){const s=G.gs,tally=new Map();s.votes.forEach(id=>tally.set(id,(tally.get(id)||0)+1));s.tally=tally;const max=Math.max(0,...tally.values());
-    s.subs.forEach((v,id)=>{const p=G.players.get(id);if(!p||s.hidden.has(id))return;award(p,100+(tally.get(id)||0)*250+(max>0&&tally.get(id)===max?300:0));});sfx.reveal(70);saveRoom();},
+    s.subs.forEach((v,id)=>{const p=G.players.get(id);if(!p||s.hidden.has(id))return;const nv=tally.get(id)||0;award(p,100+nv*250+(max>0&&nv===max?300:0));if(max>0&&nv===max)logAdd(p,{kind:"star",game:this.name,text:`Top translation of “${s.scenes[s.i].title}” · ${nv} vote${nv===1?"":"s"}`});});sfx.reveal(70);saveRoom();},
   next(){const s=G.gs;({brief:()=>this.go('show'),show:()=>this.go('write'),write:()=>this.go('vote'),vote:()=>this.go('result'),result:()=>s.i+1<s.scenes.length?this.go('show'):(s.phase='end',sfx.fanfare(),render(),syncAll()),end:()=>exitGame(true)})[s.phase]();},
   frame(){clockFrame();},
   act(p,d){const s=G.gs;
-    if(d.t==='sub'&&s.phase==='write'&&Array.isArray(d.rules)){const rules=d.rules.map(x=>String(x||'').trim().slice(0,90)).filter(Boolean).slice(0,3);if(!rules.length)return;s.subs.set(p.id,rules);sfx.inn();const e=$('#nSubs');if(e)e.textContent=s.subs.size;sync(p);
+    if(d.t==='sub'&&s.phase==='write'&&Array.isArray(d.rules)){const rules=d.rules.map(x=>String(x||'').trim().slice(0,90)).filter(Boolean).slice(0,3);if(!rules.length)return;if(!s.subs.has(p.id))logAdd(p,{kind:'rules',game:this.name,title:s.scenes[s.i]?s.scenes[s.i].title:'',text:rules.map((r,k)=>`${k+1}. ${r}`).join('\n')});s.subs.set(p.id,rules);sfx.inn();const e=$('#nSubs');if(e)e.textContent=s.subs.size;sync(p);
       if(online().every(x=>s.subs.has(x.id)))later(()=>{if(G.gs===s&&s.phase==='write')this.go('vote');},1200);}
     if(d.t==='vote'&&s.phase==='vote'&&s.subs.has(d.id)&&d.id!==p.id){s.votes.set(p.id,d.id);sfx.vote();const e=$('#nVotes');if(e)e.textContent=s.votes.size;sync(p);}},
   imgHTML(sc){return sc.src?`<img class="scimg" src="${esc(sc.src)}" alt="">`:`<canvas class="scimg" data-art="${esc(sc.art)}"></canvas>`;},
@@ -332,21 +385,31 @@ game({
   how:['Everyone designs a patch on their phone’s eight-knob synth.','Each round you get someone else’s sound — no settings, just ears. Recreate it, then change exactly one knob and pass it on.','At the end, each chain plays from first to last on the big screen. Points for how close your copies were.'],
   badges:['Scored','Sound design','Uses phone speakers'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="16" cy="20" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M16 20 L22 12" stroke="var(--red)" stroke-width="4"/><circle cx="48" cy="44" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M48 44 L40 50" stroke="var(--blue)" stroke-width="4"/><path d="M26 26 Q40 22 40 34" fill="none" stroke="var(--ink)" stroke-width="3" stroke-dasharray="4 4"/></svg>`,
-  options:[{key:'gens',label:'Generations',choices:[[3,'3','make + 2 copies'],[4,'4'],[5,'5']],def:3},{key:'csecs',label:'Design time',choices:[[60,'1','min'],[90,'1.5','min'],[120,'2','min']],def:90},{key:'rsecs',label:'Recreate time',choices:[[120,'2','min'],[180,'3','min'],[240,'4','min']],def:180}],
-  note:'Students hear the sounds on their own phones — headphones help. Needs at least two players.',
-  check:()=>online().length>=2?'':'At least two phones need to be in the room',
+  options:[{key:'gens',label:'Generations',choices:[[3,'3','make + 2 copies'],[4,'4'],[5,'5']],def:3},{key:'csecs',label:'Design time',choices:[[60,'1','min'],[90,'1.5','min'],[120,'2','min']],def:90},{key:'rsecs',label:'Recreate time',choices:[[120,'2','min'],[180,'3','min'],[240,'4','min']],def:180},
+    {key:'test',label:'Test mode',choices:[[0,'Off','real players only'],[1,'Bots','two bots join the chain']],def:0}],
+  note:'Students hear the sounds on their own phones — headphones help. Needs at least two players, or turn on Test mode: two bots join the chain so you can try it with one phone.',
+  check:v=>online().length>=2||(v&&v.test&&online().length>=1)?'':'At least two phones need to be in the room (or turn on Test mode)',
   topInfo(){const s=G.gs;return !s?this.tag:s.phase==='brief'?'Ready':s.phase==='create'?'Generation 1 · design':s.phase==='recreate'?`Generation ${s.r+1} of ${s.gens} · recreate`:s.phase==='reveal'?`Chain ${s.c+1} of ${s.N}`:'Final';},
-  start(o){const ids=shuffle(online().map(p=>p.id)),N=ids.length;G.gs={o,phase:'brief',ids,N,gens:Math.min(o.gens,N),r:0,c:0,chains:ids.map(()=>[]),subs:new Set()};},
+  start(o){const bots=o.test?['Bot Moog','Bot Buchla']:[],botNames={};bots.forEach((n,i)=>botNames['bot:'+i]=n);
+    const ids=shuffle([...online().map(p=>p.id),...Object.keys(botNames)]),N=ids.length;G.gs={o,phase:'brief',ids,N,gens:Math.min(o.gens,N),r:0,c:0,chains:ids.map(()=>[]),subs:new Set(),botNames};},
+  isBot(id){return !!(G.gs.botNames||{})[id];},
+  nameOf(id){const s=G.gs;return (G.players.get(id)||{name:(s.botNames||{})[id]||'?'}).name;},
   chainFor(j,r){const s=G.gs;return ((j-r)%s.N+s.N)%s.N;},
   go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();s.subs=new Set();
     if(ph==='create')startClock(s.o.csecs*1000,()=>this.close());
     if(ph==='recreate')startClock(s.o.rsecs*1000,()=>this.close());
+    if((ph==='create'||ph==='recreate')&&s.botNames)Object.keys(s.botNames).forEach((id,i)=>later(()=>{if(G.gs===s&&s.phase===ph){s.subs.add(id);sfx.inn();render();}},2500+i*1800));
     if(ph==='reveal'){s.c=0;sfx.fanfare();}
     render();syncAll();},
   close(){const s=G.gs;// anyone who didn't submit: fill in so every chain stays whole
     s.ids.forEach((id,j)=>{const c=this.chainFor(j,s.r),ch=s.chains[c];if(ch[s.r])return;const prev=ch[s.r-1];
+      if(this.isBot(id)){if(!prev){ch[s.r]={by:id,p:randomPatch(),bot:true};return;}
+        // a bot copies by ear: close on every knob, never exact — then twists one knob
+        const copy=Object.fromEntries(PATCH_KNOBS.map(({k})=>[k,Math.round(clamp(prev.p[k]+(Math.random()-.5)*.18,0,1)*100)/100])),tw={...copy},k=pick(PATCH_KNOBS).k;
+        tw[k]=Math.round(clamp(tw[k]+(Math.random()<.5?-1:1)*(.25+Math.random()*.3),0,1)*100)/100;
+        ch[s.r]={by:id,p:tw,copy,acc:clamp(1-patchDist(copy,prev.p)*2.2,0,1),bot:true};return;}
       if(!prev)ch[s.r]={by:id,p:randomPatch(),auto:true};else{const p={...prev.p},k=pick(PATCH_KNOBS).k;p[k]=Math.round(Math.random()*100)/100;ch[s.r]={by:id,p,copy:prev.p,acc:0,auto:true};}});
-    if(s.r>0)s.ids.forEach((id,j)=>{const it=s.chains[this.chainFor(j,s.r)][s.r];const pl=G.players.get(id);if(pl&&!it.auto&&it.acc!=null)award(pl,Math.round(it.acc*1000/10)*10);});
+    if(s.r>0)s.ids.forEach((id,j)=>{const it=s.chains[this.chainFor(j,s.r)][s.r];const pl=G.players.get(id);if(pl&&!it.auto&&it.acc!=null){award(pl,Math.round(it.acc*1000/10)*10);logAdd(pl,{kind:'finish',game:this.name,text:`Generation ${s.r+1} copy · ${Math.round(it.acc*100)}% accurate`});}});
     if(s.r+1<s.gens){s.r++;this.go('recreate');}else this.go('reveal');saveRoom();},
   next(){const s=G.gs;if(s.phase==='brief')this.go('create');else if(s.phase==='create'||s.phase==='recreate')this.close();else if(s.phase==='reveal'){if(s.c+1<s.N){s.c++;stopAud();render();syncAll();}else{s.phase='end';stopAud();sfx.fanfare();render();syncAll();}}else exitGame(true);},
   stop(){stopAud();},
@@ -356,10 +419,10 @@ game({
     if(ch[s.r]&&!ch[s.r].auto)return;
     if(s.r===0)ch[0]={by:p.id,p:clean(d.p)};else{const copy=clean(d.copy),tw=clean(d.p),acc=clamp(1-patchDist(copy,ch[s.r-1].p)*2.2,0,1);ch[s.r]={by:p.id,p:tw,copy,acc};}
     s.subs.add(p.id);sfx.inn();const e=$('#nSubs');if(e)e.textContent=s.subs.size;sync(p);
-    if(s.ids.every(id=>s.subs.has(id)||!(G.players.get(id)||{}).conn))later(()=>{if(G.gs===s&&(s.phase==='create'||s.phase==='recreate'))this.close();},1200);},
+    if(s.ids.every(id=>s.subs.has(id)||this.isBot(id)||!(G.players.get(id)||{}).conn))later(()=>{if(G.gs===s&&(s.phase==='create'||s.phase==='recreate'))this.close();},1200);},
   playChain(){const s=G.gs,ch=s.chains[s.c];let t=0;ch.forEach((g,k)=>{later(()=>{if(G.gs!==s||s.phase!=='reveal')return;setAud(playPatch(g.p));$$('.gen').forEach((x,i)=>x.classList.toggle('playing',i===k));},t);t+=4600;});},
   render(st){
-    const s=G.gs,P=id=>(G.players.get(id)||{name:'?'}).name;
+    const s=G.gs,P=id=>this.nameOf(id);
     if(s.phase==='end'){rPodium(st,{title:'Golden ears'});return;}
     if(s.phase==='reveal'){const ch=s.chains[s.c],o=ch[0];
       st.innerHTML=`<div class="tele dots"><div class="rtop"><span class="lab">Chain ${s.c+1} of ${s.N} · started by ${esc(P(o.by))}</span><h2>How far did it drift?</h2></div>

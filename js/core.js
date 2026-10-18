@@ -76,7 +76,7 @@ const numOf=g=>pad2(ordered().indexOf(g)+1);
 /* =====================================================================
    HOST
    ===================================================================== */
-const G={splash:!QS.has('nosplash'),code:'',peer:null,status:'',players:new Map(),banned:new Set(),view:'menu',game:null,gs:null,timers:[]};
+const G={lobby:new Set(),splash:!QS.has('nosplash'),code:'',peer:null,status:'',players:new Map(),banned:new Set(),view:'menu',game:null,gs:null,timers:[]};
 function later(fn,ms){const t=setTimeout(fn,ms);G.timers.push(t);return t;}
 function clearLater(){G.timers.forEach(clearTimeout);G.timers=[];}
 const players=()=>[...G.players.values()];
@@ -84,7 +84,12 @@ const online=()=>players().filter(p=>p.conn&&p.conn.open);
 const blankP=()=>({gp:0,total:0,streak:0,best:0,right:0,last:null});
 function rankBy(key){const list=players().sort((a,b)=>(b[key]||0)-(a[key]||0)||a.name.localeCompare(b.name)),map=new Map();let last=null,rk=0;list.forEach((p,i)=>{if(p[key]!==last){rk=i+1;last=p[key];}map.set(p.id,rk);});return {list,map};}
 function award(p,pts){pts=Math.round(pts);p.gp=(p.gp||0)+pts;p.total=(p.total||0)+pts;return pts;}
-function saveRoom(){if(!G.code)return;store.set('room',{t:Date.now(),code:G.code,banned:[...G.banned],players:players().map(p=>({id:p.id,name:p.name,total:p.total,sh:p.sh}))});}
+function saveRoom(){if(!G.code)return;store.set('room',{t:Date.now(),code:G.code,banned:[...G.banned],players:players().map(p=>({id:p.id,name:p.name,total:p.total,sh:p.sh,log:p.log||[]}))});}
+/* the session notebook: every student's own record of the lesson — briefs and styles they
+   spun, picks they kept, rules they wrote, cards they were dealt, and milestones (streaks,
+   finishing places). Kept on the host, pushed to that student's phone. */
+function logAdd(p,e){if(!p)return;p.log=p.log||[];p.log.push({...e,at:Date.now()});if(p.log.length>300)p.log.shift();sendLog(p);saveRoom();}
+function sendLog(p){if(p.conn&&p.conn.open)try{p.conn.send({t:'log',log:p.log||[]});}catch(e){}}
 
 async function openRoom(code){
   G.status='Opening the room…';render();
@@ -100,7 +105,7 @@ async function openRoom(code){
       peer.on('disconnected',()=>{try{peer.reconnect();}catch(e){}});
       peer.on('connection',conn=>{
         conn.on('data',m=>{try{hostData(conn,m);}catch(e){console.error(e);}});
-        conn.on('close',()=>{const p=players().find(x=>x.conn===conn);if(p){p.conn=null;liveUpdate();if(G.view!=='play')render();}});
+        conn.on('close',()=>{G.lobby.delete(conn);const p=players().find(x=>x.conn===conn);if(p){p.conn=null;lobbyNames();liveUpdate();if(G.view!=='play')render();}});
         conn.on('error',()=>{});
       });
     };
@@ -112,22 +117,58 @@ async function newRoom(){
   exitGame(true);G.players.forEach(p=>{try{p.conn&&p.conn.send({t:'kick',why:'closed'});}catch(e){}});
   G.players.clear();G.banned.clear();store.del('room');try{G.peer&&G.peer.destroy();}catch(e){}G.peer=null;G.code='';render();await openRoom();render();
 }
+/* ---------- class list + attendance ----------
+   The teacher picks a class; its names come from the attendance Google Sheet (data/content.js →
+   ATTENDANCE.url, the sheet's Apps Script web app). Phones show those names, and picking one checks
+   the student in on the sheet in the background, once per class per day. No class = typed names. */
+const ATT={classes:null,cls:store.get('cls',''),names:[],err:''};
+const attDay=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
+const ATT_DONE=Object.fromEntries(Object.entries(store.get('attDone',{})).filter(([k])=>k.startsWith(attDay()+'|')));
+function attCall(fn,args){const url=(window.ATTENDANCE||{}).url;if(!url)return Promise.reject(new Error('No attendance sheet set'));
+  return fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn,...args})})
+    .catch(()=>{throw new Error('Can’t reach the attendance sheet (offline, or the script’s new version isn’t deployed yet)');})
+    .then(r=>r.text()).then(t=>{let j;try{j=JSON.parse(t);}catch(e){throw new Error('The attendance sheet did not answer (is the new version deployed?)');}if(!j.ok)throw new Error(j.error||'Sheet error');return j;});}
+function attLoad(){if(!(window.ATTENDANCE||{}).url)return;
+  attCall('classes').then(j=>{ATT.classes=j.classes||[];ATT.err='';if(ATT.cls&&!ATT.classes.includes(ATT.cls))ATT.cls='';return attRoster();})
+    .catch(e=>{ATT.classes=null;ATT.err=e.message;}).finally(()=>{if(G.view==='menu'&&!G.splash)render();});}
+function attRoster(){const c=ATT.cls;if(!c){ATT.names=[];lobbyNames();return Promise.resolve();}
+  return attCall('roster',{className:c}).then(j=>{if(ATT.cls!==c)return;ATT.names=(j.names||[]).map(n=>String(n).trim()).filter(Boolean);ATT.err='';lobbyNames();if(G.view==='menu')render();})
+    .catch(e=>{ATT.err=e.message;if(G.view==='menu')render();});}
+function attSetClass(c){ATT.cls=c;store.set('cls',c);ATT.names=[];lobbyNames();render();attRoster();}
+const attMatch=n=>{const k=String(n||'').trim().toLowerCase();return ATT.names.find(x=>x.toLowerCase()===k)||null;};
+const attCount=()=>Object.keys(ATT_DONE).filter(k=>k.startsWith(attDay()+'|'+ATT.cls+'|')).length;
+function attCheckIn(p){if(!ATT.cls||!attMatch(p.name))return;const k=attDay()+'|'+ATT.cls+'|'+p.name;if(ATT_DONE[k]){p.att='in';return;}
+  if(p.att==='…')return;p.att='…';let tries=0;
+  const go=()=>attCall('checkIn',{className:ATT.cls,name:p.name}).then(j=>{ATT_DONE[k]=j.result;store.set('attDone',ATT_DONE);p.att='in';if(G.view==='menu')render();})
+    .catch(e=>{if(++tries<4)setTimeout(go,3000*tries);else{p.att='fail';console.warn('attendance',p.name,e.message);if(G.view==='menu')render();}});
+  go();}
+// phones that are connected but haven't picked a name yet
+function namesMsg(){return {t:'names',cls:ATT.cls,names:ATT.cls?ATT.names.map(n=>({n,here:players().some(p=>p.name===n&&p.conn&&p.conn.open)})):[]};}
+function lobbyNames(){G.lobby.forEach(c=>{if(c.open)try{c.send(namesMsg());}catch(e){}});}
 function resetPoints(){if(!confirm('Reset everyone’s total points to zero?'))return;players().forEach(p=>{p.total=0;p.gp=0;});saveRoom();render();syncAll();}
-function uniqueName(name,id){
-  name=String(name||'').replace(/\s+/g,' ').trim().slice(0,18)||'Player';let n=name,k=2;
+function uniqueName(name,id,max=30){
+  name=String(name||'').replace(/\s+/g,' ').trim().slice(0,max)||'Player';let n=name,k=2;
   const taken=s=>players().some(p=>p.id!==id&&p.name.toLowerCase()===s.toLowerCase());
   while(taken(n))n=name+' '+(k++);return n;
 }
 function hostData(conn,m){
   if(!m||typeof m!=='object')return;
   if(m.t==='ping'){try{conn.send({t:'pong'});}catch(e){}return;}
+  if(m.t==='who'){G.lobby.add(conn);try{conn.send(namesMsg());}catch(e){}return;}
   if(m.t==='hi'){
     const id=String(m.id||'').slice(0,40);if(!id)return;
     if(G.banned.has(id)){try{conn.send({t:'kick'});}catch(e){}setTimeout(()=>conn.close(),300);return;}
-    let p=G.players.get(id);
+    G.lobby.delete(conn);
+    let p=G.players.get(id);const listed=!p&&attMatch(m.name);
+    if(listed){ // a name from the class list: one phone each, and a new device takes over an offline seat (points kept)
+      const q=players().find(x=>x.name===listed);
+      if(q&&q.conn&&q.conn.open){try{conn.send({t:'taken',name:listed});conn.send(namesMsg());}catch(e){}G.lobby.add(conn);return;}
+      if(q){G.players.delete(q.id);q.id=id;G.players.set(id,q);p=q;}
+    }
     if(p){if(p.conn&&p.conn!==conn)try{p.conn.close();}catch(e){}p.conn=conn;}
-    else{p={id,name:uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
-    sync(p);saveRoom();
+    else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
+    attCheckIn(p);lobbyNames();
+    sync(p);sendLog(p);saveRoom();
     if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else render();
     return;
   }
@@ -217,8 +258,10 @@ function rMenu(st){
       <button class="qr" id="roomQR" aria-label="Show the join QR full screen"></button>
       <div class="code">${G.code||'····'}</div>
       <div class="url">${G.code?esc(joinURL(G.code).replace(/^https?:\/\//,'')):esc(G.status||'Opening the room…')}</div>
+      ${(window.ATTENDANCE||{}).url?`<div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join('')}</select></label>
+        <span class="fine">${ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>`:''}
       <div class="rhead2"><b>${ps.length}</b><span>${ps.length===1?'player':'players'} in the room</span></div>
-      <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}" data-id="${esc(p.id)}" title="Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
+      <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
     </aside>
@@ -229,6 +272,7 @@ function rMenu(st){
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
   $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
+  if($('#selCls'))$('#selCls').onchange=e=>attSetClass(e.target.value);
 }
 
 /* setup: the game's poster on the left, its options on the right */
@@ -245,7 +289,7 @@ function rSetup(st){
     <section class="gintro dots"><div class="bigico">${g.icon||''}</div>
       <div class="gtitle"><div class="no">${numOf(g)}</div><h1>${esc(g.name)}</h1><p class="tag">${esc(g.tag)}</p></div>
       <ol class="how">${(g.how||[]).map(h=>`<li><span>${h}</span></li>`).join('')}</ol></section>
-    <section class="form">${(g.options||[]).map(optHTML).join('')}
+    <section class="form">${(g.options||[]).map(optHTML).join('')}${g.setupExtra?g.setupExtra(v):''}
       <div class="frow"><button class="ghost" id="bBack">← Menu</button><button class="big go" id="bGo">${esc(g.startLabel||'Start')} <small>SPACE</small></button>
       <span class="fine">${online().length?online().length+' online':'Nobody online yet — phones can join any time.'}</span></div>
       ${g.note?`<p class="fine">${g.note}</p>`:''}</section></div>`;
@@ -256,6 +300,7 @@ function rSetup(st){
   $$('[data-none]',st).forEach(b=>b.onclick=()=>{v[b.dataset.none]=[];save();});
   $('#bBack').onclick=()=>{G.view='menu';render();syncAll();};
   $('#bGo').onclick=()=>startGame(g,v);
+  if(g.setupBind)g.setupBind(st,()=>rSetup(st));
 }
 function startGame(g,v){
   v=v||optVals(g);
@@ -370,7 +415,7 @@ function roundGame(spec){
     players().forEach(p=>{
       const a=s.ans.get(p.id);let res=a?(g.score(r,a.a,{ms:a.ms,T:s.T,opts:s.opts})||{acc:0}):{acc:0,note:'No answer this time'};
       const acc=clamp(+res.acc||0,0,1),ok=!!a&&acc>=g.okAt,sf=s.T&&a?1-g.speed*clamp(a.ms/s.T,0,1):1;
-      if(ok){p.streak++;p.right++;p.best=Math.max(p.best,p.streak);}else p.streak=0;
+      if(ok){p.streak++;p.right++;p.best=Math.max(p.best,p.streak);if([3,5,8,12].includes(p.streak))logAdd(p,{kind:'star',game:g.name,text:`${p.streak} right in a row`});}else p.streak=0;
       let pts=a?Math.round(1000*acc*sf/10)*10:0;if(ok)pts+=Math.min(p.streak-1,5)*100;
       award(p,pts);const cls=!a?'none':ok?'yes':acc>=g.closeAt?'close':'no';p.last={pts,acc,ok,cls};s.res.set(p.id,{...res,acc,pts,cls});
       if(a){accSum+=acc;n++;}
@@ -383,13 +428,16 @@ function roundGame(spec){
     if(s.phase==='prep')open();
     else if(s.phase==='open')reveal();
     else if(s.phase==='reveal'){if(boardDue())g.toBoard();else g.skip();}
-    else if(s.phase==='board'){if(s.done+1<s.rounds.length)goRound(s.done+1);else{s.phase='end';sfx.fanfare();render();syncAll();}}
+    else if(s.phase==='board'){if(s.done+1<s.rounds.length)goRound(s.done+1);else g.finish();}
     else if(s.phase==='end')exitGame(true);
   };
-  // the leaderboard comes up every third round (and after the last); either way one button jumps past it
-  const boardDue=()=>{const s=G.gs;return (s.done+1)%3===0||s.done+1>=s.rounds.length;};
+  // the leaderboard only comes up when the teacher asks for it; after the last round Next goes to the podium
+  const boardDue=()=>false;
   g.toBoard=()=>{const s=G.gs;g.leave&&g.leave();s.phase='board';sfx.board();render();syncAll();};
-  g.skip=()=>{const s=G.gs;g.leave&&g.leave();if(s.done+1<s.rounds.length)goRound(s.done+1);else{s.phase='end';sfx.fanfare();render();syncAll();}};
+  g.skip=()=>{const s=G.gs;g.leave&&g.leave();if(s.done+1<s.rounds.length)goRound(s.done+1);else g.finish();};
+  g.finish=()=>{const s=G.gs;s.phase='end';sfx.fanfare();const rk=rankBy('gp');
+    players().filter(p=>p.gp>0||p.right>0).forEach(p=>logAdd(p,{kind:'finish',game:g.name,text:`${ordinal(rk.map.get(p.id))} of ${G.players.size} · ${p.gp} pts · ${p.right}/${s.rounds.length} right${p.best>1?` · best streak ${p.best}`:''}`}));
+    render();syncAll();};
   const ownStop=spec.stop; // a module's own stop hook (e.g. hiding an embedded frame) still runs
   g.stop=()=>{g.leave&&g.leave();ownStop&&ownStop.call(g);};
   g.act=(p,d)=>{if(d.t==='ans')answer(p,d);else if(g.onAct)g.onAct(p,d);};
@@ -402,8 +450,8 @@ function roundGame(spec){
     if(s.phase==='end')return rPodium(st);
     const ctx={phase:s.phase,opts:s.opts,s,list:g.answers()};
     const last=s.done+1>=s.rounds.length,due=boardDue();
-    const btn={prep:g.prepBtn||'Open answers now',open:'Reveal now',reveal:due?'Leaderboard':'Next round'}[s.phase];
-    const alt=s.phase==='reveal'?`<button class="ghost wide" id="bAlt">${due?(last?'Skip to the podium':'Skip to the next round'):'Show the leaderboard'}</button>`:'';
+    const btn={prep:g.prepBtn||'Open answers now',open:'Reveal now',reveal:last?'Reveal the podium':'Next round'}[s.phase];
+    const alt=s.phase==='reveal'?`<button class="ghost wide" id="bAlt">Show the leaderboard</button>`:'';
     st.innerHTML=`<div class="rg ph-${s.phase}"><section class="rgm dots" id="rgm"></section>
       <aside class="side"><div class="ringbox"><canvas id="ring"></canvas></div><div class="sinfo" id="sinfo"></div>
       <div class="sact">${g.replay?`<button class="ghost wide" id="bReplay">▶ ${esc(g.replayLabel||'Play again')}</button>`:''}<button class="big ${s.phase==='reveal'?'go':''}" id="bNext">${esc(btn)} <small>SPACE</small></button>${alt}<span class="keys">Space / → next · Q join code</span></div></aside></div>
@@ -471,9 +519,9 @@ async function pConnect(){
   if(PL.peer&&!PL.peer.destroyed)PL.peer.destroy();
   const peer=new Peer({debug:0});PL.peer=peer;
   clearTimeout(PL.wd);PL.wd=setTimeout(()=>{if(PL.peer===peer&&(!PL.conn||!PL.conn.open))pRetry();},10000);
-  peer.on('open',()=>{const conn=peer.connect(peerId(PL.code),{serialization:'json',reliable:true});PL.conn=conn;
+  peer.on('open',()=>{const conn=peer.connect(peerId(PL.code),{serialization:'json',reliable:true});PL.conn=conn;PL.connCode=PL.code;
     const fail=setTimeout(()=>{if(!conn.open){PL.status='No room '+PL.code+' found. Check the code on the big screen.';pRender();}},9000);
-    conn.on('open',()=>{clearTimeout(fail);PL.retry=0;PL.heard=now();PL.status='';conn.send({t:'hi',id:PL.id,name:PL.name});const q=PL.q;PL.q=[];q.forEach(m=>{try{conn.send(m);}catch(e){}});});
+    conn.on('open',()=>{clearTimeout(fail);PL.retry=0;PL.heard=now();PL.status='';conn.send(PL.joined?{t:'hi',id:PL.id,name:PL.name}:{t:'who'});if(!PL.joined)pRender();const q=PL.q;PL.q=[];q.forEach(m=>{try{conn.send(m);}catch(e){}});});
     conn.on('data',m=>{PL.heard=now();pData(m);});
     conn.on('close',()=>{if(PL.kicked)return;PL.status='Lost the room — reconnecting…';pRender();pRetry();});});
   peer.on('error',e=>{if(e.type==='peer-unavailable'){PL.status='No room '+PL.code+' found. Check the code on the big screen.';pRender();if(PL.joined)pRetry();return;}PL.status='Connection problem ('+(e.type||'?')+') — retrying…';pRender();pRetry();});
@@ -486,6 +534,9 @@ function pRetry(){clearTimeout(PL.rt);PL.rt=setTimeout(()=>{if(!PL.conn||!PL.con
 document.addEventListener('visibilitychange',()=>{if(ROLE==='player'&&document.visibilityState==='visible'&&PL.joined&&(!PL.conn||!PL.conn.open)){PL.retry=0;pConnect();}});
 function pData(m){
   if(!m||typeof m!=='object'||m.t==='pong')return;
+  if(m.t==='log'){const had=(PL.log||[]).length;PL.log=Array.isArray(m.log)?m.log:[];const b=$('.nbcount');if(b){b.textContent=PL.log.length;if(PL.log.length>had){const n=$('#nbBtn');if(n){n.classList.remove('ping');void n.offsetWidth;n.classList.add('ping');}}}if($('#nb'))openNotebook();return;}
+  if(m.t==='names'){PL.names=m;if(!PL.joined)pRender();return;}
+  if(m.t==='taken'){PL.joined=false;PL.st=null;store.del('proom');PL.status=m.name+' is already in the room on another phone. Tell your teacher if that isn’t you.';pRender();return;}
   if(m.t==='kick'){PL.kicked=true;PL.st={view:'kicked',why:m.why};try{PL.conn.close();}catch(e){}pRender();return;}
   if(m.t!=='st')return;
   const prev=PL.st;PL.st=m;PL.name=m.name;
@@ -498,9 +549,25 @@ function pRankCard(root,st,label){root.innerHTML=`<div class="pcenter dots"><div
 function pRender(){
   if(ROLE!=='player')return;
   const app=$('#app');app.className='ply';const s=PL.st;
-  const top=`<header class="ptop">${logo()}${PL.joined&&s&&s.view!=='kicked'?`<div class="who"><span>${esc(PL.name)}</span><b class="pscore">${s.total||0}</b></div>`:''}</header>`;
+  const top=`<header class="ptop">${logo()}${PL.joined&&s&&s.view!=='kicked'?`<button class="nbbtn" id="nbBtn" aria-label="Your notebook">${NB_ICON}<b class="nbcount">${(PL.log||[]).length}</b></button><div class="who"><span>${esc(PL.name)}</span><b class="pscore">${s.total||0}</b></div>`:''}</header>`;
   app.innerHTML=top+`<main class="pbody" id="pbody"></main>`;
+  if($('#nbBtn'))$('#nbBtn').onclick=openNotebook;
   const body=$('#pbody');PL.key='';PL.timer=null;PL.clock=null;
+  if(!PL.joined&&PL.names&&PL.names.names.length&&!PL.typing){
+    const L=PL.names.names.slice().sort((a,b)=>a.n.localeCompare(b.n));
+    body.innerHTML=`<div class="pjoin pwho"><h1>Who<br><i>are you?</i></h1><p class="lab">${esc(PL.names.cls)} · room ${esc(PL.code)}</p>
+      <div class="pnames">${L.map((x,i)=>`<button class="pname c${i%4}" data-n="${esc(x.n)}" ${x.here?'disabled':''}>${esc(x.n)}${x.here?'<small>in the room</small>':''}</button>`).join('')}</div>
+      ${PL.status?`<p class="pst err">${esc(PL.status)}</p>`:''}
+      <button class="linkbtn" id="pType">My name isn’t on the list</button></div>`;
+    $$('.pname',body).forEach(b=>b.onclick=()=>{PL.name=b.dataset.n;PL.status='';store.set('pname',PL.name);store.set('proom',PL.code);PL.joined=true;papi.vibe(15);
+      if(PL.conn&&PL.conn.open){PL.conn.send({t:'hi',id:PL.id,name:PL.name});pRender();}else pConnect();});
+    $('#pType').onclick=()=>{PL.typing=true;pRender();};
+    return;
+  }
+  if(!PL.joined&&PL.code&&QS.has('room')&&!PL.names&&!PL.typing&&!/No room/.test(PL.status||'')){
+    body.innerHTML=`<div class="pcenter"><h2 class="pul">Room ${esc(PL.code)}</h2><p>${esc(PL.status||'Connecting…')}</p><button class="linkbtn" id="pType">Type my name instead</button></div>`;
+    $('#pType').onclick=()=>{PL.typing=true;pRender();};return;
+  }
   if(!PL.joined){
     body.innerHTML=`<form class="pjoin" id="fJoin"><h1>Control<br><i>Room</i></h1>
       <label><span class="lab">Room code</span><input class="code" id="iCode" maxlength="4" autocomplete="off" autocapitalize="characters" value="${esc(PL.code)}" placeholder="ABCD" required></label>
@@ -510,7 +577,7 @@ function pRender(){
       <p class="fine">You join once for the whole lesson. Your phone follows the big screen from game to game.${!QS.has('room')?' · <a href="?host">Host on this device</a>':''}</p></form>`;
     $('#fJoin').onsubmit=e=>{e.preventDefault();const c=$('#iCode').value.toUpperCase().replace(/[^A-Z0-9]/g,''),n=$('#iName').value.trim();
       if(c.length!==4){PL.status='Room codes have 4 characters.';pRender();return;}if(!n){$('#iName').focus();return;}
-      PL.code=c;PL.name=n.slice(0,18);store.set('pname',PL.name);store.set('proom',PL.code);PL.joined=true;pConnect();};
+      PL.code=c;PL.name=n.slice(0,30);store.set('pname',PL.name);store.set('proom',PL.code);PL.joined=true;if(PL.conn&&PL.conn.open&&PL.connCode===c){PL.conn.send({t:'hi',id:PL.id,name:PL.name});pRender();}else pConnect();};
     if(PL.code&&!PL.name)setTimeout(()=>$('#iName')&&$('#iName').focus(),50);
     return;
   }
@@ -528,6 +595,19 @@ function pRender(){
     <p>${s.g?'The game starts in a moment.':`Look for <b>${esc(s.name)}</b> on the big screen. The next game starts soon.`}</p>
     ${s.total?`<p class="lab">Room total · ${s.total} pts · ${ordinal(s.rank)} of ${s.of}</p>`:''}${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>`;
 }
+const NB_ICON='<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="2" width="16" height="18" fill="var(--yel)" stroke="var(--ink)" stroke-width="2"/><path d="M7 2v18M10 7h6M10 11h6M10 15h4" stroke="var(--ink)" stroke-width="2"/></svg>';
+const NB_KINDS=[['brief','Briefs & styles','◆'],['rules','Rules you wrote','✎'],['pick','Picks you kept','●'],['card','Cards you were dealt','▲'],['team','Teams & chains','■'],['finish','Results','★'],['star','Milestones','★']];
+function openNotebook(){
+  let ov=$('#nb');if(!ov){ov=el('div','nb');ov.id='nb';ov.setAttribute('role','dialog');document.body.appendChild(ov);}
+  const L=(PL.log||[]).slice().reverse(),s=PL.st||{};
+  const sec=([k,label,ic])=>{const items=L.filter(e=>e.kind===k||(k==='finish'&&e.kind==='finish'));if(!items.length)return '';
+    return `<section class="nbsec"><h3><i>${ic}</i>${esc(label)}<em>${items.length}</em></h3>${items.map(e=>`<article><span class="lab">${esc(e.game||'')}${e.at?' · '+new Date(e.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</span>${e.title?`<b>${esc(e.title)}</b>`:''}<p>${esc(e.text||'').replace(/\n/g,'<br>')}</p></article>`).join('')}</section>`;};
+  const body=NB_KINDS.filter(k=>k[0]!=='star').map(sec).join('')+sec(NB_KINDS.find(k=>k[0]==='star'));
+  ov.innerHTML=`<div class="nbpanel"><header><div><span class="lab">This session</span><h2>Your notebook</h2></div><button class="ghost" id="nbX">Close</button></header>
+    <div class="nbstats"><div><b>${s.total||0}</b><span>points</span></div><div><b>${s.rank?ordinal(s.rank):'—'}</b><span>in the room</span></div><div><b>${L.length}</b><span>entries</span></div></div>
+    <div class="nbbody">${body||'<p class="nbempty">Nothing yet. Your briefs, rules, kept picks and milestones collect here as the lesson goes on.</p>'}</div></div>`;
+  $('#nbX').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove();};
+}
 function pFrame(){
   const c=PL.clock;if(c){const left=Math.max(0,c.end-now());$$('.pclk').forEach(e=>e.textContent=fmtClock(left));$$('.pclkbar i').forEach(e=>e.style.width=(100*left/c.T)+'%');}
   const t=PL.timer;if(t){const left=Math.max(0,t.end-now()),b=$('#pBar'),l=$('#pLeft');if(b)b.style.width=(100*left/t.T)+'%';if(l)l.textContent=Math.ceil(left/1000)+' s';}
@@ -537,7 +617,7 @@ function pFrame(){
 /* ---------- boot ---------- */
 function boot(){
   document.addEventListener('keydown',e=>{
-    if(ROLE!=='host'||G.splash||e.target.closest('input,textarea'))return;
+    if(ROLE!=='host'||G.splash||e.target.closest('input,textarea,select'))return;
     if(e.key==='Escape'){const o=$('#qrbig');if(o)o.remove();return;}
     if((e.key==='q'||e.key==='Q')&&G.code){const o=$('#qrbig');o?o.remove():showBigQR(G.code);return;}
     if(e.key===' '||e.key==='ArrowRight'||(e.key==='Enter'&&e.target.tagName!=='BUTTON')){
@@ -550,11 +630,13 @@ function boot(){
     if(s&&Date.now()-s.t<12*3600e3){s.players.forEach((p,k)=>G.players.set(p.id,{...blankP(),...p,sh:p.sh??k%4,conn:null}));G.banned=new Set(s.banned||[]);}
     render();
     if(typeof songReady==='function')songReady().catch(()=>{});
+    attLoad();
     openRoom(s&&Date.now()-s.t<12*3600e3?s.code:null).then(async ok=>{if(!ok&&s){try{G.peer&&G.peer.destroy();}catch(e){}await openRoom();}render();});
     addEventListener('beforeunload',e=>{if(G.view==='play'){e.preventDefault();e.returnValue='';}});
   }else{
     const u=QS.get('room');PL.code=(u||store.get('proom','')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
     if(u&&PL.name&&store.get('proom','')===PL.code){PL.joined=true;pConnect();}
+    else if(u&&PL.code.length===4)pConnect(); // connect first, so the class list can arrive before the student picks a name
     pRender();
   }
   requestAnimationFrame(frame);

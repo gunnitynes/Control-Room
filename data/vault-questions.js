@@ -5,7 +5,6 @@
 window.VAULT={
 1:[
 ["How did engineer Andy Johns and John Bonham get the huge drum sound on Led Zeppelin's \"When the Levee Breaks\"?",1,["Twenty microphones packed tightly around the kit","The kit in the stairwell of Headley Grange, recorded by a pair of mics hung above and heavily compressed","Electronic drum samples blended with the real kit","Recording inside an empty tiled swimming pool"]],
-["What did Beatles engineer Geoff Emerick do to John Lennon's voice on \"Tomorrow Never Knows\" to make him sound like a lama chanting on a mountaintop?",0,["Sent it through the rotating Leslie speaker of a Hammond organ","Recorded him singing inside a metal ventilation duct","Reversed the tape and ran it through a fuzz pedal","Wired an old telephone receiver into the console"]],
 ["What was the core method behind Phil Spector's \"Wall of Sound\"?",1,["Recording in a giant stadium for natural arena reflections","Doubling and tripling instruments (several pianos, guitars, basses) playing live in one small room, then flooding it with echo chamber","Heavy multiband compression on every track","Recording orchestras down telephone lines"],'wallofsound'],
 ["Which production team built Public Enemy's dense, noisy sample collages, layering dozens of samples on machines like the SP-1200?",1,["The Neptunes","The Bomb Squad","The Dust Brothers","Organized Noize"]],
 ["What did Les Paul do after Bing Crosby gave him an Ampex tape recorder in 1948?",0,["Modified it for sound-on-sound: recording new parts over playback, an early step to multitracking","Built the first software DAW","Invented the solid-body guitar pickup","Built the first stereo vinyl lathe"],'multitrack'],
@@ -63,7 +62,6 @@ window.VAULT={
 ["What did Roger Linn's LinnDrum LM-1 (1980) bring to drum machines?",0,["Sampled real drums, plus quantise and swing settings that made programmed beats groove","Mouse control","A wrist strap","Internet connectivity"],'linndrum'],
 ["The main hook of Dr. Dre's \"The Next Episode\" is built on a sample of which 1967 recording?",0,["David McCallum's \"The Edge\"","James Brown's \"Funky Drummer\"","Isaac Hayes' \"Walk On By\"","Bob James' \"Nautilus\""]],
 ["What was Brian Eno's idea behind Music for Airports (1978)?",0,["Music \"as ignorable as it is interesting\": it blends into the surroundings and calms the space","Notes chosen by rolling dice","Music recorded in plane cabins","Music played at 120 dB"],'airports'],
-["Which 1986 Slayer album did Rick Rubin produce, famous for its dry, tight, ferocious sound?",0,["Reign in Blood","Master of Puppets","Peace Sells… but Who's Buying?","Rust in Peace"]],
 ["What standard did the Compact Disc (1982) set for consumer digital audio?",0,["44.1 kHz sample rate, 16-bit depth","192-bit floating point","No more digital jitter, ever","500 hours of multitrack per disc"],'cdrate'],
 ["Which Oxfordshire manor house became Virgin's residential studio, where Mike Oldfield recorded Tubular Bells?",0,["The Manor Studio","Real World Studios","Abbey Road Studios","Rockfield Studios"]],
 ],
@@ -90,7 +88,6 @@ window.VAULT={
 4:[
 ["How did Ray Dolby's noise reduction (Dolby A) beat tape hiss without dulling the music?",1,["Slowing the tape to 7.5 ips","Companding: quiet high frequencies boosted when recording and turned back down on playback, taking the hiss down with them","A brickwall filter at 15 kHz","Carbon-fibre tape coating"]],
 ["Why did Shure's SM57 and SM58 (mid-1960s) become studio and stage standards?",1,["They used high-voltage capacitor plates","Rugged moving-coil cardioid designs that reject off-axis sound and survive anything","They used dual ribbons","They had built-in digital preamps"]],
-["Who played the twangy solo on Glen Campbell's \"Wichita Lineman\" (1968)?",1,["Carol Kaye on electric bass","Glen Campbell himself, on a six-string Danelectro bass","Jimmy Webb on organ","Tommy Tedesco on 12-string"]],
 ["What did API's 500-series format introduce?",1,["Audio over telephone wire","A standard rack (later the \"lunchbox\") giving power and connections to swappable preamp, EQ and compressor modules","The first digital modular synth","Fibre-optic XLR cables"]],
 ["Before producing Bowie, engineer Ken Scott worked on much of which Beatles album?",0,["The White Album","Please Please Me","Rubber Soul","Let It Be"]],
 ["What does a de-esser actually do?",1,["Remove low rumble from stand bumps","Compress only when harsh S sounds (roughly 5–9 kHz) spike, leaving the rest of the voice alone","Correct pitch","Add room reverb"]],
@@ -98,7 +95,6 @@ window.VAULT={
 ["How did Daphne Oram's Oramics machine turn drawings into sound?",1,["A TV camera read sheet music","Shapes drawn on clear 35 mm film strips passed over photocells, whose voltages controlled the sound generators","Oscilloscopes reacting to paintings on glass","Photo pixels converted to MIDI"],'oramics'],
 ["How did Steve Albini charge for producing albums like In Utero?",1,["A percentage of every sale","A flat fee — he refused royalties on principle","Nothing at all","In studio equipment"]],
 ["The chaotic brass on Radiohead's \"The National Anthem\" was inspired by which jazz musician?",2,["Miles Davis","John Coltrane","Charles Mingus","Duke Ellington"]],
-["Mark Ronson produced half of Amy Winehouse's Back to Black. Who produced the other half?",1,["Pharrell Williams","Salaam Remi","Timbaland","Danger Mouse"]],
 ["What was distinctive about how Dr. Dre built The Chronic (1992)?",1,["Multiband compression on stock synth plugins","Instead of only sampling, he had musicians replay classic funk parts, adding Minimoog bass and whining synth leads","Bass guitars through fuzz boxes","+20 dB at 50 Hz on everything"],'gfunk'],
 ["What did Geoff Emerick do to Ringo's bass drum on Revolver that broke Abbey Road's rules?",1,["Recorded it two miles away","Moved the mic right up close and stuffed a woollen jumper inside the drum to deaden it","Wrapped the mic in foil","Used one mono ribbon for the whole kit"]],
 ["What does bitcrushing add to a sound on purpose?",1,["Tape flutter and tube warmth","Quantisation noise, aliasing and stair-stepped waveforms from cutting bit depth and sample rate","Natural room reverb","Stereo phase cancellation"]],
@@ -113,7 +109,6 @@ window.VAULT={
 ["Why did Phil Spector's Wall of Sound fuse into one huge texture?",1,["The Haas effect plus phase cancellation","Many doubled instruments masking and smearing into each other, then soaked in echo chamber","Binaural HRTF tricks","Sub-octave transistor saturation"],'wallofsound'],
 ["How did Tony Visconti record Bowie's vocal on \"Heroes\" in the big hall at Hansa?",0,["Three mics — close, about 20 feet and about 50 feet away — with the far ones gated to open only when Bowie sang loud","Mics wrapped in wool blankets at 20:1","Through a vocoder","In a metal tank with a dummy head"],'heroes'],
 ["What is the famous \"Pultec trick\" with the EQP-1A?",0,["Boosting and cutting the same low frequency at once, for a firm low end without mud","Using its 31 graphic sliders","Its optical auto-EQ","Running it unpowered"]],
-["What did Bruce Swedien call his recording approach on Thriller?",0,["The \"Acusonic Recording Process\"","The \"Wall of Sound\"","\"Total Recall\"","\"Sound-on-sound\""]],
 ["What were the Studer J37 4-track machines used for on Sgt. Pepper?",0,["\"Reduction mixes\": bouncing several tracks down onto one track of a second machine to free up space","Endless tape echo on vocals","Only recording strings elsewhere","Running automated mixing"]],
 ["What did the Eventide H3000 Harmonizer (late 1980s) bring to mixing?",0,["Pitch-shifting, micro-pitch detuning and complex multi-effects in one programmable rack unit","Vinyl-to-WAV conversion","True-peak limiting","Bluetooth patchbays"]],
 ["What is the key to Glyn Johns' minimal drum-miking method?",0,["The overhead and the floor-tom-side mic are exactly the same distance from the snare, so they stay in phase","Wrapping mics in foam","Gating the overheads","Flipping the kick mic's polarity"],'glynjohns'],
@@ -135,7 +130,6 @@ window.VAULT={
 ["Which band did Nigel Godrich form with Thom Yorke and Flea?",0,["Atoms for Peace","The Smile","Them Crooked Vultures","Unkle"]],
 ["Where did Aretha Franklin record \"I Never Loved a Man (The Way I Love You)\" (1967) with producer Jerry Wexler?",0,["FAME Studios, Muscle Shoals, Alabama","Motown's Hitsville U.S.A., Detroit","Abbey Road, London","Sun Studio, Memphis"]],
 ["How does a membrane (panel) bass trap work?",1,["Diffusing highs off curved wood","A flexible panel over a sealed air space vibrates with low frequencies and turns that energy into heat","Steel plates making reverb","Round rooms focusing sound"]],
-["What made the EMS Synthi 100 (1971) remarkable?",1,["A battery synth for buskers","A huge analog modular console: 12 oscillators, built-in scopes and a digital sequencer","Internal digital summing","Dial-up internet"]],
 ["Where was John Coltrane's A Love Supreme (1964) recorded?",0,["Van Gelder Studio, Englewood Cliffs, New Jersey","Rudy Van Gelder's parents' living room in Hackensack","Abbey Road","Columbia's 30th Street Studio"],'vangelder'],
 ["What do diffusers on a control room's back wall do?",1,["Absorb everything below 30 Hz","Scatter strong reflections in many directions, making a small room feel more open","Make plate reverb","Power the monitors"]],
 ["Abbey Road (1969) was the first Beatles album recorded through which console?",0,["EMI's transistor TG12345","A Neve 8028","An SSL 4000 E","A Helios"]],

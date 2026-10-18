@@ -1,0 +1,19 @@
+Preset Archeologist — sound credits
+
+808-*.wav   Roland TR-808 one-shots sampled directly from a TR-808 by Michael Fischer (Technopolis).
+            Distributed as a free sample set ("ABSOLUTELY FREE!"), via machines.hyperreal.org /
+            the npm package @fluid-music/tr-808. Files: BD5075, CP, CB, CH, OH25.
+
+tb303.mp3   Excerpt (54–64 s) of "The Sound of Roland TB-303 for Wikipedia" by I speak so quietly.
+            https://commons.wikimedia.org/wiki/File:The_Sound_of_Roland_TB-303_for_Wikipedia.ogg
+            Licence: CC BY-SA 4.0 — https://creativecommons.org/licenses/by-sa/4.0/
+            Changes: trimmed, faded, loudness-normalised, re-encoded to MP3. This excerpt is shared under CC BY-SA 4.0.
+
+juno60.mp3  Excerpt (0–9 s) of "JUNO-60 PWM Strings" by Raymangold22.
+            https://commons.wikimedia.org/wiki/File:JUNO-60_PWM_Strings.ogg
+            Licence: CC0 1.0 (public domain dedication).
+
+hoover.mp3  Excerpt (9.5–18.5 s) of "Juno Hoover What The patch" by Djnebula1.
+            https://commons.wikimedia.org/wiki/File:Juno_Hoover_What_The_patch.ogg
+            Licence: CC BY-SA 3.0 — https://creativecommons.org/licenses/by-sa/3.0/
+            Changes: trimmed, faded, loudness-normalised, re-encoded to MP3. This excerpt is shared under CC BY-SA 3.0.
