@@ -319,8 +319,8 @@ function render(){
 let POSTER=null;
 function rSplash(app){
   app.className='splash';
-  app.innerHTML=`<canvas id="poster"></canvas><div class="sptt"><div class="kick">Production class · a sister to Meter Lab</div><h1>Control<br><i>Room</i></h1>
-    <p>${GAMES.length} games for one room. The big screen asks, the phones answer.</p><button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
+  app.innerHTML=`<canvas id="poster"></canvas><div class="sptt"><div class="kick">Catalyst</div><h1>Control<br><i>Room</i></h1>
+    <p>The big screen asks, the phones answer.</p><button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
 
 `;
   const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
