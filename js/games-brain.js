@@ -38,21 +38,23 @@ function buildQuizDeck(o){
   return out;
 }
 game(roundGame(mcSpec({
-  id:'quiz',group:'brain',name:'The Quiz',tag:'The question on the big screen, the four answers on every phone.',
-  how:['The question shows alone for four seconds, then the answers open on the phones.','The answer is revealed when everyone has voted — and you see how the room split.','Fast right answers score more. Streaks add a bonus.'],
-  badges:['Scored','300 questions'],
+  id:'quiz',group:'brain',name:'The Quiz',tag:'The question on the big screen, the four answers on every phone. Two banks: production know-how, or studio history from the Vault.',
+  how:['Pick a bank: The Quiz (production know-how) or The Studio Vault (the stories behind famous records, rooms and machines).','The question shows alone for a few seconds, then the answers open on the phones.','Fast right answers score more. Streaks add a bonus.'],
+  badges:['Scored',`${CATS.reduce((a,c)=>a+c.qs.length,0)+Object.values(VAULT).reduce((a,v)=>a+v.length,0)} questions`],
   icon:`<svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="14" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="36" y="6" width="22" height="22" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><polygon points="20,38 34,60 6,60" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/><polygon points="47,36 60,49 47,62 34,49" fill="var(--green)" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
-    {key:'cats',type:'multi',label:'Categories',choices:CATS.map(c=>[c.id,c.name,c.sub+' · '+c.qs.length]),def:CATS.map(c=>c.id),sub:v=>`${v.cats.length} of ${CATS.length}`},
+    {key:'bank',label:'Question bank',choices:[['quiz','The Quiz',`production · ${CATS.reduce((a,c)=>a+c.qs.length,0)} qs`],['vault','The Studio Vault',`studio history · ${Object.values(VAULT).reduce((a,v)=>a+v.length,0)} qs`]],def:'quiz'},
+    {key:'cats',type:'multi',label:'Categories',show:v=>v.bank!=='vault',choices:CATS.map(c=>[c.id,c.name,c.sub+' · '+c.qs.length]),def:CATS.map(c=>c.id),sub:v=>`${v.cats.length} of ${CATS.length}`},
+    {key:'vols',type:'multi',label:'Volumes',show:v=>v.bank==='vault',choices:Object.keys(VAULT).map(k=>[k,'Volume '+k,VAULT[k].length+' questions']),def:Object.keys(VAULT),sub:v=>`${v.vols.length} of ${Object.keys(VAULT).length}`},
     {key:'n',label:'Questions',choices:[[10,'10','qs'],[15,'15','qs'],[20,'20','qs'],[30,'30','qs'],[0,'ALL','of them']],def:15},
     {key:'secs',label:'Answer time',choices:[[10,'10','seconds'],[20,'20','seconds'],[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:20,help:'Faster right answers score more: 1000 points at once, sliding to 500 at the buzzer, +100 for every answer in a streak (up to +500).'},
   ],
-  check:v=>v.cats.length?'':'Pick at least one category',
-  prepMs:4000,prepLabel:'READ',prepSub:'the question',
+  check:v=>v.bank==='vault'?(v.vols.length?'':'Pick at least one volume'):(v.cats.length?'':'Pick at least one category'),
+  prepMs:r=>r&&r.vol?5000:4000,prepLabel:'READ',prepSub:'the question',
   prepText:()=>({big:'Eyes up',small:'Read the question on the big screen. The answers appear here in a moment.'}),
-  secs:o=>o.secs,build:buildQuizDeck,roundInfo:r=>catOf(r.cat).name,
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;animateBars(m);},
+  secs:o=>o.secs,build:o=>o.bank==='vault'?buildVaultDeck(o):buildQuizDeck(o),roundInfo:r=>r.vol?'Studio Vault · Vol. '+r.vol:catOf(r.cat).name,
+  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc">${r.vol?`<div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div>`:''}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
+  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal">${r.vol?`<div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div>`:''}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;animateBars(m);},
 })));
 
 /* ---------- THE STUDIO VAULT · audio history & production trivia ---------- */
@@ -62,26 +64,11 @@ function buildVaultDeck(o){
     out.push({vol,text:q[0],...shuffledOpts(q[2],q[1])});if(o.n&&out.length>=o.n)break;}
   return out;
 }
-game(roundGame(mcSpec({
-  id:'vault',group:'brain',name:'The Studio Vault',tag:'Audio history and production trivia: the stories behind famous records, rooms and machines.',
-  how:['A story from studio history goes up on the big screen.','The four possible answers open on every phone — tap one.','The reveal shows how the room split. Fast right answers score more.'],
-  badges:['Scored',`${Object.values(VAULT).reduce((a,v)=>a+v.length,0)} questions`],
-  icon:`<svg viewBox="0 0 64 64"><rect x="4" y="6" width="56" height="52" rx="4" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><circle cx="32" cy="32" r="15" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle cx="32" cy="32" r="4" fill="var(--red)" stroke="var(--ink)" stroke-width="2"/><path d="M32 17v6M32 41v6M17 32h6M41 32h6" stroke="var(--ink)" stroke-width="3"/><rect x="50" y="20" width="6" height="24" fill="var(--yel)" stroke="var(--ink)" stroke-width="2"/></svg>`,
-  options:[
-    {key:'vols',type:'multi',label:'Volumes',choices:Object.keys(VAULT).map(v=>[v,'Volume '+v,VAULT[v].length+' questions']),def:Object.keys(VAULT),sub:v=>`${v.vols.length} of ${Object.keys(VAULT).length}`},
-    {key:'n',label:'Questions',choices:[[10,'10','qs'],[15,'15','qs'],[20,'20','qs'],[0,'ALL','of them']],def:15},
-    {key:'secs',label:'Answer time',choices:[[15,'15','seconds'],[20,'20','seconds'],[30,'30','seconds'],[0,'OFF','no clock']],def:20},
-  ],
-  check:v=>v.vols.length?'':'Pick at least one volume',
-  prepMs:5000,prepLabel:'READ',prepSub:'the story',
-  prepText:()=>({big:'Eyes up',small:'Read the question on the big screen. The answers appear here in a moment.'}),
-  secs:o=>o.secs,build:buildVaultDeck,roundInfo:r=>'Volume '+r.vol,
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div><h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><div class="dawtag">The Studio Vault · Vol. ${esc(r.vol)}</div><h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;animateBars(m);},
-})));
+
 
 /* ---------- DAW SHORTCUT SHOWDOWN ---------- */
-const keycaps=s=>s.split(/(?=[⌘⇧⌥⌃])|\+/).filter(Boolean).map(k=>`<kbd>${esc(k)}</kbd>`).join('');
+// every modifier gets its own key: "⇧⌘J" → ⇧ ⌘ J, "Ctrl+Shift+S" → Ctrl Shift S
+const keycaps=s=>String(s).split('+').flatMap(part=>{const keys=[];let rest=part.trim();while(/^[⌘⇧⌥⌃]/.test(rest)){keys.push(rest[0]);rest=rest.slice(1).trim();}if(rest)keys.push(rest);return keys;}).map(k=>`<kbd>${esc(k)}</kbd>`).join('');
 game(roundGame(mcSpec({
   id:'shortcuts',group:'brain',name:'Shortcut Showdown',tag:'Rapid-fire keyboard shortcuts. Mouse-clickers become power users.',
   how:['A DAW task flashes up on the big screen.','Pick the right shortcut from four on your phone — fast.','Ten seconds a question. Muscle memory wins.'],

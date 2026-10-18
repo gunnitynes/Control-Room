@@ -66,6 +66,7 @@ const GROUPS=[
   {id:'brain',name:'Know your stuff',short:'Know',sub:'Fast answers on your phone, big points',col:'--blue'},
   {id:'ears',name:'Train your ears',short:'Ears',sub:'The room listens, the phones answer',col:'--red'},
   {id:'make',name:'Make something',sub:'Creative sprints, generators and party games',short:'Make',col:'--yel'},
+  {id:'final',name:'The grand finale',sub:'One giant guessing game for every ear',short:'Finale',col:'--green'},
 ];
 const GAMES=[];
 function game(g){g.col=g.col||(GROUPS.find(x=>x.id===g.group)||{}).col;GAMES.push(g);return g;}
@@ -290,7 +291,7 @@ function rSetup(st){
     <section class="gintro dots"><div class="bigico">${g.icon||''}</div>
       <div class="gtitle"><div class="no">${numOf(g)}</div><h1>${esc(g.name)}</h1><p class="tag">${esc(g.tag)}</p></div>
       <ol class="how">${(g.how||[]).map(h=>`<li><span>${h}</span></li>`).join('')}</ol></section>
-    <section class="form">${(g.options||[]).map(optHTML).join('')}${g.setupExtra?g.setupExtra(v):''}
+    <section class="form">${(g.options||[]).filter(o=>!o.show||o.show(v)).map(optHTML).join('')}${g.setupExtra?g.setupExtra(v):''}
       <div class="frow"><button class="ghost" id="bBack">← Menu</button><button class="big go" id="bGo">${esc(g.startLabel||'Start')} <small>SPACE</small></button>
       <span class="fine">${online().length?online().length+' online':'Nobody online yet — phones can join any time.'}</span></div>
       ${g.note?`<p class="fine">${g.note}</p>`:''}</section></div>`;

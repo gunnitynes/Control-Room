@@ -315,7 +315,7 @@ function clipBuffer(c){if(c.src)return sampleReady(c.src);const k='my:'+c.id;if(
   return AU.smp[k]=c.blob.arrayBuffer().then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej))).catch(e=>{delete AU.smp[k];throw e;});}
 function erasPool(o){const pool={};
   if(o.src!=='synth'){Object.entries(ERA_DECADES).forEach(([d,e])=>{if(e.clips.length)pool[d]=e.clips.map(c=>({...c,kind:'real'}));});
-    MYCLIPS.list.forEach(c=>{(pool[c.dec]=pool[c.dec]||[]).push({id:c.id,blob:c.blob,title:c.name,credit:'Your clip',kind:'mine'});});}
+    MYCLIPS.list.filter(c=>c.dec>=1900).forEach(c=>{(pool[c.dec]=pool[c.dec]||[]).push({id:c.id,blob:c.blob,title:c.name,credit:'Your clip',kind:'mine'});});}
   if(o.src==='synth'||Object.keys(pool).length<4)Object.entries(ERA_SYNTH).forEach(([d,y])=>{if(!pool[d])pool[d]=[{synth:y,title:'Re-created in the browser',kind:'synth'}];});
   return pool;}
 game(roundGame({

@@ -95,8 +95,8 @@ function slotGame(spec){
   g.player=(root,st)=>{
     if(st.solo){soloPlayer(root,st);return;}
     const cards=`<div class="pbrief">${st.reels.map(([t,v],k)=>`<div class="bcard c${k}"><span class="lab">${esc(t)}</span><b>${esc(v||'?')}</b></div>`).join('')}</div>`;
-    if(st.ph==='sprint'){pClockStart(st.clock);root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}${st.title?`<h2 class="pmash">${esc(st.title)}</h2>`:''}${cards}<p class="fine">Make it. The clock is on the big screen too.</p></div>`;return;}
-    root.innerHTML=`<div class="pcol2">${st.title?`<h2 class="pmash">${esc(st.title)}</h2>`:''}${cards}
+    if(st.ph==='sprint'){pClockStart(st.clock);root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}${st.title?(()=>{const [nm,...rest]=st.title.split(' · ');return `<div class="pmashbox"><span class="lab">Your hybrid</span><h2>${esc(nm)}</h2>${rest.length?`<p>${esc(rest.join(' · '))}</p>`:''}</div>`;})():''}${cards}<p class="fine">Make it. The clock is on the big screen too.</p></div>`;return;}
+    root.innerHTML=`<div class="pcol2">${st.title?(()=>{const [nm,...rest]=st.title.split(' · ');return `<div class="pmashbox"><span class="lab">Your hybrid</span><h2>${esc(nm)}</h2>${rest.length?`<p>${esc(rest.join(' · '))}</p>`:''}</div>`;})():''}${cards}
       <button class="leverbtn" ${st.spinning?'disabled':''}><span>${st.spinning?'Spinning…':'TAP'}</span><i class="pcharge"><i style="width:${st.charge}%"></i></i></button>
       <p class="fine">Everyone taps together — the more phones, the faster it spins.</p></div>`;
     const b=$('.leverbtn',root);b.onclick=()=>{papi.send({t:'pull'});papi.vibe(12);b.classList.remove('yank');void b.offsetWidth;b.classList.add('yank');};
@@ -110,7 +110,7 @@ function soloPlayer(root,st){
   PL.slotSeen={seq:st.seq,lk:st.reels.map(r=>r.lk)};
   const head=st.ph==='sprint'?pClockHTML(st.clock):`<p class="lab">Spin ${Math.min(st.spins+(st.need==='spin'?1:0),st.max)} of ${st.max}</p>`;
   const msg={spin:st.spins?'Tap to spin the reels you haven’t kept':'Tap to spin your reels',lock:'Keep one — tap the result you want',done:'Your brief'}[st.need];
-  root.innerHTML=`<div class="pcol2 psolo">${head}${st.title?`<h2 class="pmash">${esc(st.title)}</h2>`:''}<p class="soloMsg">${esc(msg)}</p>
+  root.innerHTML=`<div class="pcol2 psolo">${head}${st.title?(()=>{const [nm,...rest]=st.title.split(' · ');return `<div class="pmashbox"><span class="lab">Your hybrid</span><h2>${esc(nm)}</h2>${rest.length?`<p>${esc(rest.join(' · '))}</p>`:''}</div>`;})():''}<p class="soloMsg">${esc(msg)}</p>
     <div class="preels">${st.reels.map((r,k)=>`<button class="preel c${k} ${r.lk?'lk':''}" data-k="${k}" ${st.need==='lock'&&!r.lk?'':'disabled'}><span class="lab">${esc(r.t)}${r.lk?' · kept':''}</span><div class="pwin"><div class="pstrip"><b>${esc(r.v||'?')}</b></div></div>${st.need==='lock'&&!r.lk?'<em>Keep this</em>':''}</button>`).join('')}</div>
     ${st.need==='spin'?'<button class="leverbtn small"><span>TAP</span></button>':st.need==='done'?`<p class="fine">${st.ph==='sprint'?'Make it!':'Look at the big screen. Your teacher starts the sprint.'}</p>`:''}</div>`;
   const tap=$('.leverbtn',root);if(tap)tap.onclick=()=>{tap.disabled=true;tap.classList.add('yank');papi.send({t:'spin'});papi.vibe(15);};
@@ -129,8 +129,11 @@ game(slotGame({
   reels:()=>[{key:'tool',title:'Tool',items:CONSTRAINTS.tool},{key:'source',title:'Source material',items:CONSTRAINTS.source},{key:'structure',title:'Structure',items:CONSTRAINTS.structure}],
 }));
 /* portmanteau: "Doo-wop" × "Hardstyle" → "Doo-style" */
-function mash(a,b){const A=a.replace(/^\d{4}s /,'').split(/[\s-]/)[0],B=b.split(/\s/).pop();const cut=w=>{const m=w.match(/^[^aeiouy]*[aeiouy]+[^aeiouy]?/i);return m?m[0]:w.slice(0,3);};
-  const tail=B.length>5?B.slice(Math.floor(B.length/2)-1):B;return (cut(A)+tail.toLowerCase()).replace(/^./,c=>c.toUpperCase());}
+function mash(a,b){const P=window.GENRE_PARTS||{a:{},b:{}};
+  const head=P.a[a]||(w=>{const m=w.match(/^[^aeiouy]*[aeiouy]+[^aeiouy]?/i);return m?m[0]:w.slice(0,3);})(a.replace(/[^A-Za-z ]/g,'').split(' ')[0]);
+  const tail=P.b[b]||b.replace(/[^A-Za-z ]/g,'').split(' ').pop().toLowerCase();
+  const name=head.replace(/(.)$/,(c)=>tail[0]&&c.toLowerCase()===tail[0]?'':c)+tail; // Grime + e… no doubled seam letters
+  return name.charAt(0).toUpperCase()+name.slice(1).toLowerCase();}
 game(slotGame({
   id:'genres',group:'make',name:'Genre Cross-Pollinator',tag:'Roll two genres that should never meet — and make them meet.',
   how:['Everyone spins on their own phone: Genre A, Genre B and any extra reels.','After each spin, keep one result — three spins, then the machine names your hybrid.','The big screen shows everyone’s hybrid. Start the sprint and make it.'],

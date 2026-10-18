@@ -842,3 +842,63 @@ kbd{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding:
 @media (max-width:380px){.ptop{gap:6px;padding-left:10px;padding-right:10px}.ptop .logo .lg{font-size:.86em}.ptop .pscore{font-size:22px;padding:4px 6px}}
 .res{grid-template-columns:minmax(0,1fr)}
 .res h2{max-width:100%;font-size:clamp(60px,24vw,160px);overflow-wrap:break-word;hyphens:manual}
+/* ---------- Genre Cross-Pollinator: the hybrid's name is the headline ---------- */
+.pmashbox{width:100%;border:3px solid var(--ink);background:var(--ink);color:var(--paper);padding:10px 12px 12px;box-shadow:5px 5px 0 var(--red);display:grid;gap:2px;text-align:center;animation:stamp2 .5s cubic-bezier(.3,1.6,.5,1) both}
+.pmashbox .lab{color:var(--yel)}
+.pmashbox h2{font:900 clamp(40px,14vw,64px)/.9 var(--disp);font-stretch:62%;text-transform:uppercase;overflow-wrap:anywhere}
+.pmashbox p{font:700 11px var(--mono);text-transform:uppercase;opacity:.8}
+.sc2t{font-size:34px!important;line-height:.9!important}
+/* ====================== THE EAR ATLAS ====================== */
+.atlas{display:flex;flex-direction:column;gap:18px;height:100%;padding:18px 26px;min-height:0}
+.athead{display:flex;align-items:center;gap:18px}
+.athead .atglyph{flex-shrink:0;background:var(--c);border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);padding:6px;width:84px;height:84px}
+.athead h2{font:900 clamp(40px,4.6vw,86px)/.86 var(--disp);font-stretch:62%;text-transform:uppercase}
+.athead .lab{display:block;margin-bottom:6px}
+.atbig{flex:1;min-height:0;display:grid;place-items:center;align-content:center;gap:16px}
+.atbpm{font:900 clamp(120px,15vw,240px)/.8 var(--disp);font-stretch:62%;color:var(--red);display:flex;align-items:baseline;gap:12px}
+.atbpm small{font:700 22px var(--mono);color:var(--ink2)}
+.atans{font:900 clamp(60px,7vw,110px)/.85 var(--disp);font-stretch:62%;text-transform:uppercase;color:var(--blue)}
+.atrev{flex:1;min-height:0;display:grid;gap:20px;align-items:center}
+.atrev.two{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.atinfo{border:3px solid var(--ink);background:var(--paper);box-shadow:6px 6px 0 var(--ink);padding:16px 18px;display:grid;gap:6px;align-content:start;animation:pop .5s .2s both}
+.atinfo>b{font:900 clamp(34px,3.6vw,60px)/.88 var(--disp);font-stretch:62%;text-transform:uppercase;color:var(--red)}
+.atinfo p{font-size:17px;line-height:1.35}
+.atinfo .credit{font:600 11px/1.35 var(--mono);color:var(--ink2)}
+.atworld{gap:8px}
+.atmap{width:100%;height:auto;display:block;background:color-mix(in srgb,var(--blue) 8%,var(--paper));border:2px solid var(--ink)}
+.atmap .land circle{fill:var(--ink3)}
+.atpin circle{fill:var(--red);stroke:var(--ink);stroke-width:4}
+.atpin .ring{fill:none;stroke:var(--red);stroke-width:5;transform-box:fill-box;transform-origin:center;animation:atring 1.6s ease-out infinite}
+@keyframes atring{from{transform:scale(.4);opacity:1}to{transform:scale(2.2);opacity:0}}
+/* keyboard: the host's note reveal and the phone's answer pad */
+.atkeys{position:relative;display:flex;width:min(760px,92%);height:min(240px,30vh);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:var(--ink)}
+.atkeys .wk{flex:1;position:relative;background:var(--paper);border:0;border-right:2px solid var(--ink);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:0 0 10px;font:900 18px var(--disp);color:var(--ink)}
+.atkeys .wk:last-of-type{border-right:0}
+.atkeys .bk{position:absolute;top:0;width:calc(100%/14);height:60%;background:var(--ink);border:2px solid var(--ink);color:var(--paper);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:6px;font:800 11px var(--disp);z-index:2}
+.atkeys .mark{background:var(--red)!important;color:var(--paper)}
+.atkeys .wk.mark span,.atkeys .bk.mark span{font-size:1.4em}
+.atkeys em{position:absolute;top:8px;font:900 14px var(--mono);font-style:normal;background:var(--yel);color:var(--ink);border:2px solid var(--ink);padding:0 5px}
+.atkeys .bk em{top:auto;bottom:30px}
+/* phone */
+.atnote,.attempo{display:grid;gap:14px;justify-items:center;width:100%}
+.atnote .atkeys{width:100%;height:190px;box-shadow:4px 4px 0 var(--ink)}
+.atnote .atkeys button{cursor:pointer}
+.atnote .atkeys .sel{background:var(--blue)!important;color:var(--paper)}
+.atnote .atkeys .wk{font-size:15px}
+.atrange{width:100%;accent-color:var(--red);height:40px}
+.attempo .snudge{display:flex;gap:10px;align-items:center;justify-content:center;width:100%}
+.attempo .snudge button{border:3px solid var(--ink);background:var(--paper);font:900 18px var(--disp);padding:10px 14px;box-shadow:3px 3px 0 var(--ink)}
+.attempo .attap{width:110px;height:110px;border-radius:50%!important;background:var(--yel)!important;font-size:30px!important}
+.attempo .attap:active{transform:scale(.94);background:var(--red)!important;color:var(--paper)}
+.atpinfo{font:800 18px var(--disp);text-align:center}
+.mysongs .songlist{display:grid;gap:6px}
+.mysongs .songrow{display:flex;gap:6px}
+.mysongs .songrow input{flex:1;min-width:0;font:700 15px var(--disp);border:2px solid var(--ink);padding:6px 8px;background:var(--paper);color:var(--ink)}
+.mysongs .addsong{justify-self:start;margin-top:6px;cursor:pointer}
+@media (max-width:900px){.atrev.two{grid-template-columns:1fr}}
+.atnote,.attempo{align-content:center;padding:12px 16px calc(16px + env(safe-area-inset-bottom))}
+.atnote .plock,.attempo .plock{width:100%;height:auto;min-height:0}
+.atbig .axplot{width:min(980px,94%);justify-self:stretch;margin:0 auto}
+.t-world .atrev.two{grid-template-columns:minmax(0,.85fr) minmax(0,1.4fr)}
+.atmap .land circle{fill:color-mix(in srgb,var(--ink) 55%,var(--paper))}
+.t-world .atrev .tiles{grid-template-columns:1fr}
