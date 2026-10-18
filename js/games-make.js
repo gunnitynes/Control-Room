@@ -325,6 +325,11 @@ game({
   },
 });
 
+// the teacher's own photos for Metaphor Translation (one object URL per photo, kept for the session)
+const META_URLS=new Map();
+const metaPhotos=()=>MYCLIPS.list.filter(c=>c.dec===-2);
+const metaURL=c=>{if(!META_URLS.has(c.id))META_URLS.set(c.id,URL.createObjectURL(c.blob));return META_URLS.get(c.id);};
+const metaTitle=f=>{const t=String(f).replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();return t?t[0].toUpperCase()+t.slice(1):'Untitled';};
 /* =====================================================================
    METAPHOR TRANSLATION — a picture becomes three production rules
    ===================================================================== */
@@ -372,10 +377,27 @@ game({
   how:['A picture appears: a parking garage at night, melting ice, neon in the rain…','On your phone, write three concrete production rules that would make it sound like that.','Everyone votes for the translation that nails the mood. Votes are points.'],
   badges:['Scored by votes','Writing'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><rect x="4" y="8" width="38" height="30" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><circle cx="16" cy="18" r="5" fill="var(--yel)"/><path d="M4 38 L18 26 L28 34 L42 22 L42 38 Z" fill="var(--green)" stroke="var(--ink)" stroke-width="2.5"/><path d="M46 44 q4 -8 8 0 t8 0" fill="none" stroke="var(--red)" stroke-width="4"/><path d="M38 52 q4 -8 8 0 t8 0" fill="none" stroke="var(--ink)" stroke-width="4"/></svg>`,
-  options:[{key:'n',label:'Pictures',choices:[[1,'1'],[2,'2'],[3,'3']],def:2},{key:'secs',label:'Writing time',choices:[[120,'2','min'],[180,'3','min'],[300,'5','min']],def:180},{key:'vsecs',label:'Voting time',choices:[[45,'45','sec'],[60,'60','sec'],[90,'90','sec']],def:60}],
-  note:'The pictures are painted live by the app. You can also add your own images on the next screen, or list photos in data/content.js (SCENES → src).',
+  options:[{key:'pics',label:'Pictures from',choices:[['mine','Your photos','saved in this browser'],['both','Yours + painted','mixed together'],['art','Painted','drawn by the app']],def:'mine'},
+    {key:'n',label:'Pictures',choices:[[1,'1'],[2,'2'],[3,'3'],[4,'4'],[5,'5']],def:2},{key:'secs',label:'Writing time',choices:[[120,'2','min'],[180,'3','min'],[300,'5','min']],def:180},{key:'vsecs',label:'Voting time',choices:[[45,'45','sec'],[60,'60','sec'],[90,'90','sec']],def:60}],
+  note:'Add your own photographs below: they are saved in this browser only (never uploaded), and the phones only see the title. Without photos, the app paints its own pictures.',
+  // the teacher's photo library: images in this browser's IndexedDB (the clips store, dec −2), title = what the phones see
+  setupExtra(v){const P=metaPhotos();
+    return `<div class="fsec myphotos"><h3><b>▣</b>Your photos<small>${P.length} saved · stay in this browser · the title shows on the phones</small></h3>
+      <div class="phgrid">${P.map(c=>`<figure class="phcell"><img src="${esc(metaURL(c))}" alt=""><input value="${esc(c.name)}" data-id="${esc(c.id)}" aria-label="Photo title"><button class="ghost" data-del="${esc(c.id)}" aria-label="Remove">×</button></figure>`).join('')}
+        <label class="phadd"><input type="file" accept="image/*" multiple hidden><b>+</b><span>Add photos</span><small>or drop them here</small></label></div></div>`;},
+  setupBind(st,redraw){const box=$('.myphotos',st);if(!box)return;
+    const add=async files=>{let n=0;for(const f of files){if(!f.type.startsWith('image/'))continue;if(f.size>25e6){toast(f.name+' is over 25 MB');continue;}
+        await clipDB.put({id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),dec:-2,name:metaTitle(f.name),blob:f,at:Date.now()+n++});}
+      await loadMyClips();if(n)toast(n+' photo'+(n===1?'':'s')+' saved in this browser');redraw();};
+    const inp=$('.phadd input',box);inp.onchange=()=>add([...inp.files]);
+    const dz=$('.phadd',box);dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};dz.ondragleave=()=>dz.classList.remove('over');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');add([...e.dataTransfer.files]);};
+    $$('.phcell input',box).forEach(i=>i.onchange=async()=>{const c=MYCLIPS.list.find(x=>x.id===i.dataset.id);if(!c)return;await clipDB.put({...c,name:i.value.trim()||c.name});await loadMyClips();toast('Title saved');});
+    $$('.phcell [data-del]',box).forEach(b=>b.onclick=async()=>{if(!confirm('Remove this photo from this browser?'))return;await clipDB.del(b.dataset.del);await loadMyClips();redraw();});},
   topInfo(){const s=G.gs;return !s?this.tag:s.phase==='brief'?'Pick the pictures':`Picture ${s.i+1} of ${s.scenes.length} · ${({show:'look',write:'write',vote:'vote',result:'results'})[s.phase]||''}`;},
-  start(o){G.gs={o,phase:'brief',scenes:shuffle(SCENES).slice(0,o.n),custom:[],i:-1,subs:new Map(),votes:new Map(),hidden:new Set()};},
+  start(o){const mine=metaPhotos().map(c=>({title:c.name,src:metaURL(c),mine:true}));
+    if(o.pics==='mine'&&!mine.length)toast('No photos saved yet: using painted pictures');
+    const pool=o.pics==='art'||!mine.length?SCENES:o.pics==='both'?[...mine,...SCENES]:mine;
+    G.gs={o,phase:'brief',scenes:shuffle(pool).slice(0,o.n),custom:[],i:-1,subs:new Map(),votes:new Map(),hidden:new Set()};},
   go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
     if(ph==='show'){s.i++;s.subs=new Map();s.votes=new Map();s.hidden=new Set();sfx.whoosh();later(()=>{if(G.gs===s&&s.phase==='show')this.go('write');},9000);}
     if(ph==='write')startClock(s.o.secs*1000,()=>this.go('vote'));
@@ -390,7 +412,7 @@ game({
     if(d.t==='sub'&&s.phase==='write'&&Array.isArray(d.rules)){const rules=d.rules.map(x=>String(x||'').trim().slice(0,90)).filter(Boolean).slice(0,3);if(!rules.length)return;if(!s.subs.has(p.id))logAdd(p,{kind:'rules',game:this.name,title:s.scenes[s.i]?s.scenes[s.i].title:'',text:rules.map((r,k)=>`${k+1}. ${r}`).join('\n')});s.subs.set(p.id,rules);sfx.inn();const e=$('#nSubs');if(e)e.textContent=s.subs.size;sync(p);
       if(online().every(x=>s.subs.has(x.id)))later(()=>{if(G.gs===s&&s.phase==='write')this.go('vote');},1200);}
     if(d.t==='vote'&&s.phase==='vote'&&s.subs.has(d.id)&&d.id!==p.id){s.votes.set(p.id,d.id);sfx.vote();const e=$('#nVotes');if(e)e.textContent=s.votes.size;sync(p);}},
-  imgHTML(sc){return sc.src?`<img class="scimg" src="${esc(sc.src)}" alt="">`:`<canvas class="scimg" data-art="${esc(sc.art)}"></canvas>`;},
+  imgHTML(sc){return sc.src?`<img class="scimg${sc.mine?' photo':''}" src="${esc(sc.src)}" alt="">`:`<canvas class="scimg" data-art="${esc(sc.art)}"></canvas>`;},
   render(st){
     const s=G.gs;
     if(s.phase==='end'){rPodium(st,{title:'Best translators'});return;}

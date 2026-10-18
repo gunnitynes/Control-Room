@@ -62,8 +62,9 @@ Phones and the host keep old files otherwise.
   Control Room); the host sends them with `pcSend(player, msg)`. No answer counts as "busy"; students can sit out.
 - Phones: tapping the logo opens Add to Home Screen (manifest.webmanifest, sw.js, icons/). The splash shows the join
   QR as art (`artQR`, error correction H; check scannability with jsQR after changing it).
-- Teacher-uploaded clips (Chronologist decades, Ear Atlas songs) live in IndexedDB on the host only
-  (`clipDB`, `MYCLIPS`; songs use `dec:-1`). They are never uploaded anywhere.
+- Teacher-uploaded clips and photos (Chronologist decades, Ear Atlas songs, Metaphor Translation photos) live in IndexedDB on
+  the host only (`clipDB`, `MYCLIPS`; songs use `dec:-1`, photos `dec:-2`). They are never uploaded anywhere. Copyrighted
+  photos belong there, not in the repo.
 - Class list + attendance: see `integrations/attendance/README.md`. No sheet is built in: each teacher connects their own
   Apps Script web app on the main menu (`attUrl()`, stored per browser as `att.url`).
 - **Lobby per teacher**: `controlroom-lobby-<teacher name>` (asked once on the host, `teacher` in localStorage; computers use

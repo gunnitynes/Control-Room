@@ -1253,3 +1253,15 @@ body:has(#app.guidepage){overflow:auto}
 /* guide footer: the three shapes sized to their own box, with room above the closing line */
 .ghshapes.small{width:170px;height:180px;margin:0 auto 18px}
 .ghshapes.small i:nth-child(3){border-left-width:78px;border-bottom-width:96px;right:20%;top:44%}
+/* Metaphor Translation: the teacher's own photos */
+.phgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.phcell{position:relative;margin:0;display:grid;gap:6px;border:3px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--ink);padding:6px}
+.phcell img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border:2px solid var(--ink);background:#222}
+.phcell input{font:700 13px var(--disp);border:2px solid var(--ink);padding:4px 6px;background:#fff;color:#161514;min-width:0}
+.phcell [data-del]{position:absolute;top:10px;right:10px;width:28px;height:28px;padding:0;background:var(--paper);font-size:16px;line-height:1}
+.phadd{display:grid;place-items:center;align-content:center;gap:2px;min-height:150px;border:3px dashed var(--ink);cursor:pointer;text-align:center;padding:10px}
+.phadd b{font:900 44px/1 var(--disp);color:var(--red)}.phadd span{font:900 16px var(--disp);text-transform:uppercase}.phadd small{font:700 10px var(--mono);text-transform:uppercase;color:var(--ink2)}
+.phadd.over{background:color-mix(in srgb,var(--yel) 35%,var(--paper))}
+/* real photographs are shown whole (no cropping), on black */
+.mimg .scimg.photo{object-fit:contain;background:#0d0d0c}
+.mthumbs .scimg.photo{object-fit:contain;background:#0d0d0c}
