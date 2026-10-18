@@ -114,7 +114,7 @@ async function openRoom(code){
   return new Promise(res=>{
     const tryOpen=left=>{
       G.code=code||newCode();const peer=new Peer(peerId(G.code),{debug:0});G.peer=peer;
-      peer.on('open',()=>{G.status='';saveRoom();if(!G.splash)render();else splashQR();res(true);});
+      peer.on('open',()=>{G.status='';saveRoom();startLobby();if(!G.splash)render();else splashQR();res(true);});
       peer.on('error',e=>{
         if(e.type==='unavailable-id'&&left>0){peer.destroy();if(code)setTimeout(()=>tryOpen(left-1),1500);else tryOpen(left-1);return;}
         if(e.type==='peer-unavailable')return;
@@ -189,6 +189,18 @@ function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)retur
   if(!e||e.dead){const conn=G.peer.connect('cadcast-pc-'+pc,{serialization:'json',reliable:true});e={conn,q:[],dead:false};PCC.set(pc,e);
     conn.on('open',()=>{e.q.forEach(m=>{try{conn.send(m);}catch(x){}});e.q=[];});conn.on('close',()=>{e.dead=true;});conn.on('error',()=>{e.dead=true;});}
   if(e.conn.open){try{e.conn.send(msg);}catch(x){e.q.push(msg);}}else e.q.push(msg);return true;}
+/* ---------- the class lobby: a fixed relay address (controlroom-lobby-<CLASS_KEY>) that tells any device which
+   room is open right now. The CADCAST computer page puts it in its QR; a phone without a room asks it too. */
+const lobbyId=()=>{const k=String(window.CLASS_KEY||'').toLowerCase().replace(/[^a-z0-9]/g,'');return k?'controlroom-lobby-'+k:'';};
+function startLobby(){const id=lobbyId();if(!id||!window.Peer||(G.lobbyPeer&&!G.lobbyPeer.destroyed))return;
+  const lp=new Peer(id,{debug:0});G.lobbyPeer=lp;
+  lp.on('connection',c=>{c.on('data',m=>{if(m&&m.t==='room?')try{c.send({t:'room',code:G.code});}catch(e){}});c.on('error',()=>{});});
+  lp.on('error',e=>{if(e.type==='unavailable-id')setTimeout(()=>{if(G.lobbyPeer===lp){lp.destroy();G.lobbyPeer=null;startLobby();}},20000);});   // another host tab holds it
+  lp.on('disconnected',()=>{setTimeout(()=>{if(!lp.destroyed)try{lp.reconnect();}catch(e){}},1500);});}
+async function lobbyRoom(){const id=lobbyId();if(!id)return null;try{await needPeer();}catch(e){return null;}
+  return new Promise(res=>{const p=new Peer({debug:0});let done=false;const fin=v=>{if(done)return;done=true;res(v);setTimeout(()=>{try{p.destroy();}catch(e){}},500);};
+    setTimeout(()=>fin(null),9000);p.on('error',e=>{if(e.type==='peer-unavailable')fin(null);});
+    p.on('open',()=>{const c=p.connect(id,{serialization:'json',reliable:true});c.on('open',()=>c.send({t:'room?'}));c.on('data',m=>{if(m&&m.t==='room'&&m.code)fin(String(m.code).toUpperCase());});});});}
 function resetPoints(){if(!confirm('Reset everyone’s total points to zero?'))return;players().forEach(p=>{p.total=0;p.gp=0;});saveRoom();render();syncAll();}
 function uniqueName(name,id,max=30){
   name=String(name||'').replace(/\s+/g,' ').trim().slice(0,max)||'Player';let n=name,k=2;
@@ -200,6 +212,7 @@ function hostData(conn,m){
   if(m.t==='ping'){try{conn.send({t:'pong'});}catch(e){}return;}
   if(m.t==='who'){G.lobby.add(conn);try{conn.send(namesMsg());}catch(e){}return;}
   if(m.t==='pair'){cadcastPair(conn,m);return;}
+  if(m.t==='vote'){const p=players().find(x=>x.conn===conn);if(p&&G.view==='vote'&&V)voteAct(p,m);return;}
   if(m.t==='hi'){
     const id=String(m.id||'').slice(0,40);if(!id)return;
     if(G.banned.has(id)){try{conn.send({t:'kick'});}catch(e){}setTimeout(()=>conn.close(),300);return;}
@@ -214,15 +227,16 @@ function hostData(conn,m){
     else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
     attCheckIn(p);lobbyNames();
     sync(p);sendLog(p);saveRoom();
-    if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else render();
+    if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else if(G.view==='vote'){voteLive();syncAll();}else render();
     return;
   }
   if(m.t==='act'){const p=players().find(x=>x.conn===conn);if(!p||G.view!=='play'||!G.game||m.g!==G.game.id)return;G.game.act(p,m.d||{});}
 }
 function stateFor(p){
   const rk=rankBy('total').map,g=G.game&&G.view!=='menu'?G.game:null;
-  const m={t:'st',name:p.name,total:p.total||0,rank:rk.get(p.id)||0,of:G.players.size,view:G.view==='play'?'play':'menu',g:g?g.id:null,gname:g?g.name:''};
-  if(G.view==='play'){try{m.s=G.game.pstate(p);}catch(e){console.error(e);m.s={k:'err'};}}
+  const m={t:'st',name:p.name,total:p.total||0,rank:rk.get(p.id)||0,of:G.players.size,view:G.view==='play'?'play':G.view==='vote'&&V?'vote':'menu',g:g&&G.view!=='vote'?g.id:null,gname:g?g.name:''};
+  if(G.view==='vote'&&V)m.s=voteState(p);
+  else if(G.view==='play'){try{m.s=G.game.pstate(p);}catch(e){console.error(e);m.s={k:'err'};}}
   return m;
 }
 function sync(p){if(p.conn&&p.conn.open)try{p.conn.send(stateFor(p));}catch(e){}}
@@ -231,13 +245,14 @@ function kick(id){const p=G.players.get(id);if(!p)return;G.banned.add(id);if(p.c
 function liveUpdate(){
   const n=$('#nOn');if(n)n.textContent=online().length;
   if(G.view==='play'&&G.game&&G.game.live)G.game.live();
+  if(G.view==='vote')voteLive();
 }
 
 /* ---------- views ---------- */
 function topBar(){
-  const g=G.game,inG=G.view!=='menu'&&g;
+  const g=G.game,inG=G.view!=='menu'&&G.view!=='vote'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
-    :`<div class="cat"><div><b>Main menu</b><span>${GAMES.length} games · pick one</span></div></div>`;
+    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:`<div class="cat"><div><b>Main menu</b><span>${GAMES.length} games · pick one</span></div></div>`;
   const room=G.code&&G.view!=='menu'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button><div><b>${G.code}</b><span>join any time</span></div></div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}</div><div class="tright">${room}<div class="count"><b id="nOn">${online().length}</b><span>online</span></div>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
@@ -251,13 +266,13 @@ function render(){
   if(G.splash){rSplash(app);return;}
   app.innerHTML=topBar()+`<main class="stage" id="stage"></main>`;
   const st=$('#stage');
-  try{if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
+  try{if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
-  home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
+  home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
   const mq=$('#miniQR');if(mq){drawQR(mq,G.code,160);mq.onclick=()=>showBigQR(G.code);}
 }
 /* splash: the original Control Room poster — faders breathing like a live mix,
@@ -309,15 +324,15 @@ function rMenu(st){
       <div class="rhead2"><b>${ps.length}</b><span>${ps.length===1?'player':'players'} in the room</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
-      <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
+      <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button><a class="ghost" href="?guide" target="_blank" rel="noopener">Guide</a></div>
     </aside>
-    <section class="games">${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b><span>${esc(gr.sub)}</span></div>
+    <section class="games"><button class="votebn" id="bVote"><span class="vbshapes">${shape(0,40,'var(--ink)','var(--red)')}${shape(1,40,'var(--ink)','var(--blue)')}${shape(2,40,'var(--ink)','var(--yel)')}</span><span class="vbt"><small>Let the room decide</small><b>Vote on the next game</b></span><span class="vbgo">Open the ballot →</span></button>${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b><span>${esc(gr.sub)}</span></div>
       <div class="gtiles">${GAMES.filter(g=>g.group===gr.id).map(g=>`<button class="gt" data-g="${g.id}" style="--c:var(${g.col})"><span class="no">${numOf(g)}</span><span class="ico">${g.icon||''}</span><strong>${esc(g.name)}</strong><p>${esc(g.tag)}</p><span class="meta">${(g.badges||[]).map(b=>`<span>${esc(b)}</span>`).join('')}</span></button>`).join('')}</div></div>`).join('')}</section>
   </div>`;
   if(G.code){drawQR($('#roomQR'),G.code,480);$('#roomQR').onclick=()=>showBigQR(G.code);}
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
-  $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
+  $('#bVote').onclick=voteGames;$('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
   if($('#selCls'))$('#selCls').onchange=e=>attSetClass(e.target.value);
 }
 
@@ -362,7 +377,8 @@ function startGame(g,v){
 function exitGame(force){
   if(G.view==='menu')return;
   if(!force&&G.view==='play'&&G.gs&&!(G.gs.phase==='end')&&!confirm('Leave this game and go back to the menu? Points won so far are kept.'))return;
-  try{G.game&&G.game.stop&&G.game.stop();}catch(e){}
+  if(G.view==='play')try{G.game&&G.game.stop&&G.game.stop();}catch(e){}
+  if(typeof V!=='undefined')V=null;
   clearLater();AU_stopAll();G.view='menu';G.gs=null;saveRoom();render();syncAll();
 }
 
@@ -598,12 +614,15 @@ function pData(m){
   if(!m||typeof m!=='object'||m.t==='pong')return;
   if(m.t==='log'){const had=(PL.log||[]).length;PL.log=Array.isArray(m.log)?m.log:[];const b=$('.nbcount');if(b){b.textContent=PL.log.length;if(PL.log.length>had){const n=$('#nbBtn');if(n){n.classList.remove('ping');void n.offsetWidth;n.classList.add('ping');}}}if($('#nb'))openNotebook();return;}
   if(m.t==='names'){PL.names=m;if(!PL.joined)pRender();return;}
+  if(m.t==='paired'){showPaired(m);return;}
   if(m.t==='clock'){if(PL.timer){PL.timer.end=now()+(+m.left||0);PL.timer.frozen=m.paused?(+m.left||0):null;}return;}
   if(m.t==='taken'){PL.joined=false;PL.st=null;store.del('proom');PL.status=m.name+' is already in the room on another phone. Tell your teacher if that isn’t you.';pRender();return;}
   if(m.t==='kick'){PL.kicked=true;PL.st={view:'kicked',why:m.why};try{PL.conn.close();}catch(e){}pRender();return;}
   if(m.t!=='st')return;
+  if(PL.pairPc&&PL.joined&&m.view!=='kicked'&&PL.conn&&PL.conn.open){const pc=PL.pairPc;PL.pairPc=null;try{PL.conn.send({t:'pair',id:PL.id,pc});}catch(e){PL.pairPc=pc;}}
   const prev=PL.st;PL.st=m;PL.name=m.name;if(m.name&&m.view!=='kicked'&&store.get('pname','')!==m.name)store.set('pname',m.name);
   const key=m.view+'|'+m.g+'|'+(m.s?m.s.k:'');
+  if(prev&&key===PL.key&&m.view==='vote'){const top=$('.pscore');if(top)top.textContent=m.total;pVoteUpdate($('#pbody'),m.s);return;}
   if(prev&&key===PL.key&&m.view==='play'){const g=gameById(m.g);const top=$('.pscore');if(top)top.textContent=m.total;if(g&&g.pupdate)g.pupdate($('#pbody'),m.s,papi);return;}
   if(m.view==='play'&&m.s&&m.s.ph==='reveal'&&navigator.vibrate)navigator.vibrate(m.s.cls==='yes'?[40,40,40]:120);
   pRender();
@@ -617,6 +636,7 @@ function pRender(){
   if($('#nbBtn'))$('#nbBtn').onclick=openNotebook;
   const lg=$('.ptop .logo');if(lg){lg.onclick=openInstall;if(!isStandalone())lg.insertAdjacentHTML('beforeend','<i class="appbadge" aria-label="Add to home screen">＋</i>');}
   const body=$('#pbody');PL.key='';PL.timer=null;PL.clock=null;
+  setTimeout(()=>{const gb=$('#pGuide');if(gb)gb.onclick=openGuide;},0);
   if(!PL.joined&&PL.names&&PL.names.names.length&&!PL.typing){
     const L=PL.names.names.slice().sort((a,b)=>a.n.localeCompare(b.n));
     body.innerHTML=`<div class="pjoin pwho"><h1>Who<br><i>are you?</i></h1><p class="lab">${esc(PL.names.cls)} · room ${esc(PL.code)}</p>
@@ -628,7 +648,7 @@ function pRender(){
     $('#pType').onclick=()=>{PL.typing=true;pRender();};
     return;
   }
-  if(!PL.joined&&PL.code&&QS.has('room')&&!PL.names&&!PL.typing&&!/No room/.test(PL.status||'')){
+  if(!PL.joined&&PL.code&&(QS.has('room')||QS.has('pair'))&&!PL.names&&!PL.typing&&!/No room/.test(PL.status||'')){
     body.innerHTML=`<div class="pcenter"><h2 class="pul">Room ${esc(PL.code)}</h2><p>${esc(PL.status||'Connecting…')}</p><button class="linkbtn" id="pType">Type my name instead</button></div>`;
     $('#pType').onclick=()=>{PL.typing=true;pRender();};return;
   }
@@ -649,6 +669,7 @@ function pRender(){
   if(s.view==='kicked'){body.innerHTML=`<div class="pcenter"><h2>${s.why==='closed'?'Room closed':'Removed'}</h2><p>${s.why==='closed'?'The host started a new room. Scan the new code to join again.':'The host removed you from this room.'}</p></div>`;return;}
   PL.key=s.view+'|'+s.g+'|'+(s.s?s.s.k:'');
   if(PL.synH&&!(s.view==='play'&&s.g==='telephone')&&typeof synStop==='function')synStop();
+  if(s.view==='vote'&&s.s){pVote(body,s.s);return;}
   if(s.view==='play'){
     const g=gameById(s.g);if(!g){body.innerHTML=`<div class="pcenter"><h2>Update</h2><p>Reload this page to get the newest version of the games.</p></div>`;return;}
     try{g.player(body,s.s,papi);}catch(e){console.error(e);body.innerHTML=`<div class="pcenter"><h2>Hmm</h2><p>${esc(e.message)}</p></div>`;}
@@ -658,27 +679,14 @@ function pRender(){
   body.innerHTML=`<div class="pcenter dots idle"><div class="idlefig">${shape(0,64,'var(--ink)','var(--red)')}${shape(1,64,'var(--ink)','var(--blue)')}${shape(2,64,'var(--ink)','var(--yel)')}</div>
     <h2>${s.g?'Next up':'You’re in'}</h2>${s.g?`<p class="nextg">${esc(s.gname)}</p>`:''}
     <p>${s.g?'The game starts in a moment.':`Look for <b>${esc(s.name)}</b> on the big screen. The next game starts soon.`}</p>
+    <button class="guidebtn" id="pGuide"><span>Guide to the</span><b>Control Room</b><i>→</i></button>
     ${s.total?`<p class="lab">Room total · ${s.total} pts · ${ordinal(s.rank)} of ${s.of}</p>`:''}${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>`;
 }
-/* the phone scanned a computer's CADCAST code: vouch for it through the room's host, then get out of the way */
-async function pairPage(){
-  const pc=String(QS.get('pair')||'').replace(/[^a-z0-9]/gi,'').slice(0,24),code=String(store.get('proom','')||'').toUpperCase(),name=store.get('pname','');
-  const app=$('#app');app.className='ply';
-  const show=(h,p,cls='')=>{app.innerHTML=`<header class="ptop">${logo()}</header><main class="pbody"><div class="pcenter dots pairp ${cls}">${h}${p}</div></main>`;};
-  if(!code||!name)return show('<h2>Join the room first</h2>','<p>Scan the QR code on the big screen and pick your name. Then scan your computer’s code again.</p>','bad');
-  show(`<div class="pairspin"></div><h2>Connecting your computer</h2>`,`<p>as <b>${esc(name)}</b> · room ${esc(code)}</p>`);
-  const fail=why=>show('<h2>Not connected</h2>',`<p>${esc(why)}</p><p class="fine">Scan your computer’s code to try again.</p>`,'bad');
-  try{await needPeer();}catch(e){return fail('No internet connection.');}
-  const peer=new Peer({debug:0});let done=false;const to=setTimeout(()=>{if(!done)fail(`Could not reach room ${code}. Is Control Room open on the teacher’s Mac?`);},12000);
-  peer.on('error',e=>{if(!done&&e.type==='peer-unavailable'){done=true;clearTimeout(to);fail(`Room ${code} is closed. Scan the big screen to join the new room.`);}});
-  peer.on('open',()=>{const c=peer.connect(peerId(code),{serialization:'json',reliable:true});
-    c.on('open',()=>c.send({t:'pair',id:PL.id,pc}));
-    c.on('data',m=>{if(!m||m.t!=='paired')return;done=true;clearTimeout(to);
-      if(!m.ok)return fail(m.why||'The teacher’s Mac said no.');
-      if(navigator.vibrate)navigator.vibrate([30,40,30]);
-      show(`<div class="paircheck">✓</div><h2>Your computer is now</h2><div class="pairname">${esc(m.name)}</div>`,'<p>It connects to the teacher’s patch bay by itself. You can close this tab.</p>','ok');
-      setTimeout(()=>{try{peer.destroy();}catch(e){}},2000);});});
-}
+/* the computer that was scanned is now this student's: a short confirmation card over whatever is on screen */
+function showPaired(m){let ov=$('#paired');if(!ov){ov=el('div','pairedov');ov.id='paired';document.body.appendChild(ov);}
+  ov.innerHTML=m.ok?`<div class="pairedcard"><div class="paircheck">✓</div><span class="lab">Your computer is now</span><div class="pairname">${esc(m.name)}</div><p>It sends your sound to the teacher and gets your files.</p></div>`
+    :`<div class="pairedcard bad"><div class="paircheck">!</div><span class="lab">Computer not connected</span><p>${esc(m.why||'Scan its code again.')}</p></div>`;
+  if(navigator.vibrate)navigator.vibrate(m.ok?[30,40,30]:200);ov.onclick=()=>ov.remove();clearTimeout(showPaired.t);showPaired.t=setTimeout(()=>ov.remove(),m.ok?4200:7000);}
 /* ---------- Add to Home Screen (tap the logo on a phone) ---------- */
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.__bip=e;});
@@ -707,10 +715,10 @@ function openNotebook(){
   const sec=([k,label,ic])=>{const items=L.filter(e=>e.kind===k||(k==='finish'&&e.kind==='finish'));if(!items.length)return '';
     return `<section class="nbsec"><h3><i>${ic}</i>${esc(label)}<em>${items.length}</em></h3>${items.map(e=>`<article><span class="lab">${esc(e.game||'')}${e.at?' · '+new Date(e.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</span>${e.title?`<b>${esc(e.title)}</b>`:''}<p>${esc(e.text||'').replace(/\n/g,'<br>')}</p></article>`).join('')}</section>`;};
   const body=NB_KINDS.filter(k=>k[0]!=='star').map(sec).join('')+sec(NB_KINDS.find(k=>k[0]==='star'));
-  ov.innerHTML=`<div class="nbpanel"><header><div><span class="lab">This session</span><h2>Your notebook</h2></div><button class="ghost" id="nbX">Close</button></header>
+  ov.innerHTML=`<div class="nbpanel"><header><div><span class="lab">This session</span><h2>Your notebook</h2></div><div class="nbhbtns"><button class="ghost" id="nbGuide">Guide</button><button class="ghost" id="nbX">Close</button></div></header>
     <div class="nbstats"><div><b>${s.total||0}</b><span>points</span></div><div><b>${s.rank?ordinal(s.rank):'—'}</b><span>in the room</span></div><div><b>${L.length}</b><span>entries</span></div></div>
     <div class="nbbody">${body||'<p class="nbempty">Nothing yet. Your briefs, rules, kept picks and milestones collect here as the lesson goes on.</p>'}</div></div>`;
-  $('#nbX').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  $('#nbX').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove();};$('#nbGuide').onclick=()=>{ov.remove();openGuide();};
 }
 function pFrame(){
   const c=PL.clock;if(c){const left=Math.max(0,c.end-now());$$('.pclk').forEach(e=>e.textContent=fmtClock(left));$$('.pclkbar i').forEach(e=>e.style.width=(100*left/c.T)+'%');}
@@ -720,6 +728,7 @@ function pFrame(){
 
 /* ---------- boot ---------- */
 function boot(){
+  if(QS.has('guide')){const app=$('#app');app.className='guidepage';app.innerHTML=guideHTML();return;}
   document.addEventListener('keydown',e=>{
     if(ROLE!=='host'||G.splash||e.target.closest('input,textarea,select'))return;
     if(e.key==='Escape'){const o=$('#qrbig');if(o)o.remove();return;}
@@ -739,7 +748,13 @@ function boot(){
     openRoom(s&&Date.now()-s.t<12*3600e3?s.code:null).then(async ok=>{if(!ok&&s){try{G.peer&&G.peer.destroy();}catch(e){}await openRoom();}render();});
     addEventListener('beforeunload',e=>{if(G.view==='play'){e.preventDefault();e.returnValue='';}});
   }else{
-    if(QS.has('pair')){pairPage();requestAnimationFrame(frame);return;}
+    if(QS.has('pair')){ // scanned a computer's CADCAST code: log in here, and the computer comes along
+      PL.pairPc=String(QS.get('pair')||'').replace(/[^a-z0-9]/gi,'').slice(0,24);
+      const go=code=>{PL.code=code;try{history.replaceState(null,'',location.pathname+'?room='+code+(QS.get('as')?'&as='+QS.get('as'):''));}catch(e){}
+        if(PL.name&&store.get('proom','')===code)PL.joined=true;PL.status='';pConnect();pRender();};
+      const r=String(QS.get('room')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
+      if(r.length===4)go(r);else{PL.status='Finding your class…';pRender();lobbyRoom().then(c=>{if(c)go(c);else{PL.status='Control Room isn’t open on the teacher’s Mac yet. Scan again in a moment.';pRender();}});}
+      requestAnimationFrame(frame);return;}
     const u=QS.get('room');PL.code=(u||store.get('proom','')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);
     if(u&&PL.name&&store.get('proom','')===PL.code){PL.joined=true;pConnect();}
     else if(u&&PL.code.length===4)pConnect(); // connect first, so the class list can arrive before the student picks a name

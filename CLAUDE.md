@@ -22,6 +22,8 @@ js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Prese
 js/games-make.js    Make something: Constraint Generator, Genre Cross-Pollinator, Soundabout Roundabout,
                     Metaphor Translation, and Parameter Telephone (shown under Train your ears, slot 10)
 js/games-atlas.js   The Ear Atlas (in Know your stuff, after The Translation Grid)
+js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
+js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
 audio/              demo song, eras/, atlas/ (piano, inst, world), presets/; each set has a CREDITS.txt
 meterlab/           copy of Meter Lab with an ?embed mode exposing window.MLAPI
 tools/              scripts that build the audio clips from Wikimedia Commons (see tools/README.md)
@@ -58,10 +60,19 @@ Phones and the host keep old files otherwise.
 - Teacher-uploaded clips (Chronologist decades, Ear Atlas songs) live in IndexedDB on the host only
   (`clipDB`, `MYCLIPS`; songs use `dec:-1`). They are never uploaded anywhere.
 - Class list + attendance: see `integrations/attendance/README.md`.
-- CADCAST pairing (sister repo gunnitynes/CADCAST): a student's computer opens gunnitynes.github.io/CADCAST/go and
-  shows a QR → `?pair=<pc id>` here. `pairPage()` (phone) sends `{t:'pair', id, pc}` to the host; `cadcastPair()`
-  (host) writes `controlroom.cadcast.allow`, tells the computer `{t:'paired', name, desk:'cadcast-desk-<room>'}`
-  over PeerJS. The CADCAST patch bay (same site, same Chrome) reads the room code and allow-list from localStorage.
+- **Login = CADCAST first** (sister repo gunnitynes/CADCAST). Each student computer shows
+  gunnitynes.github.io/CADCAST/go (a QR card on the desk links there). It asks the **lobby** peer
+  `controlroom-lobby-<CLASS_KEY>` (content.js; the host registers it on open, answers `{t:'room?'}` with the code)
+  and draws a QR → `?pair=<pc id>&room=<code>` here. The phone scans it, taps its name (the normal join), and once
+  joined sends `{t:'pair', id, pc}`; `cadcastPair()` (host) writes `controlroom.cadcast.allow` and tells the computer
+  `{t:'paired', name, desk}`; the phone gets `{t:'paired'}` and shows "Your computer is now NAME". One scan signs the
+  student into both. Joining via the room QR still works on its own. The patch bay reads room + allow-list from
+  localStorage (same site, same Chrome).
+- **Room vote** (js/vote.js): `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
+  `{t:'vote', v}` (not `act`). Votes are by player id and only count while the player is in the room. Close → 3-2-1 →
+  winner card (ties: a spotlight picks one). Reuse it with `openVote({title, sub, kind:'text', opts:[{v,l,s,c}], win:{go, fn}})`.
+- **Guide** (js/guide.js, copy in `GUIDE` in content.js): `?guide` is a standalone page; `openGuide()` overlays it
+  (phone idle screen, notebook header, host room panel). Cards come from `GAMES`; variation chips from game options.
 
 ## Audio and licences
 
