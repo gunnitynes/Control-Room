@@ -47,7 +47,7 @@ game(roundGame(mcSpec({
     {key:'cats',type:'multi',label:'Categories',show:v=>v.bank!=='vault',choices:CATS.map(c=>[c.id,c.name,c.sub+' · '+c.qs.length]),def:CATS.map(c=>c.id),sub:v=>`${v.cats.length} of ${CATS.length}`},
     {key:'vols',type:'multi',label:'Volumes',show:v=>v.bank==='vault',choices:Object.keys(VAULT).map(k=>[k,'Volume '+k,VAULT[k].length+' questions']),def:Object.keys(VAULT),sub:v=>`${v.vols.length} of ${Object.keys(VAULT).length}`},
     {key:'n',label:'Questions',choices:[[10,'10','qs'],[15,'15','qs'],[20,'20','qs'],[30,'30','qs'],[0,'ALL','of them']],def:15},
-    {key:'auto',label:'Next question',choices:[[0,'Manual','you click Next'],[6,'6','seconds'],[10,'10','seconds'],[15,'15','seconds']],def:10,help:'After the answer shows, the next question starts by itself. Click the ring (or press P) to pause any clock.'},
+    AUTO_OPT,
     {key:'secs',label:'Answer time',choices:[[10,'10','seconds'],[20,'20','seconds'],[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:20,help:'Faster right answers score more: 1000 points at once, sliding to 500 at the buzzer, +100 for every answer in a streak (up to +500).'},
   ],
   check:v=>v.bank==='vault'?(v.vols.length?'':'Pick at least one volume'):(v.cats.length?'':'Pick at least one category'),

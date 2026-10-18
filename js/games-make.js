@@ -454,13 +454,13 @@ game({
   how:['Headphones on! Everyone listens on their own phone, and the differences are small.','Everyone designs a patch on their phone’s eight-knob synth.','Each round you get someone else’s sound — no settings, just ears. Recreate it, then change exactly one knob and pass it on.','At the end, each chain plays from first to last on the big screen. Points for how close your copies were.'],
   badges:['Scored','Sound design','Uses phone speakers'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="16" cy="20" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M16 20 L22 12" stroke="var(--red)" stroke-width="4"/><circle cx="48" cy="44" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M48 44 L40 50" stroke="var(--blue)" stroke-width="4"/><path d="M26 26 Q40 22 40 34" fill="none" stroke="var(--ink)" stroke-width="3" stroke-dasharray="4 4"/></svg>`,
-  options:[{key:'gens',label:'Generations',choices:[[3,'3','make + 2 copies'],[4,'4'],[5,'5']],def:3},{key:'csecs',label:'Design time',choices:[[60,'1','min'],[90,'1.5','min'],[120,'2','min']],def:90},{key:'rsecs',label:'Recreate time',choices:[[120,'2','min'],[180,'3','min'],[240,'4','min']],def:180},
+  options:[{key:'gens',label:'Generations',choices:[[3,'3','make + 2 copies'],[4,'4'],[5,'5']],def:3},{key:'csecs',label:'Design time',choices:[[60,'1','min'],[90,'1.5','min'],[120,'2','min']],def:90},{key:'rsecs',label:'Recreate time',choices:[[120,'2','min'],[180,'3','min'],[240,'4','min']],def:180},AUTO_OPT,
     {key:'test',label:'Test mode',choices:[[0,'Off','real students only'],[1,'Bots','two bots join the chain']],def:0}],
   note:'Students listen on their own phones, so ask everyone to put headphones on before you start. Play loops until pressed again, and every knob turn is heard at once. Needs at least two students, or turn on Test mode: two bots join the chain so you can try it with one phone.',
   check:v=>online().length>=2||(v&&v.test&&online().length>=1)?'':'At least two phones need to be in the room (or turn on Test mode)',
   topInfo(){const s=G.gs;return !s?this.tag:s.phase==='brief'?'Ready':s.phase==='create'?'Generation 1 · design':s.phase==='recreate'?`Generation ${s.r+1} of ${s.gens} · recreate`:s.phase==='reveal'?`Chain ${s.c+1} of ${s.N}`:'Final';},
   start(o){const bots=o.test?['Bot Moog','Bot Buchla']:[],botNames={};bots.forEach((n,i)=>botNames['bot:'+i]=n);
-    const ids=shuffle([...online().map(p=>p.id),...Object.keys(botNames)]),N=ids.length;G.gs={o,phase:'brief',ids,N,gens:Math.min(o.gens,N),r:0,c:0,chains:ids.map(()=>[]),subs:new Set(),botNames};},
+    const ids=shuffle([...online().map(p=>p.id),...Object.keys(botNames)]),N=ids.length;G.gs={o,opts:o,phase:'brief',ids,N,gens:Math.min(o.gens,N),r:0,c:0,chains:ids.map(()=>[]),subs:new Set(),botNames};},
   isBot(id){return !!(G.gs.botNames||{})[id];},
   nameOf(id){const s=G.gs;return (G.players.get(id)||{name:(s.botNames||{})[id]||'?'}).name;},
   chainFor(j,r){const s=G.gs;return ((j-r)%s.N+s.N)%s.N;},
@@ -489,15 +489,19 @@ game({
     if(s.r===0)ch[0]={by:p.id,p:clean(d.p)};else{const copy=clean(d.copy),tw=clean(d.p),acc=clamp(1-patchDist(copy,ch[s.r-1].p)*2.2,0,1);ch[s.r]={by:p.id,p:tw,copy,acc};}
     s.subs.add(p.id);sfx.inn();const e=$('#nSubs');if(e)e.textContent=s.subs.size;sync(p);
     if(s.ids.every(id=>s.subs.has(id)||this.isBot(id)||!(G.players.get(id)||{}).conn))later(()=>{if(G.gs===s&&(s.phase==='create'||s.phase==='recreate'))this.close();},1200);},
-  playChain(){const s=G.gs,ch=s.chains[s.c];let t=0;ch.forEach((g,k)=>{later(()=>{if(G.gs!==s||s.phase!=='reveal')return;setAud(playPatch(g.p));$$('.gen').forEach((x,i)=>x.classList.toggle('playing',i===k));},t);t+=4600;});},
+  // Autoplay: once the chain has played through, count down to the next chain
+  armAuto(){const s=G.gs;clearTimeout(s.autoT);const v=+s.o.auto||0;if(!v||s.phase!=='reveal')return;const c=s.c;
+    s.autoT=later(()=>{if(G.gs===s&&s.phase==='reveal'&&s.c===c)this.next();},Math.max(0,(s.chainEnd||0)-now())+v*1000);},
+  autoFlip(){const s=G.gs;if(!s||s.phase==='end')return;autoFlip(this);const b=$('#bAuto');if(b)b.outerHTML=autoBtn(s);const nb=$('#bAuto');if(nb)nb.onclick=()=>this.autoFlip();this.armAuto();},
+  playChain(){const s=G.gs,ch=s.chains[s.c];s.chainEnd=now()+ch.length*4600;this.armAuto();let t=0;ch.forEach((g,k)=>{later(()=>{if(G.gs!==s||s.phase!=='reveal')return;setAud(playPatch(g.p));$$('.gen').forEach((x,i)=>x.classList.toggle('playing',i===k));},t);t+=4600;});},
   render(st){
     const s=G.gs,P=id=>this.nameOf(id);
     if(s.phase==='end'){rPodium(st,{title:'Golden ears'});return;}
     if(s.phase==='reveal'){const ch=s.chains[s.c],o=ch[0];
       st.innerHTML=`<div class="tele dots"><div class="rtop"><span class="lab">Chain ${s.c+1} of ${s.N} · started by ${esc(P(o.by))}</span><h2>How far did it drift?</h2></div>
         <div class="gens">${ch.map((g,k)=>`<div class="gen ${k?'':'orig'}"><span class="lab">${k?'Copy '+k:'Original'}</span><b>${esc(P(g.by))}${g.auto?' <em>(auto)</em>':''}</b>${patchBars(g.p,k?o.p:null)}<p class="fine">${k?`drift from original ${Math.round(patchDist(g.p,o.p)*100)}% · copy accuracy ${Math.round((g.acc||0)*100)}%`:'the starting sound'}</p></div>`).join('<i class="garrow">→</i>')}</div>
-        <div class="dfoot"><button class="ghost" id="bPlay">▶ Play the chain, first to last</button><span></span><button class="big go" id="bNext">${s.c+1<s.N?'Next chain':'Final standings'} <small>SPACE</small></button></div></div>`;
-      $('#bPlay').onclick=()=>this.playChain();$('#bNext').onclick=()=>this.next();later(()=>this.playChain(),600);return;}
+        <div class="dfoot"><button class="ghost" id="bPlay">▶ Play the chain, first to last</button><span class="dauto">${autoBtn(s)}</span><button class="big go" id="bNext">${s.c+1<s.N?'Next chain':'Final standings'} <small>SPACE</small></button></div></div>`;
+      $('#bPlay').onclick=()=>this.playChain();$('#bNext').onclick=()=>this.next();$('#bAuto').onclick=()=>this.autoFlip();s.chainEnd=now()+600+s.chains[s.c].length*4600;later(()=>this.playChain(),600);return;}
     const head={brief:`<h2>Design a sound</h2><p>Everyone gets an eight-knob synth on their phone. ${s.N} students → ${s.N} chains, ${s.gens} generations each.</p>`,
       create:`<span class="lab">Generation 1 · design your patch</span>${clockHTML('huge')}`,
       recreate:`<span class="lab">Generation ${s.r+1} of ${s.gens} · recreate by ear, then twist ONE knob</span>${clockHTML('huge')}`}[s.phase];

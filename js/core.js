@@ -448,7 +448,15 @@ function confetti(c){
    Points: 1000 × accuracy × speed factor (spec.speed = how much a slow
    answer loses, 0..1), +100 per streak step up to +500.
    ===================================================================== */
+/* Autoplay: after a reveal, a countdown starts the next round by itself. Every round game gets the option, and the
+   teacher can flip it any time from the button under Next (or the A key). */
+const AUTO_OPT={key:'auto',label:'Autoplay',sub:'the next round starts by itself',choices:[[0,'Off','you click Next'],[6,'6','seconds'],[10,'10','seconds'],[15,'15','seconds']],def:10,
+  help:'After each reveal a countdown starts the next round. Switch it on or off any time with the Autoplay button under Next, or press A. Click the ring (or press P) to pause.'};
+function autoFlip(g){const s=G.gs;if(!s||!s.opts)return 0;const v=+s.opts.auto||0;if(v)s.autoLast=v;s.opts.auto=v?0:(s.autoLast||10);
+  const sv=store.get('opt.'+g.id,{});sv.auto=s.opts.auto;store.set('opt.'+g.id,sv);toast(s.opts.auto?`Autoplay on · ${s.opts.auto} s`:'Autoplay off');return s.opts.auto;}
+const autoBtn=s=>{const v=+(s.opts&&s.opts.auto)||0;return `<button class="ghost wide autob${v?' on':''}" id="bAuto" title="Start the next round by itself (A)"><i></i>${v?`Autoplay on · ${v} s`:'Autoplay off'}</button>`;};
 function roundGame(spec){
+  if(!(spec.options||[]).some(o=>o.key==='auto'))spec.options=[...(spec.options||[]),AUTO_OPT];
   const g=Object.assign({kind:'round',speed:.5,okAt:.99,closeAt:.45,prepMs:0,badges:['Scored']},spec);
   const cur=()=>G.gs.rounds[G.gs.i];
   g.topInfo=()=>{const s=G.gs;if(!s)return g.tag;if(s.phase==='end')return 'Final results';return `Round ${Math.min(s.i+1,s.rounds.length)} of ${s.rounds.length}`+(g.roundInfo?' · '+g.roundInfo(cur(),s.opts):'');};
@@ -488,9 +496,12 @@ function roundGame(spec){
     });
     s.done=s.i;s.phase='reveal';g.onReveal&&g.onReveal(r,s.opts);sfx.reveal(n?100*accSum/n:0);
     // optional countdown to the next question (the game's "auto" option, in seconds)
-    s.nextT=(+s.opts.auto||0)*1000;if(s.nextT){const i=s.i;s.nextEnd=now()+s.nextT;mainTimer(s.nextT,()=>{if(s.phase==='reveal'&&s.i===i)g.next();});}
+    startNext();
     render();syncAll();saveRoom();
   }
+  function startNext(){const s=G.gs;s.nextT=(+s.opts.auto||0)*1000;if(s.nextT){const i=s.i;s.nextEnd=now()+s.nextT;mainTimer(s.nextT,()=>{if(s.phase==='reveal'&&s.i===i)g.next();});}}
+  g.autoFlip=()=>{const s=G.gs;if(!s||s.phase==='end')return;autoFlip(g);
+    if(s.phase==='reveal'){clearTimeout(s.tmr);s.paused=false;s.nextT=0;startNext();}render();};
   // click the ring (or press P): pause / resume whichever clock is running
   g.pause=()=>{const s=G.gs;if(!s)return;const can=s.phase==='prep'||(s.phase==='open'&&s.T)||(s.phase==='reveal'&&s.nextT);if(!can&&!s.paused)return;
     if(!s.paused){s.paused=true;s.pauseAt=now();clearTimeout(s.tmr);s.pauseLeft=Math.max(0,s.tmrEnd-now());}
@@ -528,7 +539,7 @@ function roundGame(spec){
     const alt=s.phase==='reveal'?`<button class="ghost wide" id="bAlt">Show the leaderboard</button>`:'';
     st.innerHTML=`<div class="rg ph-${s.phase}"><section class="rgm dots" id="rgm"></section>
       <aside class="side"><div class="ringbox"><canvas id="ring"></canvas></div><div class="sinfo" id="sinfo"></div>
-      <div class="sact">${g.replay?`<button class="ghost wide" id="bReplay">▶ ${esc(g.replayLabel||'Play again')}</button>`:''}${s.phase==='reveal'&&(g.replay||g.leave)?'<button class="ghost wide" id="bStopA">■ Stop the sound</button>':''}<button class="big ${s.phase==='reveal'?'go':''}" id="bNext">${esc(btn)} <small>SPACE</small></button>${alt}<span class="keys">Space / → next · Q join code</span></div></aside></div>
+      <div class="sact">${g.replay?`<button class="ghost wide" id="bReplay">▶ ${esc(g.replayLabel||'Play again')}</button>`:''}${s.phase==='reveal'&&(g.replay||g.leave)?'<button class="ghost wide" id="bStopA">■ Stop the sound</button>':''}<button class="big ${s.phase==='reveal'?'go':''}" id="bNext">${esc(btn)} <small>SPACE</small></button>${autoBtn(s)}${alt}<span class="keys">Space / → next · Q join code</span></div></aside></div>
       ${s.phase==='prep'&&s.prepMsTot>0?'<i class="readbar" id="readbar"></i>':''}`;
     const m=$('#rgm');(s.phase==='reveal'?g.reveal:g.stage).call(g,m,r,ctx);
     const si=$('#sinfo');
@@ -537,7 +548,7 @@ function roundGame(spec){
       si.innerHTML=(g.revealSide?g.revealSide(r,ctx):`<div class="stat"><b>${g.okAt>=.99?Math.round(100*L.filter(x=>x.res&&x.res.cls==='yes').length/Math.max(1,players().length))+'%':avg+'%'}</b><span>${g.okAt>=.99?'got it right':'average accuracy'}</span></div>`)
         +(best&&best.res&&best.res.pts>0?`<div class="fast"><span class="lab">Top score this round</span><b>${esc(best.p.name)}</b><span class="lab">+${best.res.pts}${best.res.note?' · '+esc(best.res.note):''}</span></div>`:`<div class="fast"><span class="lab">Nobody scored</span><b>Stump the room ✓</b></div>`);
     }else si.innerHTML=`<div class="stat"><b id="nAns">${s.ans.size}<span>/${online().length}</span></b><span>answered</span></div><p class="fine">${s.phase==='prep'?(g.prepSide?g.prepSide(r,s.opts):'Get ready…'):(g.openSide?g.openSide(r,s.opts):'Revealed when everyone has answered'+(s.T?' or the clock runs out.':'.'))}</p>`;
-    $('#bNext').onclick=g.next;if($('#bAlt'))$('#bAlt').onclick=due?g.skip:g.toBoard;if(g.replay)$('#bReplay').onclick=()=>g.replay(r,s.phase,s.opts);if($('#bStopA'))$('#bStopA').onclick=()=>{try{g.leave&&g.leave();}catch(e){}AU_stopAll();toast('Sound stopped');};
+    $('#bNext').onclick=g.next;$('#bAuto').onclick=g.autoFlip;if($('#bAlt'))$('#bAlt').onclick=due?g.skip:g.toBoard;if(g.replay)$('#bReplay').onclick=()=>g.replay(r,s.phase,s.opts);if($('#bStopA'))$('#bStopA').onclick=()=>{try{g.leave&&g.leave();}catch(e){}AU_stopAll();toast('Sound stopped');};
     const rc=$('#ring');if(rc){rc.style.cursor='pointer';rc.title='Click to pause or resume the clock (P)';rc.onclick=g.pause;}
     ring($('#ring'),t0=>{const t=s.paused?s.pauseAt:t0;
       const beads=players().map(p=>{const a=s.ans.has(p.id),on=p.conn&&p.conn.open,rs=s.res.get(p.id);
@@ -733,6 +744,7 @@ function boot(){
     if(ROLE!=='host'||G.splash||e.target.closest('input,textarea,select'))return;
     if(e.key==='Escape'){const o=$('#qrbig');if(o)o.remove();return;}
     if((e.key==='p'||e.key==='P')&&G.view==='play'&&G.game&&G.game.pause){G.game.pause();return;}
+    if((e.key==='a'||e.key==='A')&&!e.metaKey&&!e.ctrlKey&&G.view==='play'&&G.game&&G.game.autoFlip&&!(e.target.closest&&e.target.closest('input,textarea,select'))){G.game.autoFlip();return;}
     if((e.key==='q'||e.key==='Q')&&G.code){const o=$('#qrbig');o?o.remove():showBigQR(G.code);return;}
     if(e.key===' '||e.key==='ArrowRight'||(e.key==='Enter'&&e.target.tagName!=='BUTTON')){
       if(G.view==='setup'){e.preventDefault();startGame(G.game);}

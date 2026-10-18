@@ -51,7 +51,9 @@ Phones and the host keep old files otherwise.
   `show:v=>bool` to hide an option; `setupExtra(v)` / `setupBind(st, redraw)` add custom setup panels.
 - The phone **notebook**: the host calls `logAdd(player, {kind, game, title, text})`.
 - Round clock: one main timer per phase (`mainTimer`); the teacher pauses it by clicking the ring or pressing P
-  (`g.pause`, phones get `{t:'clock'}`). A game option `auto` (seconds) counts down from the reveal to the next round.
+  (`g.pause`, phones get `{t:'clock'}`). **Autoplay**: every `roundGame` gets `AUTO_OPT` (key `auto`, default 10 s) added automatically; after a reveal it counts down
+  to the next round. The Autoplay switch under Next (or the A key) flips it mid-game (`autoFlip`, saved per game). Parameter
+  Telephone has it too: after a chain plays through, it counts down to the next chain (`armAuto`).
 - Constraint Generator: missions = task (per file kind) + rule + evolution, from `CONSTRAINT_BRAIN` in content.js.
   Files are recipes `{kind, seed, bpm, key}` built by `ASSETS.make` on the student's computer (CADCAST/go, paired via
   Control Room); the host sends them with `pcSend(player, msg)`. No answer counts as "busy"; students can sit out.
