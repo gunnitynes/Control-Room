@@ -38,8 +38,7 @@ function guideHTML(){
       ${d.lesson?`<p class="gclesson"><b>★</b>${esc(d.lesson)}</p>`:''}</article>`;};
   const used=new Set(Object.values(G0).flatMap(d=>d.play||[]));
   return `<div class="guide">
-    <header class="ghero"><div class="ghshapes"><i></i><i></i><i></i></div><span class="lab">The guide to</span><h1>The Control<br><i>Room</i></h1>
-      <div class="ghstats"><span><b>${games.length}</b> games</span><span><b>${GROUPS.length}</b> rooms of play</span><span><b>1</b> phone each</span></div></header>
+    <header class="ghero"><div class="ghshapes"><i></i><i></i><i></i></div><span class="lab">The guide to</span><h1>The Control<br><i>Room</i></h1></header>
     <section class="gsec"><h2>Get in</h2><div class="gjoin">
       <div><b>1</b><svg viewBox="0 0 64 48"><rect x="6" y="4" width="52" height="32" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><rect x="24" y="10" width="16" height="16" fill="var(--ink)"/><rect x="2" y="38" width="60" height="6" fill="var(--ink)"/></svg><span>Scan your computer’s code</span></div>
       <div><b>2</b><svg viewBox="0 0 64 48"><rect x="8" y="8" width="48" height="32" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/><rect x="16" y="18" width="32" height="5" fill="var(--ink)"/><rect x="16" y="27" width="20" height="4" fill="var(--ink)"/></svg><span>Tap your name</span></div>
