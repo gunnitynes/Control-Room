@@ -126,6 +126,8 @@ window.ENVELOPES=[
   {name:'Reverse swell',a:1.2,d:.01,s:1,r:.02,hold:1.25},
   {name:'Soft keys',a:.02,d:.8,s:.3,r:.5,hold:1.0},
   {name:'Gated hit',a:.002,d:.02,s:1,r:.01,hold:.45},
+  {name:'Swell and fade',a:.9,d:.01,s:1,r:1.5,hold:.95},
+  {name:'Accent then hold',a:.002,d:.25,s:.45,r:.4,hold:1.5},
 ];
 
 /* ---------- Translation Grid: concept ↔ picture (v: drawn in js/games-brain.js) or ↔ analogy (a) ---------- */

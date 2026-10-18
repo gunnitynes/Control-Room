@@ -399,14 +399,24 @@ function playGroove(g,{bars=4,countIn=true,onStep,dest}={}){
 }
 
 /* ---------- envelope tones (Envelope Sculptor) ---------- */
-// Envelope Sculptor's voice: a warm open fifth (A–E–A), soft detuned voices and a vibrato that blooms in.
-// The filter stays fixed so only the loudness moves, and the room is short so it doesn't blur the release.
-function playEnvelope(E,dest){const ac=audio(),r=rig(dest,{rt:.9,damp:.6});r.strip('e',{gain:1,send:.05});
-  const t=ac.currentTime+.08,g=gn(ac,0),f=bq(ac,'lowpass',2300,.5),end=adsr(g,t,{a:E.a,d:E.d,s:E.s,r:E.r,len:E.hold,peak:.7});
-  const lfo=osc(ac,'sine',5.1),lg=gn(ac,0);lfo.connect(lg);lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(6,t+.7);   // ±6 cents
-  [57,64,69].forEach((n,k)=>[[-5,'triangle',.24],[6,'sawtooth',.07]].forEach(([dt,type,v])=>{const o=osc(ac,type,hz(n));o.detune.value=dt;lg.connect(o.detune);
+// The one envelope shape both the drawing and the sound use: breakpoints [seconds, level 0–1], straight lines between.
+// A sustain of 0 ends the note at the bottom of its decay (nothing left to release).
+function envPts(E){const sus=Math.max(.3,E.hold-E.a-E.d),p=[[0,0],[E.a,1],[E.a+E.d,E.s]];
+  if(E.s>0)p.push([E.a+E.d+sus,E.s],[E.a+E.d+sus+E.r,0]);return p;}
+const envLen=E=>{const p=envPts(E);return p[p.length-1][0];};
+// Plays that shape on a gain: level is loudness, so gain = level^1.7 (half as loud ≈ −10 dB) and a straight line on the
+// picture sounds straight. Sampled at 250 Hz into one value curve. Returns the end time.
+function envApply(g,t,E,peak=1){const p=envPts(E),T=p[p.length-1][0],n=Math.max(8,Math.ceil(T*250)),c=new Float32Array(n+1);
+  for(let i=0,k=0;i<=n;i++){const x=T*i/n;while(k<p.length-2&&x>p[k+1][0])k++;const [x0,y0]=p[k],[x1,y1]=p[k+1],v=x1>x0?y0+(y1-y0)*(x-x0)/(x1-x0):y1;
+    c[i]=peak*Math.pow(Math.max(0,Math.min(1,v)),1.7);}
+  c[n]=0;g.gain.setValueAtTime(0,t);g.gain.setValueCurveAtTime(c,t,T);return t+T;}
+// Envelope Sculptor's voice: a bright, perfectly steady open fifth (A–E–A) — no vibrato, no filter movement and no room,
+// so the only thing that changes is loudness and the release ends exactly where the drawing does.
+function playEnvelope(E,dest){const ac=audio(),r=rig(dest,{rt:.3,damp:.6});r.strip('e',{gain:1,send:0});
+  const t=ac.currentTime+.08,g=gn(ac,0),f=bq(ac,'lowpass',3200,.5),end=envApply(g,t,E,.75);
+  [57,64,69].forEach((n,k)=>[[-4,'triangle',.22],[5,'sawtooth',.09]].forEach(([dt,type,v])=>{const o=osc(ac,type,hz(n));o.detune.value=dt;
     const vg=gn(ac,v*(k===1?.85:1));o.connect(vg).connect(f);o.start(t);o.stop(end+.05);}));
-  lfo.start(t);lfo.stop(end+.1);f.connect(g).connect(r.strips.e.in);r.dur=end-t;return r;}
+  f.connect(g).connect(r.strips.e.in);r.dur=end-t;return r;}
 
 /* ---------- decaying spaces (Decay Guessr) ---------- */
 const DECAY_SRC={
@@ -545,9 +555,9 @@ function freezeBuffer(fr){
   out.notes=top.length;return AU.frz[key]=out;
 }
 function playFreeze(fr,E,dest){
-  const ac=audio(),r=rig(dest,{rt:.6});r.strip('e',{gain:1,send:.04});
+  const ac=audio(),r=rig(dest,{rt:.3});r.strip('e',{gain:1,send:0});
   const t0=ac.currentTime+.06,s=ac.createBufferSource(),out=gn(ac,0);s.buffer=freezeBuffer(fr);s.loop=true;
-  const end=adsr(out,t0,{a:E.a,d:E.d,s:E.s,r:E.r,len:E.hold,peak:1.2});
+  const end=envApply(out,t0,E,1.2);
   s.connect(out).connect(r.strips.e.in);s.start(t0,Math.random()*2);s.stop(end+.05);
   r.dur=end-t0;return r;
 }

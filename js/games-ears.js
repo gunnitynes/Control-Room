@@ -191,29 +191,30 @@ const envVec=E=>[Math.log10(E.a+.01),Math.log10(E.d+.01),E.s*1.5,Math.log10(E.r+
 const envDist=(A,B)=>Math.hypot(...envVec(A).map((v,i)=>v-envVec(B)[i]));
 function pickDistinctEnvs(E){const out=[];for(const x of shuffle(ENVELOPES.filter(x=>x!==E))){if(envDist(x,E)>.7&&out.every(y=>envDist(x,y)>.7))out.push(x);if(out.length===3)break;}
   for(const x of shuffle(ENVELOPES.filter(x=>x!==E&&!out.includes(x)))){if(out.length===3)break;out.push(x);}return out;}
-function adsrSVG(E,{W=200,H=90}={}){
-  const sus=Math.max(.25,E.hold-E.a-E.d),tot=E.a+E.d+sus+E.r,X=t=>8+(W-16)*Math.pow(t/tot,.75),Y=v=>H-8-(H-18)*v;
-  const pts=[[0,0],[E.a,1],[E.a+E.d,E.s],[E.a+E.d+sus,E.s],[tot,0]];
-  return `<svg class="adsr" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><line x1="6" y1="${H-8}" x2="${W-6}" y2="${H-8}" stroke="var(--hair)" stroke-width="2"/><path d="${pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('')}" fill="color-mix(in srgb,currentColor 18%,transparent)" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>`;
+// Drawn from envPts (the same shape the sound plays), on real time: every option in a round shares the axis T,
+// so a long tail looks long next to a short one. Ticks mark each second.
+function adsrSVG(E,{W=340,H=96,T}={}){T=T||envLen(E);const X=t=>8+(W-16)*t/T,Y=v=>H-8-(H-18)*v,pts=envPts(E);
+  const ticks=Array.from({length:Math.floor(T)+1},(_,i)=>`<line x1="${X(i).toFixed(1)}" y1="${H-8}" x2="${X(i).toFixed(1)}" y2="${H-1}" stroke="currentColor" stroke-opacity=".55" stroke-width="3"/>`).join('');
+  return `<svg class="adsr" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><line x1="6" y1="${H-8}" x2="${W-6}" y2="${H-8}" stroke="currentColor" stroke-opacity=".35" stroke-width="2"/>${ticks}<path d="${pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('')}Z" fill="color-mix(in srgb,currentColor 18%,transparent)" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>`;
 }
 game(roundGame(mcSpec({
   id:'envelope',group:'ears',name:'Envelope Sculptor',tag:'Hear a sound, pick its shape: attack, decay, sustain, release.',
-  how:['One note plays once — the same tone every round, only its envelope changes (or switch the sound to a frozen moment of the demo song).','Four ADSR shapes appear on your phone. Tap the one you heard.','Fast right answers score more.'],
+  how:['One note plays once — the same steady tone every round, only its loudness shape changes (or switch the sound to a frozen moment of the demo song).','Four shapes appear on your phone, all on the same time scale (a tick per second). Tap the one you heard.','Fast right answers score more.'],
   badges:['Scored','Listening'],speed:.4,htmlOpts:true,kind:'env',
   icon:`<svg viewBox="0 0 64 64"><path d="M4 56 L16 8 L28 30 L44 30 L60 56" fill="var(--yel)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/><line x1="4" y1="58" x2="60" y2="58" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[{key:'src',label:'Sound',choices:[['mix','Synth tone','the same tone every time'],['song','Frozen song','a moment of the song held still']],def:'mix'},
     {key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10']],def:8},{key:'secs',label:'Answer time',choices:[[12,'12','seconds'],[20,'20','seconds'],[0,'OFF','no clock']],def:20}],
-  prepMs:r=>Math.round((r.E.hold+r.E.r*1.6)*1000+900),prepLabel:'LISTEN',prepSub:'to the shape',
+  prepMs:r=>Math.round(envLen(r.E)*1000+900),prepLabel:'LISTEN',prepSub:'to the shape',
   prepText:()=>({big:'Listen',small:'Watch the four shapes on the big screen while it plays.'}),
   secs:o=>o.secs,
-  build:o=>{const fz=dealSong(SONG.freeze,o.n);return shuffle(ENVELOPES).slice(0,o.n).map((E,k)=>{const others=pickDistinctEnvs(E);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E),fz:o.src==='song'?fz[k]:null};});},
+  build:o=>{const fz=dealSong(SONG.freeze,o.n);return shuffle(ENVELOPES).slice(0,o.n).map((E,k)=>{const others=pickDistinctEnvs(E);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E),T:Math.max(...order.map(envLen)),fz:o.src==='song'?fz[k]:null};});},
   sound(r){if(r.fz)withSong(()=>setAud(playFreeze(r.fz,r.E)));else setAud(playEnvelope(r.E));},
   onPrep(r){this.sound(r);},leave:stopAud,
   replay(r){this.sound(r);},
-  public:r=>({opts:r.opts.map(E=>adsrSVG(E)),html:true,kind:'env'}),
+  public:r=>({opts:r.opts.map(E=>adsrSVG(E,{T:r.T})),html:true,kind:'env'}),
   // the shapes show while it plays; class env-open stops them animating in a second time when answers open
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc env-${ctx.phase}"><h2 class="qtext">Which envelope is this?</h2>${mcTiles({...r,opts:r.opts},{...ctx,phase:ctx.phase==='prep'?'open':ctx.phase},{optHTML:E=>adsrSVG(E)})}</div>`;},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><h2 class="qtext"><span class="hl">${esc(r.E.name)}</span> · A ${r.E.a}s · D ${r.E.d}s · S ${Math.round(r.E.s*100)}% · R ${r.E.r}s${r.fz?` <span class="songtag">the sound: the song frozen at ${Math.floor(r.fz.at/60)}:${pad2(Math.floor(r.fz.at%60))} (${esc(r.fz.name.toLowerCase())})</span>`:''}</h2>${mcTiles(r,ctx,{optHTML:E=>adsrSVG(E)+`<small>${esc(E.name)}</small>`})}</div>`;animateBars(m);},
+  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc env-${ctx.phase}"><h2 class="qtext">Which envelope is this?</h2>${mcTiles({...r,opts:r.opts},{...ctx,phase:ctx.phase==='prep'?'open':ctx.phase},{optHTML:E=>adsrSVG(E,{T:r.T})})}</div>`;},
+  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><h2 class="qtext"><span class="hl">${esc(r.E.name)}</span> · A ${r.E.a}s · D ${r.E.d}s · S ${Math.round(r.E.s*100)}%${r.E.s>0?` · R ${r.E.r}s`:''}${r.fz?` <span class="songtag">the sound: the song frozen at ${Math.floor(r.fz.at/60)}:${pad2(Math.floor(r.fz.at%60))} (${esc(r.fz.name.toLowerCase())})</span>`:''}</h2>${mcTiles(r,ctx,{optHTML:E=>adsrSVG(E,{T:r.T})+`<small>${esc(E.name)}</small>`})}</div>`;animateBars(m);},
 })));
 
 /* ---------- PRESET ARCHEOLOGIST ---------- */
