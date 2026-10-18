@@ -281,6 +281,7 @@ function rSetup(st){
   const g=G.game,v=optVals(g);
   const optHTML=(o,k)=>{
     const head=`<h3><b>${pad2(k+1)}</b>${esc(o.label)}${o.sub?`<small>${esc(typeof o.sub==='function'?o.sub(v):o.sub)}</small>`:''}</h3>`;
+    if(o.type==='step')return `<div class="fsec">${head}<div class="stepper" data-k="${o.key}"><button data-d="-1" aria-label="Less" ${v[o.key]<=o.min?'disabled':''}>−</button><b>${v[o.key]}<small>${esc(typeof o.unit==='function'?o.unit(v[o.key]):o.unit||'')}</small></b><button data-d="1" aria-label="More" ${v[o.key]>=o.max?'disabled':''}>+</button></div>${o.help?`<p class="fine">${o.help}</p>`:''}</div>`;
     if(o.type==='multi')return `<div class="fsec">${head}<div class="cats" data-k="${o.key}">${o.choices.map(([cv,lab,sm],i)=>`<button class="catc" data-i="${i}" aria-pressed="${v[o.key].includes(cv)}"><b>${pad2(i+1)}</b><strong>${esc(lab)}</strong><span>${esc(sm||'')}</span></button>`).join('')}</div>
       <div class="frow"><button class="ghost" data-all="${o.key}">All</button><button class="ghost" data-none="${o.key}">None</button></div>${o.help?`<p class="fine">${o.help}</p>`:''}</div>`;
     return `<div class="fsec">${head}<div class="seg" data-k="${o.key}">${o.choices.map(([cv,lab,sm],i)=>`<button data-i="${i}" aria-pressed="${JSON.stringify(v[o.key])===JSON.stringify(cv)}">${esc(lab)}${sm?`<small>${esc(sm)}</small>`:''}</button>`).join('')}</div>${o.help?`<p class="fine">${o.help}</p>`:''}</div>`;
@@ -295,6 +296,7 @@ function rSetup(st){
       ${g.note?`<p class="fine">${g.note}</p>`:''}</section></div>`;
   const save=()=>{store.set('opt.'+g.id,v);rSetup(st);};
   $$('.seg',st).forEach(sg=>{const o=g.options.find(x=>x.key===sg.dataset.k);$$('button',sg).forEach(b=>b.onclick=()=>{v[o.key]=o.choices[+b.dataset.i][0];save();});});
+  $$('.stepper',st).forEach(sg=>{const o=g.options.find(x=>x.key===sg.dataset.k);$$('button',sg).forEach(b=>b.onclick=()=>{v[o.key]=clamp(Number(v[o.key])+(+b.dataset.d)*(o.step||1),o.min,o.max);save();});});
   $$('.cats',st).forEach(sg=>{const o=g.options.find(x=>x.key===sg.dataset.k);$$('button',sg).forEach(b=>b.onclick=()=>{const cv=o.choices[+b.dataset.i][0],s=new Set(v[o.key]);s.has(cv)?s.delete(cv):s.add(cv);v[o.key]=o.choices.map(c=>c[0]).filter(x=>s.has(x));save();});});
   $$('[data-all]',st).forEach(b=>b.onclick=()=>{const o=g.options.find(x=>x.key===b.dataset.all);v[o.key]=o.choices.map(c=>c[0]);save();});
   $$('[data-none]',st).forEach(b=>b.onclick=()=>{v[b.dataset.none]=[];save();});
@@ -454,7 +456,7 @@ function roundGame(spec){
     const alt=s.phase==='reveal'?`<button class="ghost wide" id="bAlt">Show the leaderboard</button>`:'';
     st.innerHTML=`<div class="rg ph-${s.phase}"><section class="rgm dots" id="rgm"></section>
       <aside class="side"><div class="ringbox"><canvas id="ring"></canvas></div><div class="sinfo" id="sinfo"></div>
-      <div class="sact">${g.replay?`<button class="ghost wide" id="bReplay">▶ ${esc(g.replayLabel||'Play again')}</button>`:''}<button class="big ${s.phase==='reveal'?'go':''}" id="bNext">${esc(btn)} <small>SPACE</small></button>${alt}<span class="keys">Space / → next · Q join code</span></div></aside></div>
+      <div class="sact">${g.replay?`<button class="ghost wide" id="bReplay">▶ ${esc(g.replayLabel||'Play again')}</button>`:''}${s.phase==='reveal'&&(g.replay||g.leave)?'<button class="ghost wide" id="bStopA">■ Stop the sound</button>':''}<button class="big ${s.phase==='reveal'?'go':''}" id="bNext">${esc(btn)} <small>SPACE</small></button>${alt}<span class="keys">Space / → next · Q join code</span></div></aside></div>
       ${s.phase==='prep'&&s.prepMsTot>0?'<i class="readbar" id="readbar"></i>':''}`;
     const m=$('#rgm');(s.phase==='reveal'?g.reveal:g.stage).call(g,m,r,ctx);
     const si=$('#sinfo');
@@ -463,7 +465,7 @@ function roundGame(spec){
       si.innerHTML=(g.revealSide?g.revealSide(r,ctx):`<div class="stat"><b>${g.okAt>=.99?Math.round(100*L.filter(x=>x.res&&x.res.cls==='yes').length/Math.max(1,players().length))+'%':avg+'%'}</b><span>${g.okAt>=.99?'got it right':'average accuracy'}</span></div>`)
         +(best&&best.res&&best.res.pts>0?`<div class="fast"><span class="lab">Top score this round</span><b>${esc(best.p.name)}</b><span class="lab">+${best.res.pts}${best.res.note?' · '+esc(best.res.note):''}</span></div>`:`<div class="fast"><span class="lab">Nobody scored</span><b>Stump the room ✓</b></div>`);
     }else si.innerHTML=`<div class="stat"><b id="nAns">${s.ans.size}<span>/${online().length}</span></b><span>answered</span></div><p class="fine">${s.phase==='prep'?(g.prepSide?g.prepSide(r,s.opts):'Get ready…'):(g.openSide?g.openSide(r,s.opts):'Revealed when everyone has answered'+(s.T?' or the clock runs out.':'.'))}</p>`;
-    $('#bNext').onclick=g.next;if($('#bAlt'))$('#bAlt').onclick=due?g.skip:g.toBoard;if(g.replay)$('#bReplay').onclick=()=>g.replay(r,s.phase,s.opts);
+    $('#bNext').onclick=g.next;if($('#bAlt'))$('#bAlt').onclick=due?g.skip:g.toBoard;if(g.replay)$('#bReplay').onclick=()=>g.replay(r,s.phase,s.opts);if($('#bStopA'))$('#bStopA').onclick=()=>{try{g.leave&&g.leave();}catch(e){}AU_stopAll();toast('Sound stopped');};
     ring($('#ring'),t=>{
       const beads=players().map(p=>{const a=s.ans.has(p.id),on=p.conn&&p.conn.open,rs=s.res.get(p.id);
         return {f:s.phase==='reveal'?(rs?{yes:'--green',close:'--yel',no:'--red',none:''}[rs.cls]:''):a?'--ink':'',big:a,a:on?1:.3};});
@@ -584,6 +586,7 @@ function pRender(){
   if(!s){body.innerHTML=`<div class="pcenter"><h2 class="pul">…</h2><p>${esc(PL.status||'Connecting…')}</p></div>`;return;}
   if(s.view==='kicked'){body.innerHTML=`<div class="pcenter"><h2>${s.why==='closed'?'Room closed':'Removed'}</h2><p>${s.why==='closed'?'The host started a new room. Scan the new code to join again.':'The host removed you from this room.'}</p></div>`;return;}
   PL.key=s.view+'|'+s.g+'|'+(s.s?s.s.k:'');
+  if(PL.synH&&!(s.view==='play'&&s.g==='telephone')&&typeof synStop==='function')synStop();
   if(s.view==='play'){
     const g=gameById(s.g);if(!g){body.innerHTML=`<div class="pcenter"><h2>Update</h2><p>Reload this page to get the newest version of the games.</p></div>`;return;}
     try{g.player(body,s.s,papi);}catch(e){console.error(e);body.innerHTML=`<div class="pcenter"><h2>Hmm</h2><p>${esc(e.message)}</p></div>`;}

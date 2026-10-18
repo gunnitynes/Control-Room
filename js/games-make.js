@@ -1,7 +1,7 @@
 /* ====================================================================
    MAKE SOMETHING — creative sprints, generators and party games.
-   Constraint Generator · Genre Cross-Pollinator · Destructive Remix ·
-   Remix Relay · Metaphor Translation · Parameter Telephone
+   Constraint Generator · Genre Cross-Pollinator · Soundabout Roundabout ·
+   Metaphor Translation · Parameter Telephone (listed under Train your ears)
    ==================================================================== */
 
 /* ---------- a shared countdown (host big clock + phone clock) ---------- */
@@ -141,119 +141,75 @@ game(slotGame({
 }));
 
 /* =====================================================================
-   DESTRUCTIVE REMIX — sketch, rotate, sabotage, rebuild
+   SOUNDABOUT ROUNDABOUT — a track travels round the room; every stop deals a fresh prompt card
    ===================================================================== */
+const RB_KINDS=Object.keys(ROUNDABOUT);
+const RB_ALL=RB_KINDS.flatMap(kind=>ROUNDABOUT[kind].map(text=>({kind,text})));
+// one shuffled deck per browser: a card is not dealt again until every card has been used,
+// and a single deal spreads across the kinds so neighbours get different sorts of idea
+function rbDeal(n){let used=new Set(store.get('rb.used',[]));const out=[];
+  for(let i=0;i<n;i++){let left=RB_ALL.filter(c=>!used.has(c.text)&&!out.includes(c));if(!left.length){used=new Set();left=RB_ALL.filter(c=>!out.includes(c));}
+    const seen=new Set(out.slice(-(RB_KINDS.length-1)).map(c=>c.kind)),fresh=left.filter(c=>!seen.has(c.kind)),c=pick(fresh.length?fresh:left);out.push(c);used.add(c.text);}
+  store.set('rb.used',[...used]);return out;}
 game({
-  id:'destruct',group:'make',name:'Destructive Remix',tag:'Make a sketch. Pass it on. The app tells your neighbour how to wreck it.',
-  how:['Everyone starts a quick sketch on their own machine.','When the timer ends: swap seats or pass the project to your left.','A sabotage card lands — obey it, then rebuild something great from what survives.'],
-  badges:['Sprint','No score'],kind:'free',
-  icon:`<svg viewBox="0 0 64 64"><rect x="6" y="10" width="36" height="44" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M12 20h24M12 28h24M12 36h14" stroke="var(--ink)" stroke-width="3"/><path d="M30 6 L58 40 L48 46 L24 12 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/></svg>`,
+  id:'roundabout',group:'make',name:'Soundabout Roundabout',tag:'Start a track, pass it round the room. Every stop deals a new prompt card.',
+  how:['Everyone starts a short sketch on their own machine.','When the timer ends, move one seat on (or pass the project file). The track in front of you is now yours to grow.','A prompt card lands on your phone: a fun, specific idea to try. Add it, then pass the track on again.'],
+  badges:['Sprint','No score','Prompt cards'],kind:'free',
+  icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="21" fill="none" stroke="var(--ink)" stroke-width="4" stroke-dasharray="26 7"/><path d="M50 14 L54 26 L42 25 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5"/><path d="M14 50 L10 38 L22 39 Z" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5"/><rect x="25" y="25" width="14" height="14" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" transform="rotate(12 32 32)"/></svg>`,
   options:[
-    {key:'sketch',label:'Sketch time',choices:[[5,'5','min'],[10,'10','min'],[15,'15','min']],def:10},
-    {key:'rebuild',label:'Rebuild time',choices:[[5,'5','min'],[10,'10','min'],[15,'15','min']],def:10},
-    {key:'rounds',label:'Sabotage rounds',choices:[[1,'1'],[2,'2'],[3,'3']],def:2},
-    {key:'sev',label:'Cruelty',choices:[['mild','Mild'],['brutal','Brutal'],['chaos','Chaos'],['climb','Escalate','mild → chaos']],def:'climb'},
+    {key:'sketch',label:'First sketch',type:'step',min:1,max:30,step:1,def:8,unit:'min'},
+    {key:'stop',label:'Time at each stop',type:'step',min:1,max:30,step:1,def:6,unit:'min'},
+    {key:'rounds',label:'Stops',type:'step',min:1,max:20,step:1,def:3,unit:n=>n===1?'stop':'stops',help:'How many times each track moves on before the listening party.'},
+    {key:'deal',label:'Cards',choices:[['each','Everyone different','a card per phone'],['room','One for the room','the same card on the big screen']],def:'each'},
   ],
-  topInfo(){const s=G.gs;return s?({brief:'Ready',sketch:'Sketching',rotate:'Rotate!',sabotage:`Sabotage ${s.round}`,rebuild:`Rebuild ${s.round}`,done:'Showcase'})[s.phase]:this.tag;},
-  start(o){G.gs={o,phase:'brief',round:0,card:'',done:new Set(),used:new Set()};},
-  draw(){const s=G.gs,sev=s.o.sev==='climb'?['mild','brutal','chaos'][Math.min(2,s.round-1)]:s.o.sev;const deck=SABOTAGE[sev].filter(c=>!s.used.has(c));s.card=pick(deck.length?deck:SABOTAGE[sev]);s.used.add(s.card);s.sev=sev;s.done=new Set();sfx.card();
-    online().forEach(p=>logAdd(p,{kind:'card',game:this.name,title:`Sabotage ${s.round} · ${sev}`,text:s.card}));},
+  note:`${RB_ALL.length} prompt cards in ${RB_KINDS.length} kinds (${RB_KINDS.join(', ')}). A card is not dealt again until every card has been used (counted in this browser). Edit them in data/content.js → ROUNDABOUT.`,
+  topInfo(){const s=G.gs;return s?({brief:'Ready',sketch:'First sketch',pass:'Pass it on!',card:`Stop ${s.round} · your card`,build:`Stop ${s.round} of ${s.o.rounds}`,done:'Listening party'})[s.phase]:this.tag;},
+  start(o){G.gs={o,phase:'brief',round:0,cards:new Map(),room:null,done:new Set(),swapped:new Set()};},
+  logCard(p,c){logAdd(p,{kind:'card',game:this.name,title:`Stop ${G.gs.round} · ${c.kind}`,text:c.text});},
+  draw(){const s=G.gs,ps=online();s.done=new Set();s.swapped=new Set();sfx.card();
+    if(s.o.deal==='room'){s.room=rbDeal(1)[0];s.cards=new Map();ps.forEach(p=>this.logCard(p,s.room));}
+    else{const d=rbDeal(ps.length);s.room=null;s.cards=new Map(ps.map((p,i)=>[p.id,d[i]]));ps.forEach(p=>this.logCard(p,s.cards.get(p.id)));}},
+  cardFor(p){const s=G.gs;if(s.room)return s.room;if(s.phase!=='card'&&s.phase!=='build')return null;
+    if(!s.cards.has(p.id)){const c=rbDeal(1)[0];s.cards.set(p.id,c);this.logCard(p,c);} // a late joiner gets a card too
+    return s.cards.get(p.id);},
   go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
-    if(ph==='sketch')startClock(s.o.sketch*60000,()=>{sfx.alarm();this.go('rotate');});
-    if(ph==='rotate'){s.round++;sfx.whoosh();startClock(30000,()=>this.go('sabotage'));}
-    if(ph==='sabotage'){this.draw();}
-    if(ph==='rebuild')startClock(s.o.rebuild*60000,()=>{sfx.alarm();this.go(s.round<s.o.rounds?'rotate':'done');});
+    if(ph==='sketch')startClock(s.o.sketch*60000,()=>{sfx.alarm();this.go('pass');});
+    if(ph==='pass'){s.round++;sfx.whoosh();startClock(30000,()=>this.go('card'));}
+    if(ph==='card')this.draw();
+    if(ph==='build')startClock(s.o.stop*60000,()=>{sfx.alarm();this.go(s.round<s.o.rounds?'pass':'done');});
     if(ph==='done')sfx.fanfare();
     render();syncAll();},
-  next(){const s=G.gs;({brief:()=>this.go('sketch'),sketch:()=>this.go('rotate'),rotate:()=>this.go('sabotage'),sabotage:()=>this.go('rebuild'),rebuild:()=>this.go(s.round<s.o.rounds?'rotate':'done'),done:()=>exitGame(true)})[s.phase]();},
+  next(){const s=G.gs;({brief:()=>this.go('sketch'),sketch:()=>this.go('pass'),pass:()=>this.go('card'),card:()=>this.go('build'),build:()=>this.go(s.round<s.o.rounds?'pass':'done'),done:()=>exitGame(true)})[s.phase]();},
   frame(){clockFrame();},
-  act(p,d){const s=G.gs;if(d.t==='done'&&(s.phase==='sabotage'||s.phase==='rebuild')){s.done.add(p.id);sfx.vote();sync(p);const e=$('#nDone');if(e)e.textContent=s.done.size;}},
+  act(p,d){const s=G.gs;
+    if(d.t==='got'&&(s.phase==='card'||s.phase==='build')){s.done.add(p.id);sfx.vote();sync(p);const e=$('#nDone');if(e)e.textContent=s.done.size;}
+    if(d.t==='swap'&&s.phase==='card'&&!s.room&&!s.swapped.has(p.id)){s.swapped.add(p.id);const c=rbDeal(1)[0];s.cards.set(p.id,c);this.logCard(p,c);sfx.card();sync(p);render();}},
   render(st){
     const s=G.gs,o=s.o;
+    const wall=()=>`<div class="rbwall">${online().map(p=>{const c=this.cardFor(p);return c?`<div class="rbc c${p.sh}${s.done.has(p.id)?' got':''}"><span class="lab">${esc(p.name)} · ${esc(c.kind)}</span><p>${esc(c.text)}</p></div>`:'';}).join('')}</div>`;
     const bodies={
-      brief:`<div class="dbig"><span class="lab">Round 0</span><h2>Start a sketch</h2><p>${o.sketch} minutes. A loop, a beat, an idea — anything. Then it stops being yours.</p></div>`,
-      sketch:`<div class="dbig"><span class="lab">Sketch</span>${clockHTML('huge')}<p>Make something you’d be sad to lose.</p></div>`,
-      rotate:`<div class="dbig rot"><div class="arrows"><i></i><i></i><i></i><i></i></div><h2>Rotate!</h2><p>Swap seats with the person on your left — or send them your project file. Hands off your own.</p>${clockHTML()}</div>`,
-      sabotage:`<div class="dbig"><span class="lab">Sabotage ${s.round} of ${o.rounds} · ${esc(s.sev||'')}</span><div class="scard"><b>${esc(s.card)}</b></div><p><b id="nDone">${s.done.size}</b> of ${online().length} have done it</p><div class="frow"><button class="ghost" id="bRedraw">Draw another card</button></div></div>`,
-      rebuild:`<div class="dbig"><span class="lab">Rebuild ${s.round} of ${o.rounds}</span>${clockHTML('huge')}<div class="scard small"><b>${esc(s.card)}</b></div><p>Make it great again — with what survived.</p></div>`,
-      done:`<div class="dbig"><span class="lab">Showcase</span><h2>Play them back</h2><p>Go round the room: play each wrecked-and-rebuilt track next to what it started as. Which darling was worth killing?</p></div>`,
+      brief:`<div class="dbig"><span class="lab">Before the first stop</span><h2>Start a sketch</h2><p>${o.sketch} minute${o.sketch>1?'s':''}: a loop, a beat, a sound you love. Then it goes on a journey round the room, ${o.rounds} stop${o.rounds>1?'s':''} long.</p></div>`,
+      sketch:`<div class="dbig"><span class="lab">First sketch</span>${clockHTML('huge')}<p>Start something worth passing on.</p></div>`,
+      pass:`<div class="dbig rot"><div class="arrows"><i></i><i></i><i></i><i></i></div><h2>Pass it on!</h2><p>Move one seat on, or send your project file to the next person. The track in front of you is now yours to grow.</p>${clockHTML()}</div>`,
+      card:s.room?`<div class="dbig"><span class="lab">Stop ${s.round} of ${o.rounds} · ${esc(s.room.kind)}</span><div class="scard"><b>${esc(s.room.text)}</b></div><p><b id="nDone">${s.done.size}</b> of ${online().length} ready</p><div class="frow"><button class="ghost" id="bRedraw">Draw another card</button></div></div>`
+        :`<div class="rbcards"><div class="rbhead"><span class="lab">Stop ${s.round} of ${o.rounds} · everyone has their own card</span><h2>Check your phone</h2><p><b id="nDone">${s.done.size}</b> of ${online().length} ready</p></div>${wall()}</div>`,
+      build:`<div class="dbig"><span class="lab">Stop ${s.round} of ${o.rounds}</span>${clockHTML('huge')}${s.room?`<div class="scard small"><b>${esc(s.room.text)}</b></div>`:'<p>Your card is on your phone.</p>'}</div>`,
+      done:`<div class="dbig"><span class="lab">Listening party</span><h2>Play them back</h2><p>Go round the room: play each track and tell its journey. Which card took it somewhere nobody expected?</p></div>`,
     };
-    const lbl={brief:'Start the sketch',sketch:'Time — rotate now',rotate:'Draw the sabotage',sabotage:'Start the rebuild',rebuild:s.round<o.rounds?'Rotate again':'Showcase',done:'Back to the menu'}[s.phase];
-    st.innerHTML=`<div class="destruct dots ph-${s.phase}">${bodies[s.phase]}<div class="dfoot"><div class="steps2">${(()=>{const seq=['sketch',...[...Array(o.rounds)].flatMap(()=>['rotate','sabotage','rebuild']),'done'],at=s.phase==='brief'?-1:s.phase==='sketch'?0:s.phase==='done'?seq.length-1:1+(s.round-1)*3+['rotate','sabotage','rebuild'].indexOf(s.phase);return seq.map((p,i)=>`<i class="${i<at?'past':i===at?'cur':''}" title="${p}"></i>`).join('');})()}</div><button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
-    $('#bNext').onclick=()=>this.next();if($('#bRedraw'))$('#bRedraw').onclick=()=>{this.draw();render();syncAll();};
+    const lbl={brief:'Start the sketch',sketch:'Time: pass it on',pass:'Deal the cards',card:'Start the clock',build:s.round<o.rounds?'Pass it on again':'Listening party',done:'Back to the menu'}[s.phase];
+    const seq=['sketch',...[...Array(o.rounds)].flatMap(()=>['pass','card','build']),'done'],at=s.phase==='brief'?-1:s.phase==='sketch'?0:s.phase==='done'?seq.length-1:1+(s.round-1)*3+['pass','card','build'].indexOf(s.phase);
+    st.innerHTML=`<div class="destruct roundabout dots ph-${s.phase}">${bodies[s.phase]}<div class="dfoot"><div class="steps2">${seq.map((p,i)=>`<i class="${i<at?'past':i===at?'cur':''}" title="${p}"></i>`).join('')}</div><button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
+    $('#bNext').onclick=()=>this.next();if($('#bRedraw'))$('#bRedraw').onclick=()=>{s.room=rbDeal(1)[0];s.done=new Set();online().forEach(p=>this.logCard(p,s.room));sfx.card();render();syncAll();};
   },
-  pstate(p){const s=G.gs;return {k:s.phase+s.round+(s.card||'').length+(s.done.has(p.id)?'d':''),ph:s.phase,round:s.round,rounds:s.o.rounds,card:s.card,done:s.done.has(p.id),clock:pClock()};},
+  pstate(p){const s=G.gs,c=this.cardFor(p);return {k:s.phase+s.round+(c?c.text.length:0)+(s.done.has(p.id)?'d':'')+(s.swapped.has(p.id)?'s':''),ph:s.phase,round:s.round,rounds:s.o.rounds,card:c,done:s.done.has(p.id),canSwap:!s.room&&s.phase==='card'&&!s.swapped.has(p.id),clock:pClock()};},
   player(root,st){pClockStart(st.clock);
-    const T={brief:['Get ready','Start a sketch when the timer starts.'],sketch:['Sketch!','Make something you’d be sad to lose.'],rotate:['Rotate!','Move one seat to the left (or pass your project). Hands off your own.'],sabotage:['Sabotage','Obey the card. No arguing.'],rebuild:['Rebuild','Make it great with what survived.'],done:['Showcase','Play it back to the room.']}[st.ph];
-    root.innerHTML=`<div class="pcol2 ${st.ph==='rotate'?'rotating':''}">${pClockHTML(st.clock)}<h2 class="pbigt">${esc(T[0])}</h2><p>${esc(T[1])}</p>
-      ${st.card&&(st.ph==='sabotage'||st.ph==='rebuild')?`<div class="scard"><b>${esc(st.card)}</b></div>`:''}
-      ${st.ph==='sabotage'?`<button class="big go" id="pDone" ${st.done?'disabled':''}>${st.done?'Done ✓':'I did it'}</button>`:''}</div>`;
-    if($('#pDone',root))$('#pDone',root).onclick=()=>{papi.send({t:'done'});papi.vibe(20);};
-    if(st.ph==='rotate')papi.vibe([60,60,60]);
-  },
-});
-
-/* =====================================================================
-   REMIX RELAY — teams of four, one machine each, three minutes a leg
-   ===================================================================== */
-const TEAM_NAMES=['Red Circles','Blue Squares','Yellow Triangles','Green Diamonds','Red Squares','Blue Triangles','Yellow Diamonds','Green Circles'];
-game({
-  id:'relay',group:'make',name:'Remix Relay',tag:'Teams share one machine. Three minutes each, no questions — pass the baton.',
-  how:['The room is split into teams. Runner 1 of each team starts a beat at their team’s station.','When the buzzer goes, runner 2 takes over blind — whatever state it’s in — for the next leg.','After every runner has had a turn, play the tracks back. Phones vote for the best other team.'],
-  badges:['Teams','Scored by votes'],kind:'free',
-  icon:`<svg viewBox="0 0 64 64"><rect x="4" y="28" width="38" height="10" rx="5" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" transform="rotate(-20 23 33)"/><circle cx="46" cy="18" r="8" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><path d="M8 54 h48" stroke="var(--ink)" stroke-width="3" stroke-dasharray="6 5"/></svg>`,
-  options:[
-    {key:'size',label:'Team size',choices:[[3,'3'],[4,'4'],[5,'5']],def:4},
-    {key:'leg',label:'Leg length',choices:[[2,'2','min'],[3,'3','min'],[4,'4','min'],[5,'5','min']],def:3},
-    {key:'twist',label:'Twist cards',choices:[[1,'On','each leg gets a task'],[0,'Off']],def:1},
-  ],
-  check:()=>online().length>=2?'':'At least two phones need to be in the room',
-  topInfo(){const s=G.gs;return !s?this.tag:{teams:'Teams',leg:`Leg ${s.leg} of ${s.legs}`,switch:'Switch!',vote:'Vote',result:'Results'}[s.phase];},
-  makeTeams(){const s=G.gs,ids=shuffle(online().map(p=>p.id)),n=Math.max(ids.length>=2?2:1,Math.round(ids.length/s.o.size)); // at least two teams, so there is someone else to vote for
-    s.teams=[...Array(n)].map((_,i)=>({name:TEAM_NAMES[i%8],sh:i%4,col:i%4,ids:[]}));ids.forEach((id,i)=>s.teams[i%n].ids.push(id));s.legs=Math.max(...s.teams.map(t=>t.ids.length));},
-  start(o){G.gs={o,phase:'teams',leg:0,legs:0,teams:[],votes:new Map(),twists:[]};this.makeTeams();},
-  onJoin(p){const s=G.gs;if(s.teams.some(t=>t.ids.includes(p.id)))return;const t=s.teams.slice().sort((a,b)=>a.ids.length-b.ids.length)[0];if(t){t.ids.push(p.id);s.legs=Math.max(s.legs,t.ids.length);}if(s.phase==='teams')render();sync(p);},
-  teamOf(id){return G.gs.teams.findIndex(t=>t.ids.includes(id));},
-  go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
-    if(ph==='leg'){s.leg++;s.twist=s.o.twist?pick(RELAY_TWISTS):'';
-      s.teams.forEach(t=>{if(s.leg===1)t.ids.forEach((id,k)=>logAdd(G.players.get(id),{kind:'team',game:this.name,title:t.name,text:`You run leg ${k+1} of ${t.ids.length} · with ${t.ids.filter(x=>x!==id).map(x=>(G.players.get(x)||{name:'?'}).name).join(', ')||'nobody'}`}));
-        const r=G.players.get(t.ids[s.leg-1]);if(r&&s.twist)logAdd(r,{kind:'card',game:this.name,title:`Leg ${s.leg} twist`,text:s.twist});});startClock(s.o.leg*60000,()=>{sfx.swap();this.go(s.leg<s.legs?'switch':'vote');});}
-    if(ph==='switch')startClock(10000,()=>this.go('leg'));
-    if(ph==='result')this.score();
-    if(ph==='vote')sfx.fanfare();
-    render();syncAll();},
-  score(){const s=G.gs,tally=s.teams.map(()=>0);s.votes.forEach(t=>{if(tally[t]!=null)tally[t]++;});const max=Math.max(...tally);s.tally=tally;
-    s.teams.forEach((t,i)=>t.ids.forEach(id=>{const p=G.players.get(id);if(p){award(p,tally[i]*150+(tally[i]===max&&max>0?500:0)+100);logAdd(p,{kind:'finish',game:this.name,text:`${t.name}: ${tally[i]} vote${tally[i]===1?'':'s'}${tally[i]===max&&max>0?' · winning team':''}`});}}));saveRoom();},
-  next(){const s=G.gs;({teams:()=>this.go('leg'),leg:()=>this.go(s.leg<s.legs?'switch':'vote'),switch:()=>this.go('leg'),vote:()=>this.go('result'),result:()=>exitGame(true)})[s.phase]();},
-  frame(){clockFrame();},
-  act(p,d){const s=G.gs;if(d.t==='vote'&&s.phase==='vote'){const t=+d.team;if(t===this.teamOf(p.id)||!s.teams[t])return;s.votes.set(p.id,t);sfx.vote();const e=$('#nVotes');if(e)e.textContent=s.votes.size;sync(p);}},
-  render(st){
-    const s=G.gs,P=id=>G.players.get(id),runner=t=>t.ids[s.leg-1];
-    const teamCols=s.teams.map((t,i)=>`<div class="team c${t.col}"><div class="thead">${shape(t.sh,30,'var(--ink)','var(--c)')}<b>${esc(t.name)}</b>${s.phase==='result'?`<em>${s.tally[i]} vote${s.tally[i]===1?'':'s'}</em>`:''}</div>
-      <ol>${t.ids.map((id,k)=>`<li class="${s.phase!=='teams'&&k===s.leg-1&&(s.phase==='leg')?'up':k<s.leg-(s.phase==='switch'?0:1)?'ran':''}">${esc(P(id)?P(id).name:'?')}</li>`).join('')}</ol>
-      ${s.phase==='leg'&&!runner(t)?'<p class="fine">no runner this leg — free choice</p>':''}</div>`).join('');
-    const winners=()=>{const m=Math.max(...s.tally);const w=s.teams.filter((t,i)=>s.tally[i]===m&&m>0);return w.length?esc(w.map(t=>t.name).join(' & '))+' win':'No votes cast';};
-    const head={teams:()=>`<h2>The teams</h2><p>Each team gathers at one machine. Runner 1 sits down.</p>`,
-      leg:()=>`<span class="lab">Leg ${s.leg} of ${s.legs}</span>${clockHTML('huge')}${s.twist?`<div class="scard small"><span class="lab">Twist for this leg</span><b>${esc(s.twist)}</b></div>`:''}`,
-      switch:()=>`<h2 class="pul">SWITCH!</h2><p>Runner ${s.leg+1} takes the seat. No talking — just listen and build.</p>${clockHTML()}`,
-      vote:()=>`<h2>Listening party</h2><p>Play each team’s track. Then everyone votes on their phone for the best <b>other</b> team. <b id="nVotes">${s.votes.size}</b> votes in.</p>`,
-      result:()=>`<h2>${winners()}</h2><p>150 points per vote, +500 to the winners, +100 to everyone who ran.</p>`}[s.phase]();
-    const lbl={teams:'Start leg 1',leg:s.leg<s.legs?'Buzzer — switch now':'Finish — go to the vote',switch:'Go',vote:'Show the results',result:'Back to the menu'}[s.phase];
-    st.innerHTML=`<div class="relay dots"><div class="rtop">${head}</div><div class="teams">${teamCols}</div><div class="dfoot">${s.phase==='teams'?'<button class="ghost" id="bShuf">Shuffle teams</button>':''}<span></span><button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
-    $('#bNext').onclick=()=>this.next();if($('#bShuf'))$('#bShuf').onclick=()=>{this.makeTeams();render();syncAll();};
-  },
-  pstate(p){const s=G.gs,ti=this.teamOf(p.id),t=s.teams[ti],k=t?t.ids.indexOf(p.id):-1;
-    return {k:s.phase+s.leg+(s.votes.has(p.id)?'v':''),ph:s.phase,leg:s.leg,legs:s.legs,team:t?{name:t.name,sh:t.sh,i:ti}:null,mine:k+1,runner:t&&s.leg?(G.players.get(t.ids[s.leg-1])||{}).name:'',twist:s.twist,
-      teams:s.phase==='vote'?s.teams.map((x,i)=>({name:x.name,sh:x.sh,i})):null,voted:s.votes.get(p.id),tally:s.tally,clock:pClock()};},
-  player(root,st){pClockStart(st.clock);
-    if(!st.team){root.innerHTML=`<div class="pcenter"><h2>Watching</h2><p>You'll be added to a team in a moment.</p></div>`;return;}
-    const badge=`<div class="tbadge c${st.team.sh}">${shape(st.team.sh,40,'var(--ink)','var(--c)')}<b>${esc(st.team.name)}</b><span>runner ${st.mine}</span></div>`;
-    if(st.ph==='vote'){root.innerHTML=`<div class="pcol2">${badge}<h2 class="pbigt">Vote</h2><p>Which other team made the best track?</p><div class="pvotes">${st.teams.filter(t=>t.i!==st.team.i).map(t=>`<button class="pvote c${t.sh} ${st.voted===t.i?'on':''}" data-t="${t.i}">${shape(t.sh,32,'var(--ink)','var(--c)')}<b>${esc(t.name)}</b></button>`).join('')}</div></div>`;
-      $$('.pvote',root).forEach(b=>b.onclick=()=>{papi.send({t:'vote',team:+b.dataset.t});papi.vibe(15);});return;}
-    const up=st.ph==='leg'&&st.mine===st.leg,next=st.ph==='switch'&&st.mine===st.leg+1;
-    const msg=st.ph==='teams'?['Find your team','Runner '+st.mine+'. Gather at your team’s machine.']:st.ph==='result'?['Results','See the big screen.']:up?['YOU’RE UP!','Build. No questions. Make the next layer.']:next?['You’re next!','Take the seat. Listen first, then build.']:st.mine<st.leg?['Done ✓','You ran. Cheer on '+(st.runner||'the next runner')+'.']:['Waiting','Now running: '+(st.runner||'—')+'. Your leg is '+st.mine+'.'];
-    root.innerHTML=`<div class="pcol2 ${up||next?'hot':''}">${badge}${pClockHTML(st.clock)}<h2 class="pbigt">${esc(msg[0])}</h2><p>${esc(msg[1])}</p>${st.twist&&st.ph==='leg'?`<div class="scard small"><span class="lab">Twist</span><b>${esc(st.twist)}</b></div>`:''}</div>`;
-    if(up||next)papi.vibe([80,60,80]);
+    const T={brief:['Get ready','Start a sketch when the timer starts.'],sketch:['Sketch!','Start something worth passing on.'],pass:['Pass it on!','Move one seat on, or pass your project file. Your card arrives in a moment.'],card:['Your card','Read it, then make it happen in the track in front of you.'],build:['Make it happen',''],done:['Listening party','Play your track back to the room.']}[st.ph];
+    root.innerHTML=`<div class="pcol2 ${st.ph==='pass'?'rotating':''}">${pClockHTML(st.clock)}<h2 class="pbigt">${esc(T[0])}</h2>${T[1]?`<p>${esc(T[1])}</p>`:''}
+      ${st.card?`<div class="scard rbphone"><span class="lab">Stop ${st.round} of ${st.rounds} · ${esc(st.card.kind)}</span><b>${esc(st.card.text)}</b></div>`:''}
+      ${st.ph==='card'?`<button class="big go" id="pGot" ${st.done?'disabled':''}>${st.done?'Ready ✓':'Got it'}</button>${st.canSwap?'<button class="ghost" id="pSwap">Different card (once)</button>':''}`:''}</div>`;
+    if($('#pGot',root))$('#pGot',root).onclick=()=>{papi.send({t:'got'});papi.vibe(20);};
+    if($('#pSwap',root))$('#pSwap',root).onclick=()=>{papi.send({t:'swap'});papi.vibe(15);};
+    if(st.ph==='pass')papi.vibe([60,60,60]);
   },
 });
 
@@ -380,14 +336,15 @@ function knobSVG(v){const a0=135,a1=405,ang=a0+v*270,R=26,c=32,pt=a=>[c+R*Math.c
   const arc=(x,y)=>{const [sx,sy]=pt(x),[ex,ey]=pt(y);return `M${sx.toFixed(1)} ${sy.toFixed(1)}A${R} ${R} 0 ${y-x>180?1:0} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`;};const [kx,ky]=pt(ang);
   return `<svg viewBox="0 0 64 64"><path d="${arc(a0,a1)}" fill="none" stroke="var(--hair)" stroke-width="5" stroke-linecap="round"/>${v>.005?`<path d="${arc(a0,ang)}" fill="none" stroke="var(--c,var(--red))" stroke-width="5" stroke-linecap="round"/>`:''}<circle cx="${kx.toFixed(1)}" cy="${ky.toFixed(1)}" r="4.5" fill="var(--c,var(--red))" stroke="var(--ink)" stroke-width="1.5"/><circle cx="32" cy="32" r="2.5" fill="var(--ink)"/></svg>`;}
 function patchBars(p,ref){return `<div class="pbars">${PATCH_KNOBS.map(({k,l})=>`<i title="${l}"><b style="height:${Math.round(p[k]*100)}%"></b>${ref?`<s style="bottom:${Math.round(ref[k]*100)}%"></s>`:''}<span>${l.slice(0,3)}</span></i>`).join('')}</div>`;}
+function synStop(){if(PL.synH){try{PL.synH.h.stop();}catch(e){}PL.synH=null;}AU_stopAll();}
 game({
-  id:'telephone',group:'make',name:'Parameter Telephone',tag:'Design a synth sound. The next person recreates it by ear — and twists one knob.',
-  how:['Everyone designs a patch on their phone’s eight-knob synth.','Each round you get someone else’s sound — no settings, just ears. Recreate it, then change exactly one knob and pass it on.','At the end, each chain plays from first to last on the big screen. Points for how close your copies were.'],
+  id:'telephone',group:'ears',name:'Parameter Telephone',tag:'Design a synth sound. The next person recreates it by ear — and twists one knob.',
+  how:['Headphones on! Everyone listens on their own phone, and the differences are small.','Everyone designs a patch on their phone’s eight-knob synth.','Each round you get someone else’s sound — no settings, just ears. Recreate it, then change exactly one knob and pass it on.','At the end, each chain plays from first to last on the big screen. Points for how close your copies were.'],
   badges:['Scored','Sound design','Uses phone speakers'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="16" cy="20" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M16 20 L22 12" stroke="var(--red)" stroke-width="4"/><circle cx="48" cy="44" r="11" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M48 44 L40 50" stroke="var(--blue)" stroke-width="4"/><path d="M26 26 Q40 22 40 34" fill="none" stroke="var(--ink)" stroke-width="3" stroke-dasharray="4 4"/></svg>`,
   options:[{key:'gens',label:'Generations',choices:[[3,'3','make + 2 copies'],[4,'4'],[5,'5']],def:3},{key:'csecs',label:'Design time',choices:[[60,'1','min'],[90,'1.5','min'],[120,'2','min']],def:90},{key:'rsecs',label:'Recreate time',choices:[[120,'2','min'],[180,'3','min'],[240,'4','min']],def:180},
     {key:'test',label:'Test mode',choices:[[0,'Off','real players only'],[1,'Bots','two bots join the chain']],def:0}],
-  note:'Students hear the sounds on their own phones — headphones help. Needs at least two players, or turn on Test mode: two bots join the chain so you can try it with one phone.',
+  note:'Students listen on their own phones, so ask everyone to put headphones on before you start. Play loops until pressed again, and every knob turn is heard at once. Needs at least two players, or turn on Test mode: two bots join the chain so you can try it with one phone.',
   check:v=>online().length>=2||(v&&v.test&&online().length>=1)?'':'At least two phones need to be in the room (or turn on Test mode)',
   topInfo(){const s=G.gs;return !s?this.tag:s.phase==='brief'?'Ready':s.phase==='create'?'Generation 1 · design':s.phase==='recreate'?`Generation ${s.r+1} of ${s.gens} · recreate`:s.phase==='reveal'?`Chain ${s.c+1} of ${s.N}`:'Final';},
   start(o){const bots=o.test?['Bot Moog','Bot Buchla']:[],botNames={};bots.forEach((n,i)=>botNames['bot:'+i]=n);
@@ -443,29 +400,33 @@ game({
     if(s.phase==='create')return {...base,sent:s.subs.has(p.id)};
     if(s.phase==='reveal'){const mine=s.chains.flatMap(ch=>ch).filter(g=>g.by===p.id&&g.acc!=null);return {...base,acc:mine.length?Math.round(100*mine.reduce((a,g)=>a+g.acc,0)/mine.length):null};}
     return base;},
-  player(root,st){pClockStart(st.clock);
+  player(root,st){pClockStart(st.clock);if(PL.synH&&(st.sent||!/create|recreate/.test(st.ph)||(PL.syn&&PL.syn.key!=='tp'+st.ph+st.r)))synStop();
     if(st.watch){root.innerHTML=`<div class="pcenter"><h2>Watching</h2><p>This game started before you joined — join the next one!</p></div>`;return;}
-    if(st.ph==='brief'){root.innerHTML=`<div class="pcenter dots"><h2 class="pul">Get ready</h2><p>You’ll design a synth sound on your phone. Headphones help.</p></div>`;return;}
+    if(st.ph==='brief'){root.innerHTML=`<div class="pcenter dots"><h2 class="pul">Headphones on</h2><p>You’ll design a synth sound on your phone. Plug in your headphones now: the differences between sounds are small.</p></div>`;return;}
     if(st.ph==='reveal'||st.ph==='end'){root.innerHTML=`<div class="pcenter dots"><div class="lab">Your copies were</div><div class="rankbig">${st.acc??'—'}<sup>%</sup></div><p>accurate · ${st.gp} pts · watch the big screen</p></div>`;return;}
     if(st.sent){root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}<h2 class="pbigt">Sent on ✓</h2><p>Waiting for the others…</p></div>`;return;}
     // the synth: knobs, play buttons, and in a recreate round the copy → twist steps
     const key='tp'+st.ph+st.r,S=PL.syn&&PL.syn.key===key?PL.syn:(PL.syn={key,p:{...PATCH_DEFAULT},step:st.ph==='create'?'design':'copy',copy:null,tw:null});
     const draw=()=>{
       const twisting=S.step==='twist';
-      root.innerHTML=`<div class="psynth">${pClockHTML(st.clock)}<p class="lab">${st.ph==='create'?'Design a sound — make it yours':twisting?'Now change ONE knob — your twist':'Recreate the mystery sound by ear'}</p>
+      root.innerHTML=`<div class="psynth">${pClockHTML(st.clock)}<p class="lab">${st.ph==='create'?'Design a sound — make it yours':twisting?'Now change ONE knob — your twist':'Recreate the mystery sound by ear'}</p><p class="phones">🎧 Headphones on · press Play and turn the knobs while it loops</p>
         <div class="pknobs">${PATCH_KNOBS.map(({k,l,fmt},i)=>`<div class="pknob c${i%4} ${twisting&&S.tw&&S.tw!==k?'off':''}" data-k="${k}">${knobSVG(S.p[k])}<b>${l}</b><span>${esc(fmt(S.p[k]))}</span></div>`).join('')}</div>
-        <div class="frow pcenterrow">${st.ph==='recreate'?'<button class="ghost" id="pMy">▶ Mystery</button>':''}<button class="ghost" id="pMine">▶ ${st.ph==='create'?'Play':'Mine'}</button></div>
+        <div class="frow pcenterrow">${st.ph==='recreate'?`<button class="ghost ${PL.synH&&PL.synH.which==='my'?'on':''}" id="pMy">${PL.synH&&PL.synH.which==='my'?'■ Stop':'▶ Mystery'}</button>`:''}<button class="ghost ${PL.synH&&PL.synH.which==='mine'?'on':''}" id="pMine">${PL.synH&&PL.synH.which==='mine'?'■ Stop':'▶ '+(st.ph==='create'?'Play':'Mine')}</button></div>
         <button class="big go" id="pGo">${st.ph==='create'?'Send it on':twisting?(S.tw?'Send it on':'Turn one knob first'):'Lock my copy'}</button></div>`;
       $$('.pknob',root).forEach(n=>{const k=n.dataset.k;let y0=0,v0=0;
         n.addEventListener('pointerdown',e=>{if(twisting&&S.tw&&S.tw!==k)return;n.setPointerCapture(e.pointerId);y0=e.clientY;v0=S.p[k];if(twisting)S.tw=k;});
-        n.addEventListener('pointermove',e=>{if(!n.hasPointerCapture(e.pointerId))return;S.p[k]=Math.round(clamp(v0+(y0-e.clientY)/160,0,1)*100)/100;$('svg',n).outerHTML=knobSVG(S.p[k]);$('span',n).textContent=PATCH_KNOBS.find(x=>x.k===k).fmt(S.p[k]);});
+        n.addEventListener('pointermove',e=>{if(!n.hasPointerCapture(e.pointerId))return;S.p[k]=Math.round(clamp(v0+(y0-e.clientY)/160,0,1)*100)/100;if(PL.synH&&PL.synH.which==='mine')PL.synH.h.set(S.p);$('svg',n).outerHTML=knobSVG(S.p[k]);$('span',n).textContent=PATCH_KNOBS.find(x=>x.k===k).fmt(S.p[k]);});
         n.addEventListener('pointerup',()=>{if(twisting)draw();});});
-      if($('#pMy',root))$('#pMy',root).onclick=()=>{AU_stopAll();playPatch(st.mystery);};
-      $('#pMine',root).onclick=()=>{AU_stopAll();playPatch(S.p);};
-      $('#pGo',root).onclick=()=>{AU_stopAll();
+      // play buttons loop until pressed again; turning a knob changes "Mine" while you listen
+      const toggle=which=>{const was=PL.synH&&PL.synH.which;synStop();if(was!==which){PL.synH={which,h:playPatch(which==='my'?st.mystery:S.p,null,{loops:0})};}draw();};
+      if($('#pMy',root))$('#pMy',root).onclick=()=>toggle('my');
+      $('#pMine',root).onclick=()=>toggle('mine');
+      $('#pGo',root).onclick=()=>{synStop();
         if(st.ph==='create'){papi.send({t:'sub',r:0,p:S.p});return;}
         if(S.step==='copy'){S.copy={...S.p};S.step='twist';draw();return;}
         if(!S.tw)return;papi.send({t:'sub',r:st.r,copy:S.copy,p:S.p});};
     };draw();
   },
 });
+// Parameter Telephone sits with the ear-training games, in slot 10 just before Meter Lab
+(()=>{const i=GAMES.findIndex(g=>g.id==='telephone');if(i<0)return;const [tel]=GAMES.splice(i,1);const m=GAMES.findIndex(g=>g.id==='meterlab');GAMES.splice(m<0?GAMES.length:m,0,tel);})();

@@ -428,19 +428,29 @@ const PATCH_KNOBS=[
 ];
 const PATCH_DEFAULT={wave:.6,cut:.6,res:.2,drive:0,att:0,dec:.3,echo:0,wob:0};
 const randomPatch=()=>Object.fromEntries(PATCH_KNOBS.map(({k})=>[k,Math.round(Math.random()*100)/100]));
+/* The Telephone synth. loops=0 plays until stopped, and h.set(p) changes the sound while it plays:
+   filter, drive, wobble and echo move at once, wave/attack/decay from the next note on. */
 function playPatch(p,dest,{loops=1}={}){
   const ac=audio(),out=gn(ac,1);out.connect(dest||AU.music);
-  const wave=['sine','triangle','sawtooth','square'][Math.min(3,Math.floor(p.wave*4))];
-  const f=bq(ac,'lowpass',80*Math.pow(150,p.cut),.5+p.res*16),drv=shaper(ac,'soft',p.drive*1.6),pre=gn(ac,1+p.drive*1.5),vca=gn(ac,.28/(1+p.drive*1.2));
-  const lfo=osc(ac,'sine',3.2),lg=gn(ac,80*Math.pow(150,p.cut)*p.wob*1.4);lfo.connect(lg).connect(f.frequency);lfo.start();
-  const dl=ac.createDelay(1),fb=gn(ac,p.echo*.55),wet=gn(ac,p.echo*.7);dl.delayTime.value=.409;
+  const f=bq(ac,'lowpass',1000,1),drv=shaper(ac,'soft',0),pre=gn(ac,1),vca=gn(ac,.28);
+  const lfo=osc(ac,'sine',3.2),lg=gn(ac,0);lfo.connect(lg).connect(f.frequency);lfo.start();
+  const dl=ac.createDelay(1),fb=gn(ac,0),wet=gn(ac,0);dl.delayTime.value=.409;
   pre.connect(drv).connect(f).connect(vca).connect(out);vca.connect(dl);dl.connect(fb).connect(dl);dl.connect(wet).connect(out);
-  const bpm=110,sd=60/bpm/4,riff=[57,64,69,72,64,69,60,67,57,64,69,72,65,69,67,64],t0=ac.currentTime+.06;
-  const A=.001+p.att*p.att*.6,D=.04+p.dec*p.dec*1.4;
-  for(let L=0;L<loops;L++)riff.forEach((n,i)=>{const t=t0+(L*16+i)*sd*2,o=osc(ac,wave,hz(n-12)),g=gn(ac,0);o.connect(g).connect(pre);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+A);g.gain.setTargetAtTime(0,t+A,D/3);o.start(t);o.stop(t+A+D*2+.05);});
-  const dur=loops*16*sd*2;
-  const h={dur,stop(fd=.08){const t=ac.currentTime;out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+fd);setTimeout(()=>{try{out.disconnect();lfo.stop();}catch(e){}},fd*1000+400);AU.live.delete(h);}};
-  AU.live.add(h);setTimeout(()=>{if(AU.live.has(h))h.stop(.6);},(dur+1.8)*1000);return h;
+  let P={...p};
+  const set=(q,tc=.025)=>{P={...q};const t=ac.currentTime,fc=80*Math.pow(150,P.cut);
+    f.frequency.setTargetAtTime(fc,t,tc);f.Q.setTargetAtTime(.5+P.res*16,t,tc);drv.curve=curve('soft',P.drive*1.6);
+    pre.gain.setTargetAtTime(1+P.drive*1.5,t,tc);vca.gain.setTargetAtTime(.28/(1+P.drive*1.2),t,tc);
+    lg.gain.setTargetAtTime(fc*P.wob*1.4,t,tc);fb.gain.setTargetAtTime(P.echo*.55,t,tc);wet.gain.setTargetAtTime(P.echo*.7,t,tc);};
+  set(p,.001);
+  const bpm=110,step=60/bpm/2,riff=[57,64,69,72,64,69,60,67,57,64,69,72,65,69,67,64],t0=ac.currentTime+.06,N=loops?loops*16:Infinity;let i=0;
+  const note=(t,n)=>{const wave=['sine','triangle','sawtooth','square'][Math.min(3,Math.floor(P.wave*4))],A=.001+P.att*P.att*.6,D=.04+P.dec*P.dec*1.4;
+    const o=osc(ac,wave,hz(n-12)),g=gn(ac,0);o.connect(g).connect(pre);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(1,t+A);g.gain.setTargetAtTime(0,t+A,D/3);o.start(t);o.stop(t+A+D*2+.05);};
+  // a finite take is scheduled up front (background tabs throttle timers); an endless one looks 150 ms ahead
+  const tick=()=>{const lim=loops?Infinity:ac.currentTime+.15;while(i<N&&t0+i*step<lim){note(t0+i*step,riff[i%16]);i++;}};
+  tick();const timer=loops?0:setInterval(tick,40);
+  const dur=loops?N*step:Infinity;
+  const h={dur,set,stop(fd=.08){clearInterval(timer);const t=ac.currentTime;out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+fd);setTimeout(()=>{try{out.disconnect();lfo.stop();}catch(e){}},fd*1000+400);AU.live.delete(h);}};
+  AU.live.add(h);if(loops)setTimeout(()=>{if(AU.live.has(h))h.stop(.6);},(dur+1.8)*1000);return h;
 }
 const patchDist=(a,b)=>PATCH_KNOBS.reduce((s,{k})=>s+Math.abs((a[k]??0)-(b[k]??0)),0)/PATCH_KNOBS.length;
 

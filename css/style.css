@@ -809,3 +809,36 @@ kbd{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding:
 .pname:disabled{opacity:.4;box-shadow:none;background:transparent}
 .pname small{font:700 9px var(--mono);text-transform:uppercase}
 .linkbtn{border:0;background:none;font:700 12px var(--mono);text-decoration:underline;color:var(--ink2);padding:8px;cursor:pointer;justify-self:center}
+.psynth .phones{font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.04em;background:var(--yel);border:2px solid var(--ink);padding:3px 6px;justify-self:center}
+.psynth .ghost.on{background:var(--ink);color:var(--paper)}
+/* ---------- + / − option stepper ---------- */
+.stepper{display:inline-grid;grid-template-columns:56px minmax(130px,auto) 56px;border:3px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--ink)}
+.stepper button{border:0;background:var(--yel);font:900 30px/1 var(--disp);cursor:pointer;color:var(--ink)}
+.stepper button:first-child{border-right:3px solid var(--ink)}.stepper button:last-child{border-left:3px solid var(--ink)}
+.stepper button:disabled{background:var(--hair);color:var(--ink2);cursor:default}
+.stepper button:not(:disabled):active{background:var(--ink);color:var(--paper)}
+.stepper b{display:flex;align-items:baseline;justify-content:center;gap:6px;padding:8px 14px;font:900 34px/1 var(--disp);font-stretch:70%}
+.stepper b small{font:700 11px var(--mono);text-transform:uppercase;color:var(--ink2)}
+/* ---------- Soundabout Roundabout ---------- */
+.rbcards{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+.rbhead{display:flex;align-items:end;gap:20px;flex-wrap:wrap}
+.rbhead h2{font:900 clamp(40px,4.4vw,72px)/.85 var(--disp);font-stretch:62%;text-transform:uppercase}
+.rbhead p{font-size:18px}
+.rbwall{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;align-content:start}
+.rbc{border:3px solid var(--ink);background:color-mix(in srgb,var(--c) 14%,var(--paper));padding:8px 10px;box-shadow:3px 3px 0 var(--ink);display:grid;gap:4px}
+.rbc p{font:700 15px/1.25 var(--disp)}
+.rbc.got{box-shadow:3px 3px 0 var(--green);border-color:var(--green)}
+.scard.rbphone{display:grid;gap:6px;text-align:left}
+.scard.rbphone b{font-size:22px;line-height:1.15}
+/* ---------- phone shell: always exactly the screen's width ----------
+   (a long class-list name used to widen the header, and the whole page with it) */
+.ply{width:100%;max-width:100vw;grid-template-columns:minmax(0,1fr);overflow-x:hidden}
+.ply>*{min-width:0;max-width:100%}
+.ptop{min-width:0}
+.ptop .logo,.ptop .nbbtn,.ptop .pscore{flex-shrink:0}
+.ptop .who{flex:0 1 auto;min-width:0}
+.ptop .who span{flex:1 1 auto;min-width:0;max-width:none}
+.pbody>*{min-width:0;max-width:100%}
+@media (max-width:380px){.ptop{gap:6px;padding-left:10px;padding-right:10px}.ptop .logo .lg{font-size:.86em}.ptop .pscore{font-size:22px;padding:4px 6px}}
+.res{grid-template-columns:minmax(0,1fr)}
+.res h2{max-width:100%;font-size:clamp(60px,24vw,160px);overflow-wrap:break-word;hyphens:manual}

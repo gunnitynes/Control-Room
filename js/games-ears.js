@@ -58,16 +58,16 @@ game(roundGame({
     {key:'n',label:'Rounds',choices:[[5,'5'],[8,'8'],[10,'10']],def:8},
     {key:'secs',label:'Answer time',choices:[[15,'15','seconds'],[25,'25','seconds'],[0,'OFF','no clock']],def:25},
   ],
-  prepMs:7000,prepLabel:'HUNT',prepSub:'the filter moves',
+  prepMs:3500,prepLabel:'HUNT',prepSub:'the filter moves',
   prepText:()=>({big:'Listen',small:'The filter is sweeping. Your slider appears when it stops.'}),
   secs:o=>o.secs,
   build:o=>{const ex=dealSong(SONG.excerpts,o.n);return shuffle([90,160,300,550,1000,1800,3200,5600,9000,12000]).slice(0,o.n).map((b,k)=>({f:Math.round(b*rnd(.85,1.18)),start:pick([120,400,1500,6000]),ex:o.src==='song'?ex[k]:null}));},
   onPrep(r,o){const ac=audio(),bp=bq(ac,'bandpass',r.start,o.q),mk=gn(ac,o.src==='noise'?3:4.5);bp.connect(mk).connect(AU.music);
     let src={stop(){}};if(o.src==='song')withSong(()=>{src=playExcerpt(r.ex,bp);});else src=o.src==='noise'?playPink(bp):playDemo(bp,{rt:1.1});
-    const n=96,c=new Float32Array(n);let w=Math.log2(r.start);for(let i=0;i<n;i++){const k=i/(n-1);w+=(Math.random()-.5)*.45;c[i]=Math.pow(2,lerp(w,Math.log2(r.f),Math.pow(k,2.2)));}c[n-1]=r.f;
-    bp.frequency.setValueCurveAtTime(c,ac.currentTime+.15,6.4);
+    const n=64,c=new Float32Array(n);let w=Math.log2(r.start);for(let i=0;i<n;i++){const k=i/(n-1);w+=(Math.random()-.5)*.45;c[i]=Math.pow(2,lerp(w,Math.log2(r.f),Math.pow(k,2.2)));}c[n-1]=r.f;
+    bp.frequency.setValueCurveAtTime(c,ac.currentTime+.1,3.15);
     // the song is bass-heavy: lift the gain as the filter climbs so high bands aren't faint (≈ +2.7 dB/octave)
-    if(o.src==='song'){const gc=c.map(f=>4.5*Math.pow(f/1000,.45));mk.gain.setValueCurveAtTime(gc,ac.currentTime+.15,6.4);}
+    if(o.src==='song'){const gc=c.map(f=>4.5*Math.pow(f/1000,.45));mk.gain.setValueCurveAtTime(gc,ac.currentTime+.1,3.15);}
     setAud({bp,mk,stop(){src.stop();setTimeout(()=>{try{mk.disconnect();}catch(e){}},800);}});},
   leave:stopAud,
   replay(r,ph,o){const ac=audio(),bp=bq(ac,'bandpass',r.f,o.q),mk=gn(ac,o.src==='noise'?3:o.src==='song'?4.5*Math.pow(r.f/1000,.45):4.5),dry=gn(ac,0),sum=gn(ac,1);bp.connect(mk).connect(sum);dry.connect(sum);sum.connect(AU.music);
@@ -129,7 +129,7 @@ game(roundGame({
 
 /* ---------- FREQUENCY SCULPTOR ---------- */
 // the flaw: a strong, fairly narrow resonance — loud enough that nobody can miss it
-const EQ_BOOST=18,EQ_Q=3.2;
+const EQ_BOOST=24,EQ_Q=4;
 function eqGraphSVG({bump,cuts=[],W=900,H=260}){
   const X=f=>40+(W-60)*unLog(40,16000,f),bell=(f0,g,q)=>f=>{const x=Math.log2(f/f0)*q*1.4;return g*Math.exp(-x*x);};
   const curve=fn=>{let d='';for(let i=0;i<=200;i++){const f=logU(40,16000,i/200);d+=(i?'L':'M')+X(f).toFixed(1)+' '+(H/2-fn(f)*5).toFixed(1);}return d;};
@@ -140,7 +140,7 @@ function eqGraphSVG({bump,cuts=[],W=900,H=260}){
 }
 game(roundGame({
   id:'sculptor',noWord:'Missed it',group:'ears',name:'Frequency Sculptor',tag:'Something in the mix sounds wrong. Find it on the EQ and cut it.',
-  how:['The mix plays with one ugly resonance boosted hard — +18 dB (boxy, harsh, muddy…).','Drag an EQ notch on your phone right onto the problem and lock it in.','The closer your cut, the more points. Then hear the room’s fix.'],
+  how:['The mix plays with one ugly resonance boosted hard: +24 dB (boxy, harsh, muddy…).','Drag an EQ notch on your phone right onto the problem and lock it in.','The closer your cut, the more points. Then hear the room’s fix.'],
   badges:['Scored','Listening'],speed:.15,okAt:.78,closeAt:.45,yesWord:'Fixed it!',
   icon:`<svg viewBox="0 0 64 64"><path d="M4 32 L22 32 Q28 32 30 52 Q32 60 34 52 Q36 32 42 32 L60 32" fill="none" stroke="var(--ink)" stroke-width="4"/><circle cx="32" cy="54" r="7" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><path d="M44 10 l10 10 M54 10 l-10 10" stroke="var(--ink)" stroke-width="4"/></svg>`,
   options:[
@@ -152,16 +152,22 @@ game(roundGame({
   prepText:()=>({big:'What’s wrong?',small:'Listen for the ugly bit. Your EQ appears in a moment.'}),
   secs:o=>o.secs,
   build:o=>{const ex=dealSong(SONG.excerpts,o.n);return shuffle(EQ_PROBLEMS).slice(0,o.n).map((p,k)=>({...p,f:Math.round(p.f*rnd(.87,1.15)),ex:o.src==='song'?ex[k]:null}));},
-  play(r,cut){const ac=audio(),pk=bq(ac,'peaking',r.f,EQ_Q,EQ_BOOST),c=bq(ac,'peaking',cut||1000,EQ_Q,cut?-EQ_BOOST:0),g=gn(ac,.5);pk.connect(c).connect(g).connect(AU.music);
-    let src={stop(){}};const h=setAud({stop(){src.stop();setTimeout(()=>{try{g.disconnect();}catch(e){}},800);}});
+  // one chain, switchable while it plays: 'flaw' (the boost), 'clean' (no boost), or a student's cut on top of the boost
+  play(r,mode='flaw'){const ac=audio(),pk=bq(ac,'peaking',r.f,EQ_Q,EQ_BOOST),c=bq(ac,'peaking',1000,EQ_Q,0),g=gn(ac,.42);pk.connect(c).connect(g).connect(AU.music);
+    let src={stop(){}};const h=setAud({stop(){src.stop();setTimeout(()=>{try{g.disconnect();}catch(e){}},800);},
+      mode(m){const t=ac.currentTime;pk.gain.setTargetAtTime(m==='clean'?0:EQ_BOOST,t,.02);if(typeof m==='number'){c.frequency.setValueAtTime(m,t);c.gain.setTargetAtTime(-EQ_BOOST,t,.02);}else c.gain.setTargetAtTime(0,t,.02);}});
+    h.mode(mode);G.gs.sculpt=h;
     if(r.ex)withSong(()=>{if(G.gs&&G.gs.aud===h)src=playExcerpt(r.ex,pk);});else src=playDemo(pk,{rt:1.1});},
   onPrep(r){this.play(r);},leave:stopAud,
   replay(r,ph){const s=G.gs;if(ph!=='reveal'){this.play(r);return;}
-    const best=this.answers().sort((a,b)=>(b.res?.acc||0)-(a.res?.acc||0))[0];s.fixOn=!s.fixOn;
-    if(s.fixOn&&best){this.play(r,+best.a);toast(`Fixed with ${best.p.name}'s cut at ${fmtHz(+best.a)}`);}else{this.play(r);toast('The flawed mix');}},
-  replayLabel:'A/B the fix',
+    const best=this.answers().sort((a,b)=>(b.res?.acc||0)-(a.res?.acc||0))[0];
+    const modes=[['flaw',`Flawed: +${EQ_BOOST} dB at ${fmtHz(r.f)}`],['clean','Clean: the boost removed']].concat(best?[[+best.a,`Fixed with ${best.p.name}’s cut at ${fmtHz(+best.a)}`]]:[]);
+    s.abI=((s.abI??-1)+1)%modes.length;const [m,label]=modes[s.abI];
+    if(s.sculpt&&s.aud===s.sculpt)s.sculpt.mode(m);else this.play(r,m);
+    toast(label);const b=$('#bReplay');if(b)b.innerHTML=`▶ A/B · now: ${esc(label.split(':')[0].split(' with')[0])}`;},
+  replayLabel:'A/B the mix',
   stage:(m,r,ctx)=>{m.innerHTML=listenStage(ctx.phase==='prep'?'Something is off…':'Find it and cut it',ctx.phase==='prep'?'Boomy? Boxy? Harsh? Listen to where it lives.':'Drag the notch on your phone onto the problem.',eqGraphSVG({}));},
-  reveal(m,r,ctx){m.innerHTML=`<div class="axwrap"><h2 class="qtext"><span class="hl">${esc(r.name)}</span> at ${fmtHz(r.f)} — ${esc(r.hint)}.${songTag(r.ex)}</h2>${eqGraphSVG({bump:r.f,cuts:ctx.list.map(x=>({f:+x.a,sh:x.p.sh}))})}${axisPlot({min:40,max:16000,fmt:fmtHz,marks:FREQ_MARKS},ctx.list,r.f,{truthLabel:r.name})}<p class="fine">“A/B the fix” switches between the flawed mix and the best student’s cut.</p></div>`;G.gs.fixOn=false;},
+  reveal(m,r,ctx){m.innerHTML=`<div class="axwrap"><h2 class="qtext"><span class="hl">${esc(r.name)}</span> at ${fmtHz(r.f)} — ${esc(r.hint)}.${songTag(r.ex)}</h2>${eqGraphSVG({bump:r.f,cuts:ctx.list.map(x=>({f:+x.a,sh:x.p.sh}))})}${axisPlot({min:40,max:16000,fmt:fmtHz,marks:FREQ_MARKS},ctx.list,r.f,{truthLabel:r.name})}<p class="fine">“A/B the mix” switches instantly while it plays: flawed → clean → the best student’s cut.</p></div>`;G.gs.abI=-1;},
   ringLabel:r=>({label:fmtHz(r.f).replace(' ',''),fill:'--red'}),
   public:()=>({}),valid:(r,a)=>a>=20&&a<=20000,
   input(root,pub,submit){
@@ -226,52 +232,6 @@ game(roundGame(mcSpec({
   reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><div class="artifact"><b>${r.P.year}</b><div><h3>${esc(r.P.name)}</h3><p>${esc(r.P.what)} · ${esc(r.P.fact)}</p></div></div>${mcTiles(r,ctx)}
       <p class="credit">${r.P.credit?'Sound: '+esc(r.P.credit):'Sound: recreated in the browser (no freely licensed original recording available)'}</p></div>`;animateBars(m);},
 })));
-
-/* ---------- GHOST NOTE ---------- */
-const LANE_NAME={kick:'Kick',snare:'Snare',hat:'Hat',clave:'Clave',bass:'Bass',cowbell:'Cowbell',clap:'Clap'};
-function gridHTML(lanes,{heat,cur,mine,truth=true}={}){
-  return `<div class="g16">${lanes.map(([l,s])=>`<div class="glane"><span class="gname">${esc(LANE_NAME[l]||l)}</span>${[...Array(16)].map((_,i)=>{const on=truth&&s[i]==='x',h=heat?heat[l][i]:0;
-    return `<i class="gc ${i%4===0?'beat':''} ${on?'on':''} ${cur===i?'cur':''}" style="--h:${h}">${heat&&h>0?`<em>${Math.round(h*100)}</em>`:''}</i>`;}).join('')}</div>`).join('')}<div class="gnums"><span></span>${[...Array(16)].map((_,i)=>`<b>${i%4===0?i/4+1:'·'}</b>`).join('')}</div></div>`;
-}
-game(roundGame({
-  id:'ghost',noWord:'Not quite',group:'ears',name:'The Ghost Note',tag:'Hear a groove for four bars. Then rebuild it from memory on a 16-step grid.',
-  how:['A one-bar count-in, then a syncopated groove loops four times.','The sound stops. An empty 16-step grid appears on your phone.','Tap in every hit you remember. Wrong taps and missed hits both cost.'],
-  badges:['Scored','Rhythm'],speed:.2,okAt:.99,closeAt:.6,yesWord:'Perfect!',
-  icon:`<svg viewBox="0 0 64 64">${[0,1,2,3].map(r=>[0,1,2,3].map(c=>`<rect x="${4+c*15}" y="${4+r*15}" width="12" height="12" fill="${(r*4+c)%5===0||(r*4+c)%7===3?'var(--red)':'var(--paper)'}" stroke="var(--ink)" stroke-width="2.5"/>`).join('')).join('')}</svg>`,
-  options:[
-    {key:'level',label:'Difficulty',choices:[[1,'One lane','clave, bass…'],[2,'Two lanes','kick + snare'],[3,'Three lanes','+ hats'],[0,'Climb','gets harder']],def:0},
-    {key:'n',label:'Rounds',choices:[[4,'4'],[6,'6'],[8,'8']],def:6},
-    {key:'secs',label:'Answer time',choices:[[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:45},
-  ],
-  prepMs:r=>Math.round(5*16*60/r.g.bpm/4*1000+700),prepLabel:'LISTEN',prepSub:'memorise it',
-  prepText:r=>({big:'Memorise it',small:`${Object.keys(r.g.lanes).map(l=>LANE_NAME[l]).join(' + ')} — one bar of count-in, then four bars.`}),
-  secs:o=>o.secs,
-  build:o=>{const by=l=>shuffle(GROOVES.filter(g=>g.level===l));if(o.level){let p=by(o.level);while(p.length<o.n)p=p.concat(by(o.level));return p.slice(0,o.n).map(g=>({g}));}
-    const out=[];const a=by(1),b=by(2),c=by(3);for(let i=0;i<o.n;i++){const k=i/o.n;out.push({g:(k<.34?a:k<.67?b:c).shift()||pick(GROOVES)});}return out;},
-  roundInfo:r=>r.g.name,
-  onPrep(r){const s=G.gs;s.cur=-1;setAud(playGroove(r.g,{bars:4,onStep:st=>{if(G.gs!==s)return;s.cur=st<16?-1:(st-16)%16;$$('.gc',$('#rgm')).forEach(c=>c.classList.remove('cur'));if(s.cur>=0)$$('.glane',$('#rgm')).forEach(l=>{const c=l.children[s.cur+1];if(c)c.classList.add('cur');});}}));},
-  leave:stopAud,
-  replay(r,ph){const s=G.gs;setAud(playGroove(r.g,{bars:2,countIn:false,onStep:st=>{if(G.gs!==s)return;const k=st%16;$$('.gc',$('#rgm')).forEach(c=>c.classList.remove('cur'));$$('.glane',$('#rgm')).forEach(l=>{const c=l.children[k+1];if(c)c.classList.add('cur');});}}));},
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="ghostw"><h2 class="qtext">${ctx.phase==='prep'?'Listen. Memorise.':'Rebuild it on your phone'}</h2>${gridHTML(Object.entries(r.g.lanes),{truth:false})}<p class="fine">${esc(r.g.name)} · ${r.g.bpm} BPM</p></div>`;},
-  reveal:(m,r,ctx)=>{const n=Math.max(1,ctx.list.length),heat={};Object.entries(r.g.lanes).forEach(([l])=>{heat[l]=[...Array(16)].map((_,i)=>ctx.list.filter(x=>x.a&&x.a[l]&&x.a[l][i]).length/n);});
-    m.innerHTML=`<div class="ghostw rev"><h2 class="qtext"><span class="hl">${esc(r.g.name)}</span> — the real pattern, with how the room remembered it</h2>${gridHTML(Object.entries(r.g.lanes),{heat})}<p class="fine">Filled cells are the real hits; the shading and numbers show what % of the room tapped each step. Press “Play again” to follow along.</p></div>`;},
-  ringLabel:()=>({label:'♩',fill:'--red'}),
-  public:r=>({lanes:Object.keys(r.g.lanes)}),
-  valid:(r,a)=>a&&typeof a==='object',
-  input(root,pub,submit){
-    const st={};pub.lanes.forEach(l=>st[l]=Array(16).fill(0));
-    root.innerHTML=`<div class="pgrid">${pub.lanes.map(l=>`<div class="plane"><span>${esc(LANE_NAME[l]||l)}</span><div class="pcells">${[...Array(16)].map((_,i)=>`<button class="pc ${i%4===0?'beat':''}" data-l="${l}" data-i="${i}"></button>`).join('')}</div></div>`).join('')}
-      <div class="pnums"><span></span><div>${[1,2,3,4].map(n=>`<b>${n}</b>`).join('')}</div></div></div><div class="frow pcenterrow"><button class="ghost" id="pClr">Clear</button><button class="big go plock">Lock in</button></div>`;
-    $$('.pc',root).forEach(b=>b.onclick=()=>{const l=b.dataset.l,i=+b.dataset.i;st[l][i]^=1;b.classList.toggle('on',!!st[l][i]);papi.vibe(8);});
-    $('#pClr',root).onclick=()=>{pub.lanes.forEach(l=>st[l].fill(0));$$('.pc',root).forEach(b=>b.classList.remove('on'));};
-    $('.plock',root).onclick=()=>submit(st);
-  },
-  locked:(box,mine,pub)=>{box.innerHTML=`<div class="minigrid">${pub.lanes.map(l=>`<div>${(mine[l]||[]).map(v=>`<i class="${v?'on':''}"></i>`).join('')}</div>`).join('')}</div>`;},
-  score:(r,a)=>{let tp=0,fp=0,fn=0;Object.entries(r.g.lanes).forEach(([l,s])=>{const m=a[l]||[];for(let i=0;i<16;i++){const t=s[i]==='x',u=!!m[i];if(t&&u)tp++;else if(u)fp++;else if(t)fn++;}});
-    return {acc:tp?2*tp/(2*tp+fp+fn):0,note:`${tp} hits right · ${fn} missed · ${fp} extra`};},
-  publicReveal:r=>({lanes:r.g.lanes}),
-  pReveal:(box,st)=>{box.innerHTML=`<div class="minigrid truth">${Object.entries(st.rv.lanes).map(([l,s])=>`<div>${[...s].map((c,i)=>`<i class="${c==='x'?'on':''} ${st.mine&&st.mine[l]&&st.mine[l][i]?(c==='x'?'hit':'extra'):''}"></i>`).join('')}</div>`).join('')}</div><p class="lab">white = the real hits · yellow box = your taps</p>`;},
-}));
 
 /* ---------- METER LAB ----------
    The Meter Lab project (meterlab/index.html) runs inside the big screen in
@@ -374,9 +334,10 @@ game(roundGame({
       for(const f of inp.files){if(f.size>40e6){toast(f.name+' is over 40 MB');continue;}await clipDB.put({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),dec,name:f.name,blob:f,at:Date.now()});}
       await loadMyClips();toast('Saved in this browser');redraw();});
     $$('.myclips [data-del]',st).forEach(b=>b.onclick=async()=>{await clipDB.del(b.dataset.del);await loadMyClips();redraw();});},
-  prepMs:()=>4*7600+600,prepLabel:'LISTEN',prepSub:'four decades',
-  prepText:()=>({big:'Four clips',small:'Listen to A, B, C and D. Then put them in order.'}),
-  secs:o=>o.secs,
+  // the order buttons open on the phones with the first clip; the clock covers the listening plus the answer time
+  prepMs:()=>1200,prepLabel:'READY',prepSub:'four decades',
+  prepText:()=>({big:'Four clips',small:'Clip A starts in a moment. Tap the order as you listen.'}),
+  secs:o=>o.secs?o.secs+31:0,
   build(o){const pool=erasPool(o),decs=Object.keys(pool).map(Number),used=new Set();
     return [...Array(o.n)].map(()=>{const pick4=shuffle(decs).slice(0,4);
       const items=pick4.map(d=>{const fresh=pool[d].filter(c=>!used.has(c)),c=pick(fresh.length?fresh:pool[d]);used.add(c);if(!c.synth)clipBuffer(c).catch(()=>{});return {dec:d,clip:c};});
@@ -385,10 +346,10 @@ game(roundGame({
     if(c.synth){setAud(playEra(c.synth));return;}
     stopAud();clipBuffer(c).then(buf=>{if(G.gs!==s||s.i!==i||s.playing!==k)return;const off=c.kind==='mine'&&buf.duration>20?buf.duration*.33:0;setAud(playSample(buf,AU.music,{gain:c.gain||.9,maxDur:7,offset:off}));})
       .catch(()=>{toast('Could not play clip '+LET[k]);if(ERA_SYNTH[it.dec])setAud(playEra(ERA_SYNTH[it.dec]));});},
-  onPrep(r){const s=G.gs,i=s.i;[0,1,2,3].forEach(k=>later(()=>{if(G.gs===s&&s.i===i&&s.phase==='prep')this.playCard(k);},300+k*7600));},
+  onOpen(r){const s=G.gs,i=s.i;[0,1,2,3].forEach(k=>later(()=>{if(G.gs===s&&s.i===i&&s.phase==='open')this.playCard(k);},200+k*7600));},
   leave(){stopAud();},
   replay(){const s=G.gs;this.playCard(((s.playing??-1)+1)%4);},replayLabel:'Play next clip',
-  stage(m,r,ctx){m.innerHTML=`<div class="chrono"><h2 class="qtext">${ctx.phase==='prep'?'Listen to all four':'Oldest to newest — on your phone'}</h2><div class="ccards">${r.eras.map((y,k)=>`<button class="ccard c${k}" data-k="${k}">${shape(k,56,'var(--ink)','var(--c)')}<b>${LET[k]}</b><span>click to play</span></button>`).join('')}</div></div>`;
+  stage(m,r,ctx){m.innerHTML=`<div class="chrono"><h2 class="qtext">${ctx.phase==='prep'?'Four clips coming up':'Listen, then order them oldest to newest on your phone'}</h2><div class="ccards">${r.eras.map((y,k)=>`<button class="ccard c${k}" data-k="${k}">${shape(k,56,'var(--ink)','var(--c)')}<b>${LET[k]}</b><span>click to play</span></button>`).join('')}</div></div>`;
     $$('.ccard',m).forEach(b=>b.onclick=()=>this.playCard(+b.dataset.k));},
   reveal(m,r,ctx){const order=r.items.map((it,k)=>[it,k]).sort((a,b)=>a[0].dec-b[0].dec),n=Math.max(1,ctx.list.length),exact=ctx.list.filter(x=>x.res&&x.res.acc===1).length;
     m.innerHTML=`<div class="chrono rev"><h2 class="qtext">The timeline · ${Math.round(100*exact/n)}% got the exact order</h2><div class="timeline">${order.map(([it,k])=>{const c=it.clip,e=ERA_DECADES[it.dec]||{};
