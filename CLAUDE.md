@@ -67,7 +67,8 @@ Phones and the host keep old files otherwise.
   joined sends `{t:'pair', id, pc}`; `cadcastPair()` (host) writes `controlroom.cadcast.allow` and tells the computer
   `{t:'paired', name, desk}`; the phone gets `{t:'paired'}` and shows "Your computer is now NAME". One scan signs the
   student into both. Joining via the room QR still works on its own. The patch bay reads room + allow-list from
-  localStorage (same site, same Chrome).
+  localStorage (same site, same Chrome). The header's **Mixer** button (`openMixer`) opens it as ../CADCAST/patch/ in a
+  named tab; it must be this same browser. The patch bay lists paired-but-silent students as "Paired · no sound yet".
 - **Room vote** (js/vote.js): `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
   `{t:'vote', v}` (not `act`). Votes are by player id and only count while the player is in the room. Close → 3-2-1 →
   winner card (ties: a spotlight picks one). Reuse it with `openVote({title, sub, kind:'text', opts:[{v,l,s,c}], win:{go, fn}})`.

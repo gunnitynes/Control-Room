@@ -192,6 +192,8 @@ function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)retur
 /* ---------- the class lobby: a fixed relay address (controlroom-lobby-<CLASS_KEY>) that tells any device which
    room is open right now. The CADCAST computer page puts it in its QR; a phone without a room asks it too. */
 const lobbyId=()=>{const k=String(window.CLASS_KEY||'').toLowerCase().replace(/[^a-z0-9]/g,'');return k?'controlroom-lobby-'+k:'';};
+// the CADCAST patch bay must run in this same browser: it reads the room code and the paired computers from localStorage
+function openMixer(){const w=window.open(new URL('../CADCAST/patch/',location.href).href,'cadcast-patch');if(w)try{w.focus();}catch(e){}else toast('Allow pop-ups for this page to open the mixer');}
 function startLobby(){const id=lobbyId();if(!id||!window.Peer||(G.lobbyPeer&&!G.lobbyPeer.destroyed))return;
   const lp=new Peer(id,{debug:0});G.lobbyPeer=lp;
   lp.on('connection',c=>{c.on('data',m=>{if(m&&m.t==='room?')try{c.send({t:'room',code:G.code});}catch(e){}});c.on('error',()=>{});});
@@ -256,6 +258,7 @@ function topBar(){
   const room=G.code?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${G.view!=='menu'?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}</div><div class="tright">${room}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div>
     ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote on the next game">Vote</button>`:''}
+    <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">Mixer</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
     <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
     ${G.view!=='menu'?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
@@ -272,6 +275,7 @@ function render(){
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
   if($('#bVote'))$('#bVote').onclick=voteGames;
+  $('#bMix').onclick=openMixer;
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
   home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
@@ -284,12 +288,12 @@ function rSplash(app){
   app.className='splash';
   app.innerHTML=`<canvas id="poster"></canvas><div class="sptt"><div class="kick">Production class · a sister to Meter Lab</div><h1>Control<br><i>Room</i></h1>
     <p>${GAMES.length} games for one room. The big screen asks, the phones answer.</p><button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
-    <aside class="spjoin" id="spjoin"><div class="spqr" id="spqr"><div class="spwait">opening the room…</div></div><div class="spcap"><b>Scan to join</b><span>room <em id="spcode">····</em></span></div></aside>
+
 `;
   const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
   const enter=()=>{if(!G.splash)return;G.splash=false;POSTER=null;removeEventListener('keydown',key);try{audio();}catch(e){}sfx.open();render();};
   const key=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();enter();}};
-  app.onclick=enter;addEventListener('keydown',key);$('#spjoin').onclick=e=>{e.stopPropagation();if(G.code)showBigQR(G.code);};splashQR();
+  app.onclick=enter;addEventListener('keydown',key);
 }
 function posterSize(){if(!POSTER)return;const r=POSTER.c.getBoundingClientRect(),d=devicePixelRatio||1;POSTER.c.width=r.width*d;POSTER.c.height=r.height*d;POSTER.ctx.setTransform(d,0,0,d,0,0);POSTER.w=r.width;POSTER.h=r.height;}
 function posterDraw(now){
