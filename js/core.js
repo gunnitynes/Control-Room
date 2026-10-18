@@ -800,17 +800,42 @@ const SHARE_ICON='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" st
 const ADD_ICON='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
 const NB_ICON='<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="2" width="16" height="18" fill="var(--yel)" stroke="var(--ink)" stroke-width="2"/><path d="M7 2v18M10 7h6M10 11h6M10 15h4" stroke="var(--ink)" stroke-width="2"/></svg>';
 const NB_KINDS=[['brief','Briefs & styles','◆'],['rules','Rules you wrote','✎'],['pick','Picks you kept','●'],['card','Cards you were dealt','▲'],['team','Teams & chains','■'],['finish','Results','★'],['star','Milestones','★']];
+/* The notebook: a scrapbook of the lesson, newest first. Every kind of entry is its own object: a ticket for a
+   genre brief, a taped index card for a mission, a photo caption with your rules, a starburst for a milestone,
+   a ribbon for a result. A coloured band with the game's icon starts each game. */
+const nbTime=t=>t?new Date(t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+const nbLines=t=>String(t||'').split('\n').map(x=>x.trim()).filter(Boolean);
+function nbEntry(e,j){const T=esc,L=nbLines(e.text),tm=nbTime(e.at),tilt=`--tilt:${((j*53)%7-3)*.5}deg`;
+  if(e.kind==='brief'){const kv=L.map(l=>{const i=l.indexOf(': ');return i>0?[l.slice(0,i),l.slice(i+2)]:['',l];});const [nm,...sub]=String(e.title||'').split(' · ');
+    return `<article class="nbx nbticket" style="${tilt}"><span class="nbk">Brief · ${T(tm)}</span>${nm?`<h4>${T(nm)}</h4>`:''}${sub.length?`<p class="nbsub">${T(sub.join(' · '))}</p>`:''}
+      <div class="nbchips">${kv.map(([k,v],i)=>`<span class="c${i%4}">${k?`<small>${T(k)}</small>`:''}<b>${T(v)}</b></span>`).join('')}</div><i class="nbperf"></i></article>`;}
+  if(e.kind==='pick'){const m=String(e.text||'').match(/^Kept (.+?): (.+)$/);
+    return `<article class="nbx nbpick" style="${tilt}"><span class="nbk">Kept · ${T(tm)}</span><div><small>${T(m?m[1]:'')}</small><b>${T(m?m[2]:e.text)}</b></div><i class="nbstamp">KEPT</i></article>`;}
+  if(e.kind==='card'){const rule=L.find(l=>/^Rule: /.test(l)),rest=L.filter(l=>l!==rule),task=rest.pop()||'',lead=rest.join(' ');
+    return `<article class="nbx nbcard" style="${tilt}"><i class="nbtape"></i><span class="nbk">${T(e.title||'Card')} · ${T(tm)}</span>${lead?`<p class="nblead">${T(lead)}</p>`:''}<h4>${T(task)}</h4>${rule?`<span class="nbrule">${T(rule.slice(6))}</span>`:''}</article>`;}
+  if(e.kind==='rules'){const R=L.map(l=>l.replace(/^\d+\.\s*/,''));
+    return `<article class="nbx nbrules" style="${tilt}"><div class="nbphoto"><span>${T(e.title||'The picture')}</span></div><span class="nbk">Your rules · ${T(tm)}</span><ol>${R.map((r,i)=>`<li><b class="c${i%4}">${i+1}</b><span>${T(r)}</span></li>`).join('')}</ol></article>`;}
+  if(e.kind==='star'){const n=String(e.text||'').match(/^(\d+)\s+(.*)$/);
+    return `<article class="nbx nbstar"><div class="nbburst"><b>${n?T(n[1]):'★'}</b></div><div><span class="nbk">Milestone · ${T(tm)}</span><h4>${T(n?n[2]:e.text)}</h4></div></article>`;}
+  if(e.kind==='finish'){const t=String(e.text||''),pl=t.match(/^(\d+)(st|nd|rd|th) of (\d+)/),pc=t.match(/(\d+)% accurate/),ln=t.match(/^Your lineage: (.*?) · (.*)$/);
+    if(ln)return `<article class="nbx nbfin lineage"><span class="nbk">Your lineage · ${T(tm)}</span><h4>${T(ln[1])}</h4><div class="nbchain">${ln[2].split(' → ').map((x,i)=>`<span class="c${i%4}">${T(x)}</span>`).join('<i>→</i>')}</div></article>`;
+    const big=pl?`${pl[1]}<sup>${pl[2]}</sup>`:pc?`${pc[1]}<sup>%</sup>`:'✓',rest=t.split(' · ').slice(pl||pc?1:0).filter(x=>!(pc&&x.includes('% accurate')));
+    return `<article class="nbx nbfin ${pl&&+pl[1]<=3?'p'+pl[1]:''}"><div class="nbmedal"><b>${big}</b>${pl?`<small>of ${T(pl[3])}</small>`:pc?'<small>accurate</small>':''}<i></i><i></i></div><div><span class="nbk">Result · ${T(tm)}</span>${pc&&!pl?`<h4>${T(t.split(' · ')[0])}</h4>`:''}<div class="nbstats2">${rest.map(x=>`<span>${T(x)}</span>`).join('')}</div></div></article>`;}
+  return `<article class="nbx nbcard" style="${tilt}"><span class="nbk">${T(e.title||e.kind)} · ${T(tm)}</span><h4>${T(e.text||'')}</h4></article>`;}
 function openNotebook(){
   let ov=$('#nb');if(!ov){ov=el('div','nb');ov.id='nb';ov.setAttribute('role','dialog');document.body.appendChild(ov);}
-  const L=(PL.log||[]).slice().reverse(),s=PL.st||{};
-  const sec=([k,label,ic])=>{const items=L.filter(e=>e.kind===k||(k==='finish'&&e.kind==='finish'));if(!items.length)return '';
-    return `<section class="nbsec"><h3><i>${ic}</i>${esc(label)}<em>${items.length}</em></h3>${items.map(e=>`<article><span class="lab">${esc(e.game||'')}${e.at?' · '+new Date(e.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</span>${e.title?`<b>${esc(e.title)}</b>`:''}<p>${esc(e.text||'').replace(/\n/g,'<br>')}</p></article>`).join('')}</section>`;};
-  const body=NB_KINDS.filter(k=>k[0]!=='star').map(sec).join('')+sec(NB_KINDS.find(k=>k[0]==='star'));
-  ov.innerHTML=`<div class="nbpanel"><header><div><span class="lab">This session</span><h2>Your notebook</h2></div><div class="nbhbtns"><button class="ghost" id="nbGuide">Guide</button><button class="ghost" id="nbX">Close</button></div></header>
-    <div class="nbstats"><div><b>${s.total||0}</b><span>points</span></div><div><b>${s.rank?ordinal(s.rank):'—'}</b><span>in the room</span></div><div><b>${L.length}</b><span>entries</span></div></div>
-    <div class="nbbody">${body||'<p class="nbempty">Nothing yet. Your briefs, rules, kept picks and milestones collect here as the lesson goes on.</p>'}</div></div>`;
-  $('#nbX').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove();};$('#nbGuide').onclick=()=>{ov.remove();openGuide();};
+  const L=(PL.log||[]).slice().reverse(),s=PL.st||{};let lastGame=null,out='';
+  L.forEach((e,j)=>{if(e.game!==lastGame){lastGame=e.game;const g=GAMES.find(x=>x.name===e.game);
+      out+=`<div class="nbband" style="--c:var(${(g&&g.col)||'--ink'})"><span class="nbico">${(g&&g.icon)||''}</span><div><small>${g?numOf(g):''} · ${T_(nbTime(e.at))}</small><b>${esc(e.game||'Control Room')}</b></div></div>`;}
+    out+=nbEntry(e,j);});
+  ov.innerHTML=`<div class="nbpanel"><button class="guideX" id="nbX" aria-label="Close the notebook">✕</button>
+    <header class="nbhero"><div class="nbshapes"><i></i><i></i><i></i></div><span class="lab">The notebook of</span><h2 style="font-size:min(clamp(52px,16vw,96px),${Math.floor(150/Math.max(6,...String(PL.name||'You').split(/\s+/).map(w=>w.length)))}vw)">${esc(PL.name||'You')}</h2>
+      <div class="nbstickers"><div class="nbs1"><b>${s.total||0}</b><span>points</span></div><div class="nbs2"><b>${s.rank?ordinal(s.rank):'—'}</b><span>in the room</span></div><div class="nbs3"><b>${L.length}</b><span>${L.length===1?'entry':'entries'}</span></div></div>
+      <button class="ghost nbguide" id="nbGuide">Guide to the Control Room →</button></header>
+    <div class="nbbody">${out||'<div class="nbempty"><div class="nbshapes small"><i></i><i></i><i></i></div><h3>Empty pages</h3><p>Your briefs, rules, cards, kept picks, milestones and results collect here as the lesson goes on.</p></div>'}<p class="nbend">${L.length?'The first page of today':''}</p></div></div>`;
+  const close=()=>ov.remove();$('#nbX').onclick=close;$('#nbGuide').onclick=()=>{close();openGuide();};ov.scrollTop=0;
 }
+const T_=esc;
 function pFrame(){
   const c=PL.clock;if(c){const left=Math.max(0,c.end-now());$$('.pclk').forEach(e=>e.textContent=fmtClock(left));$$('.pclkbar i').forEach(e=>e.style.width=(100*left/c.T)+'%');}
   const t=PL.timer;if(t){const left=t.frozen!=null?t.frozen:Math.max(0,t.end-now()),b=$('#pBar'),l=$('#pLeft');if(b)b.style.width=(100*left/t.T)+'%';if(l)l.textContent=t.frozen!=null?'paused':Math.ceil(left/1000)+' s';}

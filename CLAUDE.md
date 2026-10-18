@@ -54,7 +54,10 @@ Phones and the host keep old files otherwise.
   next, frame` themselves; `startClock`/`clockFrame` give sprint clocks.
 - Setup options: `choices` (segmented), `type:'multi'`, `type:'step'` (+/− with min/max/step/unit),
   `show:v=>bool` to hide an option; `setupExtra(v)` / `setupBind(st, redraw)` add custom setup panels.
-- The phone **notebook**: the host calls `logAdd(player, {kind, game, title, text})`.
+- The phone **notebook**: the host calls `logAdd(player, {kind, game, title, text})`. `openNotebook` (core.js) draws it as a
+  full-screen scrapbook: a hero (name sized to its longest word, sticker stats), a colour band per game, and one look per
+  kind via `nbEntry` (brief = ticket, pick = KEPT stamp, card = taped index card, rules = photo + numbered rules,
+  star = starburst, finish = medal parsing "2nd of 14" / "87% accurate" / "Your lineage:"). Keep new log text in those shapes.
 - Round clock: one main timer per phase (`mainTimer`); the teacher pauses it by clicking the ring or pressing P
   (`g.pause`, phones get `{t:'clock'}`). **Autoplay**: every `roundGame` gets `AUTO_OPT` (key `auto`, default 10 s) added automatically; after a reveal it counts down
   to the next round. The Autoplay switch under Next (or the A key) flips it mid-game (`autoFlip`, saved per game). Parameter
