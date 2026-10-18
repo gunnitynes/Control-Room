@@ -141,16 +141,49 @@ async function newRoom(){
 const ATT={classes:null,cls:store.get('cls',''),names:[],err:''};
 const attDay=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();};
 const ATT_DONE=Object.fromEntries(Object.entries(store.get('attDone',{})).filter(([k])=>k.startsWith(attDay()+'|')));
-function attCall(fn,args){const url=(window.ATTENDANCE||{}).url;if(!url)return Promise.reject(new Error('No attendance sheet set'));
+// another teacher's own sheet (pasted web app link, kept in this browser) wins over the built-in one
+const attUrl=()=>store.get('att.url','')||(window.ATTENDANCE||{}).url||'';
+const attOwn=()=>!!store.get('att.url','');
+function attCall(fn,args,url=attUrl()){if(!url)return Promise.reject(new Error('No attendance sheet set'));
   return fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn,...args})})
     .catch(()=>{throw new Error('Can’t reach the attendance sheet (offline, or the script’s new version isn’t deployed yet)');})
     .then(r=>r.text()).then(t=>{let j;try{j=JSON.parse(t);}catch(e){throw new Error('The attendance sheet did not answer (is the new version deployed?)');}if(!j.ok)throw new Error(j.error||'Sheet error');return j;});}
-function attLoad(){if(!(window.ATTENDANCE||{}).url)return;
+function attLoad(){if(!attUrl())return;
   attCall('classes').then(j=>{ATT.classes=j.classes||[];ATT.err='';if(ATT.cls&&!ATT.classes.includes(ATT.cls))ATT.cls='';return attRoster();})
     .catch(e=>{ATT.classes=null;ATT.err=e.message;}).finally(()=>{if(G.view==='menu'&&!G.splash)render();});}
 function attRoster(){const c=ATT.cls;if(!c){ATT.names=[];lobbyNames();return Promise.resolve();}
   return attCall('roster',{className:c}).then(j=>{if(ATT.cls!==c)return;ATT.names=(j.names||[]).map(n=>String(n).trim()).filter(Boolean);ATT.err='';lobbyNames();if(G.view==='menu')render();})
     .catch(e=>{ATT.err=e.message;if(G.view==='menu')render();});}
+function attUse(url){if(url)store.set('att.url',url);else store.del('att.url');ATT.classes=null;ATT.cls='';ATT.names=[];ATT.err='';store.set('cls','');lobbyNames();render();attLoad();}
+/* another teacher connects their own sheet: three steps and a paste box, checked before it is saved */
+function openSheetSetup(){let ov=$('#sheetov');if(!ov){ov=el('div','sheetov');ov.id='sheetov';document.body.appendChild(ov);}
+  const close=()=>ov.remove();
+  ov.innerHTML=`<div class="sheetcard" role="dialog" aria-label="Connect your own Google Sheet"><button class="guideX" id="shX" aria-label="Close">✕</button>
+    <span class="lab">Class list · attendance</span><h2>Your own<br><i>Google Sheet</i></h2>
+    <p class="shlead">Your students tap their names on their phones and are checked in on <b>your</b> sheet. Set it up once, about five minutes.</p>
+    <ol class="shsteps">
+      <li><b>1</b><div><strong>Make the sheet</strong><p>One tab per class (the tab name is the class), student names in column A from row 2. A <em>MasterLog</em> tab is added for you.</p>
+        <div class="shmini"><span>Student name</span><span>Ada</span><span>Alan</span><span>Grace</span><i>CLASS-A</i><i>CLASS-B</i><i>MasterLog</i></div></div></li>
+      <li><b>2</b><div><strong>Add the script</strong><p>In the sheet: Extensions ▸ Apps Script. Delete what is there, paste the script, save.</p>
+        <button class="big go" id="shCopy">Copy the script</button></div></li>
+      <li><b>3</b><div><strong>Deploy it</strong><p>Deploy ▸ New deployment ▸ ⚙ Web app. Execute as: <b>Me</b>. Who has access: <b>Anyone</b>. Deploy, allow access, and copy the <b>Web app URL</b>.</p></div></li>
+      <li><b>4</b><div><strong>Paste the link</strong><input id="shUrl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(store.get('att.url',''))}" spellcheck="false" autocomplete="off">
+        <div class="frow"><button class="big go" id="shGo">Connect</button>${attOwn()?'<button class="ghost" id="shOff">Disconnect</button>':''}</div><p class="shst" id="shSt"></p></div></li>
+    </ol>
+    <p class="fine">The link is saved in this browser only. Names go from your sheet to this computer and the phones in the room, nowhere else.</p></div>`;
+  ov.onclick=e=>{if(e.target===ov)close();};$('#shX').onclick=close;
+  const st=(t,bad)=>{const e=$('#shSt');e.textContent=t;e.classList.toggle('bad',!!bad);};
+  $('#shCopy').onclick=()=>fetch('integrations/attendance/ControlRoomAttendance.gs').then(r=>{if(!r.ok)throw 0;return r.text();})
+    .then(t=>navigator.clipboard.writeText(t)).then(()=>{$('#shCopy').textContent='Copied ✓';toast('Script copied: paste it into Apps Script');})
+    .catch(()=>{window.open('integrations/attendance/ControlRoomAttendance.gs','_blank');toast('Copy the script from the page that opened');});
+  if($('#shOff'))$('#shOff').onclick=()=>{attUse('');close();toast('Disconnected');};
+  $('#shGo').onclick=()=>{const u=$('#shUrl').value.trim();
+    if(/docs\.google\.com\/spreadsheets/.test(u))return st('That is the sheet itself. Paste the Web app URL from step 3 instead (it starts with script.google.com and ends in /exec).',true);
+    if(!/^https:\/\/script\.google(usercontent)?\.com\/.+/.test(u))return st('Paste the Web app URL from step 3 (it starts with https://script.google.com/).',true);
+    st('Checking your sheet…');$('#shGo').disabled=true;
+    attCall('classes',{},u).then(j=>{const n=(j.classes||[]).length;st(`Connected: ${n} class${n===1?'':'es'} found.`);attUse(u);setTimeout(close,1200);toast('Your sheet is connected');})
+      .catch(e=>st(e.message+'. Check step 3: Execute as Me, access Anyone, then copy the URL again.',true)).finally(()=>{const b=$('#shGo');if(b)b.disabled=false;});};
+  setTimeout(()=>$('#shUrl')&&$('#shUrl').focus(),50);}
 function attSetClass(c){ATT.cls=c;store.set('cls',c);ATT.names=[];lobbyNames();render();attRoster();}
 const attMatch=n=>{const k=String(n||'').trim().toLowerCase();return ATT.names.find(x=>x.toLowerCase()===k)||null;};
 const attCount=()=>Object.keys(ATT_DONE).filter(k=>k.startsWith(attDay()+'|'+ATT.cls+'|')).length;
@@ -321,8 +354,8 @@ function rMenu(st){
   const ps=players(),tot=rankBy('total');
   st.innerHTML=`<div class="menu">
     <aside class="roomp">
-      ${(window.ATTENDANCE||{}).url?`<div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join('')}</select></label>
-        <span class="fine">${ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>`:''}
+      <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
+        <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button><a class="ghost" href="?guide" target="_blank" rel="noopener">Guide</a></div>
@@ -333,7 +366,10 @@ function rMenu(st){
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
   $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
-  if($('#selCls'))$('#selCls').onchange=e=>attSetClass(e.target.value);
+  if($('#selCls'))$('#selCls').onchange=e=>{const v=e.target.value;
+    if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}
+    if(v==='__def'){e.target.value=ATT.cls;if(confirm('Stop using your own sheet in this browser and go back to the built-in class list?'))attUse('');return;}
+    attSetClass(v);};
 }
 
 /* setup: the game's poster on the left, its options on the right */

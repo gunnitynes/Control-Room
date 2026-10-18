@@ -1201,3 +1201,25 @@ body:has(#app.guidepage){overflow:auto}
 
 /* the guide on a phone: two phone pictures per row, bigger */
 @media (max-width:600px){.ghands{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}.ghands .gph{width:92px}.ghands figcaption{font-size:11px}}
+
+/* ---------- connect your own Google Sheet ---------- */
+.sheetov{position:fixed;inset:0;z-index:260;display:grid;place-items:start center;overflow-y:auto;background:rgba(10,10,10,.55);padding:24px 16px;animation:nbup .25s ease-out}
+.sheetcard{position:relative;width:min(640px,100%);background:var(--paper);border:4px solid var(--ink);box-shadow:12px 12px 0 var(--green);padding:26px 26px 20px;display:grid;gap:12px}
+.sheetcard .guideX{position:absolute;top:12px;right:12px}
+.sheetcard>.lab{justify-self:start;background:var(--green);color:#fff;border:2px solid var(--ink);padding:2px 8px}
+.sheetcard h2{font:900 clamp(38px,6vw,58px)/.86 var(--disp);font-stretch:66%;text-transform:uppercase;margin:0}
+.sheetcard h2 i{font-style:normal;color:var(--green)}
+.shlead{margin:0;font-size:16px}
+.shsteps{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:12px}
+.shsteps li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start;border:3px solid var(--ink);padding:12px;background:var(--paper2);box-shadow:5px 5px 0 var(--ink)}
+.shsteps li>b{display:grid;place-items:center;width:44px;height:44px;background:var(--ink);color:var(--paper);font:900 28px var(--disp);font-stretch:62%}
+.shsteps li:nth-child(1)>b{background:var(--red)}.shsteps li:nth-child(2)>b{background:var(--blue)}.shsteps li:nth-child(3)>b{background:var(--yel);color:#161514}.shsteps li:nth-child(4)>b{background:var(--green)}
+.shsteps strong{font:900 20px/1 var(--disp);text-transform:uppercase;font-stretch:85%}
+.shsteps p{margin:4px 0 8px;font-size:14px;line-height:1.4}
+.shsteps .big{justify-self:start;font-size:14px;padding:10px 16px}
+.shmini{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:0;font:700 11px var(--mono);border:2px solid var(--ink);background:#fff;color:#161514;width:max-content;max-width:100%}
+.shmini span{grid-column:1/-1;padding:3px 10px;border-bottom:1px solid #ccc}.shmini span:first-child{background:#e9e4da;font-weight:700}
+.shmini i{font-style:normal;padding:3px 8px;border-top:2px solid var(--ink);border-right:1px solid #ccc;background:#f4f1ea}.shmini i:first-of-type{background:#fff;font-weight:700}
+#shUrl{width:100%;font:700 13px var(--mono);border:3px solid var(--ink);padding:10px;background:#fff;color:#161514;margin:8px 0 10px}
+.shst{font:700 13px var(--disp);margin:8px 0 0;min-height:1em}.shst.bad{color:var(--red)}
+@media (max-width:520px){.sheetcard{padding:22px 16px 16px}.shsteps li{grid-template-columns:1fr}}

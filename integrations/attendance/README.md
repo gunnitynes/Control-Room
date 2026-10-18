@@ -47,3 +47,17 @@ Version: New version ▸ Deploy**. Never "New deployment"; that makes a new URL.
 - The host calls `checkIn` in the background (`attCheckIn`, 3 retries) and remembers today's check-ins in
   localStorage (`attDone`), so reloading never double-logs. An online name can't be taken twice; a new device
   takes over an offline seat and keeps its points.
+
+## Other teachers: their own sheet
+
+On the main menu, **Class list ▸ ＋ Connect your own Google Sheet…** opens a four-step card:
+
+1. A Google Sheet with one tab per class (tab name = class), student names in column A from row 2.
+2. Extensions ▸ Apps Script: replace everything with `ControlRoomAttendance.gs` (the card's "Copy the script" button
+   copies it from this folder on the live site). It is self-contained: it makes the `MasterLog` tab itself and
+   logs `Timestamp | Class | Student Name | MARKED AT MOODLE`, the same layout as the original sheet.
+3. Deploy ▸ New deployment ▸ Web app, Execute as Me, Who has access Anyone; copy the Web app URL (…/exec).
+4. Paste it. Control Room calls `classes` to check it before saving it in that browser (`localStorage`
+   `controlroom.att.url`); it then wins over `window.ATTENDANCE.url`. "Back to the built-in list" removes it.
+
+Opening the /exec link in a browser (doGet) shows `{ok, classes}`, a quick way for a teacher to test it.
