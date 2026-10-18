@@ -498,7 +498,7 @@ game({
         // a bot copies by ear: close on every knob, never exact — then twists one knob
         const copy=Object.fromEntries(PATCH_KNOBS.map(({k})=>[k,Math.round(clamp(prev.p[k]+(Math.random()-.5)*.18,0,1)*100)/100])),tw={...copy},k=pick(PATCH_KNOBS).k;
         tw[k]=Math.round(clamp(tw[k]+(Math.random()<.5?-1:1)*(.25+Math.random()*.3),0,1)*100)/100;
-        ch[s.r]={by:id,p:tw,copy,acc:clamp(1-patchDist(copy,prev.p)*2.2,0,1),bot:true};return;}
+        ch[s.r]={by:id,p:tw,copy,acc:patchAcc(copy,prev.p),bot:true};return;}
       if(!prev)ch[s.r]={by:id,p:randomPatch(),auto:true};else{const p={...prev.p},k=pick(PATCH_KNOBS).k;p[k]=Math.round(Math.random()*100)/100;ch[s.r]={by:id,p,copy:prev.p,acc:0,auto:true};}});
     if(s.r>0)s.ids.forEach((id,j)=>{const it=s.chains[this.chainFor(j,s.r)][s.r];const pl=G.players.get(id);if(pl&&!it.auto&&it.acc!=null){award(pl,Math.round(it.acc*1000/10)*10);logAdd(pl,{kind:'finish',game:this.name,text:`Generation ${s.r+1} copy · ${Math.round(it.acc*100)}% accurate`});}});
     if(s.r+1<s.gens){s.r++;this.go('recreate');}else this.go('reveal');saveRoom();},
@@ -508,7 +508,7 @@ game({
   act(p,d){const s=G.gs,j=s.ids.indexOf(p.id);if(j<0||d.t!=='sub'||d.r!==s.r||(s.phase!=='create'&&s.phase!=='recreate'))return;
     const c=this.chainFor(j,s.r),ch=s.chains[c],clean=o=>Object.fromEntries(PATCH_KNOBS.map(({k})=>[k,clamp(+(o&&o[k])||0,0,1)]));
     if(ch[s.r]&&!ch[s.r].auto)return;
-    if(s.r===0)ch[0]={by:p.id,p:clean(d.p)};else{const copy=clean(d.copy),tw=clean(d.p),acc=clamp(1-patchDist(copy,ch[s.r-1].p)*2.2,0,1);ch[s.r]={by:p.id,p:tw,copy,acc};}
+    if(s.r===0)ch[0]={by:p.id,p:clean(d.p)};else{const copy=clean(d.copy),tw=clean(d.p),acc=patchAcc(copy,ch[s.r-1].p);ch[s.r]={by:p.id,p:tw,copy,acc};}
     s.subs.add(p.id);sfx.inn();const e=$('#nSubs');if(e)e.textContent=s.subs.size;sync(p);
     if(s.ids.every(id=>s.subs.has(id)||this.isBot(id)||!(G.players.get(id)||{}).conn))later(()=>{if(G.gs===s&&(s.phase==='create'||s.phase==='recreate'))this.close();},1200);},
   // Autoplay: once the chain has played through, count down to the next chain

@@ -443,15 +443,20 @@ const randomPatch=()=>Object.fromEntries(PATCH_KNOBS.map(({k})=>[k,Math.round(Ma
    filter, drive, wobble and echo move at once, wave/attack/decay from the next note on. */
 function playPatch(p,dest,{loops=1}={}){
   const ac=audio(),out=gn(ac,1);out.connect(dest||AU.music);
-  const f=bq(ac,'lowpass',1000,1),drv=shaper(ac,'soft',0),pre=gn(ac,1),vca=gn(ac,.28);
+  // drive = a crossfade between the clean signal and one fixed saturation curve (swapping curves while playing clicks)
+  const f=bq(ac,'lowpass',1000,1),drv=shaper(ac,'soft',1.6),pre=gn(ac,1),dry=gn(ac,1),dwet=gn(ac,0),vca=gn(ac,.28);
   const lfo=osc(ac,'sine',3.2),lg=gn(ac,0);lfo.connect(lg).connect(f.frequency);lfo.start();
   const dl=ac.createDelay(1),fb=gn(ac,0),wet=gn(ac,0);dl.delayTime.value=.409;
-  pre.connect(drv).connect(f).connect(vca).connect(out);vca.connect(dl);dl.connect(fb).connect(dl);dl.connect(wet).connect(out);
+  // a gentle safety compressor: high resonance + drive + echo feedback can peak hard on phone speakers
+  const lim=ac.createDynamicsCompressor();lim.threshold.value=-10;lim.knee.value=8;lim.ratio.value=8;lim.attack.value=.003;lim.release.value=.15;
+  pre.connect(dry).connect(f);pre.connect(drv).connect(dwet).connect(f);f.connect(vca).connect(lim);vca.connect(dl);dl.connect(fb).connect(dl);dl.connect(wet).connect(lim);lim.connect(out);
   let P={...p};
   const set=(q,tc=.025)=>{P={...q};const t=ac.currentTime,fc=80*Math.pow(150,P.cut);
-    f.frequency.setTargetAtTime(fc,t,tc);f.Q.setTargetAtTime(.5+P.res*16,t,tc);drv.curve=curve('soft',P.drive*1.6);
+    f.frequency.setTargetAtTime(fc,t,tc);f.Q.setTargetAtTime(.5+P.res*16,t,tc);
+    dry.gain.setTargetAtTime(Math.cos(P.drive*Math.PI/2),t,tc);dwet.gain.setTargetAtTime(Math.sin(P.drive*Math.PI/2),t,tc);
     pre.gain.setTargetAtTime(1+P.drive*1.5,t,tc);vca.gain.setTargetAtTime(.28/(1+P.drive*1.2),t,tc);
-    lg.gain.setTargetAtTime(fc*P.wob*1.4,t,tc);fb.gain.setTargetAtTime(P.echo*.55,t,tc);wet.gain.setTargetAtTime(P.echo*.7,t,tc);};
+    // wobble sweeps the filter around its cutoff, never below 10 % of it (a negative frequency makes the filter pop)
+    lg.gain.setTargetAtTime(fc*P.wob*.9,t,tc);fb.gain.setTargetAtTime(P.echo*.55,t,tc);wet.gain.setTargetAtTime(P.echo*.7,t,tc);};
   set(p,.001);
   const bpm=110,step=60/bpm/2,riff=[57,64,69,72,64,69,60,67,57,64,69,72,65,69,67,64],t0=ac.currentTime+.06,N=loops?loops*16:Infinity;let i=0;
   const note=(t,n)=>{const wave=['sine','triangle','sawtooth','square'][Math.min(3,Math.floor(P.wave*4))],A=.001+P.att*P.att*.6,D=.04+P.dec*P.dec*1.4;
@@ -463,7 +468,18 @@ function playPatch(p,dest,{loops=1}={}){
   const h={dur,set,stop(fd=.08){clearInterval(timer);const t=ac.currentTime;out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+fd);setTimeout(()=>{try{out.disconnect();lfo.stop();}catch(e){}},fd*1000+400);AU.live.delete(h);}};
   AU.live.add(h);if(loops)setTimeout(()=>{if(AU.live.has(h))h.stop(.6);},(dur+1.8)*1000);return h;
 }
-const patchDist=(a,b)=>PATCH_KNOBS.reduce((s,{k})=>s+Math.abs((a[k]??0)-(b[k]??0)),0)/PATCH_KNOBS.length;
+/* How different two patches SOUND, 0 (same) … 1 (nothing alike). Knob distance alone was unfair: the wave knob has four
+   steps, the cutoff hardly matters on a sine, 1 ms and 20 ms attacks sound the same, and a whisper of echo is inaudible. */
+const PD_WAVE=[[0,.25,.8,.7],[.25,0,.6,.5],[.8,.6,0,.35],[.7,.5,.35,0]],PD_MAXF=[700,2500,9000,9000];
+function patchDist(a,b){const bin=v=>Math.min(3,Math.floor((v??0)*4)),wa=bin(a.wave),wb=bin(b.wave),fc=p=>80*Math.pow(150,p.cut??0);
+  const fe=(p,w)=>clamp(fc(p),90,PD_MAXF[w]),relOf=(p,w)=>Math.min(1,Math.log2(PD_MAXF[w]/fe(p,w))/2+.3),rel=Math.max(relOf(a,wa),relOf(b,wb));
+  const A=p=>Math.max(8,1+600*p.att*p.att),D=p=>40+1400*p.dec*p.dec,e=v=>Math.max(0,v-.05)/.95;
+  const d={wave:PD_WAVE[wa][wb],cut:Math.min(1,Math.abs(Math.log2(fe(a,wa)/fe(b,wb)))/3),res:Math.abs(a.res-b.res)*rel,
+    drive:Math.min(1,Math.abs(Math.sqrt(a.drive)-Math.sqrt(b.drive))*1.2),att:Math.min(1,Math.abs(Math.log10(A(a)/A(b)))/1.6),
+    dec:Math.min(1,Math.abs(Math.log2(D(a)/D(b)))/3),echo:Math.min(1,Math.abs(e(a.echo)-e(b.echo))*1.3),wob:Math.min(1,Math.abs(a.wob-b.wob)*1.3)*rel};
+  const W={wave:1.3,cut:1,res:.6,drive:1,att:.8,dec:1,echo:.8,wob:.8};let sum=0,tot=0;for(const k in W){sum+=W[k]*d[k];tot+=W[k];}return sum/tot;}
+// a copy's accuracy: a careful copy lands around 85–100 %, a rough one around 55 %, a random sound near 0
+const patchAcc=(copy,target)=>clamp(1-(patchDist(copy,target)-.04)/.32,0,1);
 
 /* ---------- the demo song (games 05–08) ----------
    One recording, used four ways: bar-locked loops, dry one-shot chops,
