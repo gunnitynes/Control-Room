@@ -235,3 +235,5 @@ game(roundGame({
     else if(st.pub.type==='note')box.innerHTML=`<p>The note was</p><div class="bignum">${esc(AT_SHORT[rv.n])}</div>`;
     else{if(st.cls!=='yes')mcPReveal(box,st);if(rv.info)box.insertAdjacentHTML('beforeend',`<p class="atpinfo">${esc(rv.info)}</p>`);}},
 }));
+// The Ear Atlas sits second in Know your stuff, right after The Quiz (numbering follows GAMES order)
+(()=>{const a=GAMES.findIndex(g=>g.id==='atlas'),q=GAMES.findIndex(g=>g.id==='quiz');if(a<0||q<0)return;const [g]=GAMES.splice(a,1);GAMES.splice(q+1,0,g);})();
