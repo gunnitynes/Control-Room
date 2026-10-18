@@ -1,2 +1,7 @@
-.claude/
 .DS_Store
+# local Claude settings stay local; the shared preview config is committed
+.claude/*
+!.claude/launch.json
+# downloaded source recordings (re-fetched by the tools; only the trimmed clips are committed)
+tools/.cache/
+__pycache__/
