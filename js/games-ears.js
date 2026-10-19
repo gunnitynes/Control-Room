@@ -381,12 +381,11 @@ game(roundGame({
     {key:'n',label:'Rounds',choices:[[3,'3'],[4,'4'],[5,'5']],def:4},{key:'secs',label:'Answer time',choices:[[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:45}],
   note:'Real recordings are public domain or Creative Commons, from Wikimedia Commons (credits in audio/eras/CREDITS.txt). The 1960s–1990s are still under copyright, so add your own clips for those decades below. They stay in this browser and are never uploaded. Decades with no real clip use the browser re-creation.',
   // one music folder for the whole game: loading a folder replaces the collection; songs stay in this browser only
-  setupExtra(v){if(v.src==='synth')return '';const mine=MYCLIPS.list.filter(c=>c.dec>=1900),decs=Object.keys(ERA_DECADES).map(Number);
+  setupExtra(v){if(v.src==='synth')return '';const mine=MYCLIPS.list.filter(c=>c.dec>=1900);
     return `<div class="fsec myclips"><h3><b>♫</b>Your music folder<small>${mine.length?`${mine.length} songs loaded`:'nothing loaded yet'} · stays in this browser, never uploaded</small></h3>
       <div class="chimport"><label class="big go">${mine.length?'Load a different folder':'Load your music folder'}<input type="file" id="chFolder" webkitdirectory multiple hidden></label>
         <span class="chprog" id="chProg"></span>
         <p class="fine">One folder with a subfolder per decade (1900s, 1910s … 2020s), or songs named like “Artist – Title (1958).mp3”. Whole songs are fine: every round plays a different 7-second moment, up to six per song.</p></div>
-      <div class="chdecs">${decs.map(d=>{const n=mine.filter(c=>c.dec===d).length,b=ERA_DECADES[d].clips.length;return `<span class="${n+b?'':'none'}"><b>${esc(ERA_DECADES[d].label)}</b>${n?`${n} yours`:b?`${b} built in`:'—'}</span>`;}).join('')}</div>
       ${mine.length?'<button class="ghost" id="chClear">Remove your songs</button>':''}</div>`;},
   setupBind(st,redraw){
     // a whole folder at once: the decade comes from a "1970s" folder in the path, else the year in the file name
@@ -403,7 +402,9 @@ game(roundGame({
   prepText:()=>({big:'Four clips',small:'Clip A starts in a moment. Tap the order as you listen.'}),
   secs:o=>o.secs?o.secs+31:0,
   build(o){const pool=erasPool(o),decs=Object.keys(pool).map(Number),used=new Set();
-    return [...Array(o.n)].map(()=>{const pick4=shuffle(decs).slice(0,4);
+    // four decades at least 20 years apart (else 10) so the order can be heard; the cards still come in a random order
+    const spread=()=>{for(const gap of [30,20,10])for(let t=0;t<300;t++){const p=shuffle(decs).slice(0,4),q=[...p].sort((a,b)=>a-b);if(q.every((d,i)=>!i||d-q[i-1]>=gap))return p;}return shuffle(decs).slice(0,4);};
+    return [...Array(o.n)].map(()=>{const pick4=spread();
       const items=pick4.map(d=>{const fresh=pool[d].filter(c=>!used.has(c)),L=fresh.length?fresh:pool[d],lo=Math.min(...L.map(x=>x.kind==='mine'?chPlays(x.id):0)),c=pick(L.filter(x=>(x.kind==='mine'?chPlays(x.id):0)===lo));used.add(c);if(!c.synth)clipBuffer(c).catch(()=>{});return {dec:d,clip:c};});
       return {eras:pick4,items};});},
   playCard(k){const s=G.gs,r=s.rounds[s.i],it=r.items[k],c=it.clip,i=s.i;s.playing=k;$$('.ccard').forEach((x,j)=>x.classList.toggle('playing',j===k));
@@ -430,5 +431,7 @@ game(roundGame({
   locked:(box,mine)=>{box.innerHTML=`<div class="pslots">${mine.map(k=>`<div class="pslot">${shape(k,40,'var(--ink)',`var(${COLS[k]})`)}</div>`).join('<i>→</i>')}</div>`;},
   score:(r,a)=>{const pos={};a.forEach((k,i)=>pos[k]=i);let ok=0;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){if((r.eras[i]<r.eras[j])===(pos[i]<pos[j]))ok++;}return {acc:ok/6,note:`${ok} of 6 pairs in the right order`};},
   publicReveal:r=>({order:r.eras.map((y,k)=>[y,k]).sort((a,b)=>a[0]-b[0]).map(([y,k])=>[k,decLabel(y)])}),
-  pReveal:(box,st)=>{box.innerHTML=`<div class="pslots">${st.rv.order.map(([k,l])=>`<div class="pslot">${shape(k,36,'var(--ink)',`var(${COLS[k]})`)}<small>${esc(l)}</small></div>`).join('<i>→</i>')}</div>`;},
+  pReveal:(box,st)=>{const right=st.rv.order,lab=Object.fromEntries(right.map(([k,l])=>[k,l])),row=(L,mark)=>`<div class="pslots">${L.map((k,i)=>`<div class="pslot${mark&&k!==right[i][0]?' wrong':''}">${shape(k,36,'var(--ink)',`var(${COLS[k]})`)}<small>${esc(lab[k])}</small></div>`).join('<i>→</i>')}</div>`;
+    const mine=Array.isArray(st.mine)&&st.mine.length===4?st.mine:null,ok=mine&&mine.every((k,i)=>k===right[i][0]);
+    box.innerHTML=`<p class="lab">The right order</p>${row(right.map(x=>x[0]),false)}${mine&&!ok?`<p class="lab">Your order</p>${row(mine,true)}`:''}`;},
 }));

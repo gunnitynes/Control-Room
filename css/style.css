@@ -1417,3 +1417,4 @@ body:has(#app.guidepage){overflow:auto}
 .chimport{display:grid;gap:8px;justify-items:start;margin-bottom:14px}.chimport .big{cursor:pointer}.chprog{font:700 12px var(--mono)}
 .chdecs{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}.chdecs span{display:grid;gap:2px;padding:8px 12px;border:3px solid var(--ink);background:var(--paper);box-shadow:3px 3px 0 var(--ink);font:700 11px var(--mono);text-transform:uppercase}.chdecs b{font:900 20px/.9 var(--disp);font-stretch:62%}.chdecs span.none{opacity:.45;border-style:dashed;box-shadow:none}
 .myclips #chClear{width:auto;display:inline-flex}
+.prv .pslot.wrong{outline:4px solid var(--red);outline-offset:2px}.prv .lab{margin:10px 0 4px}
