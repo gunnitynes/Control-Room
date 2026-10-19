@@ -1648,3 +1648,5 @@ body:has(#app.guidepage){overflow:auto}
   .gjoin div b{width:30px;height:30px;font-size:18px;top:-10px;left:-8px}.gjoin svg{width:64px;height:48px}.gjoin span{font-size:15px}}
 .teachbox .linkbtn{padding:0 2px;font-size:11px}
 .roomp .attcopy{justify-self:start;background:var(--yel)}
+.teachbox .tlink{justify-self:start;margin-top:4px}
+.roomp>.attcopy{justify-self:stretch;display:block;text-align:center;font-size:12px;padding:10px;box-shadow:4px 4px 0 var(--ink)}

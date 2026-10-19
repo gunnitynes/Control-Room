@@ -275,6 +275,15 @@ function copyText(t,done){const ok=()=>{toast(done||'Copied');};
 const teacherName=()=>store.get('teacher','');
 const lobbyId=()=>{const k=teacherKey(ROLE==='host'?teacherName():QS.get('t'));return k?'controlroom-lobby-'+k:'';};
 const goURL=()=>new URL('../CADCAST/go/?t='+encodeURIComponent(teacherName()).replace(/%20/g,'+'),location.href).href.replace(/^http:\/\/localhost:\d+\//,'https://gunnitynes.github.io/');
+/* the teacher link: Control Room set up as this teacher on any computer (name + their sheet link). The settings ride after
+   the # (never sent to a server) and are wiped from the address bar as soon as they're applied. Private: it holds the sheet link. */
+const teacherLink=()=>{const sh=store.get('att.url','');return new URL('./?host',location.href).href.replace(/^http:\/\/localhost:\d+\//,'https://gunnitynes.github.io/Control-Room/')
+  +'#teacher='+encodeURIComponent(teacherName())+(sh?'&sheet='+encodeURIComponent(sh):'');};
+function applyTeacherLink(){const h=new URLSearchParams(location.hash.slice(1)),t=h.get('teacher');if(t==null)return;
+  const n=t.replace(/\s+/g,' ').trim().slice(0,40),sh=h.get('sheet')||'';if(teacherKey(n))store.set('teacher',n);
+  if(/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(sh))store.set('att.url',sh);
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  setTimeout(()=>toast(`Set up as ${n}${sh?' with your Google Sheet':''}`),600);}
 function setTeacher(n){n=String(n||'').replace(/\s+/g,' ').trim().slice(0,40);if(!teacherKey(n))return false;store.set('teacher',n);
   if(G.lobbyPeer)try{G.lobbyPeer.destroy();}catch(e){}G.lobbyPeer=null;G.lobbyErr=false;startLobby();render();return true;}
 /* asked once when Control Room opens on a computer, changeable in the room panel */
@@ -438,12 +447,13 @@ function rMenu(st){
     <aside class="roomp">
       <div class="teachbox${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">Change</button></div>
         ${G.lobbyErr?`<p class="tbwarn">Another Control Room is already open as “${esc(teacherName())}” (another tab, or a colleague with the same name). Student computers may find that room instead: add your last name.</p>`:''}
-        <span class="fine"><a href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST</a> <button class="linkbtn" id="bCopyGo" title="Copy the student computer link">⧉ copy link</button></span></div>
+        <span class="fine"><a href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST</a></span>
+        <button class="ghost tlink" id="bCopyTeach" title="Your own link: opens Control Room set up as you (name${attOwn()?' and Google Sheet':''}) on any computer">⧉ Copy teacher link</button></div>
+      <button class="ghost attcopy" id="bAttCopy" title="Copy the names of everyone who joined this room, with the time they joined">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
       <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__copy">⧉ Copy your sheet link</option><option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
         <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
-      <button class="ghost attcopy" id="bAttCopy" title="Copy the names of everyone who joined this room, with the time they joined">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
     </aside>
     <section class="games">${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b><span>${esc(gr.sub)}</span></div>
@@ -452,7 +462,7 @@ function rMenu(st){
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
   $('#bReset').onclick=resetPoints;$('#bAttCopy').onclick=copyAttendance;$('#bNew').onclick=newRoom;
-  $('#bTeach').onclick=askTeacher;const cg=$('#bCopyGo');if(cg)cg.onclick=()=>copyText(goURL(),'Student computer link copied');if(!teacherName())setTimeout(askTeacher,300);
+  $('#bTeach').onclick=askTeacher;$('#bCopyTeach').onclick=()=>copyText(teacherLink(),'Teacher link copied. Keep it private: it opens Control Room as you'+(attOwn()?', with your sheet':''));if(!teacherName())setTimeout(askTeacher,300);
   if($('#selCls'))$('#selCls').onchange=e=>{const v=e.target.value;
     if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}
     if(v==='__copy'){e.target.value=ATT.cls;copyText(store.get('att.url',''),'Sheet link copied. Keep it private: paste it only into Control Room.');return;}
@@ -898,7 +908,7 @@ function boot(){
       else if(G.view==='play'&&G.game&&G.game.next){e.preventDefault();G.game.next();}
     }
   });
-  if(ROLE==='host'){
+  if(ROLE==='host'){applyTeacherLink();
     const s=store.get('room',null);
     if(s&&Date.now()-s.t<12*3600e3){s.players.forEach((p,k)=>G.players.set(p.id,{...blankP(),...p,hand:0,sh:p.sh??k%4,conn:null}));G.banned=new Set(s.banned||[]);}
     render();
