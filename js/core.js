@@ -753,7 +753,7 @@ function pRender(){
   app.innerHTML=top+`<main class="pbody" id="pbody"></main>`;
   if($('#nbBtn'))$('#nbBtn').onclick=openNotebook;
   if($('#pHand'))$('#pHand').onclick=()=>{PL.hand=!PL.hand;pHandShow();papi.vibe(PL.hand?[15,40,15]:10);const m={t:'hand',up:PL.hand};if(PL.conn&&PL.conn.open)try{PL.conn.send(m);}catch(e){}};
-  const lg=$('.ptop .logo');if(lg){lg.onclick=openInstall;if(!isStandalone())lg.insertAdjacentHTML('beforeend','<i class="appbadge" aria-label="Add to home screen">＋</i>');}
+  
   const body=$('#pbody');PL.key='';PL.timer=null;PL.clock=null;
   setTimeout(()=>{const gb=$('#pGuide');if(gb)gb.onclick=openGuide;},0);
   if(!PL.joined&&PL.names&&PL.names.names.length&&!PL.typing){
@@ -795,11 +795,11 @@ function pRender(){
     if(PL.status)body.insertAdjacentHTML('beforeend',`<p class="pst pfix">${esc(PL.status)}</p>`);
     return;
   }
-  body.innerHTML=`<div class="pcenter dots idle"><div class="idlefig">${shape(0,64,'var(--ink)','var(--red)')}${shape(1,64,'var(--ink)','var(--blue)')}${shape(2,64,'var(--ink)','var(--yel)')}</div>
+  body.innerHTML=`<div class="pcenter dots idle"><div class="idlemain"><div class="idlefig">${shape(0,64,'var(--ink)','var(--red)')}${shape(1,64,'var(--ink)','var(--blue)')}${shape(2,64,'var(--ink)','var(--yel)')}</div>
     <h2>${s.g?'Next up':'You’re in'}</h2>${s.g?`<p class="nextg">${esc(s.gname)}</p>`:''}
     <p>${s.g?'The game starts in a moment.':`Look for <b>${esc(s.name)}</b> on the big screen. The next game starts soon.`}</p>
-    <button class="guidebtn" id="pGuide"><b>Guide</b><span>to the Control Room</span><i>→</i></button>
-    ${s.total?`<p class="lab">Room total · ${s.total} pts · ${ordinal(s.rank)} of ${s.of}</p>`:''}${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>`;
+    ${s.total?`<p class="lab">Room total · ${s.total} pts · ${ordinal(s.rank)} of ${s.of}</p>`:''}${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>
+    <button class="guidebtn" id="pGuide"><b>Guide</b><span>to the Control Room</span><i>→</i></button></div>`;
 }
 /* the computer that was scanned is now this student's: a short confirmation card over whatever is on screen */
 function showPaired(m){let ov=$('#paired');if(!ov){ov=el('div','pairedov');ov.id='paired';document.body.appendChild(ov);}
@@ -810,22 +810,6 @@ function showPaired(m){let ov=$('#paired');if(!ov){ov=el('div','pairedov');ov.id
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.__bip=e;});
 if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
-function openInstall(){
-  let ov=$('#inst');if(!ov){ov=el('div','nb inst');ov.id='inst';document.body.appendChild(ov);}
-  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  const icon=`<div class="insticon"><img src="icons/icon-192.png" alt=""></div>`;
-  let body;
-  if(isStandalone())body=`${icon}<h2>You’re in the app</h2><p>Control Room is on your home screen. Open it from there next lesson.</p>`;
-  else if(window.__bip)body=`${icon}<h2>Put it on your home screen</h2><p>One tap next lesson, full screen, no browser bars.</p><button class="big go" id="instGo">Add Control Room</button>`;
-  else if(ios)body=`${icon}<h2>Put it on your home screen</h2><ol class="inststeps"><li><span class="ig">${SHARE_ICON}</span>Tap <b>Share</b> in Safari’s bar</li><li><span class="ig">${ADD_ICON}</span>Choose <b>Add to Home Screen</b></li><li><span class="ig ok">✓</span>Tap <b>Add</b></li></ol><div class="instarrow" aria-hidden="true">↓</div>`;
-  else body=`${icon}<h2>Put it on your home screen</h2><ol class="inststeps"><li><span class="ig">⋮</span>Open your browser’s <b>menu</b></li><li><span class="ig">${ADD_ICON}</span>Choose <b>Add to Home screen</b> or <b>Install app</b></li></ol>`;
-  ov.innerHTML=`<div class="nbpanel instpanel"><header><span class="lab">Control Room app</span><button class="ghost" id="instX">Close</button></header><div class="instbody">${body}</div></div>`;
-  $('#instX').onclick=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)ov.remove();};
-  if($('#instGo'))$('#instGo').onclick=async()=>{const e=window.__bip;window.__bip=null;e.prompt();const r=await e.userChoice.catch(()=>({}));
-    $('.instbody').innerHTML=r.outcome==='accepted'?`${icon}<h2 class="instdone">Added ✓</h2><p>Find Control Room on your home screen.</p>`:`${icon}<h2>Maybe later</h2><p>Tap the logo any time to add it.</p>`;};
-}
-const SHARE_ICON='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 8l5-5 5 5M5 12v8h14v-8"/></svg>';
-const ADD_ICON='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
 const NB_ICON='<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="2" width="16" height="18" fill="var(--yel)" stroke="var(--ink)" stroke-width="2"/><path d="M7 2v18M10 7h6M10 11h6M10 15h4" stroke="var(--ink)" stroke-width="2"/></svg>';
 const NB_KINDS=[['brief','Briefs & styles','◆'],['rules','Rules you wrote','✎'],['pick','Picks you kept','●'],['card','Cards you were dealt','▲'],['team','Teams & chains','■'],['finish','Results','★'],['star','Milestones','★']];
 /* The notebook: a scrapbook of the lesson, newest first. Every kind of entry is its own object: a ticket for a

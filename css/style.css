@@ -1392,3 +1392,7 @@ body:has(#app.guidepage){overflow:auto}
 .mchip.hand{background:var(--yel);color:var(--ink);box-shadow:4px 4px 0 var(--ink);transform:translateY(-2px)}
 .mchip .mhand{display:inline-grid;margin-left:4px;vertical-align:middle}.mchip .mhand svg{width:18px;height:18px;animation:handwave 1.4s ease-in-out infinite}
 .handbtn em{font-style:normal;padding:1px 6px;background:var(--ink);color:var(--yel)}
+.pcenter.idle{min-height:100%;align-content:stretch;grid-template-rows:1fr auto;padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+.idlemain{display:grid;align-content:center;justify-items:center;gap:18px}
+.pcenter.idle .guidebtn{margin-top:0;justify-self:center}
+.gextras .ghand{grid-template-columns:auto 1fr;column-gap:12px}.gextras .ghand svg{grid-row:1/span 2;width:54px;height:54px;color:var(--ink)}

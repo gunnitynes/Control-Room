@@ -76,7 +76,8 @@ Phones and the host keep old files otherwise.
   Control Room); the host sends them with `pcSend(player, msg)`. No answer counts as "busy"; students can sit out.
   Option `mode:'gen'` (Generator) skips rounds and the clock: Shared = one card for the room (New task / New rule /
   New constraint), Own = one card per phone, rerolled from the phone (`{t:'roll'}`); files still go to paired computers.
-- Phones: tapping the logo opens Add to Home Screen (manifest.webmanifest, sw.js, icons/). The splash shows the join
+- Phones: the app can still be added to the home screen by hand (manifest.webmanifest, sw.js, icons/); the logo no longer opens a prompt
+  (the owner removed it). The idle screen keeps the Guide button at the bottom. The splash shows the join
   QR as art (`artQR`, error correction H; check scannability with jsQR after changing it).
 - Teacher-uploaded clips and photos (Chronologist decades, Ear Atlas songs, Metaphor Translation photos) live in IndexedDB on
   the host only (`clipDB`, `MYCLIPS`; songs use `dec:-1`, photos `dec:-2`). They are never uploaded anywhere. Copyrighted

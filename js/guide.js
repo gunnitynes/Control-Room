@@ -51,7 +51,7 @@ function guideHTML(){
       <div style="--c:var(--yel)"><b>Notebook</b><span>Every brief, rule, card and milestone you collect.</span></div>
       <div style="--c:var(--green)"><b>Sit out</b><span>Busy? Skip a round. Jump back in any time.</span></div>
       <div style="--c:var(--red)"><b>Your sound</b><span>Your computer can play to the teacher’s desk.</span></div>
-      <div style="--c:var(--blue)"><b>Home screen</b><span>Tap the logo to keep Control Room one tap away.</span></div>
+      <div class="ghand" style="--c:var(--yel)">${typeof HAND_ICON!=='undefined'?HAND_ICON:''}<b>Raise your hand</b><span>Tap the hand at the top of your phone. Your name lights up on the big screen, in the order hands went up. Tap again to lower it.</span></div>
     </div></section>
     <footer class="gfoot"><div class="ghshapes small"><i></i><i></i><i></i></div><p>One room. One big screen. Everybody plays.</p></footer>
   </div>`;
