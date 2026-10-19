@@ -1,26 +1,26 @@
 /* =====================================================================
    THE CLASS ALBUM — everyone makes one song together
-   Every computer (CADCAST/go) gets the same brief: tempo, key, length, the same starter chords (an ASSETS recipe, so
-   every part fits) and a drum loop to play against. Each student is dealt a role and makes exactly N bars of it, exports
+   Nothing is sent out: each computer (CADCAST/go) only shows a small brief (role, tempo, key, length) and a drop
+   zone. Each student is dealt a role and makes exactly N bars of it, exports
    them from the DAW (sample-exact, no recording) and drops the file on the CADCAST page (pcSendFile kind 'part').
    Control Room fits every part to the length (a reverb tail wraps round to the start, half-length loops repeat) and the
    class arranges the song on the big screen: a row per part, a column per section; phones switch their own row.
-   The album: an offline render → mix WAV (+ stems, all scaled by the same gain so they sum to the mix), sent back to
-   every computer (kind 'album').
+   The album: an offline render → mix WAV (+ stems, all scaled by the same gain so they sum to the mix), downloaded
+   on the big screen.
    ===================================================================== */
 const AL_SR=44100;
 const AL_ROLES=[
   {id:'drums',name:'Drums',tip:'The beat: kick, snare, hats. Simple enough for everyone to play over.'},
-  {id:'bass',name:'Bass',tip:'Follow the roots of the starter chords and lock in with the kick.',file:'bass'},
-  {id:'chords',name:'Chords',tip:'The starter chords in your own sound and rhythm: pads, stabs, piano, guitar.'},
+  {id:'bass',name:'Bass',tip:'Follow the root of each chord and lock in with the kick.'},
+  {id:'chords',name:'Chords',tip:'The harmony everyone plays over, in your own sound and rhythm: pads, stabs, piano, guitar.'},
   {id:'hook',name:'The hook',tip:'The melody people hum on the way home. Short, catchy, repeated. Stay in the key.'},
   {id:'vox',name:'Vocal chop',tip:'Chop a voice (record yours!) into a rhythm or a tiny melody.'},
   {id:'fx',name:'FX & transitions',tip:'Risers, impacts, sweeps, reversed hits: the moments between sections.'},
   {id:'perc',name:'Percussion',tip:'Shakers, claps, toms, found sounds. Fill the gaps the drums leave.'},
   {id:'pad',name:'Atmosphere',tip:'A long, wide texture under everything. Slow movement, no busy rhythm.'},
-  {id:'arp',name:'Arp',tip:'An arpeggio of the starter chords: sixteenths, triplets, your choice.',file:'arp'},
+  {id:'arp',name:'Arp',tip:'An arpeggio in the key: sixteenths, triplets, your choice.'},
   {id:'counter',name:'Counter-melody',tip:'A second melody that answers the hook. Fewer notes, another range.'},
-  {id:'sub',name:'Sub & 808',tip:'Deep low end: an 808 or a sine sub on the chord roots. Leave space for the bass.',file:'bass'},
+  {id:'sub',name:'Sub & 808',tip:'Deep low end: an 808 or a sine sub on the roots. Leave space for the bass.'},
   {id:'lead',name:'Lead',tip:'A bold lead for the big moments: synth, guitar, anything that shouts.'},
 ];
 const AL_COL=['--red','--blue','--yel','--green'];
@@ -68,7 +68,7 @@ async function alFit(blob,bpm,bars){const L=Math.round(bars*4*60/bpm*AL_SR),barN
 
 game({
   id:'album',group:'make',name:'The Class Album',tag:'Everyone makes one part of the same song. The class arranges it and takes the track home.',
-  how:['Everyone gets the same tempo, key and starter chords on their computer, and a role: drums, bass, the hook…','Make your part, export exactly the bars asked for and drop the file on your CADCAST page.','The big screen stacks every part into one song. Arrange it together, then everyone gets the mix.'],
+  how:['Everyone works at the same tempo and key, and gets a role: drums, bass, the hook…','Make your part, export exactly the bars asked for and drop the file on your CADCAST page.','The big screen stacks every part into one song. Arrange it together, then download the mix and stems.'],
   badges:['CADCAST','Whole class','Mix + stems'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><rect x="6" y="10" width="44" height="44" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/><circle cx="40" cy="32" r="20" fill="var(--ink)"/><circle cx="40" cy="32" r="7" fill="var(--red)" stroke="var(--paper)" stroke-width="2"/>${[0,1,2,3].map(i=>`<rect x="10" y="${15+i*9}" width="${[16,10,20,12][i]}" height="5" fill="var(${['--red','--blue','--green','--paper'][i]})"/>`).join('')}</svg>`,
   options:[
@@ -77,13 +77,13 @@ game({
     {key:'bars',label:'Each part',choices:[[8,'8','bars'],[16,'16','bars']],def:8},
     {key:'mins',label:'Making time',choices:[[15,'15','min'],[20,'20','min'],[30,'30','min'],[45,'45','min'],[0,'Open','no clock'],[-10,'10 s','test run']],def:30},
   ],
-  note:'Students need their computer on CADCAST (gunnitynes.github.io/CADCAST/go): the brief and starter files land there, and that’s where they drop their finished part. A student without CADCAST can AirDrop the file to you: drag it onto their card.',
+  note:'Students hand in through CADCAST (gunnitynes.github.io/CADCAST/go): they drop their exported part on that page. Nothing is sent to the computers. A student without CADCAST can AirDrop the file to you: drag it onto their card.',
   topInfo(){const s=G.gs;if(!s)return this.tag;return `${s.o.bpm} BPM · ${s.key} · ${s.o.bars} bars each`+({make:' · making',arrange:' · arranging',album:''})[s.phase];},
   start(o){const key=o.key==='random'?pick(alKeys()):o.key;
-    G.gs={o,key,id:Date.now()%1e9,seed:Math.floor(Math.random()*1e9),phase:'make',roles:new Map(),parts:new Map(),prog:new Map(),secs:AL_SECS.slice(),on:new Map(),lvl:new Map(),mute:new Set(),
-      titles:new Map(),title:`${pick(AL_ADJ)} ${pick(AL_NOUN)}`,play:null,starter:null,out:null};
+    G.gs={o,key,id:Date.now()%1e9,phase:'make',roles:new Map(),parts:new Map(),prog:new Map(),secs:AL_SECS.slice(),on:new Map(),lvl:new Map(),mute:new Set(),
+      titles:new Map(),title:`${pick(AL_ADJ)} ${pick(AL_NOUN)}`,play:null,out:null};
     if(o.mins)startClock(o.mins<0?-o.mins*1000:o.mins*60000,()=>{sfx.alarm();toast('Time! Export your part and drop it on CADCAST.');});this.dealAll();
-    if(typeof ASSETS!=='undefined')ASSETS.make({kind:'chords',seed:G.gs.seed,bpm:o.bpm,key}).then(f=>{if(G.gs&&G.gs.o===o){G.gs.starter=f;this.live();}}).catch(()=>{});},
+  },
   stop(){this.halt();stopClock();const s=G.gs;if(s)online().forEach(p=>pcSend(p,{t:'album-end'}));},
   leave(){},
   // ---------- roles: dealt in order of need (drums and bass first), then doubled up
@@ -93,10 +93,9 @@ game({
     s.roles.set(p.id,best.r.id);this.brief(p);},
   role(pid){return AL_ROLES.find(r=>r.id===G.gs.roles.get(pid))||AL_ROLES[0];},
   roleName(pid){const s=G.gs,id=s.roles.get(pid),same=[...s.roles].filter(([,r])=>r===id).map(([k])=>k);const r=this.role(pid);return same.length>1?`${r.name} ${same.indexOf(pid)+1}`:r.name;},
-  brief(p){const s=G.gs;if(s.phase!=='make')return;const r=this.role(p.id),base={seed:s.seed,bpm:s.o.bpm,key:s.key};
-    const files=[{...base,kind:'chords',what:'The starter chords (4 bars, loop them). Everyone has these.'},{...base,kind:'beat',what:'A guide drum loop to play against (or keep it, drums!)'}];
-    if(r.file)files.push({...base,kind:r.file,what:r.file==='bass'?'A bassline on the same chords, to start from':'An arpeggio on the same chords, to start from'});
-    pcSend(p,{t:'album',m:{round:s.id,at:Date.now(),title:s.title,role:this.roleName(p.id),tip:r.tip,bpm:s.o.bpm,key:s.key,bars:s.o.bars,files,ends:s.clockEnd?Date.now()+clockLeft():0}});},
+  // only a few words and the drop zone: no files go out
+  brief(p){const s=G.gs;if(s.phase!=='make')return;const r=this.role(p.id);
+    pcSend(p,{t:'album',m:{round:s.id,at:Date.now(),title:s.title,role:this.roleName(p.id),tip:r.tip,bpm:s.o.bpm,key:s.key,bars:s.o.bars,files:[],ends:s.clockEnd?Date.now()+clockLeft():0}});},
   onJoin(p){const s=G.gs;if(s.phase==='make'&&!s.roles.has(p.id)){this.deal(p);render();sync(p);}},
   onPair(p){const s=G.gs;if(s.phase==='make'&&s.roles.has(p.id))this.brief(p);this.live();},
   // ---------- hand-in
@@ -154,12 +153,7 @@ game({
     const stems=rows.map((pid,i)=>({pid,name:`${t} - Stems/${pad2(i+1)} ${alSafe(this.roleName(pid))} - ${alSafe((G.players.get(pid)||{}).name||'')}.wav`,blob:alWav(bufs[i],gain)}));
     s.out={mix:alWav(mix,gain),stems,dur:mix.duration,title:s.title,names:rows.map(pid=>[(G.players.get(pid)||{}).name||'?',this.roleName(pid)])};s.rendering=false;
     s.out.mixURL=URL.createObjectURL(s.out.mix);s.out.stemURLs=stems.map(x=>URL.createObjectURL(x.blob));
-    s.phase='album';sfx.fanfare&&sfx.fanfare();render();syncAll();this.sendAlbum();},
-  async sendAlbum(){const s=G.gs,O=s.out;s.sent=new Map();const ps=online().filter(p=>pcFor(p));ps.forEach(p=>s.sent.set(p.id,0));this.live();
-    const q=ps.slice(),one=async()=>{while(q.length){const p=q.shift();const ok=await pcSendFile(p,{kind:'album',round:s.id,title:O.title,name:`${alSafe(O.title)} - The Class Album.wav`,what:`the class mix · ${alFmt(O.dur)}`},O.mix,f=>{s.sent.set(p.id,f);this.liveSent();});
-      if(G.gs!==s)return;s.sent.set(p.id,ok?1:-1);this.liveSent();}};
-    await Promise.all([one(),one(),one()]);},
-  liveSent(){const s=G.gs,b=$('#alSent');if(!b||!s.sent)return;const v=[...s.sent.values()],done=v.filter(x=>x===1).length;b.textContent=v.length?`On ${done} of ${v.length} computer${v.length===1?'':'s'}${v.some(x=>x>0&&x<1)?' · sending…':''}`:'No computers on CADCAST';},
+    s.phase='album';sfx.fanfare&&sfx.fanfare();render();syncAll();},
   async zip(){const s=G.gs,O=s.out;if(!O)return;const b=$('#alZip');if(b){b.disabled=true;b.textContent='Packing…';}
     const z=await alZip([{name:`${alSafe(O.title)} - Mix.wav`,blob:O.mix},...O.stems]);const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=`${alSafe(O.title)} - Class Album.zip`;a.click();
     if(b){b.disabled=false;b.textContent='⬇ Mix + all stems (.zip)';}},
@@ -174,9 +168,9 @@ game({
   frame(){clockFrame();const s=G.gs;if(!s||s.phase!=='arrange')return;const at=this.pos(),h=$('#alHead');
     if(h){h.style.display=at&&at.k<s.secs.length?'block':'none';if(at)h.style.left=(100*(at.k+at.f)/s.secs.length)+'%';}
     const k=at?at.k:-1;if(k!==this._k){this._k=k;$$('.alsec',$('#alGrid')||document).forEach((e,i)=>e.classList.toggle('now',i===k));}},
-  live(){const s=G.gs;if(!s)return;if(s.phase==='make'){const w=$('#alWall');if(w)w.innerHTML=this.wall();const st=$('#alStarter');if(st&&s.starter)st.textContent=s.starter.info;const n=$('#alCount');if(n)n.textContent=`${s.parts.size} of ${s.roles.size} parts in`;const b=$('#bNext');if(b)b.disabled=!s.parts.size;return;}
+  live(){const s=G.gs;if(!s)return;if(s.phase==='make'){const w=$('#alWall');if(w)w.innerHTML=this.wall();const n=$('#alCount');if(n)n.textContent=`${s.parts.size} of ${s.roles.size} parts in`;const b=$('#bNext');if(b)b.disabled=!s.parts.size;return;}
     if(s.phase==='arrange'){const g=$('#alGrid');if(g){g.innerHTML=this.grid();this.bindGrid(g);}const t=$('#alTitles');if(t){t.innerHTML=this.titles();this.bindTitles(t);}const pb=$('#alPlay');if(pb)pb.innerHTML=s.play?'■ Stop':'▶ Play the song';}
-    if(s.phase==='album')this.liveSent();},
+  },
   wall(){const s=G.gs;const ids=[...s.roles.keys()].filter(id=>G.players.has(id));
     return ids.map((pid,i)=>{const p=G.players.get(pid),part=s.parts.get(pid),pr=s.prog.get(pid),r=this.role(pid);
       const bad=s.fail&&s.fail.get(pid),st=part?(part.warn?'warn':'in'):pr!=null?'up':bad?'bad':pcFor(p)?'wait':'nopc';
@@ -206,8 +200,8 @@ game({
   render(st){const s=G.gs,o=s.o,nIn=s.parts.size;let body='',lbl='',dis=false;
     if(s.phase==='make'){lbl='Arrange the song';dis=!nIn;
       body=`<div class="almake"><div class="altop"><div><span class="lab">The Class Album · ${o.bars} bars each</span><h2>${o.bpm} BPM · ${esc(s.key)}</h2>
-          <p>Starter chords on every computer: <b id="alStarter">${esc(s.starter?s.starter.info:'…')}</b> <button class="ghost" id="alHear">▶ Hear the starter</button></p></div>${o.mins?clockHTML():''}</div>
-        <ol class="cdsteps alsteps"><li><span>Set <b>${o.bpm} BPM</b>. Loop the starter chords and build <b>your role</b> in <b>${esc(s.key)}</b>.</span></li><li><span>Make exactly <b>${o.bars} bars</b>, starting on bar 1.</span></li><li><span>Export <b>bars 1 to ${o.bars+1}</b> as WAV and drop it onto <b>your Class Album box on gunnitynes.github.io/CADCAST/go</b>.</span></li></ol>
+          <p>Everyone makes one part of the same song. Roles are on the cards; click a role to deal another.</p></div>${o.mins?clockHTML():''}</div>
+        <ol class="cdsteps alsteps"><li><span>Set <b>${o.bpm} BPM</b> and build <b>your role</b> in <b>${esc(s.key)}</b>.</span></li><li><span>Make exactly <b>${o.bars} bars</b>, starting on bar 1.</span></li><li><span>Export <b>bars 1 to ${o.bars+1}</b> as WAV and drop it onto <b>your Class Album box on gunnitynes.github.io/CADCAST/go</b>.</span></li></ol>
         <div class="alwall" id="alWall">${this.wall()}</div></div>`;}
     if(s.phase==='arrange'){lbl=s.rendering?'Making the album…':'Make the album';dis=!!s.rendering;const tot=this.secLen()*s.secs.length;
       body=`<div class="alarr"><div class="altop"><div><span class="lab">Arrange it · ${s.secs.length} sections · ${alFmt(tot)}</span><h2>Who plays where?</h2>
@@ -219,15 +213,14 @@ game({
       body=`<div class="alalbum"><div class="alcover"><div class="alvinyl"><i></i></div><div class="alsleeve"><span class="lab">The Class Album</span><h2>${esc(O.title)}</h2><p>${o.bpm} BPM · ${esc(s.key)} · ${alFmt(O.dur)}</p>
           <ol>${O.names.map(([n,r])=>`<li><b>${esc(n)}</b><span>${esc(r)}</span></li>`).join('')}</ol></div></div>
         <div class="aldl"><button class="big go" id="alPlayMix">▶ Play the album</button><a class="big" href="${O.mixURL}" download="${esc(alSafe(O.title))} - Mix.wav">⬇ The mix (WAV)</a><button class="big" id="alZip">⬇ Mix + all stems (.zip)</button>
-          <p class="fine" id="alSent">Sending to every computer…</p><details><summary>Stems one by one</summary>${O.stems.map((x,i)=>`<a href="${O.stemURLs[i]}" download="${esc(x.name.split('/').pop())}">${esc(x.name.split('/').pop())}</a>`).join('')}</details></div></div>`;}
+<details><summary>Stems one by one</summary>${O.stems.map((x,i)=>`<a href="${O.stemURLs[i]}" download="${esc(x.name.split('/').pop())}">${esc(x.name.split('/').pop())}</a>`).join('')}</details></div></div>`;}
     st.innerHTML=`<div class="album ph-${s.phase}">${body}<div class="dfoot"><span class="fine" id="alCount">${nIn} of ${s.roles.size} parts in</span>${s.phase==='album'?againBtn():''}<button class="big go" id="bNext" ${dis?'disabled':''}>${esc(lbl)} <small>SPACE</small></button></div></div>`;
     $('#bNext').onclick=()=>this.next();bindAgain(st);this.bindWall(st);
     const g=$('#alGrid',st);if(g)this.bindGrid(g);const t=$('#alTitles',st);if(t)this.bindTitles(t);
-    const hr=$('#alHear',st);if(hr)hr.onclick=()=>{if(!s.starter)return;if(s.hear){s.hear.stop();s.hear=null;hr.textContent='▶ Hear the starter';return;}s.hear=ASSETS.preview(s.starter);hr.textContent='■ Stop';setTimeout(()=>{if(s.hear){s.hear=null;hr.textContent='▶ Hear the starter';}},16*60/o.bpm*1000+500);};
     const pb=$('#alPlay',st);if(pb)pb.onclick=()=>{if(s.play)this.halt();else this.play(0);this.live();};
     const pm=$('#alPlayMix',st);if(pm)pm.onclick=async()=>{if(s.aud){stopAud();pm.textContent='▶ Play the album';return;}const b=s.out.dec||(s.out.dec=await audio().decodeAudioData(await s.out.mix.arrayBuffer()));setAud(playSample(b,AU.music,{gain:.95,maxDur:1200}));pm.textContent='■ Stop';};
     const z=$('#alZip',st);if(z)z.onclick=()=>this.zip();
-    if(s.phase==='album')this.liveSent();this._k=null;},
+    this._k=null;},
   // ---------- phones
   pstate(p){const s=G.gs,part=s.parts.get(p.id),on=s.on.get(p.id);
     return {k:'al'+s.phase+(s.roles.get(p.id)||'')+(part?part.at:'')+(on?[...on].join('.'):'')+s.secs.join('|')+(s.titles.get(p.id)||'')+s.title,ph:s.phase,bpm:s.o.bpm,key:s.key,bars:s.o.bars,
@@ -236,14 +229,14 @@ game({
   player(root,st){pClockStart(st.clock);
     if(st.ph==='make'){root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}<span class="lab">Your role</span><h2 class="pbigt alprole">${esc(st.role||'…')}</h2><p>${esc(st.tip)}</p>
         <div class="alpfacts"><span><small>Tempo</small><b>${st.bpm}</b></span><span><small>Key</small><b>${esc(st.key)}</b></span><span><small>Bars</small><b>${st.bars}</b></span></div>
-        <p class="cdyou ${st.part&&!st.part.warn?'ok':''}">${st.part?esc(st.part.text):st.pc?`The starter files are on your computer’s CADCAST page. When you’re done, export bars 1 to ${st.bars+1} as WAV and drop it on that page (the Class Album box).`:'Open gunnitynes.github.io/CADCAST/go on your computer and scan it: your brief and starter files land there.'}</p></div>`;return;}
+        <p class="cdyou ${st.part&&!st.part.warn?'ok':''}">${st.part?esc(st.part.text):st.pc?`When you’re done, export bars 1 to ${st.bars+1} as WAV and drop it on your computer’s CADCAST page (the Class Album box).`:'When you’re done, open gunnitynes.github.io/CADCAST/go on your computer, scan it, and drop your part there.'}</p></div>`;return;}
     if(st.ph==='arrange'){if(!st.part){root.innerHTML=`<div class="pcenter dots"><h2>Arranging</h2><p>Your part didn’t make it in. Help the class decide on the big screen, or suggest a title:</p>${this.ptitle(st)}</div>`;this.bindPTitle(root);return;}
       root.innerHTML=`<div class="pcol2 alphone"><span class="lab">Your part · ${esc(st.role)}</span><h2 class="pbigt">Where do you play?</h2>
         <div class="alpcells">${st.secs.map((n,k)=>`<button class="${st.on.includes(k)?'on':''}" data-k="${k}"><b>${esc(n)}</b><span>${st.on.includes(k)?'playing':'silent'}</span></button>`).join('')}</div>
         <label class="alplvl">Your level<input type="range" min="0" max="100" value="${Math.round(st.lvl*100)}" id="alLvl"></label>${this.ptitle(st)}</div>`;
       $$('.alpcells button',root).forEach(b=>b.onclick=()=>{b.classList.toggle('on');b.querySelector('span').textContent=b.classList.contains('on')?'playing':'silent';papi.send({t:'cell',k:+b.dataset.k});papi.vibe(15);});
       const l=$('#alLvl',root);let lt=0;l.oninput=()=>{clearTimeout(lt);lt=setTimeout(()=>papi.send({t:'lvl',v:l.value/100}),60);};this.bindPTitle(root);return;}
-    root.innerHTML=`<div class="pcenter dots"><span class="lab">The Class Album</span><h2>${esc(st.title)}</h2><p>${st.pc?'The mix is landing on your computer’s CADCAST page.':'Ask your teacher for the mix.'}</p></div>`;},
+    root.innerHTML=`<div class="pcenter dots"><span class="lab">The Class Album</span><h2>${esc(st.title)}</h2><p>Listen on the big screen.</p></div>`;},
   ptitle(st){return `<form class="alptitle" id="alPT"><label>Suggest a title<input maxlength="40" placeholder="${esc(st.title)}" value="${esc(st.mine)}"></label><button class="ghost">${st.mine?'Change':'Suggest'}</button></form>`;},
   bindPTitle(root){const f=$('#alPT',root);if(f)f.onsubmit=e=>{e.preventDefault();const v=$('input',f).value.trim();if(v){papi.send({t:'title',v});papi.vibe(20);$('button',f).textContent='Sent ✓';}};},
 });

@@ -55,14 +55,14 @@ js/games-conduct.js The Conductor (Make something): a laptop orchestra. DAWs kee
                     'cr-mixer': a sync check (clickFit on everyone's metronome → per-stream DelayNode so downbeats land
                     together), bar-quantised gates per computer, and a recording of the mix per piece
 js/games-album.js   The Class Album (Make something, the last module): everyone makes one part of the same song. Every
-                    CADCAST computer gets the brief ({t:'album',m}: role, tempo, key, bars, ASSETS recipes for the starter
-                    chords + a guide drum loop, same seed so bass/arp files follow the same chords); students EXPORT their N bars
+                    CADCAST computer gets only a small brief ({t:'album',m}: role, tempo, key, bars, no files: the owner wants
+                    nothing distributed, only received); students EXPORT their N bars
                     from the DAW and drop the WAV on CADCAST/go (pcSendFile kind 'part'; the teacher can also drag a file onto a
                     card). alFit fits it to N bars (a tail wraps to the start, half-length loops repeat, short = padded + warning)
                     and answers {t:'album-got'}. Arrange: a row per part, a column per section (AL_SECS, AL_FILL defaults by role),
                     phones switch their own row + level + suggest titles; playback schedules sections as segments half a second
                     ahead (a looped section is scheduled again). The album: one offline render per stem, the mix is their sum at
-                    one gain (stems add up to the mix), store-only zip (alZip), the mix sent to every computer (kind 'album').
+                    one gain (stems add up to the mix), store-only zip (alZip), downloaded on the big screen (nothing sent back).
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
 images/quiz/        Machine Room photos (webp) + CREDITS.txt
