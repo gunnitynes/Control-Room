@@ -701,30 +701,12 @@
   "ln": 10.0,
   "dur": 133.6
  },
- "audio/atlas/inst/violin-3.mp3": {
-  "title": "Bach Partita 3 for Violin Prelude 01",
-  "who": "Bach",
-  "lic": "Public domain",
-  "page": "https://commons.wikimedia.org/wiki/File%3ABach_Partita_3_for_Violin_Prelude_01.wav",
-  "t0": 0.0,
-  "ln": 9.47,
-  "dur": 9.5
- },
  "audio/atlas/inst/violin-5.mp3": {
   "title": "Minstrel Boy 2",
   "who": "Endersslay",
   "lic": "CC0",
   "page": "https://commons.wikimedia.org/wiki/File%3AMinstrel_Boy_2.ogg",
   "t0": 3.25,
-  "ln": 10.0,
-  "dur": 54.7
- },
- "audio/atlas/inst/violin-6.mp3": {
-  "title": "Minstrel Boy 2",
-  "who": "Endersslay",
-  "lic": "CC0",
-  "page": "https://commons.wikimedia.org/wiki/File%3AMinstrel_Boy_2.ogg",
-  "t0": 28.25,
   "ln": 10.0,
   "dur": 54.7
  },
