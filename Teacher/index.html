@@ -152,7 +152,7 @@ details>div{padding:0 16px 14px}
     <li class="c-red"><div><strong>Tell it who’s teaching</strong><p>The first time, it asks <em>“Who’s teaching?”</em>. Type your full name, e.g. <em>Gunnar Tynes</em>. Student computers find <b>your</b> class by this name, so several teachers can run Control Room at the same time in different rooms. If a colleague has the same first name, use your last name too. You can change it any time under <em>Teacher</em> on the main menu.</p></div></li>
     <li class="c-yel"><div><strong>Connect your class list (optional)</strong><p>With your own Google Sheet, students tap their name instead of typing it, and every check-in lands on the sheet as attendance. Set it up once, see section 5.</p></div></li>
   </ol>
-  <div class="note blue"><b>One browser, one computer</b>Your class list link, your music folders and your settings are saved in <em>this Chrome on this computer</em>. If you teach from another computer, connect the sheet there once too.</div>
+  <div class="note blue"><b>One browser, one computer</b>Your class list link, your music folders and your settings are saved in <em>this Chrome on this computer</em>. If you teach from another computer, type your name and paste your sheet link there once too (section 5 shows how to copy it).</div>
 </section>
 
 <!-- 3 -->
@@ -180,7 +180,8 @@ details>div{padding:0 16px 14px}
   <header><h2><span class="no">4</span>Student computers</h2><p>CADCAST: sound and files between their computer and yours</p></header>
   <h3>Every lesson</h3>
   <ol class="steps">
-    <li class="c-green"><div><strong>Students open the CADCAST page</strong><p>On every student computer, <span class="url">gunnitynes.github.io/CADCAST/go/</span> is already bookmarked. It finds your class by itself. Only if it doesn’t, it asks for <em>“Your teacher’s name”</em>: students type your name (the same as in Control Room) once.</p></div></li>
+    <li class="c-green"><div><strong>Students open the CADCAST page</strong><p>On every student computer, <span class="url">gunnitynes.github.io/CADCAST/go/</span> is already bookmarked. It finds your class by itself. Only if it doesn’t, it asks for <em>“Your teacher’s name”</em>: students type your name (the same as in Control Room) once.</p>
+      <p>Want to send students the link with your name already in it? On the main menu, under <em>Teacher</em>, click <kbd>⧉ copy link</kbd> next to <em>CADCAST</em>. It always stays the same as long as your name does.</p></div></li>
     <li class="c-blue"><div><strong>Open the Mixer to hear them</strong><p>Click <kbd>Mixer</kbd> at the top right of Control Room. It opens the CADCAST patch bay in a new tab of <b>the same Chrome</b> (allow pop-ups if Chrome asks). Every paired computer appears as a strip with its student’s name and a fader. The Mixer must stay open in that browser for The Conductor.</p></div></li>
   </ol>
   <h3>On each student computer, once</h3>
@@ -237,6 +238,14 @@ details>div{padding:0 16px 14px}
     <li class="c-red"><div><strong>Paste the link</strong><p>Main menu ▸ <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd>. Step 4 of that card: paste the <code>/exec</code> link and press <kbd>Connect</kbd>. Control Room checks it and shows how many classes it found.</p></div></li>
     <li class="c-blue"><div><strong>Each lesson: pick the class</strong><p>Main menu ▸ <em>Class list</em> ▸ choose the class. Phones now show that class’s names to tap. Below the menu you see how many are checked in today; names on the room panel get a mark when the sheet has them.</p></div></li>
   </ol>
+
+  <h3>Your sheet link: keep it, keep it private</h3>
+  <p>The <code>/exec</code> link is how Control Room reaches your sheet. It never changes, and it is the only thing you need to connect the sheet on another computer.</p>
+  <ol class="steps">
+    <li class="c-blue"><div><strong>Copy it any time</strong><p>Main menu ▸ <em>Class list</em> ▸ <kbd>⧉ Copy your sheet link</kbd>. (Also in the sheet card, next to <kbd>Disconnect</kbd>.) Save it somewhere only you can see, like a note or an email to yourself.</p></div></li>
+    <li class="c-green"><div><strong>On another computer</strong><p>Open Control Room, type your name, then <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd> and paste the link in step 4. That’s all: no script and no deploying again.</p></div></li>
+  </ol>
+  <div class="note red"><b>Treat it like a password</b>Anyone with this link can see your class names and add check-ins. Students never see it: phones get the names from your computer, not from the sheet. Don’t project it, post it or put it in shared folders. If it ever leaks: in Apps Script, <kbd>Deploy</kbd> ▸ <kbd>Manage deployments</kbd> ▸ <kbd>Archive</kbd> the old one, make a <kbd>New deployment</kbd>, and paste the new link into Control Room. The old link stops working.</div>
 
   <h3>What lands on the sheet</h3>
   <div class="mock" style="margin:12px 0"><table><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>

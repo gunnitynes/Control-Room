@@ -184,7 +184,7 @@ function openSheetSetup(){let ov=$('#sheetov');if(!ov){ov=el('div','sheetov');ov
         </ol>
         <p class="shtip">Test it: open that link in a new tab. You should see your class names listed, like <code>{"ok":true,"classes":["CLASS-A"]}</code>.</p></div></li>
       <li><b>4</b><div><strong>Paste the link</strong><input id="shUrl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(store.get('att.url',''))}" spellcheck="false" autocomplete="off">
-        <div class="frow"><button class="big go" id="shGo">Connect</button>${attOwn()?'<button class="ghost" id="shOff">Disconnect</button>':''}</div><p class="shst" id="shSt"></p></div></li>
+        <div class="frow"><button class="big go" id="shGo">Connect</button>${attOwn()?'<button class="ghost" id="shCopyUrl">⧉ Copy link</button><button class="ghost" id="shOff">Disconnect</button>':''}</div><p class="shst" id="shSt"></p></div></li>
     </ol>
     <details class="shhelp"><summary>Something not working?</summary><ul>
       <li><b>“Can’t reach the attendance sheet”</b>: in step 3, “Who has access” must be <b>Anyone</b>. Make sure you copied the Web app URL ending in <em>/exec</em>, not the editor’s address.</li>
@@ -200,6 +200,7 @@ function openSheetSetup(){let ov=$('#sheetov');if(!ov){ov=el('div','sheetov');ov
     .then(t=>navigator.clipboard.writeText(t)).then(()=>{$('#shCopy').textContent='Copied ✓';toast('Script copied: paste it into Apps Script');})
     .catch(()=>{window.open('integrations/attendance/ControlRoomAttendance.gs','_blank');toast('Copy the script from the page that opened');});
   if($('#shOff'))$('#shOff').onclick=()=>{attUse('');close();toast('Disconnected');};
+  if($('#shCopyUrl'))$('#shCopyUrl').onclick=()=>copyText(store.get('att.url',''),'Sheet link copied. Keep it private: paste it only into Control Room.');
   $('#shGo').onclick=()=>{const u=$('#shUrl').value.trim();
     if(/docs\.google\.com\/spreadsheets/.test(u))return st('That is the sheet itself. Paste the Web app URL from step 3 instead (it starts with script.google.com and ends in /exec).',true);
     if(!/^https:\/\/script\.google(usercontent)?\.com\/.+/.test(u))return st('Paste the Web app URL from step 3 (it starts with https://script.google.com/).',true);
@@ -267,6 +268,10 @@ function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadca
    which room that teacher has open right now. Student computers (CADCAST/go?t=<name>) ask it, so two teachers teaching
    at the same time never meet. The host asks the teacher's name once; a phone gets it from the QR (&t=). */
 const teacherKey=n=>String(n||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').slice(0,40);
+// copy to the clipboard (with a fallback for browsers that refuse navigator.clipboard)
+function copyText(t,done){const ok=()=>{toast(done||'Copied');};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>fb());else fb();
+  function fb(){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok();}catch(e){prompt('Copy this link:',t);}a.remove();}}
 const teacherName=()=>store.get('teacher','');
 const lobbyId=()=>{const k=teacherKey(ROLE==='host'?teacherName():QS.get('t'));return k?'controlroom-lobby-'+k:'';};
 const goURL=()=>new URL('../CADCAST/go/?t='+encodeURIComponent(teacherName()).replace(/%20/g,'+'),location.href).href.replace(/^http:\/\/localhost:\d+\//,'https://gunnitynes.github.io/');
@@ -429,8 +434,8 @@ function rMenu(st){
     <aside class="roomp">
       <div class="teachbox${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">Change</button></div>
         ${G.lobbyErr?`<p class="tbwarn">Another Control Room is already open as “${esc(teacherName())}” (another tab, or a colleague with the same name). Student computers may find that room instead: add your last name.</p>`:''}
-        <span class="fine"><a href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST</a></span></div>
-      <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
+        <span class="fine"><a href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST</a> <button class="linkbtn" id="bCopyGo" title="Copy the student computer link">⧉ copy link</button></span></div>
+      <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__copy">⧉ Copy your sheet link</option><option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
         <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
@@ -442,9 +447,10 @@ function rMenu(st){
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
   $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
-  $('#bTeach').onclick=askTeacher;if(!teacherName())setTimeout(askTeacher,300);
+  $('#bTeach').onclick=askTeacher;const cg=$('#bCopyGo');if(cg)cg.onclick=()=>copyText(goURL(),'Student computer link copied');if(!teacherName())setTimeout(askTeacher,300);
   if($('#selCls'))$('#selCls').onchange=e=>{const v=e.target.value;
     if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}
+    if(v==='__copy'){e.target.value=ATT.cls;copyText(store.get('att.url',''),'Sheet link copied. Keep it private: paste it only into Control Room.');return;}
     if(v==='__off'){e.target.value=ATT.cls;if(confirm('Disconnect your Google Sheet in this browser? Students will type their names instead.'))attUse('');return;}
     if(v==='__def'){e.target.value=ATT.cls;if(confirm('Stop using your own sheet in this browser and go back to the built-in class list?'))attUse('');return;}
     attSetClass(v);};
