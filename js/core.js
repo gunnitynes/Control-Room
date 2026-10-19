@@ -101,7 +101,7 @@ const online=()=>players().filter(p=>p.conn&&p.conn.open);
 const blankP=()=>({gp:0,total:0,streak:0,best:0,right:0,last:null});
 function rankBy(key){const list=players().sort((a,b)=>(b[key]||0)-(a[key]||0)||a.name.localeCompare(b.name)),map=new Map();let last=null,rk=0;list.forEach((p,i)=>{if(p[key]!==last){rk=i+1;last=p[key];}map.set(p.id,rk);});return {list,map};}
 function award(p,pts){pts=Math.round(pts);p.gp=(p.gp||0)+pts;p.total=(p.total||0)+pts;return pts;}
-function saveRoom(){if(!G.code)return;store.set('room',{t:Date.now(),code:G.code,banned:[...G.banned],players:players().map(p=>({id:p.id,name:p.name,total:p.total,sh:p.sh,log:p.log||[]}))});}
+function saveRoom(){if(!G.code)return;store.set('room',{t:Date.now(),code:G.code,banned:[...G.banned],players:players().map(p=>({id:p.id,name:p.name,total:p.total,sh:p.sh,log:p.log||[],in:p.in||0}))});}
 /* the session notebook: every student's own record of the lesson — briefs and styles they
    spun, picks they kept, rules they wrote, cards they were dealt, and milestones (streaks,
    finishing places). Kept on the host, pushed to that student's phone. */
@@ -130,7 +130,7 @@ async function openRoom(code){
   });
 }
 async function newRoom(){
-  if(!confirm('Start a new room? Everyone has to scan the new code, and all points are reset.'))return;
+  if(!confirm(`Start a new room? Everyone has to scan the new code, and all points are reset.${players().length?'\n\nThe room’s attendance list starts over too: copy it first if you need it (⧉ Copy attendance).':''}`))return;
   exitGame(true);G.players.forEach(p=>{try{p.conn&&p.conn.send({t:'kick',why:'closed'});}catch(e){}});
   G.players.clear();G.banned.clear();store.del('room');try{G.peer&&G.peer.destroy();}catch(e){}G.peer=null;G.code='';render();await openRoom();render();
 }
@@ -298,6 +298,10 @@ async function lobbyRoom(){const id=lobbyId();if(!id)return null;try{await needP
   return new Promise(res=>{const p=new Peer({debug:0});let done=false;const fin=v=>{if(done)return;done=true;res(v);setTimeout(()=>{try{p.destroy();}catch(e){}},500);};
     setTimeout(()=>fin(null),9000);p.on('error',e=>{if(e.type==='peer-unavailable')fin(null);});
     p.on('open',()=>{const c=p.connect(id,{serialization:'json',reliable:true});c.on('open',()=>c.send({t:'room?'}));c.on('data',m=>{if(m&&m.t==='room'&&m.code)fin(String(m.code).toUpperCase());});});});}
+function copyAttendance(){const L=players().slice().sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base'}));if(!L.length){toast('Nobody has joined yet');return;}
+  const d=new Date(),t=x=>x?new Date(x).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'';
+  const head=`Attendance · ${ATT.cls||'Room '+G.code} · ${d.toLocaleDateString([], {weekday:'short',day:'numeric',month:'short',year:'numeric'})} · ${L.length} student${L.length===1?'':'s'}`;
+  copyText(head+'\n\n'+L.map(p=>p.name+'\t'+t(p.in)).join('\n'),`${L.length} name${L.length===1?'':'s'} copied: paste into a document or spreadsheet`);}
 function resetPoints(){if(!confirm('Reset everyone’s total points to zero?'))return;players().forEach(p=>{p.total=0;p.gp=0;});saveRoom();render();syncAll();}
 function uniqueName(name,id,max=30){
   name=String(name||'').replace(/\s+/g,' ').trim().slice(0,max)||'Student';let n=name,k=2;
@@ -322,7 +326,7 @@ function hostData(conn,m){
       if(q){G.players.delete(q.id);q.id=id;G.players.set(id,q);p=q;}
     }
     if(p){if(p.conn&&p.conn!==conn)try{p.conn.close();}catch(e){}p.conn=conn;}
-    else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
+    else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP(),in:Date.now()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
     attCheckIn(p);lobbyNames();
     sync(p);sendLog(p);saveRoom();
     if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else if(G.view==='vote'){voteLive();syncAll();}else render();
@@ -439,6 +443,7 @@ function rMenu(st){
         <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
+      <button class="ghost attcopy" id="bAttCopy" title="Copy the names of everyone who joined this room, with the time they joined">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
     </aside>
     <section class="games">${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b><span>${esc(gr.sub)}</span></div>
@@ -446,7 +451,7 @@ function rMenu(st){
   </div>`;
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
-  $('#bReset').onclick=resetPoints;$('#bNew').onclick=newRoom;
+  $('#bReset').onclick=resetPoints;$('#bAttCopy').onclick=copyAttendance;$('#bNew').onclick=newRoom;
   $('#bTeach').onclick=askTeacher;const cg=$('#bCopyGo');if(cg)cg.onclick=()=>copyText(goURL(),'Student computer link copied');if(!teacherName())setTimeout(askTeacher,300);
   if($('#selCls'))$('#selCls').onchange=e=>{const v=e.target.value;
     if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}

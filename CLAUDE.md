@@ -135,6 +135,7 @@ Phones and the host keep old files otherwise.
   student into both. Joining via the room QR still works on its own. The patch bay reads room + allow-list from
   localStorage (same site, same Chrome). The header's **Mixer** button (`openMixer`) opens it as ../CADCAST/patch/ in a
   named tab; it must be this same browser. The patch bay lists paired-but-silent students as "Paired · no sound yet".
+- **Copy attendance** (room panel, `copyAttendance`): everyone who joined this room (p.in = join time, saved with the room), sorted, tab-separated with a dated heading; for teachers without a sheet. New room warns to copy first.
 - **Copy links** (`copyText`): Teacher box ⧉ copy link = the student computer link (`goURL()`); Class list ▸ ⧉ Copy your sheet link and the sheet card copy the /exec link. No setup link / login: the owner chose to keep links as they are.
 - **Raise your hand** (phones only): `#pHand` in the phone header sends `{t:'hand', up}`; the host keeps `p.hand` (time raised),
   shows `#hands` in the header (first raised + count; click for the ordered list, lower one or all) and a yellow name chip.

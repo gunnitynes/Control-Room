@@ -71,6 +71,10 @@ section>header p{font:700 13px var(--mono);text-transform:uppercase;letter-spaci
 
 /* notes */
 .sub li.hot{background:color-mix(in srgb,var(--red) 16%,#fff);border:3px solid var(--red);padding:8px 10px;margin:10px 0;list-style-position:inside;font-size:18px}
+#nosheet{scroll-margin-top:24px}
+.attfirst{margin:18px 0 22px;padding:20px 22px;border:6px solid var(--ink);background:var(--yel);box-shadow:10px 10px 0 var(--red);display:grid;gap:6px}
+.attfirst strong{font:900 clamp(34px,6vw,58px)/.9 var(--disp);font-stretch:62%;text-transform:uppercase}.attfirst p{margin:0;font-size:18px}
+a.sec{font-weight:800;color:var(--blue);text-decoration-thickness:2px}
 .note{border:4px solid var(--ink);padding:14px 16px;margin:16px 0;background:color-mix(in srgb,var(--c,var(--yel)) 22%,#fff);box-shadow:5px 5px 0 var(--ink)}
 .note b:first-child{font:900 18px var(--disp);text-transform:uppercase;display:block;margin-bottom:4px}
 .note.red{--c:var(--red)}.note.green{--c:var(--green)}.note.blue{--c:var(--blue)}
@@ -125,7 +129,7 @@ details>div{padding:0 16px 14px}
 
 <ol class="toc">
   <li><a href="#what" style="--c:var(--red)"><b>1</b>What it is</a></li>
-  <li><a href="#start" style="--c:var(--blue)"><b>2</b>First time</a></li>
+  <li><a href="#start" style="--c:var(--blue)"><b>2</b>Setup</a></li>
   <li><a href="#ways" style="--c:var(--yel)"><b>3</b>Two ways to run it</a></li>
   <li><a href="#cadcast" style="--c:var(--green)"><b>4</b>Student computers</a></li>
   <li><a href="#sheet" style="--c:var(--red)"><b>5</b>Attendance sheet</a></li>
@@ -137,22 +141,24 @@ details>div{padding:0 16px 14px}
 <!-- 1 -->
 <section id="what" style="--c:var(--red)">
   <header><h2><span class="no">1</span>What it is</h2><p>gunnitynes.github.io/Control-Room</p></header>
-  <p class="lead">Control Room runs on your computer and the projector. Students join with their phones, and the phones become buzzers, faders, knobs, voting cards and remix pads. Twenty modules: quizzes, ear training and creative sprints.</p>
+  <p class="lead">Control Room runs on your computer and the projector.</p>
+  <div class="attfirst"><span class="lab">First of all</span><strong>Joining is checking in.</strong><p>When a student joins with their phone and picks their name, their attendance is marked. Control Room is an <b>attendance tool</b> first, with the games on top: every lesson starts with everyone checking in. With a Google Sheet the list is written for you (<a class="sec" href="#sheet">section 5</a>); without one, you copy it with one click (<a class="sec" href="#nosheet">no sheet</a>).</p></div>
+  <p class="lead">Students join with their phones, and the phones become buzzers, faders, knobs, voting cards and remix pads. Twenty modules: quizzes, ear training and creative sprints.</p>
   <p>Nothing to install, no accounts. It is a website: open it in <em>Google Chrome</em> on the computer connected to the projector and speakers. Students only need a phone with a camera and a browser. Phones and your computer need internet (they find each other through a free relay, then talk directly).</p>
   <div class="note"><b>What you need</b>
     Your computer with Chrome, on the projector and the room speakers · students’ phones · internet in the room.
-    <br>Optional: students’ own computers with a DAW (Ableton Live, Logic …) for the modules that send sound and files (section 4).</div>
+    <br>Optional: students’ own computers with a DAW (Ableton Live, Logic …) for the modules that send sound and files (<a class="sec" href="#cadcast">section 4</a>).</div>
 </section>
 
 <!-- 2 -->
 <section id="start" style="--c:var(--blue)">
-  <header><h2><span class="no">2</span>First time</h2><p>about two minutes</p></header>
+  <header><h2><span class="no">2</span>Setup</h2><p>once per computer · about two minutes</p></header>
   <ol class="steps">
     <li class="c-blue"><div><strong>Open Control Room</strong><p>In Chrome, go to <span class="url">gunnitynes.github.io/Control-Room</span>. Bookmark it.</p></div></li>
     <li class="c-red"><div><strong>Tell it who’s teaching</strong><p>The first time, it asks <em>“Who’s teaching?”</em>. Type your full name, e.g. <em>Gunnar Tynes</em>. Student computers find <b>your</b> class by this name, so several teachers can run Control Room at the same time in different rooms. If a colleague has the same first name, use your last name too. You can change it any time under <em>Teacher</em> on the main menu.</p></div></li>
-    <li class="c-yel"><div><strong>Connect your class list (optional)</strong><p>With your own Google Sheet, students tap their name instead of typing it, and every check-in lands on the sheet as attendance. Set it up once, see section 5.</p></div></li>
+    <li class="c-yel"><div><strong>Connect your class list (optional)</strong><p>With your own Google Sheet, students tap their name instead of typing it, and every check-in lands on the sheet as attendance. Set it up once, see <a class="sec" href="#sheet">section 5</a>.</p></div></li>
   </ol>
-  <div class="note blue"><b>One browser, one computer</b>Your class list link, your music folders and your settings are saved in <em>this Chrome on this computer</em>. If you teach from another computer, type your name and paste your sheet link there once too (section 5 shows how to copy it).</div>
+  <div class="note blue"><b>One browser, one computer</b>Your class list link, your music folders and your settings are saved in <em>this Chrome on this computer</em>. If you teach from another computer, type your name and paste your sheet link there once too (<a class="sec" href="#sheet">section 5</a> shows how to copy it).</div>
 </section>
 
 <!-- 3 -->
@@ -165,7 +171,7 @@ details>div{padding:0 16px 14px}
       <ul><li>Every quiz, ear-training game and most creative modules work like this.</li>
         <li>All sound comes from your computer and the room speakers.</li>
         <li>Press <kbd>Q</kbd> any time to show the join code big. Latecomers can join mid-game.</li>
-        <li>Without a class list, students type their first name instead.</li></ul></div>
+        <li>Without a class list, students type their first name instead, and you copy the attendance list from the main menu (<a class="sec" href="#nosheet">no sheet</a>).</li></ul></div>
     <div class="way b"><span class="tag">Way B · phone + computer</span><h3>With CADCAST</h3>
       <p>Each student opens <b>the CADCAST page on their own computer</b>. It shows a QR code; they scan <b>that</b> with their phone and tap their name.</p>
       <ul><li>One scan signs them in twice: the phone joins Control Room, and the computer becomes theirs.</li>
@@ -204,6 +210,10 @@ details>div{padding:0 16px 14px}
 <section id="sheet" style="--c:var(--red)">
   <header><h2><span class="no">5</span>Attendance sheet</h2><p>your own Google Sheet · set up once, about five minutes</p></header>
   <p class="lead">Students tap their name on the phone and they are checked in on <b>your</b> Google Sheet, with the date and time. You build the sheet, paste a small script into it and give Control Room its link.</p>
+
+  <div class="note blue" id="nosheet"><b>No Google Sheet? Copy the list</b>
+    Students type their first name when they join. On the main menu, under the names in the room panel, click <kbd>⧉ Copy attendance</kbd>: it copies everyone who joined this room, sorted by name, with the time they joined, under a heading with the date. Paste it into an email, a document or a spreadsheet (each name and time lands in its own column).
+    <br><b style="font:800 inherit;font-weight:800;display:inline;color:var(--red)">Copy it before you click New room</b>: a new room starts an empty list. The list also covers anyone who joined and left, unless you removed them by clicking their name. It works with a Google Sheet too, as a quick check.</div>
 
   <h3>Step 1 · Make the sheet</h3>
   <div class="sheet">
@@ -272,10 +282,10 @@ details>div{padding:0 16px 14px}
 <section id="lesson" style="--c:var(--blue)">
   <header><h2><span class="no">6</span>Running a lesson</h2><p>the rhythm of a Control Room class</p></header>
   <ol class="steps">
-    <li class="c-red"><div><strong>Students join</strong><p>Way A, Way B or both (section 3). You see each name appear on the room panel.</p></div></li>
+    <li class="c-red"><div><strong>Students join</strong><p>Way A, Way B or both (<a class="sec" href="#ways">section 3</a>). You see each name appear on the room panel.</p></div></li>
     <li class="c-blue"><div><strong>Pick a module, set it up</strong><p>Click a module. Its setup screen has the options (rounds, time, difficulty, categories …) and a short “how it works”. Your choices are remembered for next time. Or let the class choose: the <kbd>Vote</kbd> button on the main menu puts every module on every phone.</p></div></li>
     <li class="c-yel"><div><strong>Play</strong><p><kbd>Space</kbd> moves on. Phones follow by themselves. Click the logo top left to go back to the menu.</p></div></li>
-    <li class="c-green"><div><strong>Finish</strong><p>Every end screen offers <em>Play another round</em> (<kbd>R</kbd>). Points across the lesson add up in the room standings; the leaderboard only appears when you click <em>Show the leaderboard</em>.</p></div></li>
+    <li class="c-green"><div><strong>Finish</strong><p>Every end screen offers <em>Play another round</em> (<kbd>R</kbd>). Points across the lesson add up in the room standings; the leaderboard only appears when you click <em>Show the leaderboard</em>. No Google Sheet? Click <kbd>⧉ Copy attendance</kbd> on the main menu before you close (<a class="sec" href="#nosheet">no sheet</a>).</p></div></li>
   </ol>
   <h3>Keys on your computer</h3>
   <div class="keys">
@@ -356,7 +366,7 @@ details>div{padding:0 16px 14px}
 <footer class="foot"><p>One room. One big screen. Everybody plays.</p><button class="print" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);print()">Print or save as PDF</button></footer>
 </div>
 <script>
-document.querySelectorAll('.toc a').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(!t)return;e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});try{history.replaceState(null,'',a.getAttribute('href'));}catch(x){}}));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(!t)return;e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});try{history.replaceState(null,'',a.getAttribute('href'));}catch(x){}}));
 </script>
 </body>
 </html>
