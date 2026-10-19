@@ -75,14 +75,14 @@ game({
     {key:'bpm',label:'Tempo',choices:[[85,'85'],[95,'95'],[100,'100'],[110,'110'],[120,'120'],[128,'128'],[140,'140']],def:100},
     {key:'key',label:'Key',choices:[['random','Deal one','a random key'],['A minor','A minor'],['C major','C major'],['E minor','E minor'],['F major','F major']],def:'random'},
     {key:'bars',label:'Each part',choices:[[8,'8','bars'],[16,'16','bars']],def:8},
-    {key:'mins',label:'Making time',choices:[[15,'15','min'],[20,'20','min'],[30,'30','min'],[45,'45','min'],[0,'Open','no clock']],def:30},
+    {key:'mins',label:'Making time',choices:[[15,'15','min'],[20,'20','min'],[30,'30','min'],[45,'45','min'],[0,'Open','no clock'],[-10,'10 s','test run']],def:30},
   ],
   note:'Students need their computer on CADCAST (gunnitynes.github.io/CADCAST/go): the brief and starter files land there, and that’s where they drop their finished part. A student without CADCAST can AirDrop the file to you: drag it onto their card.',
   topInfo(){const s=G.gs;if(!s)return this.tag;return `${s.o.bpm} BPM · ${s.key} · ${s.o.bars} bars each`+({make:' · making',arrange:' · arranging',album:''})[s.phase];},
   start(o){const key=o.key==='random'?pick(alKeys()):o.key;
     G.gs={o,key,id:Date.now()%1e9,seed:Math.floor(Math.random()*1e9),phase:'make',roles:new Map(),parts:new Map(),prog:new Map(),secs:AL_SECS.slice(),on:new Map(),lvl:new Map(),mute:new Set(),
       titles:new Map(),title:`${pick(AL_ADJ)} ${pick(AL_NOUN)}`,play:null,starter:null,out:null};
-    if(o.mins)startClock(o.mins*60000,()=>{sfx.alarm();toast('Time! Export your part and drop it on CADCAST.');});this.dealAll();
+    if(o.mins)startClock(o.mins<0?-o.mins*1000:o.mins*60000,()=>{sfx.alarm();toast('Time! Export your part and drop it on CADCAST.');});this.dealAll();
     if(typeof ASSETS!=='undefined')ASSETS.make({kind:'chords',seed:G.gs.seed,bpm:o.bpm,key}).then(f=>{if(G.gs&&G.gs.o===o){G.gs.starter=f;this.live();}}).catch(()=>{});},
   stop(){this.halt();stopClock();const s=G.gs;if(s)online().forEach(p=>pcSend(p,{t:'album-end'}));},
   leave(){},
