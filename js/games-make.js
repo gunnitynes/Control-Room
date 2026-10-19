@@ -132,7 +132,11 @@ function soloPlayer(root,st){
 const CG_GLYPH={midi:`<svg viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>${[4,10,16,22,28,34].map(x=>`<rect x="${x}" y="1" width="4" height="15" fill="var(--ink)"/>`).join('')}</svg>`,
   audio:`<svg viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><path d="M4 14 ${[...Array(16)].map((_,i)=>`L${6+i*2} ${14+Math.sin(i*1.3)*(i%3?9:4)}`).join(' ')} L36 14" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>`};
 const CG_RULE_COL={hands:'--red',ears:'--blue',tools:'--yel',time:'--green',space:'--blue',voice:'--red'};
-function cgFill(t,m){return String(t).replace(/\{asset\}/g,`the ${m.label.toLowerCase()}`).replace(/\{bpm\}/g,m.bpm).replace(/\{key\}/g,m.key).replace(/(^|[.!?]\s+)([a-z])/g,(_,a,b)=>a+b.toUpperCase());}
+// tempo is said in words, never a number, and no key is ever set: the file still has a BPM and key inside, students fit it to their track
+// a tempo change that makes sense from where the track is: nothing faster near the top, nothing slower near the bottom
+const cgShift=bpm=>pick(CONSTRAINT_BRAIN.shifts.filter(([t,f])=>!(f>1&&bpm>=150)&&!(f<1&&bpm<=84)&&!(/double/.test(t)&&bpm>118)&&!(/half/.test(t)&&bpm<96)));
+const cgTempo=w=>w==='mid'?'Mid tempo':w[0].toUpperCase()+w.slice(1)+' tempo',cgBpm=f=>f[1]+Math.floor(Math.random()*(f[2]-f[1]+1)),cgClampBpm=b=>Math.round(Math.max(60,Math.min(180,b)));
+function cgFill(t,m){return String(t).replace(/\{asset\}/g,`the ${m.label.toLowerCase()}`).replace(/\{tempo\}/g,m.feel||'mid').replace(/(^|[.!?]\s+)([a-z])/g,(_,a,b)=>a+b.toUpperCase());}
 // the mini piano roll for a MIDI mission card (built from the same recipe as the file)
 const CG_AUDIO={
   beat:[...Array(16)].map((_,i)=>`<rect x="${6+i*7}" y="${i%4===0?6:i%2?24:14}" width="4" height="${i%4===0?28:i%2?10:20}" fill="var(--ink)"/>`).join(''),
@@ -155,18 +159,18 @@ game({
     {key:'mins',label:'Each round',type:'step',min:2,max:15,step:1,def:4,unit:'min',show:v=>v.mode!=='gen'},
     {key:'rounds',label:'Rounds',type:'step',min:1,max:20,step:1,def:5,unit:n=>n===1?'round':'rounds',show:v=>v.mode!=='gen'},
     {key:'files',type:'multi',label:'Files',choices:[['midi','MIDI','chords, bass, drums, arps, melodies'],['audio','Audio','beats, textures, one-shots, risers, song chops']],def:['midi','audio'],sub:v=>v.files.join(' + ')||'none'},
-    {key:'groove',label:'Groove',choices:[['room','Shared','same BPM and key for everyone'],['own','Own','everyone gets their own']],def:'room'},
+    {key:'groove',label:'Constraints for',choices:[['room','The whole team','one constraint, everyone works to it'],['own','Each student','everyone gets their own']],def:'room'},
   ],
   check:v=>v.files.length?'':'Pick MIDI, audio or both',
   note:'Files arrive on each student’s computer: they open gunnitynes.github.io/CADCAST/go and scan its code with their phone (the same pairing CADCAST uses). Without that, the phone offers the file as a download.',
   topInfo(){const s=G.gs;if(s&&s.phase==='gen')return s.o.groove==='room'?`Generator · constraint ${s.n}`:'Generator · everyone rolls their own';return !s?this.tag:{brief:'Ready',deal:`Dealing round ${s.round}`,work:`Round ${s.round} of ${s.o.rounds}`,between:`After round ${s.round}`,done:'The lineage'}[s.phase];},
-  start(o){const groove={bpm:pick(CONSTRAINT_BRAIN.tempos),key:pick(ASSETS.KEYS).name};G.gs={o,phase:o.mode==='gen'?'gen':'brief',round:0,n:0,groove,lines:new Map(),now:new Map(),out:new Set(),dealT:0};
+  start(o){const f=pick(CONSTRAINT_BRAIN.feels),groove={feel:f[0],tempo:cgTempo(f[0]),bpm:cgBpm(f),key:pick(ASSETS.KEYS).name};G.gs={o,phase:o.mode==='gen'?'gen':'brief',round:0,n:0,groove,lines:new Map(),now:new Map(),out:new Set(),dealT:0};
     if(o.mode==='gen'){if(o.groove==='room')this.genShared();else online().forEach(p=>this.genGive(p));}},
   /* ---- Generator mode: constraints without rounds. Shared = one card for the room; own = one per phone, rerolled there ---- */
-  genMission(who,keep){const s=G.gs;s.round=++s.n;const m=this.mission(who);if(keep){m.kind=keep.kind;m.label=keep.label;m.task=keep.task;m.seed=keep.seed;m.recipe={...m.recipe,kind:keep.kind,seed:keep.seed};}
+  genMission(who,keep){const s=G.gs;s.round=++s.n;const m=this.mission(who),f=pick(CONSTRAINT_BRAIN.feels);m.feel=f[0];m.tempo=cgTempo(f[0]);m.bpm=cgBpm(f);m.recipe.bpm=m.bpm;if(keep){m.kind=keep.kind;m.label=keep.label;m.task=keep.task;m.seed=keep.seed;m.recipe={...m.recipe,kind:keep.kind,seed:keep.seed};}
     m.lead=cgFill(pick(CONSTRAINT_BRAIN.start),m);return m;},
   genShared(part){const s=G.gs,old=s.shared,R={id:'room',name:'the room'};let m;
-    if(part==='rule'&&old){m={...old,...this.genMission(R,old),lead:old.lead};}
+    if(part==='rule'&&old){m={...old,...this.genMission(R,old),lead:old.lead,feel:old.feel,tempo:old.tempo,bpm:old.bpm,recipe:old.recipe};}
     else if(part==='task'&&old){m=this.genMission(R);m.rule=old.rule;m.cat=old.cat;}
     else m=this.genMission(R);
     s.shared=m;const line=s.lines.get('room')||[];line.push(m);s.lines.set('room',line);
@@ -175,22 +179,26 @@ game({
     if(part==='rule'&&old){const r=this.genMission(p);m={...old,rule:r.rule,cat:r.cat};}else m=this.genMission(p);
     s.now.set(p.id,m);const line=s.lines.get(p.id)||[];line.push(m);s.lines.set(p.id,line);
     logAdd(p,{kind:'card',game:this.name,title:`Constraint · ${m.label}`,text:`${m.task}\nRule: ${m.rule}`});this.genPc(p,m);return m;},
-  genPc(p,m){pcSend(p,{t:'mission',m:{round:m.round,rounds:0,lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,recipe:m.recipe,ends:0,at:Date.now()}});},
+  genPc(p,m){pcSend(p,{t:'mission',m:{round:m.round,rounds:0,tempo:m.tempo,lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,recipe:m.recipe,ends:0,at:Date.now()}});},
   onJoin(p){const s=G.gs;if(s&&s.phase==='gen'&&s.o.groove!=='room'&&!s.now.has(p.id)){this.genGive(p);sync(p);render();}},
   kinds(){const o=G.gs.o;return [...(o.files.includes('midi')?ASSETS.MIDI_KINDS:[]),...(o.files.includes('audio')?ASSETS.AUDIO_KINDS:[])];},
   mission(p){const s=G.gs,B=CONSTRAINT_BRAIN,line=s.lines.get(p.id)||[],prev=[...line].reverse().find(x=>x.status!=='rest')||null;
     const kinds=this.kinds().filter(k=>!prev||k!==prev.kind),kind=pick(kinds.length?kinds:this.kinds());
-    const gro=s.o.groove==='own'?(line[0]?{bpm:line[0].bpm,key:line[0].key}:{bpm:pick(B.tempos),key:pick(ASSETS.KEYS).name}):s.groove;
+    const own=s.o.groove==='own',last0=[...line].reverse().find(x=>x.bpm);let gro;
+    if(own){if(last0)gro={feel:last0.feel,bpm:last0.bpm,key:last0.key};else{const f=pick(B.feels);gro={feel:f[0],bpm:cgBpm(f),key:pick(ASSETS.KEYS).name};}}else gro=s.groove;
     const cats=Object.keys(B.rules).filter(c=>!prev||c!==prev.cat),cat=pick(cats);
     const m={round:s.round,kind,label:ASSETS.K[kind].label,seed:Math.floor(Math.random()*2**31),bpm:gro.bpm,key:gro.key,cat,status:'working',note:'',at:Date.now()};
     const done=line.filter(x=>x.status==='done').length,last=s.round>=s.o.rounds;
+    // round 1: a tempo word; later rounds: a change (slow it down, speed it up, keep it…), one for the whole team or one each
+    m.feel=gro.feel;if(done){const sh=own?cgShift(gro.bpm):this.roomShift();m.tempo=sh[0];m.bpm=own?cgClampBpm(gro.bpm*sh[1]):s.groove.bpm;}else{m.tempo=cgTempo(gro.feel);m.bpm=gro.bpm;}
     m.lead=cgFill(last&&done?pick(B.finale):done?pick(B.evolve):pick(B.start),m);
     m.task=cgFill(pick(B.task[kind]),m);m.rule=cgFill(pick(B.rules[cat]),m);
     m.recipe={kind,seed:m.seed,bpm:m.bpm,key:m.key,round:s.round,who:p.name};
     return m;},
+  roomShift(){const s=G.gs;if(!s.shiftR||s.shiftR.round!==s.round){const sh=cgShift(s.groove.bpm);s.shiftR={round:s.round,sh};s.groove.bpm=cgClampBpm(s.groove.bpm*sh[1]);s.groove.tempo=sh[0];}return s.shiftR.sh;},
   give(p){const s=G.gs,m=this.mission(p);s.now.set(p.id,m);const line=s.lines.get(p.id)||[];line.push(m);s.lines.set(p.id,line);
     logAdd(p,{kind:'card',game:this.name,title:`Round ${m.round} · ${m.label}`,text:`${m.lead}\n${m.task}\nRule: ${m.rule}`});this.toPc(p);return m;},
-  toPc(p){const s=G.gs;if(s.phase==='gen'){const m=s.o.groove==='room'?s.shared:s.now.get(p.id);if(m)this.genPc(p,m);return;}const m=s.now.get(p.id);if(m&&s.phase==='work')pcSend(p,{t:'mission',m:{round:m.round,rounds:s.o.rounds,lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,recipe:m.recipe,ends:s.pcEnds}});},
+  toPc(p){const s=G.gs;if(s.phase==='gen'){const m=s.o.groove==='room'?s.shared:s.now.get(p.id);if(m)this.genPc(p,m);return;}const m=s.now.get(p.id);if(m&&s.phase==='work')pcSend(p,{t:'mission',m:{round:m.round,rounds:s.o.rounds,tempo:m.tempo,lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,recipe:m.recipe,ends:s.pcEnds}});},
   onPair(p){this.toPc(p);},
   go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
     if(ph==='deal'){s.round++;s.now=new Map();sfx.whoosh&&sfx.whoosh();
@@ -212,30 +220,30 @@ game({
     if(d.t==='busy'){m.status='busy';sync(p);render();}},
   render(st){
     const s=G.gs,o=s.o,P=id=>(G.players.get(id)||{name:'?'}).name;
-    const groove=`<div class="cggroove"><span><b>${s.groove.bpm}</b> BPM</span><span><b>${esc(s.groove.key)}</b></span><span>${o.mins} min rounds</span><span>round <b>${Math.max(1,s.round)}</b> / ${o.rounds}</span></div>`;
+    const groove=`<div class="cggroove">${o.groove==='room'?`<span><b>${esc(s.groove.tempo)}</b></span>`:''}<span>${o.mins} min rounds</span><span>round <b>${Math.max(1,s.round)}</b> / ${o.rounds}</span></div>`;
     const machine=(spin)=>`<div class="cgmachine ${spin?'spin':''}"><i class="m1"></i><i class="m2"></i><i class="m3"></i></div>`;
     const lineage=()=>{const ids=[...s.lines.keys()];if(!ids.length)return '<p class="fine">No missions yet.</p>';
       return `<div class="cglin">${ids.map((id,j)=>{const L=s.lines.get(id);return `<div class="cgrow c${j%4}"><b>${esc(P(id))}</b><div class="cgnodes">${L.map(m=>`<div class="cgnode st-${m.status} ${m.kind&&ASSETS.K[m.kind]&&ASSETS.K[m.kind].audio?'au':'mi'}" title="${esc(m.task||'')}"><i>${m.round}</i>${m.status==='rest'?'<span>sat out</span>':`<span>${esc(m.label)}</span>${m.note?`<em>${esc(m.note)}</em>`:''}`}</div>`).join('<s></s>')}</div></div>`;}).join('')}</div>`;};
     let body='';
     if(s.phase==='gen'){
       if(o.groove==='room'){const m=s.shared;
-        st.innerHTML=`<div class="cg cggen"><div class="cggenhead">${machine(false)}<div><span class="lab">The constraint machine · shared</span><div class="cggroove"><span><b>${m.bpm}</b> BPM</span><span><b>${esc(m.key)}</b></span><span>constraint <b>${s.n}</b></span></div></div></div>
-          <div class="cgbig" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})"><span class="lab">${esc(m.label)}</span><div class="cgasset">${cgRoll(m)}</div><h2>${esc(m.task)}</h2><span class="cgrule big">${esc(m.cat)} · ${esc(m.rule)}</span></div>
+        st.innerHTML=`<div class="cg cggen solo">
+          <div class="cgbig" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})"><span class="lab">${esc(m.label)}</span><div class="cgasset">${cgRoll(m)}</div><h2>${esc(m.task)}</h2><span class="cgtempo big">${esc(m.tempo)}</span><span class="cgrule big">${esc(m.cat)} · ${esc(m.rule)}</span></div>
           <div class="dfoot"><span class="frow"><button class="ghost" id="bTask">New task</button><button class="ghost" id="bRule">New rule</button></span><button class="big go" id="bNext">New constraint <small>SPACE</small></button></div></div>`;
         $('#bNext').onclick=()=>this.next();$('#bTask').onclick=()=>{this.genShared('task');sfx.inn();render();syncAll();};$('#bRule').onclick=()=>{this.genShared('rule');sfx.inn();render();syncAll();};return;}
       const ms=[...s.now.entries()];
       st.innerHTML=`<div class="cg cggen"><div class="cggenhead">${machine(false)}<div><span class="lab">The constraint machine · everyone rolls their own</span><h2>${ms.length} constraint${ms.length===1?'':'s'} in the room</h2><p class="fine">Students roll a new one, or just a new rule, from their phone.</p></div></div>
-        <div class="cgwall">${ms.map(([id,m],j)=>`<div class="cgcard c${j%4}" style="--tilt:${((j*37)%7-3)*.6}deg"><div class="cgch"><b>${esc(P(id))}</b><span>${esc(m.label)} · ${m.bpm} BPM · ${esc(m.key)}</span></div>
+        <div class="cgwall">${ms.map(([id,m],j)=>`<div class="cgcard c${j%4}" style="--tilt:${((j*37)%7-3)*.6}deg"><div class="cgch"><b>${esc(P(id))}</b><span>${esc(m.label)} · ${esc(m.tempo)}</span></div>
           <div class="cgasset">${cgRoll(m)}</div><p>${esc(m.task)}</p><span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>`).join('')||'<p class="fine">Waiting for phones…</p>'}</div>
         <div class="dfoot"><span></span><button class="big go" id="bNext">New constraints for everyone <small>SPACE</small></button></div></div>`;
       $('#bNext').onclick=()=>this.next();return;}
     if(s.phase==='brief')body=`<div class="cgbrief">${machine(false)}<div><span class="lab">The constraint machine</span><h2>Missions, files, fast rounds</h2>
-      <p>Everyone gets a task, a rule and a fresh file every ${o.mins} minutes. ${o.groove==='room'?'The whole room shares one groove:':'Everyone gets their own groove.'}</p>${o.groove==='room'?groove:''}
+      <p>Everyone gets a task, a rule and a fresh file every ${o.mins} minutes. ${o.groove==='room'?'The whole team works to one tempo:':'Everyone gets their own tempo.'}</p>${o.groove==='room'?groove:''}
       <ol class="cgsteps"><li>On your computer open <b>gunnitynes.github.io/CADCAST/go</b> and scan its code with your phone: your files land there.</li><li>Tap <b>Done</b> when you’ve made it happen. No tap is fine: you’re busy.</li><li>Sit out any round from your phone, come back whenever.</li></ol></div></div>`;
     else if(s.phase==='deal')body=`<div class="cgdeal">${machine(true)}<h2>Round ${s.round}</h2><p>Dealing ${s.now.size} mission${s.now.size===1?'':'s'}…</p></div>`;
     else if(s.phase==='work'){const ms=[...s.now.entries()];const done=ms.filter(([,m])=>m.status==='done').length;
       body=`<div class="cgtop">${groove}<div class="cgclock">${clockHTML('mid')}<span><b id="cgDone">${done}</b> of ${ms.length} done</span></div></div>
-        <div class="cgwall">${ms.map(([id,m],j)=>`<div class="cgcard c${j%4} st-${m.status}" style="--tilt:${((j*37)%7-3)*.6}deg"><div class="cgch"><b>${esc(P(id))}</b><span>${esc(m.label)}</span></div>
+        <div class="cgwall">${ms.map(([id,m],j)=>`<div class="cgcard c${j%4} st-${m.status}" style="--tilt:${((j*37)%7-3)*.6}deg"><div class="cgch"><b>${esc(P(id))}</b><span>${esc(m.label)}${o.groove==='own'?' · '+esc(m.tempo):''}</span></div>
           <div class="cgasset">${cgRoll(m)}</div><p>${esc(m.task)}</p><span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span>${m.status==='done'?'<i class="cgstamp">Done</i>':m.status==='busy'?'<i class="cgstamp busy">Busy</i>':''}</div>`).join('')||'<p class="fine">Everyone is sitting this one out.</p>'}</div>`;}
     else if(s.phase==='between'||s.phase==='done')body=`<div class="cgafter"><div class="cgtop"><div><span class="lab">${s.phase==='done'?'The family tree':`After round ${s.round} of ${o.rounds}`}</span><h2>${s.phase==='done'?'Every track’s lineage':'Lineage so far'}</h2></div>${groove}</div>${lineage()}</div>`;
     const lbl={brief:'Deal round 1',deal:'Start the clock',work:'End this round',between:s.round<o.rounds?`Deal round ${s.round+1}`:'Show the family tree',done:'Back to the menu'}[s.phase];
@@ -243,17 +251,17 @@ game({
     $('#bNext').onclick=()=>this.next();bindAgain(st);},
   pstate(p){const s=G.gs;
     if(s.phase==='gen'){const m=s.o.groove==='room'?s.shared:s.now.get(p.id);return {k:'gen'+(m?m.seed+m.rule:''),ph:'gen',shared:s.o.groove==='room',pc:!!pcFor(p),
-      m:m?{lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,recipe:m.recipe}:null};}
+      m:m?{lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,tempo:m.tempo,recipe:m.recipe}:null};}
     const m=s.now.get(p.id),L=s.lines.get(p.id)||[];
-    return {k:s.phase+s.round+(m?m.status+m.seed:'')+(s.out.has(p.id)?'o':''),ph:s.phase,round:s.round,rounds:s.o.rounds,out:s.out.has(p.id),pc:!!pcFor(p),groove:s.o.groove==='room'?s.groove:null,
-      m:m?{lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,status:m.status,note:m.note,recipe:m.recipe}:null,
+    return {k:s.phase+s.round+(m?m.status+m.seed:'')+(s.out.has(p.id)?'o':''),ph:s.phase,round:s.round,rounds:s.o.rounds,out:s.out.has(p.id),pc:!!pcFor(p),groove:s.o.groove==='room'?{tempo:s.groove.tempo}:null,
+      m:m?{lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,tempo:m.tempo,status:m.status,note:m.note,recipe:m.recipe}:null,
       line:L.map(x=>({round:x.round,label:x.label||'',status:x.status,note:x.note||''})),clock:pClock()};},
   player(root,st){
     if(st.ph==='gen'){const m=st.m;
       if(!m){root.innerHTML=`<div class="pcenter dots"><h2>Constraints</h2><p>Your constraint is on its way…</p></div>`;return;}
       root.innerHTML=`<div class="pcol2 cgp"><div class="cgmission"><span class="lab">${st.shared?'The room’s constraint':'Your constraint'} · ${esc(m.label)}</span><h2>${esc(m.task)}</h2>
-        <span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>
-        <div class="cgfile"><span>${esc(m.recipe.key)} · ${m.recipe.bpm} BPM</span>${st.pc?'<b>✓ The file is on your computer</b>':'<button class="ghost" id="pGet">Get the file on this phone</button>'}</div>
+        ${m.tempo?`<span class="cgtempo">${esc(m.tempo)}</span>`:''}<span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>
+        <div class="cgfile"><span>Your file: ${esc(m.label.toLowerCase())}</span>${st.pc?'<b>✓ The file is on your computer</b>':'<button class="ghost" id="pGet">Get the file on this phone</button>'}</div>
         ${st.shared?'<p class="fine">Your teacher deals the next one.</p>':'<button class="big go" id="pRoll">New constraint</button><button class="ghost" id="pRule">Just a new rule</button>'}</div>`;
       const r=$('#pRoll',root);if(r)r.onclick=()=>{papi.send({t:'roll'});papi.vibe(15);r.disabled=true;};
       const rr=$('#pRule',root);if(rr)rr.onclick=()=>{papi.send({t:'roll',part:'rule'});papi.vibe(10);rr.disabled=true;};
@@ -263,13 +271,13 @@ game({
     const out=`<label class="cgout"><input type="checkbox" id="pOut" ${st.out?'checked':''}> Sit out ${st.ph==='work'||st.ph==='deal'?'the next round':'next round'}</label>`;
     const lineHTML=st.line.length?`<div class="cgmyline">${st.line.map(x=>`<span class="st-${x.status}" title="${esc(x.note)}">${x.round}</span>`).join('')}</div>`:'';
     if(st.ph==='brief'){root.innerHTML=`<div class="pcol2"><h2 class="pbigt">Get your computer ready</h2><p>Open <b>gunnitynes.github.io/CADCAST/go</b> on your computer and scan its code with this phone. Your files will land there.</p>
-      <p class="cgpc ${st.pc?'ok':''}">${st.pc?'✓ Your computer is paired':'Computer not paired yet'}</p>${st.groove?`<p class="lab">The room’s groove: ${st.groove.bpm} BPM · ${esc(st.groove.key)}</p>`:''}${out}</div>`;}
+      <p class="cgpc ${st.pc?'ok':''}">${st.pc?'✓ Your computer is paired':'Computer not paired yet'}</p>${st.groove?`<p class="lab">The team’s tempo: ${esc(st.groove.tempo)}</p>`:''}${out}</div>`;}
     else if(st.ph==='deal')root.innerHTML=`<div class="pcenter dots"><div class="cgmachine spin small"><i class="m1"></i><i class="m2"></i><i class="m3"></i></div><h2>Round ${st.round}</h2><p>${st.out?'You’re sitting this one out.':'Your mission is coming…'}</p></div>`;
     else if(st.ph==='work'&&!st.m)root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}<h2 class="pbigt">${st.out?'Sitting out':'No mission yet'}</h2><p>Jump in whenever you like.</p><button class="big go" id="pIn">Deal me in</button>${lineHTML}</div>`;
     else if(st.m){const m=st.m;
       root.innerHTML=`<div class="pcol2 cgp">${st.ph==='work'?pClockHTML(st.clock):''}<div class="cgmission"><span class="lab">Round ${st.round} of ${st.rounds} · ${esc(m.label)}</span><p class="cglead">${esc(m.lead)}</p><h2>${esc(m.task)}</h2>
-        <span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>
-        <div class="cgfile"><span>${esc(m.recipe.key)} · ${m.recipe.bpm} BPM</span>${st.pc?'<b>✓ The file is on your computer</b>':'<button class="ghost" id="pGet">Get the file on this phone</button>'}</div>
+        ${m.tempo?`<span class="cgtempo">${esc(m.tempo)}</span>`:''}<span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>
+        <div class="cgfile"><span>Your file: ${esc(m.label.toLowerCase())}</span>${st.pc?'<b>✓ The file is on your computer</b>':'<button class="ghost" id="pGet">Get the file on this phone</button>'}</div>
         ${m.status==='done'?`<p class="cgdone">✓ Done${m.note?`: ${esc(m.note)}`:''}</p>`:st.ph==='work'?`<input class="prule" id="pNote" maxlength="90" placeholder="What did you make? (optional)"><button class="big go" id="pDone">Done</button><button class="ghost" id="pBusy">${m.status==='busy'?'Marked busy':'Busy this round'}</button>`:`<p class="cgdone busy">${m.status==='busy'?'Busy this round: that’s fine.':''}</p>`}
         ${lineHTML}${out}</div>`;}
     else root.innerHTML=`<div class="pcol2"><h2 class="pbigt">${st.ph==='done'?'Your lineage':'Between rounds'}</h2>${lineHTML||'<p>Nothing yet.</p>'}${st.line.map(x=>x.note?`<p class="fine">R${x.round} · ${esc(x.label)}: ${esc(x.note)}</p>`:'').join('')}${st.ph!=='done'?out:''}</div>`;

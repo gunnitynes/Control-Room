@@ -70,6 +70,8 @@ Phones and the host keep old files otherwise.
   to the next round. The Autoplay switch under Next (or the A key) flips it mid-game (`autoFlip`, saved per game). Parameter
   Telephone has it too: after a chain plays through, it counts down to the next chain (`armAuto`).
 - Constraint Generator: missions = task (per file kind) + rule + evolution, from `CONSTRAINT_BRAIN` in content.js.
+  Tempo is only ever said in words (`feels`: slow … very fast; later rounds a `shifts` change like "Slow it down a little", chosen by
+  `cgShift` to fit the current tempo) and no key is ever named; option `groove` is labelled "Constraints for" (The whole team / Each student).
   Files are recipes `{kind, seed, bpm, key}` built by `ASSETS.make` on the student's computer (CADCAST/go, paired via
   Control Room); the host sends them with `pcSend(player, msg)`. No answer counts as "busy"; students can sit out.
   Option `mode:'gen'` (Generator) skips rounds and the clock: Shared = one card for the room (New task / New rule /
