@@ -239,8 +239,8 @@ game({
           <div class="cgasset">${cgRoll(m)}</div><p>${esc(m.task)}</p><span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span>${m.status==='done'?'<i class="cgstamp">Done</i>':m.status==='busy'?'<i class="cgstamp busy">Busy</i>':''}</div>`).join('')||'<p class="fine">Everyone is sitting this one out.</p>'}</div>`;}
     else if(s.phase==='between'||s.phase==='done')body=`<div class="cgafter"><div class="cgtop"><div><span class="lab">${s.phase==='done'?'The family tree':`After round ${s.round} of ${o.rounds}`}</span><h2>${s.phase==='done'?'Every track’s lineage':'Lineage so far'}</h2></div>${groove}</div>${lineage()}</div>`;
     const lbl={brief:'Deal round 1',deal:'Start the clock',work:'End this round',between:s.round<o.rounds?`Deal round ${s.round+1}`:'Show the family tree',done:'Back to the menu'}[s.phase];
-    st.innerHTML=`<div class="cg ph-${s.phase}">${body}<div class="dfoot"><span class="fine">${s.out.size?`${s.out.size} sitting out next round`:''}</span><button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
-    $('#bNext').onclick=()=>this.next();},
+    st.innerHTML=`<div class="cg ph-${s.phase}">${body}<div class="dfoot"><span class="fine">${s.out.size?`${s.out.size} sitting out next round`:''}</span>${s.phase==='done'?againBtn():''}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
+    $('#bNext').onclick=()=>this.next();bindAgain(st);},
   pstate(p){const s=G.gs;
     if(s.phase==='gen'){const m=s.o.groove==='room'?s.shared:s.now.get(p.id);return {k:'gen'+(m?m.seed+m.rule:''),ph:'gen',shared:s.o.groove==='room',pc:!!pcFor(p),
       m:m?{lead:m.lead,task:m.task,rule:m.rule,cat:m.cat,label:m.label,recipe:m.recipe}:null};}
@@ -354,8 +354,8 @@ game({
     };
     const lbl={brief:'Start the sketch',sketch:'Time: pass it on',pass:'Deal the cards',card:'Start the clock',build:s.round<o.rounds?'Pass it on again':'Listening party',done:'Back to the menu'}[s.phase];
     const seq=['sketch',...[...Array(o.rounds)].flatMap(()=>['pass','card','build']),'done'],at=s.phase==='brief'?-1:s.phase==='sketch'?0:s.phase==='done'?seq.length-1:1+(s.round-1)*3+['pass','card','build'].indexOf(s.phase);
-    st.innerHTML=`<div class="destruct roundabout dots ph-${s.phase}">${bodies[s.phase]}<div class="dfoot"><div class="steps2">${seq.map((p,i)=>`<i class="${i<at?'past':i===at?'cur':''}" title="${p}"></i>`).join('')}</div><button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
-    $('#bNext').onclick=()=>this.next();if($('#bRedraw'))$('#bRedraw').onclick=()=>{s.room=rbDeal(1)[0];s.done=new Set();online().forEach(p=>this.logCard(p,s.room));sfx.card();render();syncAll();};
+    st.innerHTML=`<div class="destruct roundabout dots ph-${s.phase}">${bodies[s.phase]}<div class="dfoot"><div class="steps2">${seq.map((p,i)=>`<i class="${i<at?'past':i===at?'cur':''}" title="${p}"></i>`).join('')}</div>${s.phase==='done'?againBtn():''}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
+    $('#bNext').onclick=()=>this.next();bindAgain(st);if($('#bRedraw'))$('#bRedraw').onclick=()=>{s.room=rbDeal(1)[0];s.done=new Set();online().forEach(p=>this.logCard(p,s.room));sfx.card();render();syncAll();};
   },
   pstate(p){const s=G.gs,c=this.cardFor(p);return {k:s.phase+s.round+(c?c.text.length:0)+(s.done.has(p.id)?'d':'')+(s.swapped.has(p.id)?'s':''),ph:s.phase,round:s.round,rounds:s.o.rounds,card:c,done:s.done.has(p.id),canSwap:!s.room&&s.phase==='card'&&!s.swapped.has(p.id),clock:pClock()};},
   player(root,st){pClockStart(st.clock);

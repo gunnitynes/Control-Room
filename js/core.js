@@ -454,7 +454,7 @@ function startGame(g,v){
   if(g.check){const why=g.check(v);if(why){toast(why);return;}}
   clearLater();AU_stopAll();G.gs=null;
   players().forEach(p=>Object.assign(p,{gp:0,streak:0,best:0,right:0,last:null}));
-  G.view='play';G.game=g;
+  G.view='play';G.game=g;G.lastOpts=v;
   try{g.start(v);}catch(e){console.error(e);toast('Could not start: '+e.message);G.view='setup';}
   render();syncAll();
 }
@@ -509,10 +509,14 @@ function rPodium(st,{title='Top of the room',line=p=>`${p.gp} pts`}={}){
   st.innerHTML=`<div class="final"><section class="podium dots"><canvas id="conf"></canvas><h2>${esc(title)}</h2>
     <div class="steps">${pod.map((p,k)=>p?`<div class="step c${[1,0,2][k]}"><span class="who">${esc(p.name)}</span><span class="pts">${esc(line(p))}</span><div class="blk">${rk.get(p.id)}</div></div>`:'<div class="step"></div>').join('')}</div></section>
     <section class="flist"><h3>Everyone · this game</h3><div class="fl">${r.map(p=>`<div class="fr"><b>${rk.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.gp}</em></div>`).join('')}</div>
-      <div class="ffoot"><button class="big go" id="bMenu2">Back to the menu</button></div></section></div>`;
-  $('#bMenu2').onclick=()=>exitGame(true);
+      <div class="ffoot">${againBtn()}<button class="big go" id="bMenu2">Back to the menu</button></div></section></div>`;
+  $('#bMenu2').onclick=()=>exitGame(true);bindAgain(st);
   confetti($('#conf'));
 }
+// "Play another round" on every end screen: the same game again with the same settings (fresh questions, scores from zero)
+const againBtn=()=>`<button class="big again" id="bAgain">Play another round <small>R</small></button>`;
+function playAgain(){const g=G.game;if(!g)return;try{g.stop&&g.stop();}catch(e){}if(typeof V!=='undefined')V=null;sfx.whoosh&&sfx.whoosh();startGame(g,G.lastOpts||optVals(g));}
+function bindAgain(st){const b=$('#bAgain',st);if(b)b.onclick=playAgain;}
 function confetti(c){
   const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;const ctx=c.getContext('2d');ctx.scale(d,d);
   const cols=COLS.map(css),ink=css('--ink');
@@ -854,6 +858,7 @@ function boot(){
     if(e.key==='Escape'){const o=$('#qrbig');if(o)o.remove();return;}
     if((e.key==='p'||e.key==='P')&&G.view==='play'&&G.game&&G.game.pause){G.game.pause();return;}
     if((e.key==='a'||e.key==='A')&&!e.metaKey&&!e.ctrlKey&&G.view==='play'&&G.game&&G.game.autoFlip&&!(e.target.closest&&e.target.closest('input,textarea,select'))){G.game.autoFlip();return;}
+    if((e.key==='r'||e.key==='R')&&!e.metaKey&&!e.ctrlKey&&G.view==='play'&&$('#bAgain')){playAgain();return;}
     if((e.key==='q'||e.key==='Q')&&G.code){const o=$('#qrbig');o?o.remove():showBigQR(G.code);return;}
     if(e.key===' '||e.key==='ArrowRight'||(e.key==='Enter'&&e.target.tagName!=='BUTTON')){
       if(G.view==='setup'){e.preventDefault();startGame(G.game);}
