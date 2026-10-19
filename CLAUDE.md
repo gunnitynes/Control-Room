@@ -47,6 +47,8 @@ js/remix-engine.js  Live Remix engine: rxAnalyse (STFT spectral-flux onsets → 
 js/games-remix.js   Live Remix (Make something): 4 moves per phone (a used move is replaced), take turns round the room
                     (play:turns, s.turn, nextTurn) or everyone at once with cooldowns; the deck on the big screen; songs are the
                     teacher's own (clipDB dec -5) or the Chronologist music; analyses cached in localStorage rx.an
+js/games-drop.js    Supply Drop (Make something): the teacher's materials folder (clipDB dec -6, subfolders = labels) dealt at
+                    random to every CADCAST computer (pcSendFile kind 'drop'); modes unique / random / same; one swap per drop
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
 images/quiz/        Machine Room photos (webp) + CREDITS.txt
