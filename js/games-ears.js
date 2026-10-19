@@ -380,26 +380,24 @@ game(roundGame({
   options:[{key:'src',label:'Sound',choices:[['real','Real recordings','plus your own clips'],['synth','Re-created','same idea, 1950s–2020s']],def:'real'},
     {key:'n',label:'Rounds',choices:[[3,'3'],[4,'4'],[5,'5']],def:4},{key:'secs',label:'Answer time',choices:[[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:45}],
   note:'Real recordings are public domain or Creative Commons, from Wikimedia Commons (credits in audio/eras/CREDITS.txt). The 1960s–1990s are still under copyright, so add your own clips for those decades below. They stay in this browser and are never uploaded. Decades with no real clip use the browser re-creation.',
-  setupExtra(v){if(v.src==='synth')return '';const mine=MYCLIPS.list,decs=Object.keys(ERA_DECADES).map(Number);
-    const yours=mine.filter(c=>c.dec>=1900).length;
-    return `<div class="fsec myclips"><h3><b>+</b>Your own music<small>${yours} songs · stay in this browser, never uploaded</small></h3>
-      <div class="chimport"><label class="big go">Load a music folder<input type="file" id="chFolder" webkitdirectory multiple hidden></label>
-        <p class="fine">Pick a folder with one subfolder per decade (1900s, 1910s … 2020s), or songs with the year in the name, like “Artist – Title (1958).mp3”. MP3, M4A, WAV, WebM.</p>
-        <span class="chprog" id="chProg"></span>${yours?'<button class="ghost" id="chClear">Remove all your songs</button>':''}</div><div class="mydecs">${decs.map(d=>{const e=ERA_DECADES[d],m=mine.filter(c=>c.dec===d);
-      return `<div class="mydec ${e.clips.length+m.length?'':'empty'}"><b>${esc(e.label)}</b><span>${e.clips.length} built in${m.length?` · ${m.length} yours`:''}</span>${m.length>4?'':m.map(c=>`<em title="${esc(c.name)}">${esc(c.name.replace(/\.[a-z0-9]+$/i,''))}<button data-del="${esc(c.id)}" aria-label="Remove">×</button></em>`).join('')}<label class="ghost">+ add<input type="file" accept="audio/*" multiple hidden data-dec="${d}"></label></div>`;}).join('')}</div>
-      <p class="fine">Whole songs are fine: each one plays a different 7-second moment every time, up to six per song.</p></div>`;},
+  // one music folder for the whole game: loading a folder replaces the collection; songs stay in this browser only
+  setupExtra(v){if(v.src==='synth')return '';const mine=MYCLIPS.list.filter(c=>c.dec>=1900),decs=Object.keys(ERA_DECADES).map(Number);
+    return `<div class="fsec myclips"><h3><b>♫</b>Your music folder<small>${mine.length?`${mine.length} songs loaded`:'nothing loaded yet'} · stays in this browser, never uploaded</small></h3>
+      <div class="chimport"><label class="big go">${mine.length?'Load a different folder':'Load your music folder'}<input type="file" id="chFolder" webkitdirectory multiple hidden></label>
+        <span class="chprog" id="chProg"></span>
+        <p class="fine">One folder with a subfolder per decade (1900s, 1910s … 2020s), or songs named like “Artist – Title (1958).mp3”. Whole songs are fine: every round plays a different 7-second moment, up to six per song.</p></div>
+      <div class="chdecs">${decs.map(d=>{const n=mine.filter(c=>c.dec===d).length,b=ERA_DECADES[d].clips.length;return `<span class="${n+b?'':'none'}"><b>${esc(ERA_DECADES[d].label)}</b>${n?`${n} yours`:b?`${b} built in`:'—'}</span>`;}).join('')}</div>
+      ${mine.length?'<button class="ghost" id="chClear">Remove your songs</button>':''}</div>`;},
   setupBind(st,redraw){
     // a whole folder at once: the decade comes from a "1970s" folder in the path, else the year in the file name
     const fo=$('#chFolder',st);if(fo)fo.onchange=async()=>{const files=[...fo.files].filter(f=>/\.(mp3|m4a|aac|wav|webm|ogg|oga|flac)$/i.test(f.name));const prog=$('#chProg',st);let n=0,skip=0;
+      if(!files.length){toast('No music files in that folder');return;}
+      for(const c of MYCLIPS.list.filter(c=>c.dec>=1900))await clipDB.del(c.id);
       for(const f of files){const path=f.webkitRelativePath||f.name,m=path.match(/(?:^|\/)(\d{3})0s(?:\/|$)/),y=m?+(m[1]+'0'):+((f.name.match(/\b(1[89]\d\d|20[0-2]\d)\b/)||[])[1]||0);
         const dec=Math.floor(y/10)*10;if(!ERA_DECADES[dec]){skip++;continue;}
         await clipDB.put({id:'ch:'+path,dec,name:f.name,blob:f,at:Date.now()+n});n++;if(prog)prog.textContent=`Saving ${n} of ${files.length}…`;}
       await loadMyClips();toast(`${n} songs saved in this browser${skip?` · ${skip} without a decade skipped`:''}`);redraw();};
-    const cl=$('#chClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Remove all your songs from this browser?'))return;for(const c of MYCLIPS.list.filter(c=>c.dec>=1900))await clipDB.del(c.id);await loadMyClips();redraw();};
-    $$('.myclips input[type=file][data-dec]',st).forEach(inp=>inp.onchange=async()=>{const dec=+inp.dataset.dec;
-      for(const f of inp.files){if(f.size>40e6){toast(f.name+' is over 40 MB');continue;}await clipDB.put({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),dec,name:f.name,blob:f,at:Date.now()});}
-      await loadMyClips();toast('Saved in this browser');redraw();});
-    $$('.myclips [data-del]',st).forEach(b=>b.onclick=async()=>{await clipDB.del(b.dataset.del);await loadMyClips();redraw();});},
+    const cl=$('#chClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Remove all your songs from this browser?'))return;for(const c of MYCLIPS.list.filter(c=>c.dec>=1900))await clipDB.del(c.id);await loadMyClips();redraw();};},
   // the order buttons open on the phones with the first clip; the clock covers the listening plus the answer time
   prepMs:()=>1200,prepLabel:'READY',prepSub:'four decades',
   prepText:()=>({big:'Four clips',small:'Clip A starts in a moment. Tap the order as you listen.'}),
