@@ -798,7 +798,7 @@ function pRender(){
   body.innerHTML=`<div class="pcenter dots idle"><div class="idlemain"><div class="idlefig">${shape(0,64,'var(--ink)','var(--red)')}${shape(1,64,'var(--ink)','var(--blue)')}${shape(2,64,'var(--ink)','var(--yel)')}</div>
     <h2>${s.g?'Next up':'You’re in'}</h2>${s.g?`<p class="nextg">${esc(s.gname)}</p>`:''}
     <p>${s.g?'The game starts in a moment.':`Look for <b>${esc(s.name)}</b> on the big screen. The next game starts soon.`}</p>
-    ${s.total?`<p class="lab">Room total · ${s.total} pts · ${ordinal(s.rank)} of ${s.of}</p>`:''}${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>
+    ${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>
     <button class="guidebtn" id="pGuide"><b>Guide</b><span>to the Control Room</span><i>→</i></button></div>`;
 }
 /* the computer that was scanned is now this student's: a short confirmation card over whatever is on screen */
