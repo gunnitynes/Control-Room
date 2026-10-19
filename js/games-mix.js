@@ -14,13 +14,19 @@ const mxName=f=>String(f).replace(MX_EXT,'').replace(/^\s*\d+\s*[-_.]\s*/,'').tr
 const mxDb=v=>v<=0.005?-Infinity:60*Math.log10(v/0.8);
 const mxGain=v=>v<=0.005?0:Math.pow(v/0.8,3);
 const mxFmt=v=>{const d=mxDb(v);return d===-Infinity?'−∞':(d>=0?'+':'')+d.toFixed(1)+' dB';};
+/* hidden trims: every mix each held part gets a secret gain offset (−5 … +16 dB, spread out, never near 0), so the right fader position
+   is somewhere different for every part and every mix. The phones show no numbers and no 0 mark: ears only. */
+const mxTrim=i=>(G.gs&&G.gs.trim&&G.gs.trim[i])||0;
+const mxTarget=t=>0.8*Math.pow(10,-t/60);              // the fader position that gives back the original level
+const mxEffDb=(v,i)=>v<=0.005?-Infinity:mxDb(v)+mxTrim(i);   // what the listener hears, against the original
+const mxEffV=(v,i)=>v<=0.005?0:0.8*Math.pow(10,mxEffDb(v,i)/60);
 const MX_COLS=['--red','--blue','--yel','--green'];
 // how close the room's balance is to the original: overall loudness doesn't count, only the stems against each other
 // only the parts students held count (the rest stayed at the original level, so they set the reference)
-function mxMatch(levels,pans,withPan,held){const all=levels.map(l=>Math.max(-40,Math.min(6,mxDb(l.v)))),idx=levels.map((_,i)=>i).filter(i=>!held||held.has(i));
+function mxMatch(levels,pans,withPan,held){const all=levels.map(l=>Math.max(-40,Math.min(20,mxDb(l.v)))),idx=levels.map((_,i)=>i).filter(i=>!held||held.has(i));
   const free=levels.length>idx.length,ref=free?0:idx.reduce((a,i)=>a+all[i],0)/idx.length;   // free parts at 0 dB anchor the balance
   let err=idx.reduce((a,i)=>a+Math.abs(all[i]-ref),0)/Math.max(1,idx.length);if(withPan)err+=idx.reduce((a,i)=>a+Math.abs(pans[i])*8,0)/Math.max(1,idx.length);
-  return {pct:Math.round(100*Math.max(0,Math.min(1,1-err/15))),rel:all.map((x,i)=>!held||held.has(i)?x-ref:null)};}
+  return {pct:Math.round(100*Math.max(0,Math.min(1,1-err/12))),rel:all.map((x,i)=>!held||held.has(i)?x-ref:null)};}
 
 game({
   id:'mixroom',group:'ears',name:'The Mix Room',tag:'One song in stems, every phone a fader. Mix it together, then hear how close you got.',
@@ -72,26 +78,33 @@ game({
   levels(){const s=G.gs;return s.stems.map(st=>{const vs=[],ps=[];s.assign.forEach((L,pid)=>{if(L.includes(st.i)&&G.players.has(pid)){const x=(s.vals.get(pid)||{})[st.i];if(x){vs.push(x.v);ps.push(x.pan||0);}}});
     const sc=s.scr[st.i]||{v:0.8,pan:0};return {v:vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:sc.v,pan:ps.length?ps.reduce((a,b)=>a+b,0)/ps.length:sc.pan,n:vs.length};});},
   apply(){const s=G.gs;if(!s||!s.a)return;const ac=audio(),L=this.levels(),orig=s.phase==='orig'||(s.phase==='reveal'&&s.ab==='orig');
-    s.stems.forEach((st,i)=>{st.g.gain.setTargetAtTime(orig?1:mxGain(L[i].v),ac.currentTime,0.03);st.p.pan.setTargetAtTime(orig?0:L[i].pan,ac.currentTime,0.03);});},
+    s.stems.forEach((st,i)=>{st.g.gain.setTargetAtTime(orig?1:mxGain(L[i].v)*Math.pow(10,mxTrim(i)/20),ac.currentTime,0.03);st.p.pan.setTargetAtTime(orig?0:L[i].pan,ac.currentTime,0.03);});},
   // one fader per phone. More phones than parts: they share. Fewer: a different random set of parts each mix,
   // and the parts nobody holds stay at their original level (mixed for the room)
   deal(){const s=G.gs,ps=shuffle(online()),N=s.stems.length;s.assign=new Map();s.vals=new Map();
     const order=shuffle(s.stems.map(x=>x.i));ps.forEach((p,k)=>s.assign.set(p.id,[order[k%N]]));
     s.held=new Set([...s.assign.values()].map(L=>L[0]));},
-  scramble(){const s=G.gs;s.scr=s.stems.map(st=>{if(!s.held.has(st.i))return {v:0.8,pan:0};let v;do{v=0.15+Math.random()*0.85;}while(Math.abs(v-0.8)<0.12);return {v,pan:s.o.ctl==='both'?Math.round((Math.random()*1.6-0.8)*10)/10:0};});
+  scramble(){const s=G.gs;
+    // spread out on purpose: the parts disagree with each other, so leaving every fader in one place sounds (and scores) wrong
+    const held=shuffle([...s.held]),N=held.length,tr=held.map((_,k)=>{let t=N>1?-5+21*(k+.15+Math.random()*.7)/N:pick([-5+Math.random()*1.5,6+Math.random()*10]);if(Math.abs(t)<3)t=t<0?-3:3;return t;});
+    s.trim=s.stems.map(st=>{const k=held.indexOf(st.i);return k<0?0:tr[k];});
+    // start every fader well away (≥ 5 dB) from its own hidden right position
+    s.scr=s.stems.map(st=>{if(!s.held.has(st.i))return {v:0.8,pan:0};let v;do{v=0.12+Math.random()*0.88;}while(Math.abs(mxEffDb(v,st.i))<5);return {v,pan:s.o.ctl==='both'?Math.round((Math.random()*1.6-0.8)*10)/10:0};});
     s.assign.forEach((L,pid)=>{const o={};L.forEach(j=>o[j]={...s.scr[j]});s.vals.set(pid,o);});},
   onJoin(p){const s=G.gs;if(!s||s.phase!=='mix'||s.assign.has(p.id))return;const cnt=s.stems.map(st=>[...s.assign.values()].filter(L=>L.includes(st.i)).length),j=cnt.indexOf(Math.min(...cnt));
+    if(!s.held.has(j)){let t;do{t=-5+Math.random()*21;}while(Math.abs(t)<3);s.trim[j]=t;}   // a part nobody held gets its hidden trim now
     s.assign.set(p.id,[j]);s.held.add(j);s.vals.set(p.id,{[j]:{...this.levels()[j]}});sync(p);render();},
   go(ph){const s=G.gs;s.phase=ph;stopClock();
     if(ph==='mix'){s.round++;s.ab='room';this.deal();this.scramble();startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('reveal');});}
-    if(ph==='reveal'){s.ab='room';s.res=mxMatch(this.levels(),this.levels().map(l=>l.pan),s.o.ctl==='both',s.held);sfx.fanfare();}
+    if(ph==='reveal'){s.ab='room';const L=this.levels();s.res=mxMatch(L.map((l,i)=>({...l,v:mxEffV(l.v,i)})),L.map(l=>l.pan),s.o.ctl==='both',s.held);sfx.fanfare();}
     this.apply();render();syncAll();},
   next(){const s=G.gs;({load:()=>{},orig:()=>this.go('mix'),mix:()=>this.go('reveal'),reveal:()=>this.go('mix')})[s.phase]();},
   act(p,d){const s=G.gs;if(s.phase!=='mix'||d.t!=='v')return;const L=s.assign.get(p.id);if(!L||!L.includes(d.i))return;
     const o=s.vals.get(p.id)||{};o[d.i]={v:Math.max(0,Math.min(1,+d.v||0)),pan:Math.max(-1,Math.min(1,+d.pan||0))};s.vals.set(p.id,o);this.apply();},
   frame(){clockFrame();const s=G.gs;if(!s||!s.a||(s.phase!=='mix'&&s.phase!=='orig'&&s.phase!=='reveal'))return;const L=this.levels(),orig=s.phase==='orig'||(s.phase==='reveal'&&s.ab==='orig');
     s.stems.forEach((st,i)=>{const el=document.querySelector(`.mxs[data-i="${i}"]`);if(!el)return;const v=orig?0.8:L[i].v;
-      el.querySelector('.mxcap').style.bottom=(v*100)+'%';el.querySelector('.mxdb').textContent=orig?'0 dB':mxFmt(v);
+      el.querySelector('.mxcap').style.bottom=(v*100)+'%';el.querySelector('.mxdb').textContent=s.phase==='orig'?'original':orig?'0 dB':s.phase==='reveal'?mxFmt(mxEffV(v,i)):'';
+      const z=el.querySelector('.mx0');if(z)z.style.bottom=(s.phase==='reveal'?mxTarget(mxTrim(i)):0.8)*100+'%';
       st.an.getFloatTimeDomainData(s.meterBuf);let m=0;for(let k=0;k<s.meterBuf.length;k+=4){const x=Math.abs(s.meterBuf[k]);if(x>m)m=x;}
       el.querySelector('.mxm i').style.height=Math.max(0,Math.min(100,(20*Math.log10(m||1e-6)+60)/60*100))+'%';
       const pn=el.querySelector('.mxpan');if(pn)pn.style.left=(50+(orig?0:L[i].pan)*45)+'%';
@@ -104,10 +117,10 @@ game({
     const strip=(stm,i)=>{const h=holders(i),rel=s.res&&s.res.rel[i];
       return `<div class="mxs c${i%4}${s.held&&!s.held.has(i)&&s.phase!=='orig'?' free':''}" data-i="${i}"><div class="mxname"><b>${esc(stm.name)}</b><span>${s.phase==='mix'||s.phase==='reveal'?(h.length?esc(h.join(', ')):'mixed for you'):''}</span></div>
         ${ctl?`<div class="mxpanrow"><i class="mxpan"></i></div>`:''}
-        <div class="mxtrack"><div class="mxm"><i></i></div><div class="mxlane"><i class="mx0" title="0 dB: the original"></i><div class="mxdots"></div><i class="mxcap"></i></div></div>
-        <div class="mxdb">${mxFmt(L[i].v)}</div>${s.phase==='reveal'&&rel==null?'<div class="mxdiff free">original level</div>':''}${s.phase==='reveal'&&rel!=null?`<div class="mxdiff ${Math.abs(rel)<2?'ok':''}">${Math.abs(rel)<2?'✓ spot on':(rel>0?'▲ ':'▼ ')+Math.abs(rel).toFixed(1)+' dB '+(rel>0?'too loud':'too quiet')}</div>`:''}</div>`;};
-    const head={orig:()=>`<span class="lab">The Mix Room · ${esc(s.song)}</span><h2>The original</h2><p>Every part at its own level. Listen to the balance: in a moment the faders get scrambled.</p>`,
-      mix:()=>`<span class="lab">Mix ${s.round} · ${esc(s.song)}</span><h2>Mix it back</h2><p>Your fader is on your phone. Several of you on one part? You share it: it sits where your average is.</p>${clockHTML()}`,
+        <div class="mxtrack"><div class="mxm"><i></i></div><div class="mxlane"><i class="mx0" title="Where the original level was"></i><div class="mxdots"></div><i class="mxcap"></i></div></div>
+        <div class="mxdb">${s.phase==='reveal'?mxFmt(mxEffV(L[i].v,i)):s.phase==='orig'?'original':''}</div>${s.phase==='reveal'&&rel==null?'<div class="mxdiff free">original level</div>':''}${s.phase==='reveal'&&rel!=null?`<div class="mxdiff ${Math.abs(rel)<2?'ok':''}">${Math.abs(rel)<2?'✓ spot on':(rel>0?'▲ ':'▼ ')+Math.abs(rel).toFixed(1)+' dB '+(rel>0?'too loud':'too quiet')}</div>`:''}</div>`;};
+    const head={orig:()=>`<span class="lab">The Mix Room · ${esc(s.song)}</span><h2>The original</h2><p>Every part at its own level. Listen to the balance: in a moment the faders get scrambled, and every fader gets a hidden trim, so there are no numbers to go by. Only your ears.</p>`,
+      mix:()=>`<span class="lab">Mix ${s.round} · ${esc(s.song)}</span><h2>Mix it back</h2><p>Your fader is on your phone. No numbers, no zero mark: every part’s right spot is somewhere different. Several of you on one part? It sits where your average is.</p>${clockHTML()}`,
       reveal:()=>`<span class="lab">Mix ${s.round} · how close?</span><h2 class="mxpct">${s.res.pct}%</h2><p>${s.res.pct>=85?'Golden ears: that’s the record.':s.res.pct>=65?'Close. A couple of parts are off.':'A brave new mix. Now hear the original.'}</p>
         <div class="seg mxab"><button data-ab="room" aria-pressed="${s.ab==='room'}">The room’s mix</button><button data-ab="orig" aria-pressed="${s.ab==='orig'}">The original</button></div>`}[s.phase];
     const lbl={orig:'Scramble the faders',mix:'Stop: how close?',reveal:'Scramble again'}[s.phase];
@@ -125,10 +138,10 @@ game({
     const vals=PL.mx&&PL.mx.k===st.k?PL.mx.v:(PL.mx={k:st.k,v:Object.fromEntries(st.stems.map(x=>[x.i,{...x.init}]))}).v;
     root.innerHTML=`<div class="mxphone n${st.stems.length}">${pClockHTML(st.clock)}<div class="mxfaders">${st.stems.map((x,k)=>`<div class="mxpf c${x.i%4}" data-i="${x.i}"><b>${esc(x.name)}</b>
       ${st.ctl==='both'?`<div class="mxpk"><input type="range" min="-1" max="1" step="0.05" value="${vals[x.i].pan}" aria-label="Pan"><span>L · pan · R</span></div>`:''}
-      <div class="mxft"><i class="mxf0"></i><i class="mxfcap" style="bottom:${vals[x.i].v*100}%"></i></div><span class="mxfdb">${mxFmt(vals[x.i].v)}</span></div>`).join('')}</div></div>`;
+      <div class="mxft"><i class="mxfcap" style="bottom:${vals[x.i].v*100}%"></i></div><span class="mxfdb">listen</span></div>`).join('')}</div></div>`;
     let last=0,pend=null;const send=i=>{const now=Date.now(),go=()=>{last=Date.now();pend=null;papi.send({t:'v',i,v:vals[i].v,pan:vals[i].pan});};if(now-last>45)go();else{clearTimeout(pend);pend=setTimeout(go,50);}};
-    $$('.mxpf',root).forEach(el=>{const i=+el.dataset.i,tr=$('.mxft',el),cap=$('.mxfcap',tr),db=$('.mxfdb',el);
-      const set=y=>{const r=tr.getBoundingClientRect();let v=1-(y-r.top)/r.height;v=Math.max(0,Math.min(1,v));if(Math.abs(v-0.8)<0.02)v=0.8;vals[i].v=v;cap.style.bottom=(v*100)+'%';db.textContent=mxFmt(v);send(i);};
+    $$('.mxpf',root).forEach(el=>{const i=+el.dataset.i,tr=$('.mxft',el),cap=$('.mxfcap',tr);
+      const set=y=>{const r=tr.getBoundingClientRect();let v=1-(y-r.top)/r.height;v=Math.max(0,Math.min(1,v));vals[i].v=v;cap.style.bottom=(v*100)+'%';send(i);};
       tr.onpointerdown=e=>{tr.setPointerCapture(e.pointerId);set(e.clientY);papi.vibe(5);};tr.onpointermove=e=>{if(e.buttons||e.pointerType==='touch')if(tr.hasPointerCapture(e.pointerId))set(e.clientY);};
       const pk=$('.mxpk input',el);if(pk)pk.oninput=()=>{vals[i].pan=+pk.value;send(i);};});},
 });

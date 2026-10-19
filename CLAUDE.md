@@ -44,7 +44,8 @@ js/games-atlas.js   The Ear Atlas (Know your stuff, slot 02 right after The Quiz
 js/games-mix.js     The Mix Room (Train your ears): a song in stems loops on the big speakers, every phone is a fader
                     (one each; extra students share a part; with fewer students a random set of parts is dealt and the rest
                     stay at the original level and aren't scored); the reveal scores the balance against the original and A/Bs
-                    it. "Load your multitracks folder" (subfolder per song) replaces the collection in clipDB (dec -4); never in the repo.
+                    it. Every mix each held part gets a hidden trim (`s.trim`, −5…+16 dB, spread so parts disagree), phones and the big screen show
+                    no dB numbers or 0 mark while mixing; the reveal shows the effective level and a green target mark (`mxTarget`). "Load your multitracks folder" (subfolder per song) replaces the collection in clipDB (dec -4); never in the repo.
 js/remix-engine.js  Live Remix engine: rxAnalyse (STFT spectral-flux onsets → autocorrelation tempo → beat phase → downbeat
                     from the bass → chroma key → energy per bar), rxPlayer (the song scheduled beat by beat so any beat can
                     be repeated/reversed/re-pitched on the grid, an FX rack, generated 808/hats/claps/sub in the key), RX_FX

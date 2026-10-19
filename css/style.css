@@ -1659,3 +1659,8 @@ body:has(#app.guidepage){overflow:auto}
 .caps .kalt{font-size:.62em;margin-left:14px;gap:6px;color:var(--ink)}.caps .kalt kbd{font-size:1em}
 .ptile .kalt,.popt .kalt{font-size:.8em}
 .mc .tile .caps small.kalt{font-size:clamp(14px,1.3vw,22px)}.mc .tile .caps small.kalt kbd{font-size:inherit}
+/* Mix Room: no reference marks while mixing; the reveal shows where each part should have been */
+.mixroom.ph-mix .mx0,.mixroom.ph-orig .mx0{display:none}
+.mixroom.ph-reveal .mx0{border-top:4px solid var(--green);left:-18px;width:32px}
+.mixroom.ph-reveal .mx0::after{content:"target";position:absolute;left:34px;top:-9px;font:700 9px var(--mono);text-transform:uppercase;color:var(--green)}
+.mxfdb{font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.08em;opacity:.6}
