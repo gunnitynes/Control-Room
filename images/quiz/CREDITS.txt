@@ -73,9 +73,12 @@ popfilter.webp: File:Microphone électrostatique.jpg by Éric Chassaing at Frenc
 anechoic.webp: File:RF Fully Anechoic Room 2.jpg by Mihaelawojcik, CC BY 4.0, https://commons.wikimedia.org/wiki/File:RF_Fully_Anechoic_Room_2.jpg
 foam.webp: File:Acoustic foam closeup.jpg by Chlod Alejandro, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Acoustic_foam_closeup.jpg
 shockmount.webp: File:XLR-microphone.jpg by Kreuzschnabel, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:XLR-microphone.jpg
+md441.webp: File:Sennheiser MD441 in Mid-Side stereo setting 1, Recording Fischer, Compound Recordings, January 2008 (cropped).jpg by Roadside Guitars, CC BY-SA 2.0, https://commons.wikimedia.org/wiki/File:Sennheiser_MD441_in_Mid-Side_stereo_setting_1,_Recording_Fischer,_Compound_Recordings,_January_2008_(cropped).jpg
 nt1a.webp: File:RODE NT1A.jpg by LuukRost, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:RODE_NT1A.jpg
 at2020.webp: File:Audio-technica AT2020.JPG by Lokal_Profil, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Audio-technica_AT2020.JPG
+tlm103.webp: File:Neumann TLM 103.jpg by Tiago Cassol Schvarstzhaupt, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Neumann_TLM_103.jpg
 mkh416.webp: File:Sennheiser MKH416.jpg by Galak76, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Sennheiser_MKH416.jpg
+u67.webp: File:Microphone Neumann U-67 (1953).jpg by The original uploader was Goldfinger at Serbian Wikipedia., CC BY-SA 3.0 rs, https://commons.wikimedia.org/wiki/File:Microphone_Neumann_U-67_(1953).jpg
 coles4038.webp: File:BBC microphones (The Beatles Story).jpg by Hens Zimmerman, CC BY 2.0, https://commons.wikimedia.org/wiki/File:BBC_microphones_(The_Beatles_Story).jpg
 c37a.webp: File:100.80.60.展 Ginza Sony Park (55306461690).jpg by nagi usano, CC BY 4.0, https://commons.wikimedia.org/wiki/File:100.80.60.%E5%B1%95_Ginza_Sony_Park_(55306461690).jpg
 c451.webp: File:AKG C451B.jpg by Harumphy at en.wikipedia, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:AKG_C451B.jpg

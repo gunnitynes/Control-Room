@@ -667,6 +667,17 @@ window.QUIZ_PICS=[
 "credit": "Photo: Kreuzschnabel · CC BY-SA 3.0 · Wikimedia Commons"
 },
 {
+"id": "md441",
+"name": "Sennheiser MD 441",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/md441.webp",
+"credit": "Photo: Roadside Guitars · CC BY-SA 2.0 · Wikimedia Commons",
+"type": "Dynamic",
+"fact": "Dynamic · Often called the most accurate dynamic mic ever made: looks like a spaceship.",
+"maker": "Sennheiser"
+},
+{
 "id": "nt1a",
 "name": "Røde NT1-A",
 "cat": "outboard",
@@ -689,6 +700,17 @@ window.QUIZ_PICS=[
 "maker": "Audio-Technica"
 },
 {
+"id": "tlm103",
+"name": "Neumann TLM 103",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/tlm103.webp",
+"credit": "Photo: Tiago Cassol Schvarstzhaupt · CC BY 2.0 · Wikimedia Commons",
+"type": "Condenser",
+"fact": "FET condenser · The Neumann capsule character for home studios, without the U 87 price.",
+"maker": "Neumann"
+},
+{
 "id": "mkh416",
 "name": "Sennheiser MKH 416",
 "cat": "outboard",
@@ -698,6 +720,17 @@ window.QUIZ_PICS=[
 "type": "Condenser",
 "fact": "Shotgun condenser · A film boom mic that became the standard for voiceover, trailers and ADR.",
 "maker": "Sennheiser"
+},
+{
+"id": "u67",
+"name": "Neumann U 67",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/u67.webp",
+"credit": "Photo: The original uploader was Goldfinger at Serbian Wikipedia. · CC BY-SA 3.0 rs · Wikimedia Commons",
+"type": "Tube condenser",
+"fact": "Tube condenser · Introduced the K67 capsule; used on Nirvana's Nevermind and classic British rock.",
+"maker": "Neumann"
 },
 {
 "id": "coles4038",
@@ -774,30 +807,12 @@ window.QUIZ_PIC_SLOTS=[
 "maker": "AKG"
 },
 {
-"id": "md441",
-"name": "Sennheiser MD 441",
-"cat": "outboard",
-"kind": "mic",
-"type": "Dynamic",
-"fact": "Dynamic · Often called the most accurate dynamic mic ever made: looks like a spaceship.",
-"maker": "Sennheiser"
-},
-{
 "id": "km184",
 "name": "Neumann KM 184",
 "cat": "outboard",
 "kind": "mic",
 "type": "Condenser",
 "fact": "Small-diaphragm condenser · The pencil-condenser pair found in nearly every studio, for acoustic guitar and hi-hat.",
-"maker": "Neumann"
-},
-{
-"id": "tlm103",
-"name": "Neumann TLM 103",
-"cat": "outboard",
-"kind": "mic",
-"type": "Condenser",
-"fact": "FET condenser · The Neumann capsule character for home studios, without the U 87 price.",
 "maker": "Neumann"
 },
 {
@@ -817,15 +832,6 @@ window.QUIZ_PIC_SLOTS=[
 "type": "Tube condenser",
 "fact": "Tube condenser · An airy, bright top end: a gold standard for overheads and acoustic tracking.",
 "maker": "AKG"
-},
-{
-"id": "u67",
-"name": "Neumann U 67",
-"cat": "outboard",
-"kind": "mic",
-"type": "Tube condenser",
-"fact": "Tube condenser · Introduced the K67 capsule; used on Nirvana's Nevermind and classic British rock.",
-"maker": "Neumann"
 },
 {
 "id": "c800g",
