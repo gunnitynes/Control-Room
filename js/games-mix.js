@@ -16,13 +16,15 @@ const mxGain=v=>v<=0.005?0:Math.pow(v/0.8,3);
 const mxFmt=v=>{const d=mxDb(v);return d===-Infinity?'−∞':(d>=0?'+':'')+d.toFixed(1)+' dB';};
 const MX_COLS=['--red','--blue','--yel','--green'];
 // how close the room's balance is to the original: overall loudness doesn't count, only the stems against each other
-function mxMatch(levels,pans,withPan){const d=levels.map(l=>Math.max(-40,Math.min(6,mxDb(l.v))));const mean=d.reduce((a,b)=>a+b,0)/d.length;
-  let err=d.reduce((a,x)=>a+Math.abs(x-mean),0)/d.length;if(withPan)err+=pans.reduce((a,p)=>a+Math.abs(p)*8,0)/pans.length;
-  return {pct:Math.round(100*Math.max(0,Math.min(1,1-err/15))),rel:d.map(x=>x-mean)};}
+// only the parts students held count (the rest stayed at the original level, so they set the reference)
+function mxMatch(levels,pans,withPan,held){const all=levels.map(l=>Math.max(-40,Math.min(6,mxDb(l.v)))),idx=levels.map((_,i)=>i).filter(i=>!held||held.has(i));
+  const free=levels.length>idx.length,ref=free?0:idx.reduce((a,i)=>a+all[i],0)/idx.length;   // free parts at 0 dB anchor the balance
+  let err=idx.reduce((a,i)=>a+Math.abs(all[i]-ref),0)/Math.max(1,idx.length);if(withPan)err+=idx.reduce((a,i)=>a+Math.abs(pans[i])*8,0)/Math.max(1,idx.length);
+  return {pct:Math.round(100*Math.max(0,Math.min(1,1-err/15))),rel:all.map((x,i)=>!held||held.has(i)?x-ref:null)};}
 
 game({
   id:'mixroom',group:'ears',name:'The Mix Room',tag:'One song in stems, every phone a fader. Mix it together, then hear how close you got.',
-  how:['The original plays on the big speakers. Then the faders get scrambled.','Every phone becomes a fader for one part of the song (several people on one part share it).','Mix it back together as a room. The reveal shows how close your balance got to the original, and you can switch between the two.'],
+  how:['The original plays on the big speakers. Then the faders get scrambled.','Every phone becomes a fader for one part of the song. More students than parts? You share a part. Fewer? The other parts stay mixed for you.','Mix it back together as a room. The reveal shows how close your balance got to the original, and you can switch between the two.'],
   badges:['Live','No score','Stems'],kind:'free',
   icon:`<svg viewBox="0 0 64 64">${[0,1,2,3].map(i=>`<line x1="${12+i*13}" y1="8" x2="${12+i*13}" y2="56" stroke="var(--ink)" stroke-width="3"/><rect x="${6+i*13}" y="${[34,16,40,24][i]}" width="12" height="9" fill="var(${MX_COLS[i]})" stroke="var(--ink)" stroke-width="2.5"/>`).join('')}</svg>`,
   options:[
@@ -31,21 +33,21 @@ game({
     {key:'mins',label:'Mixing time',type:'step',min:1,max:10,step:1,def:3,unit:'min'},
     {key:'ctl',label:'Phones control',choices:[['level','Level','a fader each'],['both','Level + pan','a fader and a pan knob']],def:'level'},
   ],
-  note:'Stems stay in this browser and are never uploaded. One folder per song, one audio file per part (MP3 is fine and loads fastest). Parts that sum to the original mix work best.',
-  check(){return mxSong()?'':'Load a stems folder first';},
+  note:'Multitracks stay in this browser and are never uploaded. One folder with a subfolder per song, one audio file per part (MP3 loads fastest). Parts that sum to the original mix work best.',
+  check(){return mxSong()?'':'Load your multitracks folder first';},
   setupExtra(){const S=mxSongs(),cur=mxSong();
-    return `<div class="fsec mxsongs"><h3><b>♫</b>Your stems<small>${S.size} song${S.size===1?'':'s'} · stay in this browser, never uploaded</small></h3>
-      <div class="chimport"><label class="big go">Load a stems folder<input type="file" id="mxFolder" webkitdirectory multiple hidden></label><span class="chprog" id="mxProg"></span>
-        <p class="fine">Pick one song’s folder of stems (or a folder of song folders). Each subfolder becomes one song.</p></div>
-      ${S.size?`<div class="mxlist">${[...S].map(([song,L])=>`<button class="mxsong${song===cur?' on':''}" data-song="${esc(song)}"><b>${esc(song)}</b><span>${L.length} stems</span><i data-del="${esc(song)}" title="Remove from this browser">×</i></button>`).join('')}</div>`:''}</div>`;},
+    return `<div class="fsec mxsongs"><h3><b>♫</b>Your multitracks folder<small>${S.size?`${S.size} song${S.size===1?'':'s'} loaded`:'nothing loaded yet'} · stays in this browser, never uploaded</small></h3>
+      <div class="chimport"><label class="big go">${S.size?'Load a different folder':'Load your multitracks folder'}<input type="file" id="mxFolder" webkitdirectory multiple hidden></label><span class="chprog" id="mxProg"></span>
+        <p class="fine">One folder with a subfolder per song, each holding that song’s parts (one audio file per part). MP3 loads fastest.</p></div>
+      ${S.size?`<p class="lab">Pick the song</p><div class="mxlist">${[...S].map(([song,L])=>`<button class="mxsong${song===cur?' on':''}" data-song="${esc(song)}"><b>${esc(song)}</b><span>${L.length} parts</span></button>`).join('')}</div><button class="ghost" id="mxClear">Remove your multitracks</button>`:''}</div>`;},
   setupBind(st,redraw){const fo=$('#mxFolder',st);
     if(fo)fo.onchange=async()=>{const files=[...fo.files].filter(f=>MX_EXT.test(f.name));if(!files.length){toast('No audio files in that folder');return;}const prog=$('#mxProg',st);let n=0;
+      for(const c of MYCLIPS.list.filter(c=>c.dec===-4))await clipDB.del(c.id);   // a new folder replaces the collection
       for(const f of files){const parts=(f.webkitRelativePath||f.name).split('/'),song=parts.length>2?parts[parts.length-2]:(parts.length===2?parts[0]:'My song');
         await clipDB.put({id:'mx:'+song+'/'+f.name,dec:-4,song,name:f.name,blob:f,at:Date.now()+n});n++;if(prog)prog.textContent=`Saving ${n} of ${files.length}…`;}
-      await loadMyClips();toast(`${n} stems saved in this browser`);redraw();};
-    $$('.mxsong',st).forEach(b=>b.onclick=async e=>{const del=e.target.dataset&&e.target.dataset.del;
-      if(del){e.stopPropagation();if(!confirm('Remove '+del+' from this browser?'))return;for(const c of MYCLIPS.list.filter(c=>c.dec===-4&&c.song===del))await clipDB.del(c.id);await loadMyClips();redraw();return;}
-      store.set('mix.song',b.dataset.song);redraw();});},
+      await loadMyClips();toast(`${mxSongs().size} songs (${n} parts) saved in this browser`);redraw();};
+    const cl=$('#mxClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Remove all your multitracks from this browser?'))return;for(const c of MYCLIPS.list.filter(c=>c.dec===-4))await clipDB.del(c.id);await loadMyClips();redraw();};
+    $$('.mxsong',st).forEach(b=>b.onclick=()=>{store.set('mix.song',b.dataset.song);redraw();});},
   topInfo(){const s=G.gs;if(!s)return this.tag;return ({load:'Loading the stems',orig:'The original',mix:`Mix ${s.round}: the room at the faders`,reveal:`Mix ${s.round}: how close?`})[s.phase]||'';},
   start(o){const song=mxSong(),L=mxSongs().get(song)||[];
     G.gs={o,song,stems:L.map((c,i)=>({i,name:mxName(c.name),clip:c})),phase:'load',prog:0,round:0,assign:new Map(),vals:new Map(),scr:[],ab:'room',a:null};
@@ -71,18 +73,18 @@ game({
     const sc=s.scr[st.i]||{v:0.8,pan:0};return {v:vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:sc.v,pan:ps.length?ps.reduce((a,b)=>a+b,0)/ps.length:sc.pan,n:vs.length};});},
   apply(){const s=G.gs;if(!s||!s.a)return;const ac=audio(),L=this.levels(),orig=s.phase==='orig'||(s.phase==='reveal'&&s.ab==='orig');
     s.stems.forEach((st,i)=>{st.g.gain.setTargetAtTime(orig?1:mxGain(L[i].v),ac.currentTime,0.03);st.p.pan.setTargetAtTime(orig?0:L[i].pan,ac.currentTime,0.03);});},
-  // stems are shared out: with fewer phones than stems a phone gets several faders
-  deal(){const s=G.gs,ps=online(),N=s.stems.length;s.assign=new Map();s.vals=new Map();
-    if(!ps.length)return;
-    if(ps.length>=N)ps.forEach((p,k)=>s.assign.set(p.id,[k%N]));
-    else ps.forEach((p,k)=>s.assign.set(p.id,s.stems.map(x=>x.i).filter(j=>j%ps.length===k)));
+  // one fader per phone. More phones than parts: they share. Fewer: a different random set of parts each mix,
+  // and the parts nobody holds stay at their original level (mixed for the room)
+  deal(){const s=G.gs,ps=shuffle(online()),N=s.stems.length;s.assign=new Map();s.vals=new Map();
+    const order=shuffle(s.stems.map(x=>x.i));ps.forEach((p,k)=>s.assign.set(p.id,[order[k%N]]));
+    s.held=new Set([...s.assign.values()].map(L=>L[0]));},
+  scramble(){const s=G.gs;s.scr=s.stems.map(st=>{if(!s.held.has(st.i))return {v:0.8,pan:0};let v;do{v=0.15+Math.random()*0.85;}while(Math.abs(v-0.8)<0.12);return {v,pan:s.o.ctl==='both'?Math.round((Math.random()*1.6-0.8)*10)/10:0};});
     s.assign.forEach((L,pid)=>{const o={};L.forEach(j=>o[j]={...s.scr[j]});s.vals.set(pid,o);});},
-  scramble(){const s=G.gs;s.scr=s.stems.map(()=>{let v;do{v=0.15+Math.random()*0.85;}while(Math.abs(v-0.8)<0.12);return {v,pan:s.o.ctl==='both'?Math.round((Math.random()*1.6-0.8)*10)/10:0};});},
   onJoin(p){const s=G.gs;if(!s||s.phase!=='mix'||s.assign.has(p.id))return;const cnt=s.stems.map(st=>[...s.assign.values()].filter(L=>L.includes(st.i)).length),j=cnt.indexOf(Math.min(...cnt));
-    s.assign.set(p.id,[j]);s.vals.set(p.id,{[j]:{...this.levels()[j]}});sync(p);render();},
+    s.assign.set(p.id,[j]);s.held.add(j);s.vals.set(p.id,{[j]:{...this.levels()[j]}});sync(p);render();},
   go(ph){const s=G.gs;s.phase=ph;stopClock();
-    if(ph==='mix'){s.round++;s.ab='room';this.scramble();this.deal();startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('reveal');});}
-    if(ph==='reveal'){s.ab='room';s.res=mxMatch(this.levels(),this.levels().map(l=>l.pan),s.o.ctl==='both');sfx.fanfare();}
+    if(ph==='mix'){s.round++;s.ab='room';this.deal();this.scramble();startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('reveal');});}
+    if(ph==='reveal'){s.ab='room';s.res=mxMatch(this.levels(),this.levels().map(l=>l.pan),s.o.ctl==='both',s.held);sfx.fanfare();}
     this.apply();render();syncAll();},
   next(){const s=G.gs;({load:()=>{},orig:()=>this.go('mix'),mix:()=>this.go('reveal'),reveal:()=>this.go('mix')})[s.phase]();},
   act(p,d){const s=G.gs;if(s.phase!=='mix'||d.t!=='v')return;const L=s.assign.get(p.id);if(!L||!L.includes(d.i))return;
@@ -100,10 +102,10 @@ game({
     if(s.phase==='load'){st.innerHTML=`<div class="dbig"><span class="lab">The Mix Room · ${esc(s.song)}</span><h2>Loading the stems</h2><div class="mxbar"><i id="mxLoad" style="width:${Math.round(100*s.prog/Math.max(1,s.stems.length))}%"></i></div><p>${s.stems.length} parts, a ${o.len}-second loop.</p></div>`;return;}
     const L=this.levels(),holders=i=>{const n=[];s.assign.forEach((A,pid)=>{if(A.includes(i)){const pl=G.players.get(pid);if(pl)n.push(pl.name);}});return n;};
     const strip=(stm,i)=>{const h=holders(i),rel=s.res&&s.res.rel[i];
-      return `<div class="mxs c${i%4}" data-i="${i}"><div class="mxname"><b>${esc(stm.name)}</b><span>${s.phase==='mix'?(h.length?esc(h.join(', ')):'nobody'):''}</span></div>
+      return `<div class="mxs c${i%4}${s.held&&!s.held.has(i)&&s.phase!=='orig'?' free':''}" data-i="${i}"><div class="mxname"><b>${esc(stm.name)}</b><span>${s.phase==='mix'||s.phase==='reveal'?(h.length?esc(h.join(', ')):'mixed for you'):''}</span></div>
         ${ctl?`<div class="mxpanrow"><i class="mxpan"></i></div>`:''}
         <div class="mxtrack"><div class="mxm"><i></i></div><div class="mxlane"><i class="mx0" title="0 dB: the original"></i><div class="mxdots"></div><i class="mxcap"></i></div></div>
-        <div class="mxdb">${mxFmt(L[i].v)}</div>${s.phase==='reveal'?`<div class="mxdiff ${Math.abs(rel)<2?'ok':''}">${Math.abs(rel)<2?'✓ spot on':(rel>0?'▲ ':'▼ ')+Math.abs(rel).toFixed(1)+' dB '+(rel>0?'too loud':'too quiet')}</div>`:''}</div>`;};
+        <div class="mxdb">${mxFmt(L[i].v)}</div>${s.phase==='reveal'&&rel==null?'<div class="mxdiff free">original level</div>':''}${s.phase==='reveal'&&rel!=null?`<div class="mxdiff ${Math.abs(rel)<2?'ok':''}">${Math.abs(rel)<2?'✓ spot on':(rel>0?'▲ ':'▼ ')+Math.abs(rel).toFixed(1)+' dB '+(rel>0?'too loud':'too quiet')}</div>`:''}</div>`;};
     const head={orig:()=>`<span class="lab">The Mix Room · ${esc(s.song)}</span><h2>The original</h2><p>Every part at its own level. Listen to the balance: in a moment the faders get scrambled.</p>`,
       mix:()=>`<span class="lab">Mix ${s.round} · ${esc(s.song)}</span><h2>Mix it back</h2><p>Your fader is on your phone. Several of you on one part? You share it: it sits where your average is.</p>${clockHTML()}`,
       reveal:()=>`<span class="lab">Mix ${s.round} · how close?</span><h2 class="mxpct">${s.res.pct}%</h2><p>${s.res.pct>=85?'Golden ears: that’s the record.':s.res.pct>=65?'Close. A couple of parts are off.':'A brave new mix. Now hear the original.'}</p>
@@ -115,7 +117,7 @@ game({
     $$('.mxab button',st).forEach(b=>b.onclick=()=>{s.ab=b.dataset.ab;this.apply();render();});},
   pstate(p){const s=G.gs,A=s.assign.get(p.id)||[],L=this.levels();
     return {k:s.phase+s.round+A.join('.'),ph:s.phase,round:s.round,song:s.song,ctl:s.o.ctl,clock:pClock(),
-      stems:A.map(i=>({i,name:s.stems[i].name,init:(s.vals.get(p.id)||{})[i]||{v:0.8,pan:0},room:L[i].v,rel:s.res?s.res.rel[i]:0})),pct:s.res?s.res.pct:0};},
+      stems:A.map(i=>({i,name:s.stems[i].name,init:(s.vals.get(p.id)||{})[i]||{v:0.8,pan:0},room:L[i].v,rel:s.res&&s.res.rel[i]!=null?s.res.rel[i]:0})),pct:s.res?s.res.pct:0};},
   player(root,st){pClockStart(st.clock);
     if(st.ph==='load'||st.ph==='orig'){root.innerHTML=`<div class="pcenter dots"><h2>Listen</h2><p>${st.ph==='load'?'The stems are loading…':`The original ${esc(st.song)}. Remember the balance.`}</p></div>`;return;}
     if(st.ph==='reveal'){root.innerHTML=`<div class="pcol2"><h2 class="pbigt">${st.pct}% close</h2>${st.stems.map(x=>`<div class="mxpres"><b>${esc(x.name)}</b><span>${Math.abs(x.rel)<2?'✓ spot on':(x.rel>0?'too loud by ':'too quiet by ')+Math.abs(x.rel).toFixed(1)+' dB'}</span></div>`).join('')}<p>Listen to the original on the big screen.</p></div>`;return;}

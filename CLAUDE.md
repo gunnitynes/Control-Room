@@ -38,8 +38,9 @@ js/games-atlas.js   The Ear Atlas (Know your stuff, slot 02 right after The Quiz
                     Notes & Intervals = 'note', dealt half note / half interval); recordings in window.ATLAS (built by tools/atlas/build.py);
                     plays the clips this browser has heard least first (localStorage atlas.seen)
 js/games-mix.js     The Mix Room (Train your ears): a song in stems loops on the big speakers, every phone is a fader
-                    (several on one stem = their average), the reveal scores the balance against the original (all stems
-                    at 0 dB) and A/Bs it. Stems load from a folder into clipDB (dec -4, one song per folder); never in the repo.
+                    (one each; extra students share a part; with fewer students a random set of parts is dealt and the rest
+                    stay at the original level and aren't scored); the reveal scores the balance against the original and A/Bs
+                    it. "Load your multitracks folder" (subfolder per song) replaces the collection in clipDB (dec -4); never in the repo.
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
 images/quiz/        Machine Room photos (webp) + CREDITS.txt
