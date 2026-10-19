@@ -29,7 +29,8 @@ js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Prese
                     See it shows the question's own figure with P.hide, MLAPI.see()/mute(); the reveal shows the figure with labels)
 js/games-make.js    Make something: Constraint Generator, Genre Cross-Pollinator, Soundabout Roundabout,
                     Metaphor Translation, and Parameter Telephone (shown under Train your ears, slot 10)
-js/games-atlas.js   The Ear Atlas (Know your stuff, slot 02 right after The Quiz): 12 question types; recordings in window.ATLAS (built by tools/atlas/build.py);
+js/games-atlas.js   The Ear Atlas (Know your stuff, slot 02 right after The Quiz): two setup categories, Recordings (AT_RECS, first) and Ear training (AT_EARS;
+                    Notes & Intervals = 'note', dealt half note / half interval); recordings in window.ATLAS (built by tools/atlas/build.py);
                     plays the clips this browser has heard least first (localStorage atlas.seen)
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)

@@ -1,6 +1,6 @@
 /* ====================================================================
    THE EAR ATLAS (Know your stuff, next to The Translation Grid)
-   One game, twelve kinds of question about what you hear:
+   One game, eleven kinds of question (Notes & Intervals counts as one) about what you hear:
    tempo · note · chord · interval · tuning · scale · progression (a sampled Steinway and soft drums)
    instrument · family · where in the world · part of the world (real recordings, data/content.js → ATLAS)
    name that song (the teacher's own clips, kept in this browser)
@@ -72,6 +72,10 @@ const AT_TYPES={
   region:{name:'Part of the world',q:'Which part of the world is this from?',sub:'A real recording. Pick the region.',col:'--red'},
   song:{name:'Name that song',q:'What song is this?',sub:'From your teacher’s own collection.',col:'--green'},
 };
+// the setup's two categories (in this order on screen): real recordings first, then ear training.
+// 'note' stands for Notes & Intervals, 'interval' is never picked on its own.
+const AT_RECS=['instrument','family','world','region','song'],AT_EARS=['tempo','note','chord','tuning','scale','progression'];
+const AT_SUB={tempo:'BPM, with tap tempo',note:'a mystery note after a C, or how far apart two notes are',chord:'major, minor, 7th…',tuning:'sharp / flat / in tune',scale:'major, modes, blues…',progression:'pop four, ii–V–I…',instrument:'real recordings',family:'strings, winds, brass…',world:'real recordings + map',region:'Africa, Asia, Europe…',song:'needs 4+ of your songs'};
 const AT_GLYPH={
   tempo:`<path d="M20 54 L32 8 L44 54 Z" fill="var(--paper)" stroke="var(--ink)" stroke-width="3.5"/><path d="M32 42 L44 18" stroke="var(--ink)" stroke-width="3.5"/><circle cx="44" cy="18" r="4" fill="var(--red)" stroke="var(--ink)" stroke-width="2"/>`,
   note:`<ellipse cx="24" cy="46" rx="10" ry="8" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><path d="M33 46 V10 Q44 14 48 24" fill="none" stroke="var(--ink)" stroke-width="4"/>`,
@@ -158,16 +162,17 @@ function atKeys({mark=null,counts=null,sel=null,tag='div'}={}){
 game(roundGame({
   id:'atlas',group:'brain',name:'The Ear Atlas',tag:'One giant guessing game: tempo, notes, chords, scales, progressions, instruments of the world, where music comes from, and your own songs.',
   how:['Every round asks something different about what you hear: the tempo, a note, a chord, a scale, a progression, an instrument and its family, a place on the map, a song.','Answer on your phone: tap the tempo, play the note on a keyboard, or pick one of four.','More than 800 real recordings: 130+ instruments and 90 places, played least-heard first. A real Steinway, real drums. Fast right answers score more.'],
-  badges:['Scored','Listening','12 kinds of question'],speed:.3,okAt:.95,closeAt:.35,yesWord:'Golden ears!',noWord:'Not this time',
+  badges:['Scored','Listening','11 kinds of question'],speed:.3,okAt:.95,closeAt:.35,yesWord:'Golden ears!',noWord:'Not this time',
   icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="var(--green)" stroke="var(--ink)" stroke-width="3.5"/><ellipse cx="32" cy="32" rx="11" ry="26" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M6 32 H58" stroke="var(--ink)" stroke-width="3"/><path d="M38 6 Q60 18 50 44" fill="none" stroke="var(--red)" stroke-width="5"/><circle cx="50" cy="46" r="6" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
-    {key:'types',type:'multi',label:'Questions',choices:Object.entries(AT_TYPES).map(([k,t])=>[k,t.name,{tempo:'BPM, with tap tempo',note:'a C, then the mystery note',chord:'major, minor, 7th…',interval:'2nd to octave',tuning:'sharp / flat / in tune',scale:'major, modes, blues…',progression:'pop four, ii–V–I…',instrument:'real recordings',family:'strings, winds, brass…',world:'real recordings + map',region:'Africa, Asia, Europe…',song:'needs 4+ of your songs'}[k]]),def:Object.keys(AT_TYPES).filter(k=>k!=='song'),sub:v=>`${v.types.length} of ${Object.keys(AT_TYPES).length}`},
+    {key:'recs',type:'multi',label:'Recordings',choices:AT_RECS.map(k=>[k,AT_TYPES[k].name,AT_SUB[k]]),def:AT_RECS.filter(k=>k!=='song'),sub:v=>`${v.recs.length} of ${AT_RECS.length}`},
+    {key:'types',type:'multi',label:'Ear training',choices:AT_EARS.map(k=>[k,k==='note'?'Notes & Intervals':AT_TYPES[k].name,AT_SUB[k]]),def:AT_EARS,sub:v=>`${v.types.length} of ${AT_EARS.length}`},
     {key:'n',label:'Rounds',type:'step',min:4,max:40,step:1,def:12,unit:'rounds'},
     {key:'secs',label:'Answer time',choices:[[15,'15','seconds'],[20,'20','seconds'],[30,'30','seconds'],[0,'OFF','no clock']],def:20},
   ],
-  check:v=>v.types.length?'':'Pick at least one kind of question',
+  check:v=>v.types.length||v.recs.length?'':'Pick at least one kind of question',
   get note(){const d=atData(),n=L=>(L||[]).reduce((a,x)=>a+x.clips.length,0);return `${(d.instruments||[]).length} instruments and ${(d.world||[]).length} places in ${n(d.instruments)+n(d.world)} clips, all real recordings. The Atlas plays the clips this browser has heard least first, so lessons keep sounding new. All from Wikimedia Commons (public domain or Creative Commons, credited on the reveal and in audio/atlas/CREDITS.txt). Piano: University of Iowa Electronic Music Studios. Name that song uses your own clips (below); they stay in this browser.`;},
-  setupExtra(v){if(!v.types.includes('song'))return '';const S=mySongs();
+  setupExtra(v){if(!v.recs.includes('song'))return '';const S=mySongs();
     return `<div class="fsec myclips mysongs"><h3><b>♫</b>Your songs<small>${S.length} loaded · need 4 or more · stay in this browser</small></h3>
       <div class="songlist">${S.map(c=>`<div class="songrow"><input value="${esc(c.name.replace(/\.[a-z0-9]+$/i,''))}" data-id="${esc(c.id)}" aria-label="Song title"><button class="ghost" data-del="${esc(c.id)}" aria-label="Remove">×</button></div>`).join('')||'<p class="fine">No songs yet. Add short MP3s: the file name becomes the title, and you can edit it here.</p>'}</div>
       <label class="ghost addsong">+ add songs<input type="file" accept="audio/*" multiple hidden></label></div>`;},
@@ -175,8 +180,9 @@ game(roundGame({
     $('input[type=file]',box).onchange=async e=>{for(const f of e.target.files){if(f.size>40e6){toast(f.name+' is over 40 MB');continue;}await clipDB.put({id:'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),dec:-1,name:f.name,blob:f,at:Date.now()});}await loadMyClips();redraw();};
     $$('.songrow input',box).forEach(i=>i.onchange=async()=>{const c=MYCLIPS.list.find(x=>x.id===i.dataset.id);if(!c)return;await clipDB.put({...c,name:i.value.trim()||c.name});await loadMyClips();toast('Title saved');});
     $$('[data-del]',box).forEach(b=>b.onclick=async()=>{await clipDB.del(b.dataset.del);await loadMyClips();redraw();});},
-  build(o){const used=new Set(),types=o.types.filter(t=>t!=='song'||mySongs().length>=4),out=[];if(!types.length)return [];
-    let deck=[];for(let i=0;out.length<o.n&&i<o.n*4;i++){if(!deck.length)deck=shuffle(types.slice());const q=atQuestion(deck.pop(),used);if(q)out.push(q);}
+  build(o){const used=new Set(),types=[...(o.recs||[]),...(o.types||[])].filter(t=>t!=='song'||mySongs().length>=4),out=[];if(!types.length)return [];
+    // Notes & Intervals is one subject: each of its rounds is a note or an interval question, half and half
+    let deck=[];for(let i=0;out.length<o.n&&i<o.n*4;i++){if(!deck.length)deck=shuffle(types.slice());let t=deck.pop();if(t==='note'&&Math.random()<.5)t='interval';const q=atQuestion(t,used);if(q)out.push(q);}
     out.forEach(r=>{if(r.clip)sampleReady(r.clip.src).catch(()=>{});});
     atMark(out.flatMap(r=>r.item?[r.clip.src,(r.type==='world'||r.type==='region'?'w':'i')+r.item.id]:[]));return out;},
   roundInfo:r=>AT_TYPES[r.type].name,
