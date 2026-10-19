@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Control Room · Teacher Handbook</title>
+<meta name="description" content="How to run Control Room in your class: phones, student computers through CADCAST, and attendance on your own Google Sheet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Mono:wght@400;700&display=swap">
+<style>
+:root{--paper:#F0EBE1;--paper2:#E5DDCE;--ink:#161514;--ink2:rgba(22,21,20,.68);--hair:rgba(22,21,20,.14);
+  --red:#E4402B;--blue:#2447D5;--yel:#F2B705;--green:#1E8C5A;--on:#fff;
+  --disp:"Archivo","Arial Narrow",system-ui,sans-serif;--mono:"Space Mono",ui-monospace,Menlo,Consolas,monospace;color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.55 var(--disp);
+  background-image:radial-gradient(var(--hair) 1px,transparent 1.2px);background-size:22px 22px}
+a{color:inherit;text-decoration-thickness:2px;text-underline-offset:3px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px 60px}
+.lab{font:700 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em}
+h1,h2,h3{font-family:var(--disp);text-transform:uppercase;margin:0}
+h2{font:900 clamp(40px,8vw,84px)/.86 var(--disp);font-stretch:62%;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+h2 .no{display:inline-grid;place-items:center;min-width:1.05em;height:1.05em;padding:0 .12em;background:var(--c,var(--ink));color:var(--paper);border:5px solid var(--ink);font-size:.62em;align-self:center}
+h3{font:900 clamp(24px,3.6vw,34px)/.95 var(--disp);font-stretch:70%;margin:30px 0 10px}
+p{margin:0 0 12px}
+kbd{font:700 13px var(--mono);padding:1px 7px;border:2px solid var(--ink);background:#fff;box-shadow:2px 2px 0 var(--ink);white-space:nowrap}
+code,.url{font:700 14px var(--mono);background:#fff;border:2px solid var(--ink);padding:1px 6px;overflow-wrap:anywhere}
+em{font-style:normal;font-weight:800}
+
+/* cover */
+.hero{position:relative;padding:54px 0 40px;border-bottom:6px solid var(--ink);margin-bottom:34px;overflow:hidden}
+.hero h1{font:900 clamp(64px,15vw,170px)/.8 var(--disp);font-stretch:62%;letter-spacing:-.01em}
+.hero h1 i{font-style:normal;color:var(--red);display:block}
+.hero .sub{font:800 clamp(20px,3vw,30px)/1.1 var(--disp);max-width:20em;margin-top:22px}
+.shapes{position:absolute;right:0;top:34px;width:min(38vw,330px);aspect-ratio:1;pointer-events:none}
+.shapes i{position:absolute;border:6px solid var(--ink)}
+.shapes i:nth-child(1){width:58%;height:58%;border-radius:50%;background:var(--red);left:4%;top:0}
+.shapes i:nth-child(2){width:46%;height:46%;background:var(--blue);right:0;top:14%;transform:rotate(8deg)}
+.shapes i:nth-child(3){width:0;height:0;border:0;border-left:90px solid transparent;border-right:0;border-bottom:150px solid var(--yel);left:38%;bottom:6%;filter:drop-shadow(6px 6px 0 var(--ink))}
+@media(max-width:700px){.shapes{opacity:.35;width:62vw;top:10px}}
+
+/* contents */
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:0 0 50px;padding:0;list-style:none;counter-reset:t}
+.toc a{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:12px 14px;border:4px solid var(--ink);background:#fff;box-shadow:6px 6px 0 var(--ink);text-decoration:none;font:900 19px/1 var(--disp);text-transform:uppercase;font-stretch:80%}
+.toc a b{display:grid;place-items:center;width:34px;height:34px;background:var(--c);color:var(--on);border:3px solid var(--ink);font-size:17px}
+.toc a:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+
+section{margin:0 0 64px;scroll-margin-top:20px}
+section>header{border-bottom:5px solid var(--ink);padding-bottom:10px;margin-bottom:20px}
+section>header p{font:700 13px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);margin:10px 0 0}
+.lead{font:700 21px/1.35 var(--disp);max-width:36em}
+
+/* the two ways */
+.ways{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:22px 0}
+.way{border:5px solid var(--ink);background:#fff;box-shadow:9px 9px 0 var(--ink);padding:20px 22px;display:grid;gap:10px;align-content:start}
+.way .tag{justify-self:start;font:900 15px var(--disp);text-transform:uppercase;padding:4px 10px;background:var(--c);color:var(--on);border:3px solid var(--ink)}
+.way h3{margin:0;font-size:clamp(28px,4vw,40px)}
+.way ul{margin:0;padding-left:20px}.way li{margin:4px 0}
+.way.a{--c:var(--red)}.way.b{--c:var(--blue)}
+@media(max-width:760px){.ways{grid-template-columns:1fr}}
+
+/* steps */
+.steps{list-style:none;margin:16px 0;padding:0;display:grid;gap:14px;counter-reset:s}
+.steps>li{counter-increment:s;position:relative;display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;align-items:start;padding:16px 18px;border:4px solid var(--ink);background:#fff;box-shadow:6px 6px 0 var(--ink)}
+.steps>li::before{content:counter(s);display:grid;place-items:center;width:52px;height:52px;background:var(--c,var(--ink));color:var(--on);border:3px solid var(--ink);font:900 28px var(--disp)}
+.steps>li>div>strong{display:block;font:900 22px/1.05 var(--disp);text-transform:uppercase;font-stretch:80%;margin:4px 0 6px}
+.steps>li p:last-child{margin-bottom:0}
+.sub{margin:8px 0 0;padding-left:20px}.sub li{margin:5px 0}
+.c-red{--c:var(--red)}.c-blue{--c:var(--blue)}.c-yel{--c:var(--yel)}.c-green{--c:var(--green)}
+
+/* notes */
+.sub li.hot{background:color-mix(in srgb,var(--red) 16%,#fff);border:3px solid var(--red);padding:8px 10px;margin:10px 0;list-style-position:inside;font-size:18px}
+.note{border:4px solid var(--ink);padding:14px 16px;margin:16px 0;background:color-mix(in srgb,var(--c,var(--yel)) 22%,#fff);box-shadow:5px 5px 0 var(--ink)}
+.note b:first-child{font:900 18px var(--disp);text-transform:uppercase;display:block;margin-bottom:4px}
+.note.red{--c:var(--red)}.note.green{--c:var(--green)}.note.blue{--c:var(--blue)}
+
+/* sheet mock */
+.sheet{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start;margin:14px 0}
+.mock{border:4px solid var(--ink);background:#fff;box-shadow:6px 6px 0 var(--ink);font:400 14px var(--mono);overflow:hidden}
+.mock table{border-collapse:collapse;width:100%}.mock td,.mock th{border:1px solid #c9c4ba;padding:5px 8px;text-align:left}
+.mock th{background:#ecebe8;font-weight:700;color:#555;width:34px;text-align:center}
+.mock td.h{font-weight:700}.mock td.n{color:#555;text-align:center;width:34px;background:#ecebe8}
+.tabs{display:flex;gap:2px;background:#ecebe8;border-top:2px solid var(--ink);padding:6px 6px 0}
+.tabs span{padding:4px 10px;font:700 12px var(--mono);background:#dcd9d2;border:1px solid #bbb;border-bottom:0}
+.tabs span.on{background:#fff;color:var(--green)}.tabs span.log{color:var(--red)}
+@media(max-width:760px){.sheet{grid-template-columns:1fr}}
+
+/* modules */
+.mods{display:grid;gap:8px}
+.mod{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 12px;border:3px solid var(--ink);background:#fff}
+.mod>b{font:900 24px var(--disp);text-align:center;background:var(--c);color:var(--on);border:2px solid var(--ink)}
+.mod strong{font:900 19px/1 var(--disp);text-transform:uppercase;font-stretch:80%}.mod span{display:block;font-size:14px;color:var(--ink2);line-height:1.3;margin-top:2px}
+.mod .need{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.need i{font:700 10px var(--mono);font-style:normal;text-transform:uppercase;padding:3px 6px;border:2px solid var(--ink);background:var(--paper);white-space:nowrap}
+.need i.cc{background:var(--blue);color:var(--on)}.need i.own{background:var(--yel)}
+.grp{font:900 26px var(--disp);text-transform:uppercase;font-stretch:70%;margin:22px 0 6px;display:flex;align-items:center;gap:10px}
+.grp::before{content:"";width:22px;height:22px;background:var(--c);border:4px solid var(--ink)}
+@media(max-width:640px){.mod{grid-template-columns:40px minmax(0,1fr)}.mod .need{grid-column:2;justify-content:flex-start}}
+
+/* shortcuts + faq */
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.keys div{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:10px 12px;border:3px solid var(--ink);background:#fff}
+details{border:4px solid var(--ink);background:#fff;margin:10px 0;box-shadow:5px 5px 0 var(--ink)}
+summary{cursor:pointer;padding:12px 16px;font:900 19px var(--disp);text-transform:uppercase;font-stretch:80%;list-style:none}
+summary::before{content:"+";display:inline-grid;place-items:center;width:26px;height:26px;margin-right:10px;background:var(--ink);color:var(--paper);font-size:18px}
+details[open] summary::before{content:"–"}
+details>div{padding:0 16px 14px}
+.foot{border-top:6px solid var(--ink);padding-top:22px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.foot p{font:900 26px var(--disp);text-transform:uppercase;font-stretch:70%;margin:0}
+.print{font:900 15px var(--disp);text-transform:uppercase;padding:12px 18px;border:3px solid var(--ink);background:var(--ink);color:var(--paper);box-shadow:5px 5px 0 var(--red);cursor:pointer}
+@media print{body{background:#fff;font-size:12pt}.toc,.print{display:none}section{break-inside:auto;margin-bottom:30px}.steps>li,.way,.note,.mod,details{break-inside:avoid;box-shadow:none}details>div{display:block}
+  details:not([open])>div{display:block}.shapes{opacity:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="shapes"><i></i><i></i><i></i></div>
+  <span class="lab">Teacher handbook</span>
+  <h1>Control<i>Room</i></h1>
+  <p class="sub">A classroom playground for music production. One big screen, every phone in the room, and if you like, every student computer too.</p>
+</header>
+
+<ol class="toc">
+  <li><a href="#what" style="--c:var(--red)"><b>1</b>What it is</a></li>
+  <li><a href="#start" style="--c:var(--blue)"><b>2</b>First time</a></li>
+  <li><a href="#ways" style="--c:var(--yel)"><b>3</b>Two ways to run it</a></li>
+  <li><a href="#cadcast" style="--c:var(--green)"><b>4</b>Student computers</a></li>
+  <li><a href="#sheet" style="--c:var(--red)"><b>5</b>Attendance sheet</a></li>
+  <li><a href="#lesson" style="--c:var(--blue)"><b>6</b>Running a lesson</a></li>
+  <li><a href="#modules" style="--c:var(--yel)"><b>7</b>The 20 modules</a></li>
+  <li><a href="#help" style="--c:var(--green)"><b>8</b>Help &amp; privacy</a></li>
+</ol>
+
+<!-- 1 -->
+<section id="what" style="--c:var(--red)">
+  <header><h2><span class="no">1</span>What it is</h2><p>gunnitynes.github.io/Control-Room</p></header>
+  <p class="lead">Control Room runs on your computer and the projector. Students join with their phones, and the phones become buzzers, faders, knobs, voting cards and remix pads. Twenty modules: quizzes, ear training and creative sprints.</p>
+  <p>Nothing to install, no accounts. It is a website: open it in <em>Google Chrome</em> on the computer connected to the projector and speakers. Students only need a phone with a camera and a browser. Phones and your computer need internet (they find each other through a free relay, then talk directly).</p>
+  <div class="note"><b>What you need</b>
+    Your computer with Chrome, on the projector and the room speakers · students’ phones · internet in the room.
+    <br>Optional: students’ own computers with a DAW (Ableton Live, Logic …) for the modules that send sound and files (section 4).</div>
+</section>
+
+<!-- 2 -->
+<section id="start" style="--c:var(--blue)">
+  <header><h2><span class="no">2</span>First time</h2><p>about two minutes</p></header>
+  <ol class="steps">
+    <li class="c-blue"><div><strong>Open Control Room</strong><p>In Chrome, go to <span class="url">gunnitynes.github.io/Control-Room</span>. Bookmark it.</p></div></li>
+    <li class="c-red"><div><strong>Tell it who’s teaching</strong><p>The first time, it asks <em>“Who’s teaching?”</em>. Type your full name, e.g. <em>Gunnar Tynes</em>. Student computers find <b>your</b> class by this name, so several teachers can run Control Room at the same time in different rooms. If a colleague has the same first name, use your last name too. You can change it any time under <em>Teacher</em> on the main menu.</p></div></li>
+    <li class="c-yel"><div><strong>Connect your class list (optional)</strong><p>With your own Google Sheet, students tap their name instead of typing it, and every check-in lands on the sheet as attendance. Set it up once, see section 5.</p></div></li>
+  </ol>
+  <div class="note blue"><b>One browser, one computer</b>Your class list link, your music folders and your settings are saved in <em>this Chrome on this computer</em>. If you teach from another computer, connect the sheet there once too.</div>
+</section>
+
+<!-- 3 -->
+<section id="ways" style="--c:var(--yel)">
+  <header><h2><span class="no">3</span>Two ways to run it</h2><p>pick per lesson, mix freely</p></header>
+  <p class="lead">Either way students join with one scan, and either way picking their name checks them in on your attendance sheet.</p>
+  <div class="ways">
+    <div class="way a"><span class="tag">Way A · phones only</span><h3>Control Room as is</h3>
+      <p>Students scan the <b>QR code on the big screen</b> with their phone camera and tap their name. That’s it.</p>
+      <ul><li>Every quiz, ear-training game and most creative modules work like this.</li>
+        <li>All sound comes from your computer and the room speakers.</li>
+        <li>Press <kbd>Q</kbd> any time to show the join code big. Latecomers can join mid-game.</li>
+        <li>Without a class list, students type their first name instead.</li></ul></div>
+    <div class="way b"><span class="tag">Way B · phone + computer</span><h3>With CADCAST</h3>
+      <p>Each student opens <b>the CADCAST page on their own computer</b>. It shows a QR code; they scan <b>that</b> with their phone and tap their name.</p>
+      <ul><li>One scan signs them in twice: the phone joins Control Room, and the computer becomes theirs.</li>
+        <li>Their computer can now <b>send you its sound</b> (what their DAW plays) and <b>send and receive files</b>: missions, materials, recordings, finished parts.</li>
+        <li>Needed for Supply Drop, The Conductor and The Class Album; it adds files to Constraint Generator and the relay to Soundabout Roundabout.</li></ul></div>
+  </div>
+  <div class="note"><b>You don’t have to choose for the whole lesson</b>A student who joined with the big-screen code can pair their computer later: they open the CADCAST page and scan it with the same phone.</div>
+</section>
+
+<!-- 4 -->
+<section id="cadcast" style="--c:var(--green)">
+  <header><h2><span class="no">4</span>Student computers</h2><p>CADCAST: sound and files between their computer and yours</p></header>
+  <h3>Every lesson</h3>
+  <ol class="steps">
+    <li class="c-green"><div><strong>Students open the CADCAST page</strong><p>On every student computer, <span class="url">gunnitynes.github.io/CADCAST/go/</span> is already bookmarked. It finds your class by itself. Only if it doesn’t, it asks for <em>“Your teacher’s name”</em>: students type your name (the same as in Control Room) once.</p></div></li>
+    <li class="c-blue"><div><strong>Open the Mixer to hear them</strong><p>Click <kbd>Mixer</kbd> at the top right of Control Room. It opens the CADCAST patch bay in a new tab of <b>the same Chrome</b> (allow pop-ups if Chrome asks). Every paired computer appears as a strip with its student’s name and a fader. The Mixer must stay open in that browser for The Conductor.</p></div></li>
+  </ol>
+  <h3>On each student computer, once</h3>
+  <p>CADCAST hears exactly what the student’s DAW plays. The school computers are ready for it: <b>BlackHole</b> (a virtual audio cable) is installed, and an output device called <b>CADCAST</b> sends the sound to the student’s audio interface and to BlackHole at the same time. So the student still hears themselves, and CADCAST hears it too.</p>
+  <ol class="steps">
+    <li class="c-yel"><div><strong>The CADCAST output device</strong><p>This step may already have been done by a technician. Check in <em>Audio MIDI Setup</em> that a device called <em>CADCAST</em> exists. If not:</p><ol class="sub">
+      <li>Open <em>Audio MIDI Setup</em> (Spotlight: <kbd>⌘ Space</kbd>, type “Audio MIDI”).</li>
+      <li>Bottom left <kbd>+</kbd> ▸ <kbd>Create Multi-Output Device</kbd>. Double-click its name and call it <em>CADCAST</em>.</li>
+      <li>Tick the audio interface (or headphones) <b>and</b> <em>BlackHole 2ch</em>. Tick <em>Drift Correction</em> on BlackHole.</li></ol></div></li>
+    <li class="c-blue"><div><strong>Select CADCAST as the audio output</strong><p>In the DAW, choose <em>CADCAST</em> as the audio output device. Ableton Live: <kbd>Settings</kbd> ▸ <kbd>Audio</kbd> ▸ <em>Audio Output Device</em>. Logic: <kbd>Settings</kbd> ▸ <kbd>Audio</kbd> ▸ <em>Output Device</em>.</p></div></li>
+    <li class="c-green"><div><strong>Open the CADCAST page and pair</strong><p>Open the bookmark in Chrome. It shows a QR code: scan it with the phone, tap your name. The phone says <em>“Your computer is now …”</em>. Chrome asks to use the microphone: <b>Allow</b>. It only reads BlackHole, never the real microphone. Then press <kbd>Connect</kbd>.</p></div></li>
+  </ol>
+  <div class="note green"><b>What travels through CADCAST</b>
+    <b style="font:inherit;display:inline">To you:</b> their sound (live, in the Mixer) · Roundabout recordings · their finished part for The Class Album.<br>
+    <b style="font:inherit;display:inline">To them:</b> Constraint Generator files (MIDI and WAV made on the spot) · Supply Drop materials · the track to continue in the Roundabout relay. Files appear on their CADCAST page; they drag them straight into the DAW.</div>
+  <p>A computer stays paired for 12 hours, so reloading the page reconnects on its own. <em>Not you?</em> on the page shows the code again for a different student.</p>
+</section>
+
+<!-- 5 -->
+<section id="sheet" style="--c:var(--red)">
+  <header><h2><span class="no">5</span>Attendance sheet</h2><p>your own Google Sheet · set up once, about five minutes</p></header>
+  <p class="lead">Students tap their name on the phone and they are checked in on <b>your</b> Google Sheet, with the date and time. You build the sheet, paste a small script into it and give Control Room its link.</p>
+
+  <h3>Step 1 · Make the sheet</h3>
+  <div class="sheet">
+    <div class="mock"><table><tr><th></th><th>A</th><th>B</th></tr>
+      <tr><td class="n">1</td><td class="h">Student name</td><td></td></tr><tr><td class="n">2</td><td>Ada Lovelace</td><td></td></tr><tr><td class="n">3</td><td>Alan Turing</td><td></td></tr><tr><td class="n">4</td><td>Grace Hopper</td><td></td></tr><tr><td class="n">5</td><td>Hedy Lamarr</td><td></td></tr></table>
+      <div class="tabs"><span class="on">PROD-1A</span><span>PROD-1B</span><span>MIX-2</span><span class="log">MasterLog</span></div></div>
+    <div><ol class="sub" style="padding-left:18px">
+      <li>Go to <span class="url">sheets.new</span> while signed in to Google. Give the file a name, e.g. <em>Attendance 2026</em>.</li>
+      <li><b>One tab per class.</b> The tab’s name is the class name students see (double-click the tab to rename it). Add a tab with <kbd>+</kbd> bottom left.</li>
+      <li class="hot">In each tab: a heading in <b>A1</b> (anything, e.g. “Student name”). <b>The names start in row 2</b>: one student per row from <b>A2</b> down. Anything in row 1 is treated as a heading and never shown. Write names the way students should see them.</li>
+      <li>You don’t have to make the <em>MasterLog</em> tab: the script adds it.</li></ol></div>
+  </div>
+
+  <h3>Step 2 · Add the script</h3>
+  <ol class="steps">
+    <li class="c-red"><div><strong>Copy the script from Control Room</strong><p>Main menu ▸ <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd>. That card has a <kbd>Copy the script</kbd> button: it copies the whole script, with the setup instructions written at the top of it. The card shows these same steps too.</p></div></li>
+    <li class="c-blue"><div><strong>Paste it into your sheet</strong><p>In your sheet: <kbd>Extensions</kbd> ▸ <kbd>Apps Script</kbd>. Select everything that is there (<kbd>⌘A</kbd> / <kbd>Ctrl A</kbd>), then paste (<kbd>⌘V</kbd> / <kbd>Ctrl V</kbd>).</p></div></li>
+    <li class="c-green"><div><strong>Save</strong><p>The disk icon or <kbd>⌘S</kbd>. If it asks for a project name, type <em>Control Room</em>.</p></div></li>
+  </ol>
+
+  <h3>Step 3 · Deploy it as a web app</h3>
+  <p>This turns the script into a private link that only Control Room uses.</p>
+  <ol class="steps">
+    <li class="c-blue"><div><strong>New deployment</strong><p>Top right of the editor: the blue <kbd>Deploy</kbd> button ▸ <kbd>New deployment</kbd>. Next to “Select type”, click the gear <kbd>⚙</kbd> ▸ <kbd>Web app</kbd>.</p></div></li>
+    <li class="c-red"><div><strong>The two settings that matter</strong><p>Description: anything (<em>Control Room</em>). <b>Execute as: Me</b>. <b>Who has access: Anyone</b>. Not “Anyone with a Google account”: phones aren’t signed in to Google, so that would block them.</p></div></li>
+    <li class="c-yel"><div><strong>Authorise it</strong><p>Click <kbd>Deploy</kbd> ▸ <kbd>Authorize access</kbd> and pick your account. If Google says <em>“Google hasn’t verified this app”</em>: <kbd>Advanced</kbd> ▸ <kbd>Go to Control Room (unsafe)</kbd> ▸ <kbd>Allow</kbd>. It is your own script, and it can only read and write this one sheet.</p></div></li>
+    <li class="c-green"><div><strong>Copy the Web app URL</strong><p>The long link ending in <code>/exec</code>, with its <kbd>Copy</kbd> button. Test it: paste it into a new browser tab. You should see your classes, like <code>{"ok":true,"classes":["PROD-1A","PROD-1B"]}</code>.</p></div></li>
+  </ol>
+
+  <h3>Step 4 · Link it to Control Room</h3>
+  <ol class="steps">
+    <li class="c-red"><div><strong>Paste the link</strong><p>Main menu ▸ <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd>. Step 4 of that card: paste the <code>/exec</code> link and press <kbd>Connect</kbd>. Control Room checks it and shows how many classes it found.</p></div></li>
+    <li class="c-blue"><div><strong>Each lesson: pick the class</strong><p>Main menu ▸ <em>Class list</em> ▸ choose the class. Phones now show that class’s names to tap. Below the menu you see how many are checked in today; names on the room panel get a mark when the sheet has them.</p></div></li>
+  </ol>
+
+  <h3>What lands on the sheet</h3>
+  <div class="mock" style="margin:12px 0"><table><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+    <tr><td class="n">1</td><td class="h">Timestamp</td><td class="h">Class</td><td class="h">Student Name</td><td class="h">MARKED AT MOODLE</td></tr>
+    <tr><td class="n">2</td><td>19/10/2026 09:02</td><td>PROD-1A</td><td>Ada Lovelace</td><td></td></tr>
+    <tr><td class="n">3</td><td>19/10/2026 09:04</td><td>PROD-1A</td><td>Grace Hopper</td><td></td></tr></table>
+    <div class="tabs"><span>PROD-1A</span><span>PROD-1B</span><span class="on log">MasterLog</span></div></div>
+  <ul>
+    <li>One row per student, <b>once per class per day</b>. Reloading, rejoining or a new phone never logs twice.</li>
+    <li>The last column is yours: tick it when you have copied the attendance to your school system.</li>
+    <li>A name already in the room can’t be taken by a second phone. A student with a new or reloaded phone simply taps their name again and keeps their points.</li>
+    <li>To add a student later, add their name to the class tab. Control Room reads the list each time you pick the class.</li>
+  </ul>
+  <details><summary>Something not working?</summary><div><ul>
+    <li><b>“Can’t reach the attendance sheet”</b>: in step 3, <em>Who has access</em> must be <b>Anyone</b>. Check that you copied the <em>Web app URL</em> ending in <code>/exec</code>, not the editor’s address.</li>
+    <li><b>No classes show up</b>: each class needs its own tab, with the names in column A from row 2. The MasterLog tab is not a class.</li>
+    <li><b>“Anyone” isn’t offered</b>: some school Google accounts block it. Make the sheet with a personal Google account.</li>
+    <li><b>You edited the script later</b>: <kbd>Deploy</kbd> ▸ <kbd>Manage deployments</kbd> ▸ the pencil ✎ ▸ Version: <kbd>New version</kbd> ▸ <kbd>Deploy</kbd>. The link stays the same. A <em>New deployment</em> makes a new link that you would have to paste again.</li>
+    <li><b>Change or remove the link</b>: <em>Class list</em> ▸ <em>⚙ Your Google Sheet: change link…</em> or <em>✕ Disconnect this sheet</em>.</li>
+  </ul></div></details>
+</section>
+
+<!-- 6 -->
+<section id="lesson" style="--c:var(--blue)">
+  <header><h2><span class="no">6</span>Running a lesson</h2><p>the rhythm of a Control Room class</p></header>
+  <ol class="steps">
+    <li class="c-red"><div><strong>Students join</strong><p>Way A, Way B or both (section 3). You see each name appear on the room panel.</p></div></li>
+    <li class="c-blue"><div><strong>Pick a module, set it up</strong><p>Click a module. Its setup screen has the options (rounds, time, difficulty, categories …) and a short “how it works”. Your choices are remembered for next time. Or let the class choose: the <kbd>Vote</kbd> button on the main menu puts every module on every phone.</p></div></li>
+    <li class="c-yel"><div><strong>Play</strong><p><kbd>Space</kbd> moves on. Phones follow by themselves. Click the logo top left to go back to the menu.</p></div></li>
+    <li class="c-green"><div><strong>Finish</strong><p>Every end screen offers <em>Play another round</em> (<kbd>R</kbd>). Points across the lesson add up in the room standings; the leaderboard only appears when you click <em>Show the leaderboard</em>.</p></div></li>
+  </ol>
+  <h3>Keys on your computer</h3>
+  <div class="keys">
+    <div><kbd>Space</kbd><span>Next, start, reveal</span></div>
+    <div><kbd>P</kbd><span>Pause the round clock (or click the ring)</span></div>
+    <div><kbd>A</kbd><span>Autoplay on or off: the next round starts by itself</span></div>
+    <div><kbd>R</kbd><span>Play another round with the same settings</span></div>
+    <div><kbd>Q</kbd><span>Show the join code big</span></div>
+    <div><kbd>Esc</kbd><span>Close the big code</span></div>
+  </div>
+  <h3>On every phone</h3>
+  <div class="keys">
+    <div><b style="color:var(--yel);font-size:26px">▲</b><span><b>Raise your hand</b>: names light up on your screen in the order hands went up. Click the hand counter to lower them.</span></div>
+    <div><b style="color:var(--red);font-size:26px">●</b><span><b>Notebook</b>: every brief, rule, card and result a student collects, to keep.</span></div>
+    <div><b style="color:var(--blue);font-size:26px">■</b><span><b>The Guide</b>: a poster tour of every module and how the phone plays it.</span></div>
+    <div><b style="color:var(--green);font-size:26px">◆</b><span><b>Sit out</b>: busy students can skip a round and jump back in.</span></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="modules" style="--c:var(--yel)">
+  <header><h2><span class="no">7</span>The 20 modules</h2><p>what each needs · <i class="need"><i class="cc">CADCAST</i></i> = student computers (Way B) · <i class="need"><i class="own">Your folder</i></i> = works best with your own media</p></header>
+  <div class="grp" style="--c:var(--blue)">Know your stuff</div>
+  <div class="mods">
+    <div class="mod" style="--c:var(--blue)"><b>01</b><div><strong>The Quiz</strong><span>Big-screen questions, phone answers. Three banks: how to do it, how the gear works, the stories.</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--blue)"><b>02</b><div><strong>The Ear Atlas</strong><span>Tempo, notes, chords, scales, instruments and music from around the world.</span></div><div class="need"><i>Phones</i><i class="own">Your songs</i></div></div>
+    <div class="mod" style="--c:var(--blue)"><b>03</b><div><strong>Shortcut Showdown</strong><span>Rapid-fire DAW keyboard shortcuts.</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--blue)"><b>04</b><div><strong>The Translation Grid</strong><span>Match an idea to what it looks like, or to what it feels like.</span></div><div class="need"><i>Phones</i></div></div>
+  </div>
+  <div class="grp" style="--c:var(--red)">Train your ears</div>
+  <div class="mods">
+    <div class="mod" style="--c:var(--red)"><b>05</b><div><strong>Frequency Detective</strong><span>Find where a filter parked, or find the ugly frequency and cut it.</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--red)"><b>06</b><div><strong>The Decay Guessr</strong><span>A dry sound in a mystery space: how long until it dies away?</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--red)"><b>07</b><div><strong>Envelope Sculptor</strong><span>Hear a sound, pick its shape: attack, decay, sustain, release.</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--red)"><b>08</b><div><strong>Preset Archeologist</strong><span>A legendary sound: which machine made it famous?</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--red)"><b>09</b><div><strong>Parameter Telephone</strong><span>Design a synth sound; the next person recreates it by ear and twists one knob.</span></div><div class="need"><i>Phones + their speakers</i></div></div>
+    <div class="mod" style="--c:var(--red)"><b>10</b><div><strong>Meter Lab</strong><span>Name a groove’s meter, grouping, polyrhythm, pattern or swing.</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--red)"><b>11</b><div><strong>The Sample Chronologist</strong><span>Four recordings, four decades: put them in order.</span></div><div class="need"><i>Phones</i><i class="own">Your music folder</i></div></div>
+    <div class="mod" style="--c:var(--red)"><b>12</b><div><strong>The Mix Room</strong><span>A song in stems, every phone a fader. Mix it together, then compare with the original.</span></div><div class="need"><i>Phones</i><i class="own">Your multitracks</i></div></div>
+  </div>
+  <div class="grp" style="--c:var(--yel)">Make something</div>
+  <div class="mods">
+    <div class="mod" style="--c:var(--yel)"><b>13</b><div><strong>Constraint Generator</strong><span>Quick studio missions: a task, a rule and a fresh MIDI or audio file every round.</span></div><div class="need"><i>Phones</i><i class="cc">CADCAST for files</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>14</b><div><strong>Genre Cross-Pollinator</strong><span>Two genres that should never meet, and a name for the child.</span></div><div class="need"><i>Phones</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>15</b><div><strong>Soundabout Roundabout</strong><span>Start a track and pass it round the room; every stop deals a prompt card. Optional relay: recordings travel computer to computer.</span></div><div class="need"><i>Phones</i><i class="cc">CADCAST for the relay</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>16</b><div><strong>Metaphor Translation</strong><span>An image on the big screen becomes three production rules. The room votes.</span></div><div class="need"><i>Phones</i><i class="own">Your photos</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>17</b><div><strong>Live Remix</strong><span>One song, the whole room at the controls: stutters, tape stops, filters, 808s. Take turns or all at once.</span></div><div class="need"><i>Phones</i><i class="own">Your songs</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>18</b><div><strong>Supply Drop</strong><span>Your crate of loops, MIDI and stems lands at random on every computer.</span></div><div class="need"><i class="cc">CADCAST</i><i class="own">Your materials</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>19</b><div><strong>The Conductor</strong><span>A laptop orchestra: loops of at least 4 bars in sync with Ableton Link; one student conducts from their phone.</span></div><div class="need"><i class="cc">CADCAST + Mixer</i><i>Ableton Link</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>20</b><div><strong>The Class Album</strong><span>Everyone makes one part of the same song, hands it in from their computer, the class arranges it. Download the mix and stems.</span></div><div class="need"><i class="cc">CADCAST</i></div></div>
+  </div>
+  <div class="note"><b>Your own music stays with you</b>Modules marked “your …” have a <em>Load a folder</em> button in their setup. The files are kept inside <b>your</b> Chrome on <b>your</b> computer and are never uploaded anywhere, so you can use commercial music for teaching. They work without your files too, with the built-in free recordings where there are some.</div>
+</section>
+
+<!-- 8 -->
+<section id="help" style="--c:var(--green)">
+  <header><h2><span class="no">8</span>Help &amp; privacy</h2><p>quick answers</p></header>
+  <details><summary>A phone can’t join</summary><div><ul>
+    <li>Check the phone has internet (school Wi-Fi sometimes blocks new devices: mobile data works too).</li>
+    <li>Press <kbd>Q</kbd> and scan again, or open <span class="url">gunnitynes.github.io/Control-Room</span> on the phone and type the four-letter room code from the big screen.</li>
+    <li>“Already in the room on another phone”: the name is taken by a phone that is still connected. Remove the wrong one by clicking its name chip on the room panel.</li></ul></div></details>
+  <details><summary>A computer doesn’t pair or shows the wrong class</summary><div><ul>
+    <li>The CADCAST page must know your name: use the link from your main menu (it carries <code>?t=Your+Name</code>), or type your name in “Your teacher’s name”.</li>
+    <li>If the main menu warns that another Control Room is open with your name, close the other tab, or add your last name.</li>
+    <li>Control Room must be open on your computer while students pair.</li></ul></div></details>
+  <details><summary>I can’t hear a student’s computer</summary><div><ul>
+    <li>The <kbd>Mixer</kbd> tab must be open in the same Chrome as Control Room.</li>
+    <li>On their side: the DAW plays into the Multi-Output Device, the CADCAST page says <em>Connected</em>, and Chrome was allowed to use the microphone.</li>
+    <li>“Paired · no sound yet” in the Mixer means the page is paired but nothing is playing into BlackHole.</li></ul></div></details>
+  <details><summary>The sound is on the wrong speakers</summary><div><p>Control Room plays through your computer’s current output. Set the room speakers in your system sound settings before the lesson.</p></div></details>
+  <details open><summary>Privacy</summary><div><ul>
+    <li>No accounts and no tracking. Students give a first name or tap one from your list.</li>
+    <li>Your class list goes from <b>your</b> sheet to <b>your</b> computer and the phones in the room, nowhere else. Check-ins go back to your sheet only.</li>
+    <li>Sound and files between computers travel directly over the room’s network; the free PeerJS relay only introduces the devices to each other.</li>
+    <li>Your music, stems and photos stay in your browser.</li></ul></div></details>
+</section>
+
+<footer class="foot"><p>One room. One big screen. Everybody plays.</p><button class="print" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);print()">Print or save as PDF</button></footer>
+</div>
+<script>
+document.querySelectorAll('.toc a').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(!t)return;e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});try{history.replaceState(null,'',a.getAttribute('href'));}catch(x){}}));
+</script>
+</body>
+</html>

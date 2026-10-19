@@ -64,6 +64,9 @@ js/games-album.js   The Class Album (Make something, the last module): everyone 
                     ahead (a looped section is scheduled again). The album: one offline render per stem, the mix is their sum at
                     one gain (stems add up to the mix), store-only zip (alZip), downloaded on the big screen (nothing sent back).
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
+Teacher/index.html  The Teacher handbook (self-contained page, same look) at /Control-Room/Teacher/. NOT linked from the app
+                    (the owner sends the link). School setup assumed: CADCAST/go bookmarked on student computers, BlackHole installed,
+                    a Multi-Output Device named CADCAST. Keep it in step with the sheet card (openSheetSetup) and the module list.
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
                     "Get in" shows both ways (A: big-screen QR, B: CADCAST computer QR); new modules need a GUIDE entry in content.js
 images/quiz/        Machine Room photos (webp) + CREDITS.txt
