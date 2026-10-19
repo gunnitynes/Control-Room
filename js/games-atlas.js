@@ -160,7 +160,7 @@ function atKeys({mark=null,counts=null,sel=null,tag='div'}={}){
 // saved settings from before the new kinds of question existed: switch the new ones on, once
 (()=>{if(store.get('atlas.v2',false))return;const o=store.get('opt.atlas',null);if(o&&Array.isArray(o.types)){['scale','progression','family','region'].forEach(t=>{if(!o.types.includes(t))o.types.push(t);});store.set('opt.atlas',o);}store.set('atlas.v2',true);})();
 game(roundGame({
-  id:'atlas',group:'brain',name:'The Ear Atlas',tag:'One giant guessing game: tempo, notes, chords, scales, progressions, instruments of the world, where music comes from, and your own songs.',
+  id:'atlas',group:'brain',name:'The Ear Atlas',tag:'Tempo, notes, chords, scales, instruments and music from around the world.',
   how:['Every round asks something different about what you hear: the tempo, a note, a chord, a scale, a progression, an instrument and its family, a place on the map, a song.','Answer on your phone: tap the tempo, play the note on a keyboard, or pick one of four.','More than 800 real recordings: 130+ instruments and 90 places, played least-heard first. A real Steinway, real drums. Fast right answers score more.'],
   badges:['Scored','Listening','11 kinds of question'],speed:.3,okAt:.95,closeAt:.35,yesWord:'Golden ears!',noWord:'Not this time',
   icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="var(--green)" stroke="var(--ink)" stroke-width="3.5"/><ellipse cx="32" cy="32" rx="11" ry="26" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M6 32 H58" stroke="var(--ink)" stroke-width="3"/><path d="M38 6 Q60 18 50 44" fill="none" stroke="var(--red)" stroke-width="5"/><circle cx="50" cy="46" r="6" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/></svg>`,

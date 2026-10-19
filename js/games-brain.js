@@ -60,7 +60,7 @@ function buildQuizDeck(o){
   return out;
 }
 game(roundGame(mcSpec({
-  id:'quiz',group:'brain',name:'The Quiz',tag:'The question on the big screen, the four answers on every phone. Three banks: The Workbench, The Machine Room and The Studio Vault.',
+  id:'quiz',group:'brain',name:'The Quiz',tag:'Big-screen questions, phone answers. Three banks of production know-how.',
   how:['Pick a bank: The Workbench (how to do it: mixing, recording, mastering, the business), The Machine Room (how the gear works) or The Studio Vault (the stories behind records, producers and pioneers). Then pick its categories.','The question shows alone for a few seconds, then the answers open on the phones.','Fast right answers score more. Streaks add a bonus.'],
   badges:['Scored',`${BANKS.reduce((a,b)=>a+bankN(b),0)} questions`],
   icon:`<svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="14" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="36" y="6" width="22" height="22" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><polygon points="20,38 34,60 6,60" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/><polygon points="47,36 60,49 47,62 34,49" fill="var(--green)" stroke="var(--ink)" stroke-width="3"/></svg>`,

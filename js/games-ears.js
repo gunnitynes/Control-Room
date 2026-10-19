@@ -289,7 +289,7 @@ const MLSEE={meter:'Count the hops: one per beat. Then count the dots inside a h
   swing:'Watch where the shapes land against the dashed rings: on the rings is straight, late is swung.'};
 const mlOptHTML=o=>o.mini?`<span class="mlmini">${[...o.mini].map(c=>`<i class="${c==='1'?'on':''}"></i>`).join('')}</span>`:`<b class="mlbig">${esc(o.big)}</b>${o.small?`<small>${esc(o.small)}</small>`:''}`;
 game(roundGame({
-  id:'meterlab',group:'ears',name:'Meter Lab',tag:'The rhythm lab: hear a groove, name its meter, grouping, polyrhythm, pattern or swing.',
+  id:'meterlab',group:'ears',name:'Meter Lab',tag:'Hear a groove, name its meter, grouping, polyrhythm, pattern or swing.',
   how:['A groove loops on the big speakers while Meter Lab’s figure says LISTEN.','Name what you hear on your phone — time signature, grouping, ratio, loop length, pattern or swing.','The reveal shows the moving figure and explains the answer. Fast right answers score more.'],
   badges:['Scored','Rhythm','Meter Lab'],speed:.4,
   icon:`<svg viewBox="0 0 64 64"><circle cx="20" cy="40" r="14" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="34" y="8" width="24" height="24" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><path d="M36 58 L58 58 L47 38Z" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 q8 -8 16 0 t16 0" fill="none" stroke="var(--ink)" stroke-width="3"/></svg>`,
