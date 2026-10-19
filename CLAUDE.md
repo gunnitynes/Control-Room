@@ -96,6 +96,12 @@ Phones and the host keep old files otherwise.
   replay, stop, ringLabel`. Answers arrive as `{t:'ans', i:<round index>, a}`.
 - **Free games** (slots, sprints, Roundabout, Metaphor, Telephone) implement `start, render, pstate, player, act,
   next, frame` themselves; `startClock`/`clockFrame` give sprint clocks.
+- **No repeats**: `seenOrder(deck, list, keyOf)` / `seenMark(deck, items, keyOf)` (core.js) deal what this browser has shown least
+  first (localStorage `seen.<deck>`). Used by The Quiz, Shortcut Showdown, Translation Grid, Frequency Detective (fix), Envelope Sculptor
+  and every song excerpt (`dealSong`); Ear Atlas, Preset Archeologist and the Chronologist have their own. Decay, Frequency find and Meter Lab
+  generate fresh values each round. New question modules should use seenOrder.
+- **Shortcut Showdown**: SHORTCUTS in content.js, 140 Mac defaults; an entry may carry a 4th array of alternative keys (Pro Tools ⌥1–4
+  for F1–F4), shown as "or …"; any F-key question shows the fn tip (`scAlt`, `scFn`). Only add shortcuts you are sure of.
 - Setup options: `choices` (segmented), `type:'multi'`, `type:'step'` (+/− with min/max/step/unit),
   `show:v=>bool` to hide an option (a saved value that is no longer a choice falls back to `def`, see `optVals`); `setupExtra(v)` / `setupBind(st, redraw)` add custom setup panels.
 - The phone **notebook**: the host calls `logAdd(player, {kind, game, title, text})`. `openNotebook` (core.js) draws it as a

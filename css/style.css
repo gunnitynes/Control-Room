@@ -1650,3 +1650,12 @@ body:has(#app.guidepage){overflow:auto}
 .roomp .attcopy{justify-self:start;background:var(--yel)}
 .teachbox .tlink{justify-self:start;margin-top:4px}
 .roomp>.attcopy{justify-self:stretch;display:block;text-align:center;font-size:12px;padding:10px;box-shadow:4px 4px 0 var(--ink)}
+/* Shortcut Showdown: second keys and the fn tip */
+.kalt{display:inline-flex;align-items:center;gap:4px;margin-left:10px;font:700 12px var(--mono);text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.kalt kbd{font-size:.9em}
+.bkor{font:900 22px var(--disp);text-transform:uppercase;margin:0 14px;align-self:center}
+.fnhint{margin:10px 0 0;font:700 13px/1.4 var(--mono);color:var(--ink2);text-align:center}.fnhint b{color:var(--ink)}
+.fnhint kbd{font-size:12px;padding:1px 5px;border:2px solid var(--ink);background:#fff}
+.caps .kalt{font-size:.62em;margin-left:14px;gap:6px;color:var(--ink)}.caps .kalt kbd{font-size:1em}
+.ptile .kalt,.popt .kalt{font-size:.8em}
+.mc .tile .caps small.kalt{font-size:clamp(14px,1.3vw,22px)}.mc .tile .caps small.kalt kbd{font-size:inherit}

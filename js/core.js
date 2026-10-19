@@ -85,6 +85,10 @@ const GROUPS=[
   {id:'make',name:'Make something',sub:'Creative sprints, generators and party games',short:'Make',col:'--yel'},
 ];
 const GAMES=[];
+/* least-shown first: every question module remembers what this browser has already shown (localStorage seen.<deck>)
+   and deals the least-shown items first, ties in random order, so nothing comes back until the rest have had their turn */
+function seenOrder(deck,list,keyOf){const S=store.get('seen.'+deck,{});return shuffle(list).sort((a,b)=>(S[keyOf(a)]||0)-(S[keyOf(b)]||0));}
+function seenMark(deck,items,keyOf){const S=store.get('seen.'+deck,{});items.forEach(x=>{const k=keyOf(x);S[k]=(S[k]||0)+1;});store.set('seen.'+deck,S);}
 function game(g){g.col=g.col||(GROUPS.find(x=>x.id===g.group)||{}).col;GAMES.push(g);return g;}
 const gameById=id=>GAMES.find(g=>g.id===id);
 const ordered=()=>GROUPS.flatMap(gr=>GAMES.filter(g=>g.group===gr.id));

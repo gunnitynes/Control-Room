@@ -8,7 +8,8 @@
 function withSong(fn){if(AU.song){fn();return;}toast('Loading the demo song…');const s=G.gs,i=s&&s.i,ph=s&&s.phase;
   songReady().then(()=>{if(G.gs===s&&s.i===i&&(s.phase==='prep'||s.phase==='open'||s.phase===ph))fn();}).catch(()=>toast('Could not load the demo song (audio/demosong.mp3)'));}
 // hand out song parts so no part repeats until all have been used
-function dealSong(list,n){let deck=[];return [...Array(n)].map(()=>{if(!deck.length)deck=shuffle(list);return deck.pop();});}
+function dealSong(list,n){if(!list||!list.length)return [];const key=e=>e&&e.at!=null?String(e.at):JSON.stringify(e);let deck=[];   // least-heard song moments first
+  const out=[...Array(n)].map(()=>{if(!deck.length)deck=seenOrder('song',list,key);return deck.shift();});seenMark('song',out,key);return out;}
 const songTag=ex=>ex?` <span class="songtag">from the song · ${esc(ex.name)} · ${Math.floor(ex.at/60)}:${pad2(Math.floor(ex.at%60))}</span>`:'';
 function stopAud(){const s=G.gs;if(s&&s.aud){try{s.aud.stop();}catch(e){}s.aud=null;}}
 function setAud(h){stopAud();if(G.gs)G.gs.aud=h;return h;}
@@ -152,7 +153,7 @@ const FREQ_FIX=({
   prepMs:5000,prepLabel:'LISTEN',prepSub:'for the flaw',
   prepText:()=>({big:'What’s wrong?',small:'Listen for the ugly bit. Your EQ appears in a moment.'}),
   secs:o=>o.secs,
-  build:o=>{const ex=dealSong(SONG.excerpts,o.n);return shuffle(EQ_PROBLEMS).slice(0,o.n).map((p,k)=>({...p,f:Math.round(p.f*rnd(.87,1.15)),ex:o.src==='song'?ex[k]:null}));},
+  build:o=>{const ex=dealSong(SONG.excerpts,o.n),L=seenOrder('eqfix',EQ_PROBLEMS,p=>p.name).slice(0,o.n);seenMark('eqfix',L,p=>p.name);return L.map((p,k)=>({...p,f:Math.round(p.f*rnd(.87,1.15)),ex:o.src==='song'?ex[k]:null}));},
   // one chain, switchable while it plays: 'flaw' (the boost), 'clean' (no boost), or a student's cut on top of the boost
   play(r,mode='flaw'){const ac=audio(),pk=bq(ac,'peaking',r.f,EQ_Q,EQ_BOOST),c=bq(ac,'peaking',1000,EQ_Q,0),g=gn(ac,.42);pk.connect(c).connect(g).connect(AU.music);
     let src={stop(){}};const h=setAud({stop(){src.stop();setTimeout(()=>{try{g.disconnect();}catch(e){}},800);},
@@ -249,7 +250,7 @@ game(roundGame(mcSpec({
   prepMs:r=>Math.round(envLen(r.E)*1000+900),prepLabel:'LISTEN',prepSub:'to the shape',
   prepText:()=>({big:'Listen',small:'Watch the four shapes on the big screen while it plays.'}),
   secs:o=>o.secs,
-  build:o=>{const fz=dealSong(SONG.freeze,o.n);return shuffle(ENVELOPES).slice(0,o.n).map((E,k)=>{const others=pickDistinctEnvs(E);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E),T:Math.max(...order.map(envLen)),fz:o.src==='song'?fz[k]:null};});},
+  build:o=>{const fz=dealSong(SONG.freeze,o.n),L=seenOrder('envelope',ENVELOPES,E=>E.name).slice(0,o.n);seenMark('envelope',L,E=>E.name);return L.map((E,k)=>{const others=pickDistinctEnvs(E);const order=shuffle([E,...others]);return {E,opts:order,c:order.indexOf(E),T:Math.max(...order.map(envLen)),fz:o.src==='song'?fz[k]:null};});},
   sound(r){if(r.fz)withSong(()=>setAud(playFreeze(r.fz,r.E)));else setAud(playEnvelope(r.E));},
   onPrep(r){this.sound(r);},leave:stopAud,
   replay(r){this.sound(r);},

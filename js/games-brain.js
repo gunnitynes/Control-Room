@@ -51,13 +51,14 @@ const qtag=r=>`<div class="dawtag">${esc(bankOf(r.bank).name)} · ${esc(qcatOf(r
 function buildQuizDeck(o){
   const b=bankOf(o.bank),pick=o['c_'+b.id]||b.cats.map(c=>c.id),pool=[],seen=new Set(),out=[];
   b.cats.filter(c=>pick.includes(c.id)).forEach(c=>c.qs.forEach(q=>pool.push({cat:c.id,q})));
-  for(const it of shuffle(pool)){const cat=it.cat,P=it.q.pic?picQ(it.q):null,q=P?P.q:it.q;
+  const qkey=it=>it.q.pic?'pic:'+it.q.pic.id+':'+it.q.ask:it.q[0];
+  for(const it of seenOrder('quiz',pool,qkey)){const cat=it.cat,P=it.q.pic?picQ(it.q):null,q=P?P.q:it.q;
     // same right answer, or the same topic tag (q[3]), counts as the same question
     const keys=[q[2][q[1]].toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,48)];if(q[3])keys.push('#'+q[3]);
     if(keys.some(k=>seen.has(k)))continue;keys.forEach(k=>seen.add(k));
-    out.push({bank:b.id,cat,text:q[0],...shuffledOpts(q[2],q[1]),...(P?{img:P.img,credit:P.credit,fact:P.fact}:{})});if(o.n&&out.length>=o.n)break;
+    out.push({bank:b.id,cat,sk:qkey(it),text:q[0],...shuffledOpts(q[2],q[1]),...(P?{img:P.img,credit:P.credit,fact:P.fact}:{})});if(o.n&&out.length>=o.n)break;
   }
-  return out;
+  seenMark('quiz',out,r=>r.sk);return shuffle(out);
 }
 game(roundGame(mcSpec({
   id:'quiz',group:'brain',name:'The Quiz',tag:'Big-screen questions, phone answers. Three banks of production know-how.',
@@ -85,6 +86,9 @@ game(roundGame(mcSpec({
 
 /* ---------- DAW SHORTCUT SHOWDOWN ---------- */
 // every modifier gets its own key: "⇧⌘J" → ⇧ ⌘ J, "Ctrl+Shift+S" → Ctrl Shift S
+// F keys: some shortcuts have a second key (Pro Tools ⌥1–4 for the edit modes); on a Mac laptop the F row needs fn
+const scAlt=(r,i)=>r.alts&&r.alts[i]?`<small class="kalt">or ${keycaps(r.alts[i])}</small>`:'';
+const scFn=r=>r.opts.some(o=>/(^|[+⌘⇧⌥⌃])F\d{1,2}$/.test(o))?`<p class="fnhint"><b>No F keys?</b> On a Mac laptop hold <kbd>fn</kbd> and press the F key. Or switch on “Use F1, F2 … as standard function keys” in System Settings ▸ Keyboard.</p>`:'';
 const keycaps=s=>String(s).split('+').flatMap(part=>{const keys=[];let rest=part.trim();while(/^[⌘⇧⌥⌃]/.test(rest)){keys.push(rest[0]);rest=rest.slice(1).trim();}if(rest)keys.push(rest);return keys;}).map(k=>`<kbd>${esc(k)}</kbd>`).join('');
 game(roundGame(mcSpec({
   id:'shortcuts',group:'brain',name:'Shortcut Showdown',tag:'Rapid-fire keyboard shortcuts. Mouse-clickers become power users.',
@@ -93,20 +97,22 @@ game(roundGame(mcSpec({
   icon:`<svg viewBox="0 0 64 64"><rect x="4" y="16" width="26" height="26" rx="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><rect x="34" y="16" width="26" height="26" rx="3" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><text x="17" y="35" font-size="16" text-anchor="middle" font-weight="900" fill="var(--ink)">⌘</text><text x="47" y="35" font-size="16" text-anchor="middle" font-weight="900" fill="#fff">J</text><rect x="4" y="48" width="56" height="10" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
     {key:'daw',label:'DAW',choices:[['live','Live','Ableton'],['logic','Logic','Pro'],['protools','Pro Tools','Avid'],['fl','FL','Studio'],['mix','Mix','all of them']],def:'live'},
-    {key:'n',label:'Questions',choices:[[8,'8'],[12,'12'],[0,'ALL']],def:12},
+    {key:'n',label:'Questions',choices:[[8,'8'],[12,'12'],[20,'20'],[0,'ALL']],def:12},
     {key:'secs',label:'Answer time',choices:[[6,'6','seconds'],[10,'10','seconds'],[15,'15','seconds']],def:10},
   ],
-  note:'Mac default key commands (FL Studio shows Windows Ctrl). Edit or add shortcuts in data/content.js.',
+  note:'140 Mac default key commands (FL Studio shows Windows Ctrl). Shortcuts this computer has shown least come first. F-key questions show a second key where there is one, and a tip for laptops without F keys.',
   prepMs:1500,prepLabel:'GO',prepSub:'get ready',speed:.6,
   prepText:()=>({big:'Fingers ready',small:'The task is on the big screen.'}),
   secs:o=>o.secs,
   build:o=>{const sets=o.daw==='mix'?Object.entries(SHORTCUTS):[[o.daw,SHORTCUTS[o.daw]],['any',SHORTCUTS.any]];
-    let pool=[];sets.forEach(([k,s])=>s.qs.forEach(q=>pool.push({daw:s.name,text:q[0],...shuffledOpts(q[2],q[1])})));
-    pool=shuffle(pool);return o.n?pool.slice(0,o.n):pool;},
+    const pool=[];sets.forEach(([k,s])=>s.qs.forEach(q=>pool.push({daw:s.name,q})));
+    const key=x=>x.daw+':'+x.q[0],L=seenOrder('shortcuts',pool,key),out=(o.n?L.slice(0,o.n):L);seenMark('shortcuts',out,key);   // least-shown first
+    // shuffle the four answers, keeping each one's alternative (e.g. ⌥2 for F2) with it
+    return shuffle(out).map(({daw,q})=>{const P=shuffle(q[2].map((o,i)=>({o,a:q[3]?q[3][i]:'',ok:i===q[1]})));return {daw,text:q[0],opts:P.map(x=>x.o),alts:P.map(x=>x.a),c:P.findIndex(x=>x.ok)};});},
   roundInfo:r=>r.daw,
-  public:r=>({opts:r.opts.map(keycaps),html:true,kind:'keys'}),
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><div class="dawtag">${esc(r.daw)}</div><h2 class="qtext">${esc(r.text)}</h2>${mcTiles(r,ctx,{optHTML:o=>`<span class="caps">${keycaps(o)}</span>`})}</div>`;},
-  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><div class="dawtag">${esc(r.daw)}</div><h2 class="qtext">${esc(r.text)}</h2>${mcTiles(r,ctx,{optHTML:o=>`<span class="caps">${keycaps(o)}</span>`})}<div class="bigkeys">${keycaps(r.opts[r.c])}</div></div>`;animateBars(m);},
+  public:r=>({opts:r.opts.map((o,i)=>keycaps(o)+scAlt(r,i)),html:true,kind:'keys'}),
+  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc"><div class="dawtag">${esc(r.daw)}</div><h2 class="qtext">${esc(r.text)}</h2>${mcTiles(r,ctx,{optHTML:(o,i)=>`<span class="caps">${keycaps(o)}${scAlt(r,i)}</span>`})}${scFn(r)}</div>`;},
+  reveal:(m,r,ctx)=>{m.innerHTML=`<div class="mc reveal"><div class="dawtag">${esc(r.daw)}</div><h2 class="qtext">${esc(r.text)}</h2>${mcTiles(r,ctx,{optHTML:(o,i)=>`<span class="caps">${keycaps(o)}${scAlt(r,i)}</span>`})}<div class="bigkeys">${keycaps(r.opts[r.c])}${r.alts&&r.alts[r.c]?`<span class="bkor">or</span>${keycaps(r.alts[r.c])}`:''}</div>${scFn(r)}</div>`;animateBars(m);},
 })));
 
 /* ---------- THE TRANSLATION GRID ---------- */
@@ -231,10 +237,10 @@ game(roundGame({
   prepMs:3000,prepLabel:'LOOK',prepSub:'at the grid',
   prepText:()=>({big:'Study the grid',small:'Match each idea to its partner. The grid opens on your phone in a moment.'}),
   secs:o=>o.secs,
-  build:o=>{const pool0=TRANSLATE.filter(x=>(o.tg||[]).includes(x.t)),pool=pool0.length>=4?pool0:TRANSLATE,seen=store.get('tg.seen',{});
-    const fresh=()=>shuffle(pool).sort((a,b)=>(seen[a.c]||0)-(seen[b.c]||0));   // cards this browser has shown least come first
-    const out=[];let deck=[];for(let i=0;i<o.n;i++){if(deck.length<4)deck=deck.concat(fresh().filter(x=>!deck.includes(x)));const items=shuffle(deck.splice(0,4));items.forEach(x=>seen[x.c]=(seen[x.c]||0)+1);
-    const mode=o.mode==='mix'?(i%2?'a':'v'):o.mode;const right=shuffle([0,1,2,3]);out.push({mode,items,right});}store.set('tg.seen',seen);return out;},
+  build:o=>{const pool0=TRANSLATE.filter(x=>(o.tg||[]).includes(x.t)),pool=pool0.length>=4?pool0:TRANSLATE,seen={};
+    const fresh=()=>seenOrder('translate',pool,x=>x.c);   // cards this browser has shown least come first
+    const out=[];let deck=[];for(let i=0;i<o.n;i++){if(deck.length<4)deck=deck.concat(fresh().filter(x=>!deck.includes(x)));const items=shuffle(deck.splice(0,4));
+    const mode=o.mode==='mix'?(i%2?'a':'v'):o.mode;const right=shuffle([0,1,2,3]);out.push({mode,items,right});}seenMark('translate',out.flatMap(r=>r.items),x=>x.c);return out;},
   roundInfo:r=>r.mode==='v'?'pictures':'analogies',
   rightHTML:(r,k)=>{const it=r.items[r.right[k]];return r.mode==='v'?VIS(it.v):`<span class="anal">“${esc(it.a)}”</span>`;},
   // the big screen keeps the ideas; the pictures / analogies go to the phones
