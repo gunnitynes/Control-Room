@@ -17,7 +17,8 @@ data/               content anyone may edit: quiz-questions.js, vault-questions.
 js/core.js          helpers, game registry, host room + menu + setup, roundGame framework, phone shell, boot
 js/audio.js         WebAudio engine: buses, drums (DR), voices (VO), rig/seq sequencer, sample loading, Telephone synth
 js/assets.js        Constraint Generator files: seeded recipes → MIDI (written byte by byte) or WAV (offline render); also loaded by CADCAST/go
-js/games-brain.js   Know your stuff: The Quiz (+ Studio Vault bank), Shortcut Showdown, Translation Grid
+js/games-brain.js   Know your stuff: The Quiz (banks: The Workbench = CATS in quiz-questions.js, The Studio Vault =
+                    VAULT in vault-questions.js, nine categories named in VAULT_CATS), Shortcut Showdown, Translation Grid
 js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
                     (Envelope Sculptor: envPts/envApply in audio.js are the ONE shape drawn and played — straight lines,
                     gain = level^1.7, no vibrato or reverb; options share one time axis with a tick per second)
