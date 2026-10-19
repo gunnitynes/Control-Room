@@ -359,9 +359,17 @@ function loadMyClips(){return MYCLIPS.ready=clipDB.all().then(l=>{MYCLIPS.list=(
 if(ROLE==='host'&&window.indexedDB)loadMyClips();
 function clipBuffer(c){if(c.src)return sampleReady(c.src);const k='my:'+c.id;if(AU.smp[k])return AU.smp[k];
   return AU.smp[k]=c.blob.arrayBuffer().then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej))).catch(e=>{delete AU.smp[k];throw e;});}
+/* your own songs play a different moment each time: up to 6 windows spread across the song (8 % to 88 %),
+   the least-played window first (localStorage chrono.win = {clip id: [plays per window]}) */
+const CH_LEN=7;
+const chWins=()=>store.get('chrono.win',{});
+const chPlays=id=>(chWins()[id]||[]).reduce((a,b)=>a+b,0);
+function chWindow(c,dur){const n=Math.max(1,Math.min(6,Math.floor((dur-CH_LEN)/12))),W=chWins(),cnt=(W[c.id]||[]).slice(0,n);while(cnt.length<n)cnt.push(0);
+  const min=Math.min(...cnt),k=pick(cnt.map((x,i)=>x===min?i:-1).filter(i=>i>=0));cnt[k]++;W[c.id]=cnt;store.set('chrono.win',W);
+  const span=Math.max(0,dur-CH_LEN);return n===1?Math.min(span,dur*.3):Math.min(span,dur*(.08+.8*k/(n-1)));}
 function erasPool(o){const pool={};
   if(o.src!=='synth'){Object.entries(ERA_DECADES).forEach(([d,e])=>{if(e.clips.length)pool[d]=e.clips.map(c=>({...c,kind:'real'}));});
-    MYCLIPS.list.filter(c=>c.dec>=1900).forEach(c=>{(pool[c.dec]=pool[c.dec]||[]).push({id:c.id,blob:c.blob,title:c.name,credit:'Your clip',kind:'mine'});});}
+    MYCLIPS.list.filter(c=>c.dec>=1900).forEach(c=>{(pool[c.dec]=pool[c.dec]||[]).push({id:c.id,blob:c.blob,title:c.name.replace(/\.[a-z0-9]+$/i,''),credit:'From your own collection · kept in this browser',kind:'mine'});});}
   if(o.src==='synth'||Object.keys(pool).length<4)Object.entries(ERA_SYNTH).forEach(([d,y])=>{if(!pool[d])pool[d]=[{synth:y,title:'Re-created in the browser',kind:'synth'}];});
   return pool;}
 game(roundGame({
@@ -373,10 +381,22 @@ game(roundGame({
     {key:'n',label:'Rounds',choices:[[3,'3'],[4,'4'],[5,'5']],def:4},{key:'secs',label:'Answer time',choices:[[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:45}],
   note:'Real recordings are public domain or Creative Commons, from Wikimedia Commons (credits in audio/eras/CREDITS.txt). The 1960s–1990s are still under copyright, so add your own clips for those decades below. They stay in this browser and are never uploaded. Decades with no real clip use the browser re-creation.',
   setupExtra(v){if(v.src==='synth')return '';const mine=MYCLIPS.list,decs=Object.keys(ERA_DECADES).map(Number);
-    return `<div class="fsec myclips"><h3><b>+</b>Your own clips<small>MP3, WAV, M4A · stay in this browser</small></h3><div class="mydecs">${decs.map(d=>{const e=ERA_DECADES[d],m=mine.filter(c=>c.dec===d);
-      return `<div class="mydec ${e.clips.length+m.length?'':'empty'}"><b>${esc(e.label)}</b><span>${e.clips.length} built in${m.length?` · ${m.length} yours`:''}</span>${m.map(c=>`<em title="${esc(c.name)}">${esc(c.name.replace(/\.[a-z0-9]+$/i,''))}<button data-del="${esc(c.id)}" aria-label="Remove">×</button></em>`).join('')}<label class="ghost">+ add<input type="file" accept="audio/*" multiple hidden data-dec="${d}"></label></div>`;}).join('')}</div>
-      <p class="fine">Tip: a 10–30 second excerpt works best. Longer files play from about a third of the way in.</p></div>`;},
-  setupBind(st,redraw){$$('.myclips input[type=file]',st).forEach(inp=>inp.onchange=async()=>{const dec=+inp.dataset.dec;
+    const yours=mine.filter(c=>c.dec>=1900).length;
+    return `<div class="fsec myclips"><h3><b>+</b>Your own music<small>${yours} songs · stay in this browser, never uploaded</small></h3>
+      <div class="chimport"><label class="big go">Load a music folder<input type="file" id="chFolder" webkitdirectory multiple hidden></label>
+        <p class="fine">Pick a folder with one subfolder per decade (1900s, 1910s … 2020s), or songs with the year in the name, like “Artist – Title (1958).mp3”. MP3, M4A, WAV, WebM.</p>
+        <span class="chprog" id="chProg"></span>${yours?'<button class="ghost" id="chClear">Remove all your songs</button>':''}</div><div class="mydecs">${decs.map(d=>{const e=ERA_DECADES[d],m=mine.filter(c=>c.dec===d);
+      return `<div class="mydec ${e.clips.length+m.length?'':'empty'}"><b>${esc(e.label)}</b><span>${e.clips.length} built in${m.length?` · ${m.length} yours`:''}</span>${m.length>4?'':m.map(c=>`<em title="${esc(c.name)}">${esc(c.name.replace(/\.[a-z0-9]+$/i,''))}<button data-del="${esc(c.id)}" aria-label="Remove">×</button></em>`).join('')}<label class="ghost">+ add<input type="file" accept="audio/*" multiple hidden data-dec="${d}"></label></div>`;}).join('')}</div>
+      <p class="fine">Whole songs are fine: each one plays a different 7-second moment every time, up to six per song.</p></div>`;},
+  setupBind(st,redraw){
+    // a whole folder at once: the decade comes from a "1970s" folder in the path, else the year in the file name
+    const fo=$('#chFolder',st);if(fo)fo.onchange=async()=>{const files=[...fo.files].filter(f=>/\.(mp3|m4a|aac|wav|webm|ogg|oga|flac)$/i.test(f.name));const prog=$('#chProg',st);let n=0,skip=0;
+      for(const f of files){const path=f.webkitRelativePath||f.name,m=path.match(/(?:^|\/)(\d{3})0s(?:\/|$)/),y=m?+(m[1]+'0'):+((f.name.match(/\b(1[89]\d\d|20[0-2]\d)\b/)||[])[1]||0);
+        const dec=Math.floor(y/10)*10;if(!ERA_DECADES[dec]){skip++;continue;}
+        await clipDB.put({id:'ch:'+path,dec,name:f.name,blob:f,at:Date.now()+n});n++;if(prog)prog.textContent=`Saving ${n} of ${files.length}…`;}
+      await loadMyClips();toast(`${n} songs saved in this browser${skip?` · ${skip} without a decade skipped`:''}`);redraw();};
+    const cl=$('#chClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Remove all your songs from this browser?'))return;for(const c of MYCLIPS.list.filter(c=>c.dec>=1900))await clipDB.del(c.id);await loadMyClips();redraw();};
+    $$('.myclips input[type=file][data-dec]',st).forEach(inp=>inp.onchange=async()=>{const dec=+inp.dataset.dec;
       for(const f of inp.files){if(f.size>40e6){toast(f.name+' is over 40 MB');continue;}await clipDB.put({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),dec,name:f.name,blob:f,at:Date.now()});}
       await loadMyClips();toast('Saved in this browser');redraw();});
     $$('.myclips [data-del]',st).forEach(b=>b.onclick=async()=>{await clipDB.del(b.dataset.del);await loadMyClips();redraw();});},
@@ -386,11 +406,11 @@ game(roundGame({
   secs:o=>o.secs?o.secs+31:0,
   build(o){const pool=erasPool(o),decs=Object.keys(pool).map(Number),used=new Set();
     return [...Array(o.n)].map(()=>{const pick4=shuffle(decs).slice(0,4);
-      const items=pick4.map(d=>{const fresh=pool[d].filter(c=>!used.has(c)),c=pick(fresh.length?fresh:pool[d]);used.add(c);if(!c.synth)clipBuffer(c).catch(()=>{});return {dec:d,clip:c};});
+      const items=pick4.map(d=>{const fresh=pool[d].filter(c=>!used.has(c)),L=fresh.length?fresh:pool[d],lo=Math.min(...L.map(x=>x.kind==='mine'?chPlays(x.id):0)),c=pick(L.filter(x=>(x.kind==='mine'?chPlays(x.id):0)===lo));used.add(c);if(!c.synth)clipBuffer(c).catch(()=>{});return {dec:d,clip:c};});
       return {eras:pick4,items};});},
   playCard(k){const s=G.gs,r=s.rounds[s.i],it=r.items[k],c=it.clip,i=s.i;s.playing=k;$$('.ccard').forEach((x,j)=>x.classList.toggle('playing',j===k));
     if(c.synth){setAud(playEra(c.synth));return;}
-    stopAud();clipBuffer(c).then(buf=>{if(G.gs!==s||s.i!==i||s.playing!==k)return;const off=c.kind==='mine'&&buf.duration>20?buf.duration*.33:0;setAud(playSample(buf,AU.music,{gain:c.gain||.9,maxDur:7,offset:off}));})
+    stopAud();clipBuffer(c).then(buf=>{if(G.gs!==s||s.i!==i||s.playing!==k)return;if(c.kind==='mine'&&it.off==null)it.off=chWindow(c,buf.duration);setAud(playSample(buf,AU.music,{gain:c.gain||.9,maxDur:CH_LEN,offset:it.off||0}));})
       .catch(()=>{toast('Could not play clip '+LET[k]);if(ERA_SYNTH[it.dec])setAud(playEra(ERA_SYNTH[it.dec]));});},
   onOpen(r){const s=G.gs,i=s.i;[0,1,2,3].forEach(k=>later(()=>{if(G.gs===s&&s.i===i&&s.phase==='open')this.playCard(k);},200+k*7600));},
   leave(){stopAud();},

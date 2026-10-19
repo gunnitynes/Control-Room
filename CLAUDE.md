@@ -85,6 +85,10 @@ Phones and the host keep old files otherwise.
 - Phones: the app can still be added to the home screen by hand (manifest.webmanifest, sw.js, icons/); the logo no longer opens a prompt
   (the owner removed it). The idle screen keeps the Guide button at the bottom. The splash shows the join
   QR as art (`artQR`, error correction H; check scannability with jsQR after changing it).
+- **Sample Chronologist, your own music**: "Load a music folder" (webkitdirectory) saves every song into clipDB (`id 'ch:'+path`,
+  decade from a `1970s` folder or the year in the name). Each song plays one of up to 6 seven-second windows (8 %–88 %),
+  least-played first (`chWindow`, localStorage `chrono.win`); least-played songs are dealt first. Commercial music stays
+  in the teacher's browser only, never in the repo.
 - Teacher-uploaded clips and photos (Chronologist decades, Ear Atlas songs, Metaphor Translation photos) live in IndexedDB on
   the host only (`clipDB`, `MYCLIPS`; songs use `dec:-1`, photos `dec:-2`). They are never uploaded anywhere. Copyrighted
   photos belong there, not in the repo.

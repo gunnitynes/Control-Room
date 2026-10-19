@@ -1414,3 +1414,4 @@ body:has(#app.guidepage){overflow:auto}
 .mc.reveal.haspic .bigans{padding:12px 18px}
 .qfact{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 @media (max-height:680px){.mc.reveal.haspic .qrow{height:auto;grid-template-columns:1fr}.mc.reveal.haspic .qpic,.mc.reveal.haspic .qfact,.mc.reveal.haspic .qcredit{display:none}}
+.chimport{display:grid;gap:8px;justify-items:start;margin-bottom:14px}.chimport .big{cursor:pointer}.chprog{font:700 12px var(--mono)}
