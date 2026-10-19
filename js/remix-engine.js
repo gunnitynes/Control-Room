@@ -3,7 +3,7 @@
    1. rxAnalyse(buffer): tempo, beat grid, downbeats, key and energy per bar, straight from the audio
       (STFT at ~11 kHz → spectral-flux onsets → autocorrelation tempo → phase + downbeat from the bass → chroma key)
    2. RX player: the song scheduled beat by beat (so any beat can be repeated, reversed, sped up or shuffled
-      on the grid), through an FX rack, plus generated layers (808, hats, pad) locked to the grid and the key
+      on the grid), through an FX rack, plus generated layers (808, hats, claps, sub) locked to the grid and the key
    ===================================================================== */
 const RX_NOTES=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 function rxFFT(re,im){const n=re.length;for(let i=1,j=0;i<n;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}
@@ -74,7 +74,6 @@ const RX_FX=[
   {id:'boom',cat:'layer',name:'808 boom',d:'A sub kick tuned to the key',kind:'layer',bars:4},
   {id:'hats',cat:'layer',name:'Hi-hats',d:'Fast 16ths on top',kind:'layer',bars:4},
   {id:'clap',cat:'layer',name:'Claps',d:'On two and four',kind:'layer',bars:4},
-  {id:'pad',cat:'layer',name:'Pad',d:'A chord from the song’s key',kind:'layer',bars:4},
   {id:'sub',cat:'layer',name:'Sub bass',d:'The root note, deep',kind:'layer',bars:4},
 ];
 const RX_CAT={time:'--red',tone:'--blue',space:'--yel',layer:'--green'};
@@ -159,10 +158,9 @@ function rxAuto(P,t){const B=P.beat,ac=P.ac,set=(p,v,at,tc=.03)=>p.setTargetAtTi
       if(id==='pump'){for(let k=0;k<(end-st)/B;k++){const a=st+k*B;P.pump.gain.setValueAtTime(.08,a);P.pump.gain.setTargetAtTime(1,a+0.02,B/5);}P.pump.gain.setTargetAtTime(1,end,.02);}}
     if(t>=f.end){P.fx.delete(id);if(P.onFx)P.onFx({id,who:f.who},'end');}}
   for(const [id,l] of P.layers)if(t>=l.end){P.layers.delete(id);if(P.onFx)P.onFx({id,who:l.who},'end');}}
-// generated layers, in time and in key: the 808 and the sub sit on the key's root, the pad plays its chord
+// generated layers, in time and in key: the 808 and the sub sit on the key's root
 function rxLayers(P,t){const ac=P.ac,B=P.beat,beatInBar=P.k%4,root=P.A.key.root,minor=P.A.key.mode==='minor',d=P.lay;
   if(P.layers.has('boom')&&(beatInBar===0||beatInBar===2)){DR.kick(ac,d,t,{v:1,dec:B*1.4,f0:hz(24+root+12),f1:hz(24+root+31),click:.25,drive:.3});if(beatInBar===2)DR.kick(ac,d,t+B*0.75,{v:.7,dec:B*.6,f0:hz(36+root),f1:hz(55+root)});}
   if(P.layers.has('hats'))for(let j=0;j<4;j++)DR.hat(ac,d,t+j*B/4,{v:j===2?.55:j%2?.25:.38});
   if(P.layers.has('clap')&&(beatInBar===1||beatInBar===3))DR.clap(ac,d,t,{v:.75});
-  if(P.layers.has('pad')&&beatInBar===0){const n=48+root;VO.pad(ac,d,t,{notes:[n,n+(minor?3:4),n+7,n+12],len:B*4,v:.9,cut:1500,a:B*.5,r:B});}
   if(P.layers.has('sub')){const o=osc(ac,'sine',hz(24+root+12)),g=gn(ac,0);o.connect(g).connect(d);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.55,t+.01);g.gain.setTargetAtTime(0,t+B*.8,.05);o.start(t);o.stop(t+B+.2);}}

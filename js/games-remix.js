@@ -92,7 +92,7 @@ game({
     const map=`<div class="rxmap">${A.bars.map((_,i)=>`<i style="--h:${Math.round(8+A.energy[i]*92)}%" class="${i===s.startBar&&s.phase==='ready'?'start':''}"></i>`).join('')}</div>`;
     const stats=`<div class="rxstats"><div><b>${A.bpm}</b><span>BPM</span></div><div><b>${esc(A.key.name)}</b><span>key</span></div><div><b>${A.bars.length}</b><span>bars</span></div><div><b>${Math.floor(A.dur/60)}:${pad2(Math.round(A.dur%60))}</b><span>long</span></div></div>`;
     if(s.phase==='ready'){st.innerHTML=`<div class="remix ph-ready"><div class="rxhead"><span class="lab">Live Remix · analysed</span><h2>${esc(s.title)}</h2>${stats}</div>${map}
-      <p class="rxnote">The beat grid, the bars and the key are ready: every move lands on the beat, and the 808, sub and pad play in ${esc(A.key.name)}. ${online().length} phone${online().length===1?'':'s'} in the room.</p>
+      <p class="rxnote">The beat grid, the bars and the key are ready: every move lands on the beat, and the 808 and sub play in ${esc(A.key.name)}. ${online().length} phone${online().length===1?'':'s'} in the room.</p>
       <div class="dfoot"><span></span><button class="big go" id="bNext">Drop the needle <small>SPACE</small></button></div></div>`;$('#bNext').onclick=()=>this.next();return;}
     if(s.phase==='end'){const top=[...s.count].sort((a,b)=>b[1]-a[1]).slice(0,5),crew=[...s.by].sort((a,b)=>b[1]-a[1]).slice(0,5),mins=Math.max(1,Math.round((Date.now()-s.t0)/60000));
       st.innerHTML=`<div class="remix ph-end"><div class="rxhead"><span class="lab">Live Remix · ${esc(s.title)}</span><h2>The remix in numbers</h2></div>
