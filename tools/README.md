@@ -24,3 +24,11 @@ Rules that matter:
 | `python3 tools/presets/build.py` | Preset Archeologist: `audio/presets/<machine>-<n>.mp3` from `tools/presets/picks.json` (Wikimedia Commons + Freesound CC0/CC BY recordings of each machine), CREDITS.txt, `window.PRESETS`. Same incremental scheme as the Atlas (`built.json`, `drop`). |
 
 Freesound search pages can be read without an account; a sound's preview is `cdn.freesound.org/previews/…-hq.mp3`. Only use sounds whose title names the machine, and CC0 / CC BY only.
+
+## Quiz pictures (tools/quizpics)
+
+The Machine Room's picture questions. `gear.py` lists the gear; `search.py` finds Commons candidates (cand.json);
+`sheets.py` draws contact sheets in tools/.cache/qp so a person can check each photo really shows that gear;
+picks go in `picks.json` (id → candidate number); `build.py` writes images/quiz/*.webp, images/quiz/CREDITS.txt
+and data/quiz-pics.js. Only CC / public-domain photos are kept, and every reveal shows the credit.
+Always look at the sheets: Commons search returns trains for "KM 184" and cars for "SM7B".

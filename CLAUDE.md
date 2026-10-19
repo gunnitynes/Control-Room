@@ -20,6 +20,8 @@ js/assets.js        Constraint Generator files: seeded recipes → MIDI (written
 js/games-brain.js   Know your stuff: The Quiz, Shortcut Showdown, Translation Grid. The Quiz has three banks in
                     window.BANKS, no subject in two: The Workbench (how to do it), The Machine Room (how the gear works),
                     The Studio Vault (the stories), each 7 categories; option c_<bank id> picks a bank's categories
+                    Picture questions: data/quiz-pics.js (QUIZ_PICS, 74 Commons photos in images/quiz/, built by
+                    tools/quizpics) join The Machine Room's categories; picQ() asks name / type / maker with fresh wrong answers
 js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
                     (Envelope Sculptor: envPts/envApply in audio.js are the ONE shape drawn and played — straight lines,
                     gain = level^1.7, no vibrato or reverb; options share one time axis with a tick per second)
@@ -34,6 +36,7 @@ js/games-atlas.js   The Ear Atlas (Know your stuff, slot 02 right after The Quiz
                     plays the clips this browser has heard least first (localStorage atlas.seen)
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
+images/quiz/        Machine Room photos (webp) + CREDITS.txt
 audio/              demo song, eras/, atlas/ (piano, inst, world), presets/; each set has a CREDITS.txt
 meterlab/           copy of Meter Lab with an ?embed mode exposing window.MLAPI
 tools/              scripts that build the audio clips from Wikimedia Commons (see tools/README.md)

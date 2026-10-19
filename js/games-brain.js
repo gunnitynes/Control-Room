@@ -28,16 +28,33 @@ function shuffledOpts(opts,c){const order=shuffle([0,1,2,3]);return {opts:order.
 // three banks (data/quiz-questions.js): The Workbench, The Machine Room, The Studio Vault, each in categories.
 // A bank's categories are the multi option c_<bank id>; an unknown bank (an old saved setup) falls back to the first.
 const bankOf=id=>BANKS.find(b=>b.id===id)||BANKS[0],bankN=b=>b.cats.reduce((a,c)=>a+c.qs.length,0);
+/* picture questions (data/quiz-pics.js, built by tools/quizpics): each photo asks its name, and where it applies its type
+   (dynamic / condenser / ribbon, compressor / reverb…) or its maker. Wrong answers come from the same kind of gear, fresh every game. */
+const PIC_Q={name:{mic:'Which microphone is this?',box:'Which piece of studio gear is this?',desk:'Which console is this?',tape:'Which tape machine is this?',synth:'Which synth is this?',keys:'Which instrument is this?',drum:'Which machine is this?',sampler:'Which sampler is this?',conn:'Which connector is this?',studio:'What is this?',room:'What is this?'},
+  type:{mic:'What kind of microphone is this?',box:'What does this box do?',desk:'What is this?',tape:'What is this?'},maker:'Who made this?'};
+const PIC_TYPES={mic:['Dynamic','Condenser','Ribbon','Tube condenser'],box:['Compressor','EQ','Reverb','Tape echo','Mic preamp + EQ','Pitch shifter / multi-effect','Exciter','Rotating speaker','Channel rack']};
+(()=>{const P=window.QUIZ_PICS||[],M=(window.BANKS||[]).find(b=>b.id==='machine');if(!M)return;
+  P.forEach(p=>{const c=M.cats.find(x=>x.id===p.cat);if(!c)return;c.qs.push({pic:p,ask:'name'});
+    if(p.type&&PIC_TYPES[p.kind])c.qs.push({pic:p,ask:'type'});
+    if(p.maker&&new Set(P.filter(x=>x.maker&&x.cat===p.cat).map(x=>x.maker)).size>=4)c.qs.push({pic:p,ask:'maker'});});})();
+function picQ({pic:p,ask}){const P=window.QUIZ_PICS,uniq=a=>[...new Set(a)];let right,pool;
+  if(ask==='type'){right=p.type;pool=PIC_TYPES[p.kind];}
+  else if(ask==='maker'){right=p.maker;pool=uniq(P.filter(x=>x.maker&&x.cat===p.cat).map(x=>x.maker));}
+  else{right=p.name;pool=P.filter(x=>x.kind===p.kind).map(x=>x.name);if(pool.length<4)pool=pool.concat(P.filter(x=>x.cat===p.cat).map(x=>x.name));}
+  const wrong=shuffle(uniq(pool).filter(x=>x!==right)).slice(0,3),opts=[right,...wrong];
+  const text=ask==='maker'?PIC_Q.maker:(PIC_Q[ask]||PIC_Q.name)[p.kind]||'What is this?';
+  return {q:[text,0,opts,'pic-'+p.id],img:p.src,credit:p.credit};}
+const qpic=r=>r.img?`<figure class="qpic"><img src="${esc(r.img)}" alt=""></figure>`:'';
 const qcatOf=(bank,id)=>bankOf(bank).cats.find(c=>c.id===id)||{name:'',sub:''};
 const qtag=r=>`<div class="dawtag">${esc(bankOf(r.bank).name)} · ${esc(qcatOf(r.bank,r.cat).name)}</div>`;
 function buildQuizDeck(o){
   const b=bankOf(o.bank),pick=o['c_'+b.id]||b.cats.map(c=>c.id),pool=[],seen=new Set(),out=[];
   b.cats.filter(c=>pick.includes(c.id)).forEach(c=>c.qs.forEach(q=>pool.push({cat:c.id,q})));
-  for(const {cat,q} of shuffle(pool)){
+  for(const it of shuffle(pool)){const cat=it.cat,P=it.q.pic?picQ(it.q):null,q=P?P.q:it.q;
     // same right answer, or the same topic tag (q[3]), counts as the same question
     const keys=[q[2][q[1]].toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,48)];if(q[3])keys.push('#'+q[3]);
     if(keys.some(k=>seen.has(k)))continue;keys.forEach(k=>seen.add(k));
-    out.push({bank:b.id,cat,text:q[0],...shuffledOpts(q[2],q[1])});if(o.n&&out.length>=o.n)break;
+    out.push({bank:b.id,cat,text:q[0],...shuffledOpts(q[2],q[1]),...(P?{img:P.img,credit:P.credit}:{})});if(o.n&&out.length>=o.n)break;
   }
   return out;
 }
@@ -57,10 +74,11 @@ game(roundGame(mcSpec({
   prepMs:r=>r&&r.text.length>130?5000:4000,prepLabel:'READ',prepSub:'the question',
   prepText:()=>({big:'Eyes up',small:'Read the question on the big screen. The answers appear here in a moment.'}),
   secs:o=>o.secs,build:buildQuizDeck,roundInfo:r=>bankOf(r.bank).name+' · '+qcatOf(r.bank,r.cat).name,
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc">${qtag(r)}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
+  stage:(m,r,ctx)=>{m.innerHTML=r.img?`<div class="mc haspic">${qtag(r)}<div class="qrow">${qpic(r)}<h2 class="qtext">${esc(r.text)}</h2></div>${mcTiles(r,ctx)}</div>`
+    :`<div class="mc">${qtag(r)}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
   // the reveal: the question shrinks to a line, the right answer takes its place, big
-  reveal:(m,r,ctx)=>{const ans=r.opts[r.c];m.innerHTML=`<div class="mc reveal">${qtag(r)}<p class="qsmall">${esc(r.text)}</p>
-    <div class="bigans c${r.c}${ans.length>60?' long':ans.length>32?' mid':''}">${shape(r.c,64,'var(--ink)','var(--paper)')}<span>${esc(ans)}</span></div>${mcTiles(r,ctx)}</div>`;animateBars(m);},
+  reveal:(m,r,ctx)=>{const ans=r.opts[r.c];m.innerHTML=`<div class="mc reveal${r.img?' haspic':''}">${qtag(r)}${r.img?`<div class="qrow">${qpic(r)}<div class="qside"><p class="qsmall">${esc(r.text)}</p>`:`<p class="qsmall">${esc(r.text)}</p>`}
+    <div class="bigans c${r.c}${ans.length>60?' long':ans.length>32?' mid':''}">${shape(r.c,64,'var(--ink)','var(--paper)')}<span>${esc(ans)}</span></div>${r.img?`<p class="qcredit">${esc(r.credit||'')}</p></div></div>`:''}${mcTiles(r,ctx)}</div>`;animateBars(m);},
 })));
 
 
