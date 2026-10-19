@@ -44,7 +44,8 @@ js/games-mix.js     The Mix Room (Train your ears): a song in stems loops on the
 js/remix-engine.js  Live Remix engine: rxAnalyse (STFT spectral-flux onsets → autocorrelation tempo → beat phase → downbeat
                     from the bass → chroma key → energy per bar), rxPlayer (the song scheduled beat by beat so any beat can
                     be repeated/reversed/re-pitched on the grid, an FX rack, generated 808/hats/claps/pad/sub in the key), RX_FX
-js/games-remix.js   Live Remix (Make something): 4 rotating moves per phone, the deck on the big screen; songs are the
+js/games-remix.js   Live Remix (Make something): 4 moves per phone (a used move is replaced), take turns round the room
+                    (play:turns, s.turn, nextTurn) or everyone at once with cooldowns; the deck on the big screen; songs are the
                     teacher's own (clipDB dec -5) or the Chronologist music; analyses cached in localStorage rx.an
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
