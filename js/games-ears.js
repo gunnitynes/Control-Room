@@ -295,7 +295,7 @@ game(roundGame({
   icon:`<svg viewBox="0 0 64 64"><circle cx="20" cy="40" r="14" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="34" y="8" width="24" height="24" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><path d="M36 58 L58 58 L47 38Z" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M6 12 q8 -8 16 0 t16 0" fill="none" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
     {key:'topics',type:'multi',label:'Topics',choices:[['meter','Meter','time signatures, beats, simple or compound'],['grouping','Grouping','additive bars: 2s and 3s'],['poly','Polyrhythm','two voices, two ratios'],['polymeter','Polymeter','loops of different lengths'],['pattern','Pattern','Euclidean and famous rhythms'],['swing','Swing','straight, swung, early or late']],def:['meter','grouping','poly','polymeter','pattern','swing'],sub:v=>`${v.topics.length} of 6`},
-    {key:'style',label:'Question style',choices:[['mix','Mixed','hear, see, both'],['hear','Hear it','sound only'],['see','See it','read the figure, no sound'],['both','Hear + see','figure and sound']],def:'mix',help:'See it shows Meter Lab’s moving figure (the hops, the arcs, the wheels, the necklace, the drum score) with its labels hidden: students read the rhythm from the shapes.'},
+    {key:'style',label:'Question style',choices:[['mix','Mixed','hear it and hear + see'],['hear','Hear it','sound only'],['both','Hear + see','figure and sound'],['see','See it','silent: read the figure']],def:'mix',help:'See it shows Meter Lab’s moving figure (the hops, the arcs, the wheels, the necklace, the drum score) with its labels hidden: students read the rhythm from the shapes.'},
     {key:'level',label:'Level',choices:[[1,'I','warm-up'],[2,'II','groove'],[3,'III','odd']],def:1},
     {key:'n',label:'Rounds',choices:[[6,'6'],[8,'8'],[10,'10'],[12,'12'],[16,'16']],def:8},
     {key:'secs',label:'Answer time',choices:[[20,'20','seconds'],[30,'30','seconds'],[0,'OFF','no clock']],def:30},
@@ -305,7 +305,7 @@ game(roundGame({
   prepMs:5000,prepLabel:'LISTEN',prepSub:'to the groove',
   prepText:r=>{const m=MLSTYLE[(r&&r.style)||'hear'];return {big:m.big,small:m.small};},
   secs:o=>o.secs,
-  build:o=>{let deck=[];return [...Array(o.n)].map(()=>{if(!deck.length)deck=o.style&&o.style!=='mix'?[o.style]:shuffle(['hear','see','both']);return {q:null,style:deck.pop()};});},
+  build:o=>{let deck=[];return [...Array(o.n)].map(()=>{if(!deck.length)deck=o.style&&o.style!=='mix'?[o.style]:shuffle(['hear','both']);return {q:null,style:deck.pop()};});},
   // questions come from Meter Lab itself, so each round asks for one as it starts
   onPrep(r,o){mlApi(api=>{if(!r.q){const q=api.question(o.level,o.topics);let opts=q.options;
       if(opts.length>4){const right=opts.find(x=>x.id===q.answer);opts=shuffle([right,...shuffle(opts.filter(x=>x!==right)).slice(0,3)]);}
@@ -322,7 +322,7 @@ game(roundGame({
   roundInfo:r=>r.q?(MLTOPIC[r.q.topic]||r.q.topic):'',
   stage(m,r,ctx){const q=r.q;
     const st=r.style||'hear';
-    m.innerHTML=`<div class="mlwrap st-${st}"><div class="mlhead"><span class="dawtag">Meter Lab · ${esc(q?MLTOPIC[q.topic]:'loading')}</span><span class="mlstyle s-${st}">${esc(MLSTYLE[st].tag)}</span><h2 class="qtext">${q?esc(q.prompt):'Loading Meter Lab…'}</h2>${q&&ctx.phase!=='prep'?`<p class="fine">${esc(st==='hear'?q.hint:MLSEE[q.topic]||q.hint)}</p>`:''}</div>
+    m.innerHTML=`<div class="mlwrap st-${st}"><div class="mlhead"><span class="dawtag">Meter Lab · ${esc(q?MLTOPIC[q.topic]:'loading')}</span><span class="mlstyle s-${st}">${esc(MLSTYLE[st].tag)}</span>${st==='see'?'<span class="mlsilent">No sound this round · read the figure</span>':''}<h2 class="qtext">${q?esc(q.prompt):'Loading Meter Lab…'}</h2>${q&&ctx.phase!=='prep'?`<p class="fine">${esc(st==='hear'?q.hint:MLSEE[q.topic]||q.hint)}</p>`:''}</div>
       <div class="mlslot" id="mlslot"></div>${q?mcTiles({opts:r.opts,c:r.c},ctx,{optHTML:mlOptHTML}):''}</div>`;mlPlace();},
   reveal(m,r,ctx){const q=r.q;if(!q){m.innerHTML='';return;}const s=G.gs;
     if(s.mlWin){

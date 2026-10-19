@@ -1418,3 +1418,4 @@ body:has(#app.guidepage){overflow:auto}
 .chdecs{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}.chdecs span{display:grid;gap:2px;padding:8px 12px;border:3px solid var(--ink);background:var(--paper);box-shadow:3px 3px 0 var(--ink);font:700 11px var(--mono);text-transform:uppercase}.chdecs b{font:900 20px/.9 var(--disp);font-stretch:62%}.chdecs span.none{opacity:.45;border-style:dashed;box-shadow:none}
 .myclips #chClear{width:auto;display:inline-flex}
 .prv .pslot.wrong{outline:4px solid var(--red);outline-offset:2px}.prv .lab{margin:10px 0 4px}
+.mlsilent{display:inline-block;margin-left:10px;padding:5px 10px;background:var(--red);color:#fff;font:900 12px var(--disp);font-stretch:110%;text-transform:uppercase;border:3px solid var(--ink)}
