@@ -122,7 +122,7 @@ async function openRoom(code){
       peer.on('disconnected',()=>{try{peer.reconnect();}catch(e){}});
       peer.on('connection',conn=>{
         conn.on('data',m=>{try{hostData(conn,m);}catch(e){console.error(e);}});
-        conn.on('close',()=>{G.lobby.delete(conn);const p=players().find(x=>x.conn===conn);if(p){p.conn=null;lobbyNames();liveUpdate();if(G.view!=='play')render();}});
+        conn.on('close',()=>{G.lobby.delete(conn);const p=players().find(x=>x.conn===conn);if(p){p.conn=null;if(p.hand){p.hand=0;handsUpdate();}lobbyNames();liveUpdate();if(G.view!=='play')render();}});
         conn.on('error',()=>{});
       });
     };
@@ -286,6 +286,7 @@ function hostData(conn,m){
   if(m.t==='ping'){try{conn.send({t:'pong'});}catch(e){}return;}
   if(m.t==='who'){G.lobby.add(conn);try{conn.send(namesMsg());}catch(e){}return;}
   if(m.t==='pair'){cadcastPair(conn,m);return;}
+  if(m.t==='hand'){const p=players().find(x=>x.conn===conn);if(p)setHand(p,!!m.up);return;}
   if(m.t==='vote'){const p=players().find(x=>x.conn===conn);if(p&&G.view==='vote'&&V)voteAct(p,m);return;}
   if(m.t==='hi'){
     const id=String(m.id||'').slice(0,40);if(!id)return;
@@ -316,6 +317,21 @@ function stateFor(p){
 function sync(p){if(p.conn&&p.conn.open)try{p.conn.send(stateFor(p));}catch(e){}}
 function syncAll(){G.players.forEach(sync);}
 function kick(id){const p=G.players.get(id);if(!p)return;G.banned.add(id);if(p.conn)try{p.conn.send({t:'kick'});}catch(e){}G.players.delete(id);saveRoom();render();}
+/* ---------- raise your hand: a phone-only button; the host shows it in the header and on the name chips ---------- */
+const HAND_ICON=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 12.5V6a1.5 1.5 0 0 1 3 0v5.5M10.5 11V4.2a1.5 1.5 0 0 1 3 0V11M13.5 11V5.2a1.5 1.5 0 0 1 3 0V12M16.5 12V8.4a1.5 1.5 0 0 1 3 0v5.4c0 4.4-3 7.7-7.2 7.7-2.9 0-4.7-1.4-6.1-3.7L3.6 14a1.6 1.6 0 0 1 2.6-1.8l1.3 1.6" fill="currentColor" fill-opacity=".25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const handsUp=()=>players().filter(p=>p.hand).sort((a,b)=>a.hand-b.hand);
+function handsHTML(){const H=handsUp();if(!H.length)return '';
+  const label=`${esc(H[0].name.split(' ')[0])}${H.length>1?` <em>+${H.length-1}</em>`:''}`;
+  return `<button class="handbtn" id="bHands" aria-expanded="${!!G.handsOpen}" title="Raised hands, in order">${HAND_ICON}<b>${label}</b></button>${G.handsOpen?`<div class="handpop"><span class="lab">Hands up · first raised first</span>${H.map((p,i)=>`<button class="handrow c${p.sh}" data-lower="${esc(p.id)}" title="Lower this hand"><b>${i+1}</b>${shape(p.sh,16)}<span>${esc(p.name)}</span><em>${handAgo(p.hand)}</em><i>lower</i></button>`).join('')}<button class="ghost" id="bLowerAll">Lower all hands</button></div>`:''}`;}
+const handAgo=t=>{const s=Math.round((Date.now()-t)/1000);return s<60?s+' s':Math.floor(s/60)+' min';};
+function setHand(p,up){const was=!!p.hand;p.hand=up?(p.hand||Date.now()):0;if(up&&!was)(sfx.inn||sfx.vote||(()=>{}))();
+  if(p.conn&&p.conn.open)try{p.conn.send({t:'hand',up:!!p.hand});}catch(e){}handsUpdate();}
+// updates in place: a hand going up must never re-render a running game
+function handsUpdate(){const h=$('#hands');if(!handsUp().length)G.handsOpen=false;if(h)h.innerHTML=handsHTML();
+  $$('.mchip').forEach(b=>{const p=G.players.get(b.dataset.id);if(!p)return;b.classList.toggle('hand',!!p.hand);const i=b.querySelector('.mhand');if(p.hand&&!i)b.insertAdjacentHTML('beforeend',`<i class="mhand">${HAND_ICON}</i>`);if(!p.hand&&i)i.remove();});}
+if(ROLE==='host'){document.addEventListener('click',e=>{const t=e.target.closest('#bHands,[data-lower],#bLowerAll');if(!t)return;e.stopPropagation();
+  if(t.id==='bHands')G.handsOpen=!G.handsOpen;else if(t.id==='bLowerAll')handsUp().forEach(p=>setHand(p,false));else{const p=G.players.get(t.dataset.lower);if(p)setHand(p,false);}handsUpdate();},true);
+  setInterval(()=>{if(G.handsOpen)handsUpdate();},15000);}
 function liveUpdate(){
   const n=$('#nOn');if(n)n.textContent=online().length;
   if(G.view==='play'&&G.game&&G.game.live)G.game.live();
@@ -328,7 +344,7 @@ function topBar(){
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
     :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
   const room=G.code?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${G.view!=='menu'?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
-  return `<header class="top">${logo()}<div class="tmid">${mid}</div><div class="tright">${room}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div>
+  return `<header class="top">${logo()}<div class="tmid">${mid}</div><div class="tright">${room}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div>
     ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote on the next game">Vote</button>`:''}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">Mixer</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
@@ -398,7 +414,7 @@ function rMenu(st){
         <span class="fine"><a href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST</a></span></div>
       <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
         <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
-      <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
+      <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
     </aside>
@@ -700,7 +716,7 @@ async function pConnect(){
     const fail=setTimeout(()=>{if(!conn.open){PL.status='No room '+PL.code+' found. Check the code on the big screen.';pRender();}},9000);
     conn.on('open',()=>{clearTimeout(fail);PL.retry=0;PL.heard=now();PL.status='';conn.send(PL.joined?{t:'hi',id:PL.id,name:PL.name}:{t:'who'});if(!PL.joined)pRender();const q=PL.q;PL.q=[];q.forEach(m=>{try{conn.send(m);}catch(e){}});});
     conn.on('data',m=>{PL.heard=now();pData(m);});
-    conn.on('close',()=>{if(PL.kicked)return;PL.status='Lost the room — reconnecting…';pRender();pRetry();});});
+    conn.on('close',()=>{if(PL.kicked)return;PL.hand=false;PL.status='Lost the room — reconnecting…';pRender();pRetry();});});
   peer.on('error',e=>{if(e.type==='peer-unavailable'){PL.status='No room '+PL.code+' found. Check the code on the big screen.';pRender();if(PL.joined)pRetry();return;}PL.status='Connection problem ('+(e.type||'?')+') — retrying…';pRender();pRetry();});
 }
 // heartbeat: a reloaded host page doesn't always close the old channel, so 12 s of silence means reconnect
@@ -713,6 +729,7 @@ function pData(m){
   if(!m||typeof m!=='object'||m.t==='pong')return;
   if(m.t==='log'){const had=(PL.log||[]).length;PL.log=Array.isArray(m.log)?m.log:[];const b=$('.nbcount');if(b){b.textContent=PL.log.length;if(PL.log.length>had){const n=$('#nbBtn');if(n){n.classList.remove('ping');void n.offsetWidth;n.classList.add('ping');}}}if($('#nb'))openNotebook();return;}
   if(m.t==='names'){PL.names=m;if(!PL.joined)pRender();return;}
+  if(m.t==='hand'){PL.hand=!!m.up;pHandShow();return;}
   if(m.t==='paired'){showPaired(m);return;}
   if(m.t==='clock'){if(PL.timer){PL.timer.end=now()+(+m.left||0);PL.timer.frozen=m.paused?(+m.left||0):null;}return;}
   if(m.t==='taken'){PL.joined=false;PL.st=null;store.del('proom');PL.status=m.name+' is already in the room on another phone. Tell your teacher if that isn’t you.';pRender();return;}
@@ -727,12 +744,15 @@ function pData(m){
   pRender();
 }
 function pRankCard(root,st,label){root.innerHTML=`<div class="pcenter dots"><div class="lab">${esc(label)}</div><div class="rankbig">${st.rank}<sup>${sufx(st.rank)}</sup></div><p>of ${st.of} · <b>${st.gp}</b> points${st.streak>1?` · ${st.streak} in a row`:''}</p></div>`;}
+function pHandShow(){const b=$('#pHand');if(!b)return;b.classList.toggle('up',!!PL.hand);b.setAttribute('aria-pressed',String(!!PL.hand));
+  let t=$('#pHandTip');if(PL.hand&&!t){document.body.insertAdjacentHTML('beforeend','<div class="phandtip" id="pHandTip">Hand raised · your teacher sees it. Tap the hand again to lower it.</div>');setTimeout(()=>{const x=$('#pHandTip');if(x)x.remove();},3200);}if(!PL.hand&&t)t.remove();}
 function pRender(){
   if(ROLE!=='player')return;
   const app=$('#app');app.className='ply';const s=PL.st;
-  const top=`<header class="ptop">${logo()}${PL.joined&&s&&s.view!=='kicked'?`<button class="nbbtn" id="nbBtn" aria-label="Your notebook">${NB_ICON}<b class="nbcount">${(PL.log||[]).length}</b></button><div class="who"><span>${esc(PL.name)}</span><b class="pscore">${s.total||0}</b></div>`:''}</header>`;
+  const top=`<header class="ptop">${logo()}${PL.joined&&s&&s.view!=='kicked'?`<button class="nbbtn" id="nbBtn" aria-label="Your notebook">${NB_ICON}<b class="nbcount">${(PL.log||[]).length}</b></button><button class="phand${PL.hand?' up':''}" id="pHand" aria-pressed="${!!PL.hand}" aria-label="Raise your hand">${HAND_ICON}</button><div class="who"><span>${esc(PL.name)}</span><b class="pscore">${s.total||0}</b></div>`:''}</header>`;
   app.innerHTML=top+`<main class="pbody" id="pbody"></main>`;
   if($('#nbBtn'))$('#nbBtn').onclick=openNotebook;
+  if($('#pHand'))$('#pHand').onclick=()=>{PL.hand=!PL.hand;pHandShow();papi.vibe(PL.hand?[15,40,15]:10);const m={t:'hand',up:PL.hand};if(PL.conn&&PL.conn.open)try{PL.conn.send(m);}catch(e){}};
   const lg=$('.ptop .logo');if(lg){lg.onclick=openInstall;if(!isStandalone())lg.insertAdjacentHTML('beforeend','<i class="appbadge" aria-label="Add to home screen">＋</i>');}
   const body=$('#pbody');PL.key='';PL.timer=null;PL.clock=null;
   setTimeout(()=>{const gb=$('#pGuide');if(gb)gb.onclick=openGuide;},0);
@@ -867,7 +887,7 @@ function boot(){
   });
   if(ROLE==='host'){
     const s=store.get('room',null);
-    if(s&&Date.now()-s.t<12*3600e3){s.players.forEach((p,k)=>G.players.set(p.id,{...blankP(),...p,sh:p.sh??k%4,conn:null}));G.banned=new Set(s.banned||[]);}
+    if(s&&Date.now()-s.t<12*3600e3){s.players.forEach((p,k)=>G.players.set(p.id,{...blankP(),...p,hand:0,sh:p.sh??k%4,conn:null}));G.banned=new Set(s.banned||[]);}
     render();
     if(typeof songReady==='function')songReady().catch(()=>{});
     attLoad();

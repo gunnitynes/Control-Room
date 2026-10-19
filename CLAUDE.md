@@ -94,6 +94,9 @@ Phones and the host keep old files otherwise.
   student into both. Joining via the room QR still works on its own. The patch bay reads room + allow-list from
   localStorage (same site, same Chrome). The header's **Mixer** button (`openMixer`) opens it as ../CADCAST/patch/ in a
   named tab; it must be this same browser. The patch bay lists paired-but-silent students as "Paired · no sound yet".
+- **Raise your hand** (phones only): `#pHand` in the phone header sends `{t:'hand', up}`; the host keeps `p.hand` (time raised),
+  shows `#hands` in the header (first raised + count; click for the ordered list, lower one or all) and a yellow name chip.
+  `handsUpdate()` updates in place and never re-renders a running game. Hands drop on disconnect; lowering is echoed back to the phone.
 - **Room vote** (js/vote.js): `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
   `{t:'vote', v}` (not `act`). Votes are by player id and only count while the player is in the room. Close → 3-2-1 →
   winner card (ties: a spotlight picks one). Reuse it with `openVote({title, sub, kind:'text', opts:[{v,l,s,c}], win:{go, fn}})`.
