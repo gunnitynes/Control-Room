@@ -2,16 +2,16 @@ Photos from Wikimedia Commons, used under their licences:
 
 sm57.webp: File:Shure SM57 microphone.jpg by E bailey, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Shure_SM57_microphone.jpg
 sm58.webp: File:Portrait of a Shure SM58 Microphone (9632508732).jpg by Christopher Sessums from Portland, US, CC BY-SA 2.0, https://commons.wikimedia.org/wiki/File:Portrait_of_a_Shure_SM58_Microphone_(9632508732).jpg
-sm7b.webp: File:Shure SM7.jpg by The Midnite Wolf, CC0, https://commons.wikimedia.org/wiki/File:Shure_SM7.jpg
+sm7b.webp: File:Marius Bear SM7B.jpg by Christoph Soltmannowski, CC BY 3.0, https://commons.wikimedia.org/wiki/File:Marius_Bear_SM7B.jpg
 u87.webp: File:Neumann U87 microphone 20050905.jpg by Michael Rhys, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Neumann_U87_microphone_20050905.jpg
 u47.webp: File:Microphone Neumann U-47 (1949).jpg by The original uploader was Goldfinger at Serbian Wikipedia., CC BY-SA 3.0 rs, https://commons.wikimedia.org/wiki/File:Microphone_Neumann_U-47_(1949).jpg
 c414.webp: File:AKG-C414-front.jpg by Iain Fergusson - Iainf 07:39, 25 June 2006 (UTC), CC BY 2.5, https://commons.wikimedia.org/wiki/File:AKG-C414-front.jpg
 md421.webp: File:Sennheiser MD 421 ks01.jpg by Kreuzschnabel, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Sennheiser_MD_421_ks01.jpg
 re20.webp: File:EV RE20 voiceover booth.jpg by Binksternet, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:EV_RE20_voiceover_booth.jpg
 rca44.webp: File:RCA 44-A Velocity Microphone.jpg by Roadside Guitars, CC BY-SA 2.0, https://commons.wikimedia.org/wiki/File:RCA_44-A_Velocity_Microphone.jpg
+rca77.webp: File:RCA 77DX Ribbon Mic from Electraphonic's mic collection.jpg by Jacob Blickenstaff, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:RCA_77DX_Ribbon_Mic_from_Electraphonic%27s_mic_collection.jpg
 shure55.webp: File:Shure mikrofon 55S.jpg by Holger.Ellgaard, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Shure_mikrofon_55S.jpg
 la2a.webp: File:Teletronix LA-2A Leveling Amplifier - PatchWerk Recording Studios, 2007 (edit & clip).jpg by Teletronix LA-2A Leveling Amplifier, etc. Outboard racks 2-3, PatchWerk Recordin, CC BY 4.0, https://commons.wikimedia.org/wiki/File:Teletronix_LA-2A_Leveling_Amplifier_-_PatchWerk_Recording_Studios,_2007_(edit_%26_clip).jpg
-pultec.webp: File:Equalizers - Pultec EQP-1A, EQP-1A3 & Summit Audio EQF-100, Avex Honolulu Studios (edit1).jpg by Equalizers - Pultec EQP-1A, EQP-1A3 & Summit Audio EQF-100, Avex Honolulu Studio, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Equalizers_-_Pultec_EQP-1A,_EQP-1A3_%26_Summit_Audio_EQF-100,_Avex_Honolulu_Studios_(edit1).jpg
 fairchild.webp: File:Fairchild 670 Compressor at Audio Mix House (2014-07-28 by Audio Mix House).jpg by Audio Mix House from United States, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Fairchild_670_Compressor_at_Audio_Mix_House_(2014-07-28_by_Audio_Mix_House).jpg
 emt140.webp: File:EMT 140.jpg by EMT-Archiv-Lahr, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:EMT_140.jpg
 h3000.webp: File:Eventide H3000-D SE Dynamic Ultra-Harmonizer - My new best friend. KayoDot album "Hubardo" recording, 2013-04-21.jpg by Daniel Means, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Eventide_H3000-D_SE_Dynamic_Ultra-Harmonizer_-_My_new_best_friend._KayoDot_album_%22Hubardo%22_recording,_2013-04-21.jpg
@@ -20,7 +20,7 @@ echoplex.webp: File:Maestro Echoplex EP-2 (edit1).jpg by Maestro Echoplex EP-2.j
 api500.webp: File:DIYRecording Equipment (DIYRE) Colour Pallete 500-Series modules, mounted on 500-Series rack (API Lunchbox) - 2016 NAMM Show (2016-01-24 11.14.44 by Daniel Larsen).jpg by Daniel Larsen from Auckland, New Zealand, CC BY-SA 2.0, https://commons.wikimedia.org/wiki/File:DIYRecording_Equipment_(DIYRE)_Colour_Pallete_500-Series_modules,_mounted_on_500-Series_rack_(API_Lunchbox)_-_2016_NAMM_Show_(2016-01-24_11.14.44_by_Daniel_Larsen).jpg
 distressor.webp: File:EL8-X Distressors.jpg by The Midnite Wolf, CC0, https://commons.wikimedia.org/wiki/File:EL8-X_Distressors.jpg
 binson.webp: File:Pink Floyd Their Mortal Remains - 2017-10-13 - Andy Mabbett - 30.jpg by Andy Mabbett, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Pink_Floyd_Their_Mortal_Remains_-_2017-10-13_-_Andy_Mabbett_-_30.jpg
-studer.webp: File:Studer A800 MK III (part).jpg by eyeliam from Portland, United States, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Studer_A800_MK_III_(part).jpg
+studer.webp: File:Studer A800 MK III professional 24-track audio tape recorder, at Bullet Sound Studios (retouched).jpg by Hens Zimmerman from Zeist, The Netherlands, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Studer_A800_MK_III_professional_24-track_audio_tape_recorder,_at_Bullet_Sound_Studios_(retouched).jpg
 ampex.webp: File:Ampex model 300 ½" 3tr (RCA Studio B).jpg by Cliff, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Ampex_model_300_%C2%BD%22_3tr_(RCA_Studio_B).jpg
 minimoog.webp: File:Minimoog Model D Synthesizer at SMEM Playroom.jpg by 1904.CC, CC BY 4.0, https://commons.wikimedia.org/wiki/File:Minimoog_Model_D_Synthesizer_at_SMEM_Playroom.jpg
 moogmod.webp: File:1st commercial Moog synthesizer (1964, commissioned by the Alwin Nikolai Dance Theater of NY) @ Stearns Collection (Stearns 2035), University of Michigan.jpg by Chad, CC BY-SA 2.0, https://commons.wikimedia.org/wiki/File:1st_commercial_Moog_synthesizer_(1964,_commissioned_by_the_Alwin_Nikolai_Dance_Theater_of_NY)_@_Stearns_Collection_(Stearns_2035),_University_of_Michigan.jpg
@@ -45,7 +45,7 @@ op1.webp: File:The OP-1 by Teenage Engineering.jpg by justin lincoln, CC BY-SA 2
 hammond.webp: File:Hammond B-3 (1958) tone-wheel organ - MIM Phoenix AZ (2017-12-04 14.14.22 by bobistraveling 141422).jpg by bobistraveling, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Hammond_B-3_(1958)_tone-wheel_organ_-_MIM_Phoenix_AZ_(2017-12-04_14.14.22_by_bobistraveling_141422).jpg
 rhodes.webp: File:1975 Rhodes Mark I Stage Piano 73-key (serial no.300???) with Dyna Rhodes modification - top view (2005-01-07 20.44.14 by Daniel Spils).jpg by Daniel Spils from Seattle, USA, CC BY 2.0, https://commons.wikimedia.org/wiki/File:1975_Rhodes_Mark_I_Stage_Piano_73-key_(serial_no.300%3F%3F%3F)_with_Dyna_Rhodes_modification_-_top_view_(2005-01-07_20.44.14_by_Daniel_Spils).jpg
 wurli.webp: File:Wurlitzer 200A -2.jpg by I99pema, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Wurlitzer_200A_-2.jpg
-clavinet.webp: File:Hohner Clavinet D6 & Hammond M-100 series, Vinylizor Studio, London.jpg by Marc Wathieu from Huy, Belgium, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Hohner_Clavinet_D6_%26_Hammond_M-100_series,_Vinylizor_Studio,_London.jpg
+clavinet.webp: File:Clavinet d6.jpg by unknown, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Clavinet_d6.jpg
 tr808.webp: File:Roland TR-808 (large).jpg by Roland_TR-808_&_909.jpg: Brandon Daniel derivative work: Clusternote (talk), CC BY-SA 2.0, https://commons.wikimedia.org/wiki/File:Roland_TR-808_(large).jpg
 tr909.webp: File:Tr-909.jpg by unknown, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Tr-909.jpg
 tr606.webp: File:Roland TR-606.jpg by Midas Wouters, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Roland_TR-606.jpg
@@ -62,7 +62,6 @@ synclavier.webp: File:NED Synclavier PSMT, MIM PHX.jpg by Kevin Spencer, CC BY 2
 mirage.webp: File:Ensoniq Mirage DSK.jpg by Ensoniq_Mirage_(with_cable).jpg: emily przybylinski Ensoniq_EPS_Photo.jpg: Johnr, CC BY 2.0, https://commons.wikimedia.org/wiki/File:Ensoniq_Mirage_DSK.jpg
 emulator.webp: File:E-mu Emulator II+ (rectified, colours improved).jpg by Mojosynths, Public domain, https://commons.wikimedia.org/wiki/File:E-mu_Emulator_II%2B_(rectified,_colours_improved).jpg
 mc303.webp: File:MC-303.jpg by Nina Richards (who can be contacted via ZoeB), Public domain, https://commons.wikimedia.org/wiki/File:MC-303.jpg
-sideman.webp: File:Wurlitzer Sideman (1959) upper half.jpg by Akaphon_(1963).jpg: andrew garton from Melbourne, Australia derivative work: Clu, CC BY-SA 2.0, https://commons.wikimedia.org/wiki/File:Wurlitzer_Sideman_(1959)_upper_half.jpg
 xlr.webp: File:Xlr-connectors.jpg by No machine-readable author provided. Mxp assumed (based on copyright claims)., CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Xlr-connectors.jpg
 ts.webp: File:TS 0.25inch mono plug.jpg by Mataresephotos, CC BY 3.0, https://commons.wikimedia.org/wiki/File:TS_0.25inch_mono_plug.jpg
 rca.webp: File:Cinch-Stecker.jpg by Wollschaf, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Cinch-Stecker.jpg
@@ -74,3 +73,10 @@ popfilter.webp: File:Microphone électrostatique.jpg by Éric Chassaing at Frenc
 anechoic.webp: File:RF Fully Anechoic Room 2.jpg by Mihaelawojcik, CC BY 4.0, https://commons.wikimedia.org/wiki/File:RF_Fully_Anechoic_Room_2.jpg
 foam.webp: File:Acoustic foam closeup.jpg by Chlod Alejandro, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Acoustic_foam_closeup.jpg
 shockmount.webp: File:XLR-microphone.jpg by Kreuzschnabel, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:XLR-microphone.jpg
+nt1a.webp: File:RODE NT1A.jpg by LuukRost, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:RODE_NT1A.jpg
+at2020.webp: File:Audio-technica AT2020.JPG by Lokal_Profil, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Audio-technica_AT2020.JPG
+mkh416.webp: File:Sennheiser MKH416.jpg by Galak76, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:Sennheiser_MKH416.jpg
+coles4038.webp: File:BBC microphones (The Beatles Story).jpg by Hens Zimmerman, CC BY 2.0, https://commons.wikimedia.org/wiki/File:BBC_microphones_(The_Beatles_Story).jpg
+c37a.webp: File:100.80.60.展 Ginza Sony Park (55306461690).jpg by nagi usano, CC BY 4.0, https://commons.wikimedia.org/wiki/File:100.80.60.%E5%B1%95_Ginza_Sony_Park_(55306461690).jpg
+c451.webp: File:AKG C451B.jpg by Harumphy at en.wikipedia, CC BY-SA 3.0, https://commons.wikimedia.org/wiki/File:AKG_C451B.jpg
+soyuz017.webp: File:20220426 Soyuz microphone.jpg by Sergey A. Demidov, CC BY 4.0, https://commons.wikimedia.org/wiki/File:20220426_Soyuz_microphone.jpg

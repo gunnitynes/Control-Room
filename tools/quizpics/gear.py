@@ -17,7 +17,6 @@ GEAR = [
  ('m160','Beyerdynamic M 160','Beyerdynamic M160','outboard','mic'),
  ('shure55','Shure 55 ("Elvis mic")','Shure 55 microphone','outboard','mic'),
  ('c12','AKG C12','AKG C12 microphone','outboard','mic'),
- ('e609','Sennheiser e609','Sennheiser e609','outboard','mic'),
  # outboard and consoles
  ('la2a','Teletronix LA-2A','Teletronix LA-2A','outboard','box'),
  ('u1176','Urei 1176','Urei 1176 compressor','outboard','box'),
@@ -45,7 +44,7 @@ GEAR = [
  ('moogmod','Moog modular','Moog modular synthesizer','classic','synth'),
  ('arp2600','ARP 2600','ARP 2600','classic','synth'),
  ('odyssey','ARP Odyssey','ARP Odyssey synthesizer','classic','synth'),
- ('prophet5','Sequential Prophet-5','Prophet-5 synthesizer','classic','synth'),
+ ('prophet5','Sequential Prophet-10','Prophet-5 synthesizer','classic','synth'),
  ('obxa','Oberheim OB-Xa','Oberheim OB-Xa','classic','synth'),
  ('jupiter8','Roland Jupiter-8','Roland Jupiter-8','classic','synth'),
  ('juno106','Roland Juno-106','Roland Juno-106','classic','synth'),

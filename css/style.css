@@ -1405,3 +1405,11 @@ body:has(#app.guidepage){overflow:auto}
 .mc.reveal.haspic .qpic{box-shadow:10px 10px 0 var(--green)}
 .qside{display:grid;gap:14px;align-content:center;min-width:0}
 .qcredit{font:400 11px/1.3 var(--mono);color:var(--ink2);margin:0}
+.qfact{font:700 clamp(14px,1.3vw,19px)/1.35 var(--disp);margin:0;max-width:52ch;padding-left:12px;border-left:5px solid var(--yel)}
+.phcell .slotname{font:800 13px var(--disp)}
+.phadd.slot span{font:800 14px/1.15 var(--disp);text-align:center}
+.mc.reveal.haspic .qrow{flex:0 0 auto;height:clamp(150px,calc(100vh - 430px),56vh);overflow:hidden;align-items:start}
+.mc.reveal.haspic .qpic img{max-height:max(110px,calc(100vh - 470px))}
+.mc.reveal.haspic .bigans{padding:12px 18px}
+.qfact{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-height:680px){.mc.reveal.haspic .qrow{height:auto;grid-template-columns:1fr}.mc.reveal.haspic .qpic,.mc.reveal.haspic .qfact,.mc.reveal.haspic .qcredit{display:none}}

@@ -22,6 +22,10 @@ js/games-brain.js   Know your stuff: The Quiz, Shortcut Showdown, Translation Gr
                     The Studio Vault (the stories), each 7 categories; option c_<bank id> picks a bank's categories
                     Picture questions: data/quiz-pics.js (QUIZ_PICS, 74 Commons photos in images/quiz/, built by
                     tools/quizpics) join The Machine Room's categories; picQ() asks name / type / maker with fresh wrong answers
+                    Names/logos are blurred and extra devices cropped at build time (tools/quizpics/blur.py BLUR / CROP).
+                    The owner's mic list (tools/quizpics/mics.py) gives each mic its type and a fact for the reveal; mics with no
+                    free photo are QUIZ_PIC_SLOTS, filled in the Quiz setup from the teacher's own browser (clipDB dec -3) and never
+                    uploaded. Never commit photos copied from sites like recordinghacks.com: the repo is public.
 js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
                     (Envelope Sculptor: envPts/envApply in audio.js are the ONE shape drawn and played — straight lines,
                     gain = level^1.7, no vibrato or reverb; options share one time axis with a tick per second)

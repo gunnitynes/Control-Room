@@ -32,3 +32,6 @@ The Machine Room's picture questions. `gear.py` lists the gear; `search.py` find
 picks go in `picks.json` (id → candidate number); `build.py` writes images/quiz/*.webp, images/quiz/CREDITS.txt
 and data/quiz-pics.js. Only CC / public-domain photos are kept, and every reveal shows the credit.
 Always look at the sheets: Commons search returns trains for "KM 184" and cars for "SM7B".
+`blur.py` holds BLUR boxes (names and logos, as fractions of the image) and CROP boxes (keep only the asked-about
+device); find them with a 10 % grid drawn over each photo. `mics.py` is the teacher's microphone list (type, fact);
+`search_mics.py` searches Commons categories for it. Mics with no usable free photo become upload slots in the Quiz.

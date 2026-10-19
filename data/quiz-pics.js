@@ -9,6 +9,7 @@ window.QUIZ_PICS=[
 "src": "images/quiz/sm57.webp",
 "credit": "Photo: E bailey · CC BY-SA 4.0 · Wikimedia Commons",
 "type": "Dynamic",
+"fact": "Dynamic · The king of instrument recording: the standard for snare drums and electric guitar cabs.",
 "maker": "Shure"
 },
 {
@@ -19,16 +20,18 @@ window.QUIZ_PICS=[
 "src": "images/quiz/sm58.webp",
 "credit": "Photo: Christopher Sessums from Portland, US · CC BY-SA 2.0 · Wikimedia Commons",
 "type": "Dynamic",
+"fact": "Dynamic · The global standard for live vocals, legendary for being indestructible.",
 "maker": "Shure"
 },
 {
 "id": "sm7b",
-"name": "Shure SM7",
+"name": "Shure SM7B",
 "cat": "outboard",
 "kind": "mic",
 "src": "images/quiz/sm7b.webp",
-"credit": "Photo: The Midnite Wolf · CC0 · Wikimedia Commons",
+"credit": "Photo: Christoph Soltmannowski · CC BY 3.0 · Wikimedia Commons",
 "type": "Dynamic",
+"fact": "Dynamic · Used on Michael Jackson's Thriller; today the king of podcasting and rock vocals.",
 "maker": "Shure"
 },
 {
@@ -39,6 +42,7 @@ window.QUIZ_PICS=[
 "src": "images/quiz/u87.webp",
 "credit": "Photo: Michael Rhys · CC BY 2.0 · Wikimedia Commons",
 "type": "Condenser",
+"fact": "FET condenser · The most famous and universally used large-diaphragm studio microphone in the world.",
 "maker": "Neumann"
 },
 {
@@ -49,6 +53,7 @@ window.QUIZ_PICS=[
 "src": "images/quiz/u47.webp",
 "credit": "Photo: The original uploader was Goldfinger at Serbian Wikipedia. · CC BY-SA 3.0 rs · Wikimedia Commons",
 "type": "Tube condenser",
+"fact": "Tube condenser · The vocal blueprint: Frank Sinatra, The Beatles, Ella Fitzgerald.",
 "maker": "Neumann"
 },
 {
@@ -59,6 +64,7 @@ window.QUIZ_PICS=[
 "src": "images/quiz/c414.webp",
 "credit": "Photo: Iain Fergusson - Iainf 07:39, 25 June 2006 (UTC) · CC BY 2.5 · Wikimedia Commons",
 "type": "Condenser",
+"fact": "Multi-pattern FET condenser · The Swiss Army knife: multi-pattern recording on pianos, overheads and acoustic instruments.",
 "maker": "AKG"
 },
 {
@@ -69,6 +75,7 @@ window.QUIZ_PICS=[
 "src": "images/quiz/md421.webp",
 "credit": "Photo: Kreuzschnabel · CC BY-SA 3.0 · Wikimedia Commons",
 "type": "Dynamic",
+"fact": "Dynamic · Recognisable by its unique clip; the go-to mic for toms, brass and guitar cabinets.",
 "maker": "Sennheiser"
 },
 {
@@ -79,16 +86,29 @@ window.QUIZ_PICS=[
 "src": "images/quiz/re20.webp",
 "credit": "Photo: Binksternet · CC BY-SA 4.0 · Wikimedia Commons",
 "type": "Dynamic",
+"fact": "Dynamic · Variable-D design kills the proximity bass boost; the standard for radio and kick drums.",
 "maker": "Electro-Voice"
 },
 {
 "id": "rca44",
-"name": "RCA 44 ribbon mic",
+"name": "RCA 44",
 "cat": "outboard",
 "kind": "mic",
 "src": "images/quiz/rca44.webp",
 "credit": "Photo: Roadside Guitars · CC BY-SA 2.0 · Wikimedia Commons",
 "type": "Ribbon",
+"fact": "Ribbon · The 1930s ribbon classic: rich, smooth brass and big bands.",
+"maker": "RCA"
+},
+{
+"id": "rca77",
+"name": "RCA 77-DX",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/rca77.webp",
+"credit": "Photo: Jacob Blickenstaff · CC BY-SA 4.0 · Wikimedia Commons",
+"type": "Ribbon",
+"fact": "Ribbon · The icon of mid-century broadcast (Larry King) and smooth brass and big bands.",
 "maker": "RCA"
 },
 {
@@ -109,15 +129,6 @@ window.QUIZ_PICS=[
 "src": "images/quiz/la2a.webp",
 "credit": "Photo: Teletronix LA-2A Leveling Amplifier, etc. Outboard racks 2-3, PatchWerk Recordin · CC BY 4.0 · Wikimedia Commons",
 "type": "Compressor"
-},
-{
-"id": "pultec",
-"name": "Pultec EQP-1A",
-"cat": "outboard",
-"kind": "box",
-"src": "images/quiz/pultec.webp",
-"credit": "Photo: Equalizers - Pultec EQP-1A, EQP-1A3 & Summit Audio EQF-100, Avex Honolulu Studio · CC BY-SA 3.0 · Wikimedia Commons",
-"type": "EQ"
 },
 {
 "id": "fairchild",
@@ -197,7 +208,7 @@ window.QUIZ_PICS=[
 "cat": "outboard",
 "kind": "tape",
 "src": "images/quiz/studer.webp",
-"credit": "Photo: eyeliam from Portland, United States · CC BY 2.0 · Wikimedia Commons"
+"credit": "Photo: Hens Zimmerman from Zeist, The Netherlands · CC BY 2.0 · Wikimedia Commons"
 },
 {
 "id": "ampex",
@@ -245,7 +256,7 @@ window.QUIZ_PICS=[
 },
 {
 "id": "prophet5",
-"name": "Sequential Prophet-5",
+"name": "Sequential Prophet-10",
 "cat": "classic",
 "kind": "synth",
 "src": "images/quiz/prophet5.webp",
@@ -420,7 +431,7 @@ window.QUIZ_PICS=[
 "cat": "classic",
 "kind": "keys",
 "src": "images/quiz/clavinet.webp",
-"credit": "Photo: Marc Wathieu from Huy, Belgium · CC BY 2.0 · Wikimedia Commons",
+"credit": "Photo: unknown · CC BY-SA 3.0 · Wikimedia Commons",
 "maker": "Hohner"
 },
 {
@@ -568,15 +579,6 @@ window.QUIZ_PICS=[
 "maker": "Roland"
 },
 {
-"id": "sideman",
-"name": "Wurlitzer Sideman",
-"cat": "drums",
-"kind": "drum",
-"src": "images/quiz/sideman.webp",
-"credit": "Photo: Akaphon_(1963).jpg: andrew garton from Melbourne, Australia derivative work: Clu · CC BY-SA 2.0 · Wikimedia Commons",
-"maker": "Wurlitzer"
-},
-{
 "id": "xlr",
 "name": "XLR connector",
 "cat": "wiring",
@@ -663,5 +665,237 @@ window.QUIZ_PICS=[
 "kind": "room",
 "src": "images/quiz/shockmount.webp",
 "credit": "Photo: Kreuzschnabel · CC BY-SA 3.0 · Wikimedia Commons"
+},
+{
+"id": "nt1a",
+"name": "Røde NT1-A",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/nt1a.webp",
+"credit": "Photo: LuukRost · CC BY-SA 4.0 · Wikimedia Commons",
+"type": "Condenser",
+"fact": "FET condenser · One of the best-selling home studio mics, famous for its very low self-noise.",
+"maker": "Røde"
+},
+{
+"id": "at2020",
+"name": "Audio-Technica AT2020",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/at2020.webp",
+"credit": "Photo: Lokal_Profil · CC BY-SA 4.0 · Wikimedia Commons",
+"type": "Condenser",
+"fact": "FET condenser · The entry-level cardioid condenser that shaped the home recording revolution.",
+"maker": "Audio-Technica"
+},
+{
+"id": "mkh416",
+"name": "Sennheiser MKH 416",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/mkh416.webp",
+"credit": "Photo: Galak76 · CC BY-SA 3.0 · Wikimedia Commons",
+"type": "Condenser",
+"fact": "Shotgun condenser · A film boom mic that became the standard for voiceover, trailers and ADR.",
+"maker": "Sennheiser"
+},
+{
+"id": "coles4038",
+"name": "Coles 4038",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/coles4038.webp",
+"credit": "Photo: Hens Zimmerman · CC BY 2.0 · Wikimedia Commons",
+"type": "Ribbon",
+"fact": "Ribbon · The BBC's \"waffle iron\" ribbon from the 1950s, warm on drum overheads.",
+"maker": "Coles"
+},
+{
+"id": "c37a",
+"name": "Sony C-37A",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/c37a.webp",
+"credit": "Photo: nagi usano · CC BY 4.0 · Wikimedia Commons",
+"type": "Tube condenser",
+"fact": "Tube condenser · A 1950s tube legend loved for its smooth tone by Miles Davis and Frank Sinatra.",
+"maker": "Sony"
+},
+{
+"id": "c451",
+"name": "AKG C451",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/c451.webp",
+"credit": "Photo: Harumphy at en.wikipedia · CC BY-SA 3.0 · Wikimedia Commons",
+"type": "Condenser",
+"fact": "Small-diaphragm condenser · The modular pencil mic of the 1970s, fast on acoustic guitar and hi-hats.",
+"maker": "AKG"
+},
+{
+"id": "soyuz017",
+"name": "Soyuz 017",
+"cat": "outboard",
+"kind": "mic",
+"src": "images/quiz/soyuz017.webp",
+"credit": "Photo: Sergey A. Demidov · CC BY 4.0 · Wikimedia Commons",
+"type": "Condenser",
+"fact": "Large-diaphragm condenser · A boutique mic handmade in Russia, prized for rich, polished vocals.",
+"maker": "Soyuz"
+}
+];
+/* no free photo yet: the teacher can add their own in the Quiz setup (kept in that browser only) */
+window.QUIZ_PIC_SLOTS=[
+{
+"id": "r121",
+"name": "Royer R-121",
+"cat": "outboard",
+"kind": "mic",
+"type": "Ribbon",
+"fact": "Ribbon · The modern ribbon workhorse that changed electric guitar recording.",
+"maker": "Royer"
+},
+{
+"id": "beta52",
+"name": "Shure Beta 52A",
+"cat": "outboard",
+"kind": "mic",
+"type": "Dynamic",
+"fact": "Dynamic · A low-frequency monster found in almost every kick drum.",
+"maker": "Shure"
+},
+{
+"id": "d112",
+"name": "AKG D112",
+"cat": "outboard",
+"kind": "mic",
+"type": "Dynamic",
+"fact": "Dynamic · The \"egg mic\": heavy click and presence on kick drums and bass cabinets.",
+"maker": "AKG"
+},
+{
+"id": "md441",
+"name": "Sennheiser MD 441",
+"cat": "outboard",
+"kind": "mic",
+"type": "Dynamic",
+"fact": "Dynamic · Often called the most accurate dynamic mic ever made: looks like a spaceship.",
+"maker": "Sennheiser"
+},
+{
+"id": "km184",
+"name": "Neumann KM 184",
+"cat": "outboard",
+"kind": "mic",
+"type": "Condenser",
+"fact": "Small-diaphragm condenser · The pencil-condenser pair found in nearly every studio, for acoustic guitar and hi-hat.",
+"maker": "Neumann"
+},
+{
+"id": "tlm103",
+"name": "Neumann TLM 103",
+"cat": "outboard",
+"kind": "mic",
+"type": "Condenser",
+"fact": "FET condenser · The Neumann capsule character for home studios, without the U 87 price.",
+"maker": "Neumann"
+},
+{
+"id": "ela251",
+"name": "Telefunken ELA M 251",
+"cat": "outboard",
+"kind": "mic",
+"type": "Tube condenser",
+"fact": "Tube condenser · Legendary silky top end; one of the most expensive vintage mics there is.",
+"maker": "Telefunken"
+},
+{
+"id": "c12",
+"name": "AKG C12",
+"cat": "outboard",
+"kind": "mic",
+"type": "Tube condenser",
+"fact": "Tube condenser · An airy, bright top end: a gold standard for overheads and acoustic tracking.",
+"maker": "AKG"
+},
+{
+"id": "u67",
+"name": "Neumann U 67",
+"cat": "outboard",
+"kind": "mic",
+"type": "Tube condenser",
+"fact": "Tube condenser · Introduced the K67 capsule; used on Nirvana's Nevermind and classic British rock.",
+"maker": "Neumann"
+},
+{
+"id": "c800g",
+"name": "Sony C-800G",
+"cat": "outboard",
+"kind": "mic",
+"type": "Tube condenser",
+"fact": "Tube condenser · A modern legend with its own cooling system; the hip-hop and pop vocal mic.",
+"maker": "Sony"
+},
+{
+"id": "c24",
+"name": "AKG C24",
+"cat": "outboard",
+"kind": "mic",
+"type": "Tube condenser",
+"fact": "Stereo tube condenser · The dual-capsule stereo version of the C12.",
+"maker": "AKG"
+},
+{
+"id": "u47fet",
+"name": "Neumann U 47 fet",
+"cat": "outboard",
+"kind": "mic",
+"type": "Condenser",
+"fact": "Solid-state condenser · The 1969 solid-state U 47: the standard for kick drums and bass cabinets.",
+"maker": "Neumann"
+},
+{
+"id": "m160",
+"name": "Beyerdynamic M 160",
+"cat": "outboard",
+"kind": "mic",
+"type": "Ribbon",
+"fact": "Double ribbon · A hypercardioid ribbon; part of Bonham's \"When the Levee Breaks\" sound.",
+"maker": "Beyerdynamic"
+},
+{
+"id": "sm53",
+"name": "Shure SM53",
+"cat": "outboard",
+"kind": "mic",
+"type": "Dynamic",
+"fact": "Dynamic · A 1970s dynamic designed to minimise proximity effect; a vintage rock favourite.",
+"maker": "Shure"
+},
+{
+"id": "m201",
+"name": "Beyerdynamic M 201",
+"cat": "outboard",
+"kind": "mic",
+"type": "Dynamic",
+"fact": "Dynamic · \"The SM57 on steroids\": accurate, uncoloured snare and acoustic guitar.",
+"maker": "Beyerdynamic"
+},
+{
+"id": "at4050",
+"name": "Audio-Technica AT4050",
+"cat": "outboard",
+"kind": "mic",
+"type": "Condenser",
+"fact": "Multi-pattern condenser · A 1990s \"desert island\" mic: transparent on choirs, piano and overheads.",
+"maker": "Audio-Technica"
+},
+{
+"id": "d6",
+"name": "Audix D6",
+"cat": "outboard",
+"kind": "mic",
+"type": "Dynamic",
+"fact": "Dynamic · Pre-EQ'd with a big scooped bass: the modern rock and metal kick drum mic."
 }
 ];
