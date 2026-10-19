@@ -37,11 +37,7 @@ const PIC_TYPES={mic:['Dynamic','Condenser','Ribbon','Tube condenser'],box:['Com
   P.forEach(p=>{const c=M.cats.find(x=>x.id===p.cat);if(!c)return;c.qs.push({pic:p,ask:'name'});
     if(p.type&&PIC_TYPES[p.kind])c.qs.push({pic:p,ask:'type'});
     if(p.maker&&new Set(P.filter(x=>x.maker&&x.cat===p.cat).map(x=>x.maker)).size>=4)c.qs.push({pic:p,ask:'maker'});});})();
-// the teacher's own mic photos (Quiz setup, kept in this browser: clipDB dec -3, name = the slot id)
-const PIC_URLS=new Map();
-const myPics=()=>(typeof MYCLIPS==='undefined'?[]:MYCLIPS.list.filter(c=>c.dec===-3)).map(c=>{const sl=(window.QUIZ_PIC_SLOTS||[]).find(x=>x.id===c.name);if(!sl)return null;
-  if(!PIC_URLS.has(c.id))PIC_URLS.set(c.id,URL.createObjectURL(c.blob));return {...sl,src:PIC_URLS.get(c.id),credit:'Your own photo · kept in this browser only'};}).filter(Boolean);
-const allPics=()=>(window.QUIZ_PICS||[]).concat(myPics());
+const allPics=()=>window.QUIZ_PICS||[];
 function picQ({pic:p,ask}){const P=allPics(),uniq=a=>[...new Set(a)];let right,pool;
   if(ask==='type'){right=p.type;pool=PIC_TYPES[p.kind];}
   else if(ask==='maker'){right=p.maker;pool=uniq(P.filter(x=>x.maker&&x.cat===p.cat).map(x=>x.maker));}
@@ -55,7 +51,6 @@ const qtag=r=>`<div class="dawtag">${esc(bankOf(r.bank).name)} · ${esc(qcatOf(r
 function buildQuizDeck(o){
   const b=bankOf(o.bank),pick=o['c_'+b.id]||b.cats.map(c=>c.id),pool=[],seen=new Set(),out=[];
   b.cats.filter(c=>pick.includes(c.id)).forEach(c=>c.qs.forEach(q=>pool.push({cat:c.id,q})));
-  if(b.id==='machine'&&pick.includes('outboard'))myPics().forEach(p=>{pool.push({cat:'outboard',q:{pic:p,ask:'name'}});pool.push({cat:'outboard',q:{pic:p,ask:'type'}});});
   for(const it of shuffle(pool)){const cat=it.cat,P=it.q.pic?picQ(it.q):null,q=P?P.q:it.q;
     // same right answer, or the same topic tag (q[3]), counts as the same question
     const keys=[q[2][q[1]].toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,48)];if(q[3])keys.push('#'+q[3]);
@@ -77,17 +72,6 @@ game(roundGame(mcSpec({
     {key:'secs',label:'Answer time',choices:[[10,'10','seconds'],[20,'20','seconds'],[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:20,help:'Faster right answers score more: 1000 points at once, sliding to 500 at the buzzer, +100 for every answer in a streak (up to +500).'},
   ],
   check:v=>(v['c_'+bankOf(v.bank).id]||[]).length?'':'Pick at least one category',
-  setupExtra(v){if(bankOf(v.bank).id!=='machine'||!(window.QUIZ_PIC_SLOTS||[]).length)return '';const mine=new Map(myPics().map(p=>[p.id,p]));
-    return `<div class="fsec micslots"><h3><b>▣</b>Your mic photos<small>${mine.size} of ${QUIZ_PIC_SLOTS.length} added · they stay in this browser and are never uploaded</small></h3>
-      <p class="fine">These mics have no free photo the app may publish. Add your own and they join the picture questions. Crop or cover the name on the mic first.</p>
-      <div class="phgrid">${QUIZ_PIC_SLOTS.map(sl=>{const p=mine.get(sl.id);return p?`<figure class="phcell"><img src="${esc(p.src)}" alt=""><b class="slotname">${esc(sl.name)}</b><button class="ghost" data-delmic="${esc(sl.id)}" aria-label="Remove">×</button></figure>`
-        :`<label class="phadd slot" data-slot="${esc(sl.id)}"><input type="file" accept="image/*" hidden><b>+</b><span>${esc(sl.name)}</span><small>${esc(sl.type)}</small></label>`;}).join('')}</div></div>`;},
-  setupBind(st,redraw){const box=$('.micslots',st);if(!box)return;
-    const save=async(id,f)=>{if(!f||!f.type.startsWith('image/'))return;if(f.size>25e6){toast(f.name+' is over 25 MB');return;}
-      await clipDB.put({id:'q'+id,dec:-3,name:id,blob:f,at:Date.now()});await loadMyClips();toast('Saved in this browser');redraw();};
-    $$('.phadd.slot',box).forEach(l=>{const i=$('input',l);i.onchange=()=>save(l.dataset.slot,i.files[0]);
-      l.ondragover=e=>{e.preventDefault();l.classList.add('over');};l.ondragleave=()=>l.classList.remove('over');l.ondrop=e=>{e.preventDefault();l.classList.remove('over');save(l.dataset.slot,e.dataTransfer.files[0]);};});
-    $$('[data-delmic]',box).forEach(b=>b.onclick=async()=>{if(!confirm('Remove this photo from this browser?'))return;await clipDB.del('q'+b.dataset.delmic);await loadMyClips();redraw();});},
   prepMs:r=>r&&r.text.length>130?5000:4000,prepLabel:'READ',prepSub:'the question',
   prepText:()=>({big:'Eyes up',small:'Read the question on the big screen. The answers appear here in a moment.'}),
   secs:o=>o.secs,build:buildQuizDeck,roundInfo:r=>bankOf(r.bank).name+' · '+qcatOf(r.bank,r.cat).name,
