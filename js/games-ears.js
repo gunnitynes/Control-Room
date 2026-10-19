@@ -46,8 +46,8 @@ function axisPlot({min,max,log=true,fmt,marks=[]},list,truth,{truthLabel=''}={})
 }
 const listenStage=(title,sub,extra='')=>`<div class="listen"><div class="ear"><i></i><i></i><i></i>${shape(0,90,'var(--ink)','var(--red)')}</div><h2>${esc(title)}</h2><p>${esc(sub)}</p>${extra}</div>`;
 
-/* ---------- FREQUENCY DETECTIVE ---------- */
-game(roundGame({
+/* ---------- FREQUENCY DETECTIVE · mode 1: find the filter ---------- */
+const FREQ_FIND=({
   id:'detective',noWord:'Way off',group:'ears',name:'Frequency Detective',tag:'A narrow filter roams the mix and parks somewhere. Name the frequency.',
   how:['A sharp band-pass filter sweeps through a full mix, then stops.','Slide to the frequency you hear isolated and lock it in.','Points for how close you get — measured in octaves, like your ears.'],
   badges:['Scored','Listening'],speed:.15,okAt:.8,closeAt:.45,yesWord:'Spot on!',
@@ -85,7 +85,7 @@ game(roundGame({
   publicReveal:r=>({f:r.f}),
   pReveal:(box,st)=>{box.innerHTML=`<p>The filter was at <b>${fmtHz(st.rv.f)}</b> (${esc(zoneOf(st.rv.f))}).</p>`;},
   revealSide:(r,ctx)=>{const L=ctx.list,med=L.length?L.map(x=>+x.a).sort((a,b)=>a-b)[Math.floor(L.length/2)]:0;return `<div class="stat"><b>${L.length?fmtHz(med):'—'}</b><span>the room's median guess</span></div>`;},
-}));
+});
 
 /* ---------- DECAY GUESSR ---------- */
 const ROOMS=[[.4,'a vocal booth'],[.7,'a small studio'],[1,'a living room'],[1.5,'a classroom'],[2.2,'a concert hall'],[3.5,'a big church'],[5.5,'a cathedral'],[99,'a concrete cave']];
@@ -138,7 +138,8 @@ function eqGraphSVG({bump,cuts=[],W=900,H=260}){
     ${cuts.map(c=>`<path d="${curve(bell(c.f,-EQ_BOOST,EQ_Q))}" fill="none" stroke="var(${COLS[c.sh%4]})" stroke-width="2" opacity=".55"/>`).join('')}
     ${bump?`<path d="${curve(bell(bump,EQ_BOOST,EQ_Q))}" fill="none" stroke="var(--red)" stroke-width="6"/><circle cx="${X(bump)}" cy="${H/2-EQ_BOOST*5}" r="10" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/>`:''}</svg>`;
 }
-game(roundGame({
+/* ---------- FREQUENCY DETECTIVE · mode 2: fix the flaw (was Frequency Sculptor) ---------- */
+const FREQ_FIX=({
   id:'sculptor',noWord:'Missed it',group:'ears',name:'Frequency Sculptor',tag:'Something in the mix sounds wrong. Find it on the EQ and cut it.',
   how:['The mix plays with one ugly resonance boosted hard: +24 dB (boxy, harsh, muddy…).','Drag an EQ notch on your phone right onto the problem and lock it in.','The closer your cut, the more points. Then hear the room’s fix.'],
   badges:['Scored','Listening'],speed:.15,okAt:.78,closeAt:.45,yesWord:'Fixed it!',
@@ -183,7 +184,48 @@ game(roundGame({
   score:(r,a)=>{const e=octErr(a,r.f);return {acc:clamp(1-e/1.4,0,1),note:`${fmtHz(a)} vs ${fmtHz(r.f)}`};},
   publicReveal:r=>({f:r.f,name:r.name,hint:r.hint}),
   pReveal:(box,st)=>{box.innerHTML=`<p><b>${esc(st.rv.name)}</b> at ${fmtHz(st.rv.f)} — ${esc(st.rv.hint)}.</p>`;},
+});
+/* Frequency Detective: one game, two modes. Every round carries its mode, so the host, the phone input,
+   the locked card and the reveal all ask the right spec. */
+const FREQ_M=m=>m==='fix'?FREQ_FIX:FREQ_FIND;
+const freqR=r=>FREQ_M(r&&r.mode);
+game(roundGame({
+  id:'detective',noWord:'Way off',group:'ears',name:'Frequency Detective',tag:'Find where a filter parked, or find the ugly frequency in a mix and cut it.',
+  how:['Find the filter: a sharp band-pass sweeps a full mix, then stops. Slide to the frequency you hear.','Fix the flaw: one resonance is boosted +24 dB. Drag an EQ notch onto it and cut.','Points for how close you get, measured in octaves, like your ears.'],
+  badges:['Scored','Listening'],speed:.15,okAt:.8,closeAt:.45,yesWord:'Spot on!',icon:FREQ_FIND.icon,
+  options:[
+    {key:'mode',label:'Mode',choices:[['find','Find the filter','a band-pass parks on one frequency'],['fix','Fix the flaw','one ugly boost: cut it on the EQ'],['mix','Both','alternating']],def:'find'},
+    {key:'src',label:'Source',choices:[['song','Demo song','a new part every round'],['noise','Pink noise','easier'],['mix','Synth band','built-in']],def:'song',show:v=>v.mode!=='fix'},
+    {key:'fsrc',label:'Source',choices:[['song','Demo song','a new part every round'],['mix','Synth band','built-in']],def:'song',show:v=>v.mode==='fix'},
+    {key:'q',label:'Filter width',choices:[[2.5,'Wide','easier'],[5,'Narrow','classic'],[9,'Razor','hard']],def:5,show:v=>v.mode!=='fix'},
+    {key:'n',label:'Rounds',choices:[[4,'4'],[6,'6'],[8,'8'],[10,'10']],def:8},
+    {key:'secs',label:'Answer time',choices:[[15,'15','seconds'],[25,'25','seconds'],[0,'OFF','no clock']],def:25},
+  ],
+  prepMs:r=>r&&r.mode==='fix'?5000:3500,
+  prepText:r=>freqR(r).prepText(r),
+  secs:o=>o.secs,
+  build(o){const n=o.n,modes=o.mode==='mix'?[...Array(n)].map((_,k)=>k%2?'fix':'find'):[...Array(n)].fill(o.mode==='fix'?'fix':'find');
+    const nf=modes.filter(m=>m==='find').length,nx=n-nf;
+    const F=nf?FREQ_FIND.build({...o,n:nf}):[],X=nx?FREQ_FIX.build({...o,src:o.mode==='mix'?o.src==='noise'?'song':o.src:o.fsrc,n:nx}):[];
+    return modes.map(m=>({...(m==='fix'?X.shift():F.shift()),mode:m}));},
+  onPrep(r,o){const S=freqR(r);this.prepLabel=S.prepLabel;this.prepSub=S.prepSub;this.replayLabel=S.replayLabel;this.noWord=S.noWord;this.yesWord=S.yesWord;S.onPrep.call(this,r,o);},
+  play(r,m){return FREQ_FIX.play.call(this,r,m);},
+  leave:stopAud,
+  replay(r,ph,o){return freqR(r).replay.call(this,r,ph,o);},replayLabel:FREQ_FIND.replayLabel,
+  stage(m,r,ctx){return freqR(r).stage.call(this,m,r,ctx);},
+  reveal(m,r,ctx){return freqR(r).reveal.call(this,m,r,ctx);},
+  ringLabel:r=>freqR(r).ringLabel(r),
+  public:r=>({mode:r.mode}),valid:(r,a)=>a>=20&&a<=20000,
+  input(root,pub,submit){return FREQ_M(pub&&pub.mode).input.call(this,root,pub,submit);},
+  locked(box,mine,pub){return FREQ_M(pub&&pub.mode).locked(box,mine,pub);},
+  score:(r,a)=>freqR(r).score(r,a),
+  publicReveal:r=>({...freqR(r).publicReveal(r),mode:r.mode}),
+  pReveal:(box,st)=>FREQ_M(st.rv&&st.rv.mode).pReveal(box,st),
+  revealSide(r,ctx){const S=freqR(r);if(S.revealSide)return S.revealSide.call(this,r,ctx);const L=ctx.list.filter(x=>x.res);return `<div class="stat"><b>${L.length?Math.round(100*L.reduce((a,x)=>a+x.res.acc,0)/L.length):0}%</b><span>average accuracy</span></div>`;},
+  roundInfo:r=>r.mode==='fix'?'Fix the flaw':'Find the filter',
 }));
+// it stays where Frequency Detective always was: first in Train your ears
+{const i=GAMES.findIndex(g=>g.id==='detective'),j=GAMES.findIndex(g=>g.id==='decay');if(i>j&&j>=0)GAMES.splice(j,0,GAMES.splice(i,1)[0]);}
 
 /* ---------- ENVELOPE SCULPTOR ---------- */
 // options must look clearly different: compare attack, decay, sustain, release and length on a log scale

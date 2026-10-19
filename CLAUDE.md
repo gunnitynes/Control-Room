@@ -25,7 +25,8 @@ js/games-brain.js   Know your stuff: The Quiz, Shortcut Showdown, Translation Gr
                     Names/logos are blurred and extra devices cropped at build time (tools/quizpics/blur.py BLUR / CROP).
                     The owner's mic list (tools/quizpics/mics.py) gives each mic its type and a fact for the reveal; mics with no
                     free photo are listed in QUIZ_PIC_SLOTS (not shown anywhere yet: the owner is finding photos for them). Never commit photos copied from sites like recordinghacks.com: the repo is public.
-js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
+js/games-ears.js    Train your ears: Frequency Detective (modes find the filter / fix the flaw: FREQ_FIND + FREQ_FIX specs,
+                    each round carries r.mode), Decay, Envelope, Presets, Meter Lab, Sample Chronologist
                     (Envelope Sculptor: envPts/envApply in audio.js are the ONE shape drawn and played — straight lines,
                     gain = level^1.7, no vibrato or reverb; options share one time axis with a tick per second)
                     (Preset Archeologist: 46 machines, real recordings only, question kinds machine / kind / decade,
