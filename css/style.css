@@ -1542,3 +1542,34 @@ body:has(#app.guidepage){overflow:auto}
 .drcrate i{position:absolute;left:calc(var(--i)*30px);bottom:calc(var(--i)*14px);width:58%;height:55%;border:4px solid var(--ink);box-shadow:5px 5px 0 var(--ink);background:var(--yel);animation:drbob 2.4s ease-in-out calc(var(--i)*.3s) infinite}
 .drcrate i:nth-child(2){background:var(--blue)}.drcrate i:nth-child(3){background:var(--red)}
 @keyframes drbob{50%{transform:translateY(-8px) rotate(-2deg)}}
+/* The Conductor */
+.conductor{display:flex;flex-direction:column;gap:14px;height:100%;min-height:0;padding:18px 22px 0}
+.cdbig h2,.cdtop h2{font:900 clamp(40px,5.5vw,84px)/.9 var(--disp);font-stretch:62%;text-transform:uppercase;margin:4px 0 8px}
+.cdbrief{flex:1;min-height:0;display:grid;gap:14px;align-content:start;overflow:auto}
+.cdsteps{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:s}.cdsteps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;font-size:18px;padding:10px 12px;border:3px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--ink)}
+.cdsteps li::before{content:counter(s);font:900 30px/1 var(--disp);color:var(--red);text-align:center}
+.cdcomps{display:flex;flex-wrap:wrap;gap:8px}.cdcomps span{display:grid;padding:6px 12px;border:3px dashed var(--ink);font:800 16px var(--disp)}.cdcomps span.live{border-style:solid;background:color-mix(in srgb,var(--green) 18%,var(--paper))}
+.cdcomps i{font:700 9px var(--mono);font-style:normal;text-transform:uppercase}
+.cdwarn{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px;border:4px solid var(--ink);background:var(--yel);box-shadow:5px 5px 0 var(--ink)}.cdwarn b{font:900 22px var(--disp);text-transform:uppercase}
+.cdlive{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+.cdtop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end}.cdcond{color:var(--red)}
+.cdclock{display:grid;justify-items:center;gap:4px}.cdclock>b{font:900 clamp(56px,7vw,110px)/.85 var(--disp);font-stretch:62%}
+#cdScore,.cdscore{flex:1;min-height:0;overflow:auto}
+.cdscore{display:grid;gap:6px;align-content:start}
+.cdrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:center}
+.cdrow>b{font:900 18px/1 var(--disp);font-stretch:80%;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 8px;border:3px solid var(--ink);background:var(--paper)}
+.cdrow.on>b{background:var(--c);color:#fff}.cdrow.wait>b{outline:3px dashed var(--ink);outline-offset:2px}
+.cdrow.c0{--c:var(--red)}.cdrow.c1{--c:var(--blue)}.cdrow.c2{--c:#b8860b}.cdrow.c3{--c:var(--green)}
+.cdbars{display:grid;grid-template-columns:repeat(var(--w),minmax(0,1fr));gap:2px;height:30px}
+.cdbars i{background:color-mix(in srgb,var(--ink) 8%,transparent);border-left:1px solid color-mix(in srgb,var(--ink) 18%,transparent)}.cdbars i.f{background:var(--c)}.cdbars i.now{outline:2px solid var(--ink)}
+.cdpieces{display:grid;gap:10px}.cdpiece{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:4px solid var(--ink);background:var(--paper);box-shadow:5px 5px 0 var(--ink)}
+.cdpiece b{font:900 22px var(--disp);text-transform:uppercase}
+/* phones */
+.cdphone{display:grid;gap:10px;padding:12px;grid-template-rows:auto auto minmax(0,1fr);height:100%}
+.cdtiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start;overflow:auto}
+.cdtile{display:grid;gap:4px;min-height:96px;align-content:center;padding:12px;border:4px solid var(--ink);background:var(--paper);box-shadow:5px 5px 0 var(--ink);text-align:left}
+.cdtile b{font:900 22px/1 var(--disp);font-stretch:75%;text-transform:uppercase;overflow-wrap:anywhere}.cdtile span{font:700 11px var(--mono);text-transform:uppercase}
+.cdtile.c0{--c:var(--red)}.cdtile.c1{--c:var(--blue)}.cdtile.c2{--c:#b8860b}.cdtile.c3{--c:var(--green)}
+.cdtile.in{background:var(--c);color:#fff}.cdtile.wait{outline:4px dashed var(--ink);outline-offset:-10px}
+.cdstate{font:900 clamp(56px,18vw,96px)/.9 var(--disp);font-stretch:62%;text-transform:uppercase;padding:10px 18px;border:5px solid var(--ink);background:var(--paper);box-shadow:6px 6px 0 var(--ink)}.cdstate.in{background:var(--green);color:#fff}
+.cdyou{font:800 15px var(--disp);padding:8px 10px;border:3px dashed var(--ink)}.cdyou.ok{border-style:solid;background:color-mix(in srgb,var(--green) 18%,var(--paper))}
