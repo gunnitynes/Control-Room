@@ -124,38 +124,96 @@ window.ENVELOPES=[
 
 /* ---------- Translation Grid: concept ↔ picture (v: drawn in js/games-brain.js) or ↔ analogy (a) ---------- */
 window.TRANSLATE=[
-  {c:'Low-pass filter',v:'lowpass',a:'Music from the club next door: you hear the thump, never the cymbals'},
-  {c:'High-pass filter',v:'highpass',a:'A laptop speaker playing a bass-heavy track: all click, no boom'},
-  {c:'Bell boost',v:'bell',a:'A spotlight that makes one singer in the choir stand out'},
-  {c:'Notch filter',v:'notch',a:'Plucking one hair out with tweezers and leaving the rest'},
-  {c:'Phase cancellation',v:'phase',a:'Two identical waves meet exactly out of step and the water goes flat'},
-  {c:'Soft clipping',v:'softclip',a:'A pillow on the ceiling: you hit it, but it squashes gently'},
-  {c:'Hard clipping',v:'hardclip',a:'A guillotine slicing the top off every wave'},
-  {c:'Sidechain ducking',v:'duck',a:'The whole room goes quiet every time the kick drum speaks'},
-  {c:'Compression',v:'comp',a:'A friend who pulls you back when you shout and nudges you when you mumble'},
-  {c:'Limiter',v:'limit',a:'A height barrier at a car park: nothing taller gets through, no matter what'},
-  {c:'Noise gate',v:'gate',a:'A door that only opens when someone knocks loud enough'},
-  {c:'Comb filtering',v:'comb',a:'Two speakers a little out of time, scooping regular holes in the sound'},
-  {c:'Bitcrushing',v:'crush',a:'Zooming into a photo until it turns into blocky pixels'},
-  {c:'Delay',v:'delay',a:'Shouting into a canyon and hearing yourself come back'},
-  {c:'Reverb',v:'reverb',a:'Clapping once in an empty church and hearing it hang in the air'},
-  {c:'Pre-delay',v:'predelay',a:'The tiny gap between the flash and the thunder'},
-  {c:'Tremolo',v:'tremolo',a:'A helicopter passing: the volume throbs in and out'},
-  {c:'Vibrato',v:'vibrato',a:'An opera singer holding a note that wavers up and down in pitch'},
-  {c:'Mono',v:'mono',a:'Every instrument standing in a single spotlight, dead centre'},
-  {c:'Wide stereo',v:'wide',a:'Musicians spread out from wall to wall around you'},
-  {c:'Swing',v:'swing',a:'Skipping instead of walking: long, short, long, short'},
-  {c:'Pluck envelope',v:'pluckenv',a:'Snapping a rubber band: instant hit, gone a moment later'},
-  {c:'Pad envelope',v:'padenv',a:'Sunrise: fades in slowly, lingers, fades out slowly'},
-  {c:'Square wave',v:'square',a:'A light switch: fully on, fully off, nothing in between'},
-  {c:'Sine wave',v:'sine',a:'A pendulum swinging smoothly back and forth'},
-  {c:'Sawtooth wave',v:'saw',a:'A ramp up, then a drop off a cliff, over and over'}];
+  // t: topic (the Topics option). eq · dyn · mod · space · synth · mic · stereo · digital
+  // ---- filters & EQ
+  {t:'eq',c:'Low-pass filter',v:'lowpass',a:'Music from the club next door: you hear the thump, never the cymbals'},
+  {t:'eq',c:'High-pass filter',v:'highpass',a:'A laptop speaker playing a bass-heavy track: all click, no boom'},
+  {t:'eq',c:'Bell boost',v:'bell',a:'A spotlight that makes one singer in the choir stand out'},
+  {t:'eq',c:'Notch filter',v:'notch',a:'Plucking one hair out with tweezers and leaving the rest'},
+  {t:'eq',c:'Band-pass filter',v:'bandpass',a:'A voice on an old telephone: no deep bass, no sparkle, only the middle'},
+  {t:'eq',c:'Low shelf boost',v:'lowshelf',a:'Turning up the bass knob on a car stereo: everything below a point gets bigger'},
+  {t:'eq',c:'High shelf boost',v:'highshelf',a:'Opening the curtains: everything above a point gets brighter'},
+  {t:'eq',c:'Filter resonance',v:'resonance',a:'A wine glass that sings when you run a wet finger round it, right at the edge of the cut'},
+  {t:'eq',c:'Tilt EQ',v:'tilt',a:'A seesaw: push the lows down and the highs come up'},
+  {t:'eq',c:'De-esser',v:'deess',a:'A bouncer who only throws out the hissing guests'},
+  {t:'eq',c:'Multiband compression',v:'multiband',a:'Three volume riders, one for the bass, one for the middle, one for the top'},
+  // ---- dynamics
+  {t:'dyn',c:'Soft clipping',v:'softclip',a:'A pillow on the ceiling: you hit it, but it squashes gently'},
+  {t:'dyn',c:'Hard clipping',v:'hardclip',a:'A guillotine slicing the top off every wave'},
+  {t:'dyn',c:'Sidechain ducking',v:'duck',a:'The whole room goes quiet every time the kick drum speaks'},
+  {t:'dyn',c:'Compression',v:'comp',a:'A friend who pulls you back when you shout and nudges you when you mumble'},
+  {t:'dyn',c:'Limiter',v:'limit',a:'A height barrier at a car park: nothing taller gets through, no matter what'},
+  {t:'dyn',c:'Noise gate',v:'gate',a:'A door that only opens when someone knocks loud enough'},
+  {t:'dyn',c:'Expander',v:'expander',a:'A teacher who makes the quiet kids even quieter so the speaker stands out'},
+  {t:'dyn',c:'Transient shaper',v:'transient',a:'Sharpening the edges of a photo: the first hit of every sound jumps out'},
+  {t:'dyn',c:'Headroom',v:'headroom',a:'The space between your head and a low ceiling before you bump it'},
+  // ---- modulation
+  {t:'mod',c:'Tremolo',v:'tremolo',a:'A helicopter passing: the volume throbs in and out'},
+  {t:'mod',c:'Vibrato',v:'vibrato',a:'An opera singer holding a note that wavers up and down in pitch'},
+  {t:'mod',c:'Chorus',v:'chorus',a:'Three friends singing the same line, never quite in tune or in time'},
+  {t:'mod',c:'Flanger',v:'flanger',a:'A jet plane roaring past overhead, whooshing through the sound'},
+  {t:'mod',c:'Phaser',v:'phaser',a:'A slow swirl, like looking at the sound through rippling water'},
+  {t:'mod',c:'Auto-pan',v:'autopan',a:'A ping-pong match watched from the middle: your head swings left, right, left'},
+  {t:'mod',c:'Ring modulation',v:'ringmod',a:'A robot voice from an old sci-fi film: metallic, clangy, out of tune'},
+  {t:'mod',c:'Pitch shift up',v:'pitchup',a:'Breathing helium: same words, higher voice'},
+  // ---- time & space
+  {t:'space',c:'Delay',v:'delay',a:'Shouting into a canyon and hearing yourself come back'},
+  {t:'space',c:'Reverb',v:'reverb',a:'Clapping once in an empty church and hearing it hang in the air'},
+  {t:'space',c:'Pre-delay',v:'predelay',a:'The tiny gap between the flash and the thunder'},
+  {t:'space',c:'Slapback echo',v:'slapback',a:'One quick bounce off a wall across the street, like a 1950s rock ’n’ roll vocal'},
+  {t:'space',c:'Ping-pong delay',v:'pingpong',a:'Your echo answering from one side of the valley, then the other'},
+  {t:'space',c:'Gated reverb',v:'gatedverb',a:'A huge hall that someone slams shut after a split second: the 80s snare'},
+  {t:'space',c:'Reverse reverb',v:'reverseverb',a:'A wave that rises up out of nothing and crashes into the note'},
+  {t:'space',c:'Early reflections',v:'early',a:'The first few bounces off the nearest walls that tell you how big the room is'},
+  // ---- waves & synthesis
+  {t:'synth',c:'Square wave',v:'square',a:'A light switch: fully on, fully off, nothing in between'},
+  {t:'synth',c:'Sine wave',v:'sine',a:'A pendulum swinging smoothly back and forth'},
+  {t:'synth',c:'Sawtooth wave',v:'saw',a:'A ramp up, then a drop off a cliff, over and over'},
+  {t:'synth',c:'Triangle wave',v:'triangle',a:'Walking up a hill and straight back down, again and again'},
+  {t:'synth',c:'White noise',v:'noise',a:'The hiss of a waterfall: every frequency at once, no pitch at all'},
+  {t:'synth',c:'Pulse wave (narrow)',v:'pulse',a:'A blink: on for a moment, off for much longer'},
+  {t:'synth',c:'FM synthesis',v:'fm',a:'Someone wobbling the speed of a record player so fast it turns into a bell'},
+  {t:'synth',c:'Wavefolding',v:'fold',a:'Folding a paper strip back on itself every time it hits the edge of the table'},
+  {t:'synth',c:'Harmonic series',v:'harmonics',a:'One note is a family: the loudest parent and smaller children above it'},
+  {t:'synth',c:'Arpeggiator',v:'arp',a:'Walking up a staircase one chord note at a time, then back to the bottom'},
+  {t:'synth',c:'Portamento (glide)',v:'glide',a:'A trombone sliding from one note to the next instead of jumping'},
+  {t:'synth',c:'Granular synthesis',v:'granular',a:'A photo torn into confetti and thrown back together into a new picture'},
+  {t:'synth',c:'Pluck envelope',v:'pluckenv',a:'Snapping a rubber band: instant hit, gone a moment later'},
+  {t:'synth',c:'Pad envelope',v:'padenv',a:'Sunrise: fades in slowly, lingers, fades out slowly'},
+  // ---- microphones & the console
+  {t:'mic',c:'Omnidirectional mic',v:'omni',a:'A guest at a party who hears every conversation in the room equally'},
+  {t:'mic',c:'Cardioid mic',v:'cardioid',a:'Someone listening to you face to face, ignoring what’s behind them'},
+  {t:'mic',c:'Supercardioid mic',v:'supercard',a:'A narrower spotlight on the singer, with a small ear at the back'},
+  {t:'mic',c:'Figure-8 mic',v:'fig8',a:'A ticket window open on both sides, shut at the edges'},
+  {t:'mic',c:'Shotgun mic',v:'shotgun',a:'A telescope for sound: aimed at one actor across a film set'},
+  {t:'mic',c:'Phantom power',v:'phantom',a:'A power cable hidden inside the mic cable, feeding the condenser mic'},
+  {t:'mic',c:'Pad switch',v:'pad',a:'Earplugs for the microphone, so a kick drum doesn’t overload it'},
+  {t:'mic',c:'Polarity invert',v:'polarity',a:'Turning a wave upside down: every push becomes a pull'},
+  // ---- stereo
+  {t:'stereo',c:'Mono',v:'mono',a:'Every instrument standing in a single spotlight, dead centre'},
+  {t:'stereo',c:'Wide stereo',v:'wide',a:'Musicians spread out from wall to wall around you'},
+  {t:'stereo',c:'Phase cancellation',v:'phase',a:'Two identical waves meet exactly out of step and the water goes flat'},
+  {t:'stereo',c:'Out-of-phase stereo',v:'antiphase',a:'Left and right pulling in opposite directions: sum them to mono and it vanishes'},
+  {t:'stereo',c:'Panned left',v:'panleft',a:'The guitarist standing at the far left edge of the stage'},
+  {t:'stereo',c:'Mid/side recording',v:'midside',a:'One mic for the singer in front, one for the room on either side, mixed later'},
+  {t:'stereo',c:'Haas effect',v:'haas',a:'Hearing someone a split second later in one ear makes them sound off to the side'},
+  {t:'stereo',c:'Comb filtering',v:'comb',a:'Two speakers a little out of time, scooping regular holes in the sound'},
+  // ---- editing & digital audio
+  {t:'digital',c:'Bitcrushing',v:'crush',a:'Zooming into a photo until it turns into blocky pixels'},
+  {t:'digital',c:'Sample rate',v:'samplerate',a:'A flip-book: the more pages per second, the smoother the motion'},
+  {t:'digital',c:'Aliasing',v:'alias',a:'A spinning car wheel on film that seems to turn slowly backwards'},
+  {t:'digital',c:'DC offset',v:'dcoffset',a:'A swing hung off-centre: it still swings, but never around the middle'},
+  {t:'digital',c:'Fade-in',v:'fadein',a:'A dimmer switch slowly bringing up the lights'},
+  {t:'digital',c:'Crossfade',v:'crossfade',a:'One DJ track slipping out as the next one slides in'},
+  {t:'digital',c:'Quantize',v:'quantize',a:'Snapping wonky photos straight onto a grid on the wall'},
+  {t:'digital',c:'Reversed audio',v:'reverse',a:'A film played backwards: the note swells up and stops dead'},
+  {t:'digital',c:'Swing',v:'swing',a:'Skipping instead of walking: long, short, long, short'}];
 
 /* ---------- Attendance: the class Google Sheet's Apps Script web app ("Class Attendance System").
    The host lists its classes; phones pick their name from the chosen class and are checked in
    on the sheet's MasterLog. Set url to '' to switch the class list off. ---------- */
 /* ---------- Guide to the Control Room: how the phone plays each module (pictures) + a lesson idea. Variations come from each game's options. ---------- */
-window.GUIDE={"quiz": {"play": ["tap4"], "lesson": "Open the lesson with ten questions, or dig into studio history with the Vault."}, "shortcuts": {"play": ["tap4"], "lesson": "Pick your class’s DAW. Five minutes of this and the mouse gets lonely."}, "translate": {"play": ["match"], "lesson": "Connect what an effect looks like to what it feels like."}, "atlas": {"play": ["tempo", "keys", "tap4"], "lesson": "One giant ear workout: tempo, notes, chords, scales, progressions, 130+ instruments and 90 places on the map. It plays what your class has heard least first, so it stays fresh all year."}, "detective": {"play": ["slider", "eq"], "lesson": "Build a frequency map in your head: find where a filter parked, then find the ugly resonance and cut it."}, "decay": {"play": ["slider"], "lesson": "Hear the size of a room in its tail."}, "envelope": {"play": ["env"], "lesson": "Attack, decay, sustain, release, by ear alone."}, "presets": {"play": ["tap4"], "lesson": "Music history told by its machines: 808, 303, Juno, Hoover."}, "telephone": {"play": ["knobs"], "lesson": "Sound design by ear. Copy a patch, twist one knob, pass it on."}, "meterlab": {"play": ["tap4"], "lesson": "Meter, grouping, polyrhythm and swing in one rhythm lab."}, "chrono": {"play": ["order"], "lesson": "Hear a century of recording, from wax cylinder to bedroom pop."}, "constraints": {"play": ["mission"], "lesson": "Quick-fire studio missions with fresh MIDI and audio every round."}, "genres": {"play": ["reels"], "lesson": "Two genres that should never meet, and a name for the child."}, "roundabout": {"play": ["card", "record"], "lesson": "Pass the track round the room. Every stop deals a new idea."}, "metaphor": {"play": ["write", "vote"], "lesson": "Turn a picture into three production rules. The room votes."}, "mixroom": {"play": ["fader"], "lesson": "Every phone is one fader of a real multitrack. Balance the song together, then A/B it against the original mix."}, "remix": {"play": ["moves"], "lesson": "Remix a song live on the big speakers. Everyone holds four moves: take turns round the room or play all at once."}, "drop": {"play": ["swap"], "lesson": "Your crate of loops, MIDI and stems lands at random on every computer. Make something with what you got."}, "conductor": {"play": ["conduct"], "lesson": "A laptop orchestra: everyone loops at least 4 bars in sync with Ableton Link, one student conducts from their phone."}, "album": {"play": ["sections", "write"], "lesson": "One song, the whole class. Everyone hands in one part, the room arranges it, and you download the mix and stems."}};
+window.GUIDE={"quiz": {"play": ["tap4"], "lesson": "Open the lesson with ten questions, or dig into studio history with the Vault."}, "shortcuts": {"play": ["tap4"], "lesson": "Pick your class’s DAW. Five minutes of this and the mouse gets lonely."}, "translate": {"play": ["match"], "lesson": "75 audio ideas in 8 topics, from EQ curves and mic patterns to aliasing: match each to its picture or its analogy."}, "atlas": {"play": ["tempo", "keys", "tap4"], "lesson": "One giant ear workout: tempo, notes, chords, scales, progressions, 130+ instruments and 90 places on the map. It plays what your class has heard least first, so it stays fresh all year."}, "detective": {"play": ["slider", "eq"], "lesson": "Build a frequency map in your head: find where a filter parked, then find the ugly resonance and cut it."}, "decay": {"play": ["slider"], "lesson": "Hear the size of a room in its tail."}, "envelope": {"play": ["env"], "lesson": "Attack, decay, sustain, release, by ear alone."}, "presets": {"play": ["tap4"], "lesson": "Music history told by its machines: 808, 303, Juno, Hoover."}, "telephone": {"play": ["knobs"], "lesson": "Sound design by ear. Copy a patch, twist one knob, pass it on."}, "meterlab": {"play": ["tap4"], "lesson": "Meter, grouping, polyrhythm and swing in one rhythm lab."}, "chrono": {"play": ["order"], "lesson": "Hear a century of recording, from wax cylinder to bedroom pop."}, "constraints": {"play": ["mission"], "lesson": "Quick-fire studio missions with fresh MIDI and audio every round."}, "genres": {"play": ["reels"], "lesson": "Two genres that should never meet, and a name for the child."}, "roundabout": {"play": ["card", "record"], "lesson": "Pass the track round the room. Every stop deals a new idea."}, "metaphor": {"play": ["write", "vote"], "lesson": "Turn a picture into three production rules. The room votes."}, "mixroom": {"play": ["fader"], "lesson": "Every phone is one fader of a real multitrack. Balance the song together, then A/B it against the original mix."}, "remix": {"play": ["moves"], "lesson": "Remix a song live on the big speakers. Everyone holds four moves: take turns round the room or play all at once."}, "drop": {"play": ["swap"], "lesson": "Your crate of loops, MIDI and stems lands at random on every computer. Make something with what you got."}, "conductor": {"play": ["conduct"], "lesson": "A laptop orchestra: everyone loops at least 4 bars in sync with Ableton Link, one student conducts from their phone."}, "album": {"play": ["sections", "write"], "lesson": "One song, the whole class. Everyone hands in one part, the room arranges it, and you download the mix and stems."}};
 
 /* the class key: Control Room on the teacher's Mac answers "which room is open?" at relay address controlroom-lobby-<key>.
    The CADCAST computer page uses it, so students only ever scan their computer. Keep it unique to this class. */

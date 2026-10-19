@@ -33,6 +33,9 @@ js/games-ears.js    Train your ears: Frequency Detective (modes find the filter 
                     least-heard first via localStorage presets.seen; build with tools/presets/build.py)
                     (Meter Lab embeds meterlab/index.html?embed: questions in three styles, Hear it / See it / Hear + see;
                     See it shows the question's own figure with P.hide, MLAPI.see()/mute(); the reveal shows the figure with labels)
+                    The Translation Grid: window.TRANSLATE (content.js), 75 cards {t topic, c idea, v picture key, a analogy}; the
+                    pictures are drawn by VIS(key) in games-brain.js (helpers eq/tf/env/scope/imp/polar/btn); option tg = topics
+                    (TG_TOPICS); cards this browser has shown least are dealt first (localStorage tg.seen)
 js/games-make.js    Make something: Constraint Generator, Genre Cross-Pollinator, Soundabout Roundabout,
                     Metaphor Translation, and Parameter Telephone (shown under Train your ears, slot 10)
 js/games-atlas.js   The Ear Atlas (Know your stuff, slot 02 right after The Quiz): two setup categories, Recordings (AT_RECS, first) and Ear training (AT_EARS;

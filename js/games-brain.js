@@ -121,6 +121,11 @@ function VIS(key){
   const env=(a,d,s,r)=>{const tot=a+d+.8+r,X=t=>8+(W-16)*t/tot,Y=v=>H-10-(H-22)*v;return axis+P(`M${X(0)} ${Y(0)}L${X(a)} ${Y(1)}L${X(a+d)} ${Y(s)}L${X(a+d+.8)} ${Y(s)}L${X(tot)} ${Y(0)}`,red);};
   const tf=fn=>`<rect x="30" y="6" width="${H-14}" height="${H-14}" fill="none" stroke="${hair}" stroke-width="2"/><line x1="30" y1="${H-8}" x2="${30+H-14}" y2="6" stroke="${hair}" stroke-width="1.5" stroke-dasharray="3 4"/>`+P(path(u=>H-8-(H-14)*fn(u),80,30,30+H-14),red);
   const scope=pts=>`<circle cx="${W/2}" cy="${mid}" r="38" fill="none" stroke="${hair}" stroke-width="2"/><line x1="${W/2}" y1="${mid-38}" x2="${W/2}" y2="${mid+38}" stroke="${hair}" stroke-width="1"/><line x1="${W/2-38}" y1="${mid}" x2="${W/2+38}" y2="${mid}" stroke="${hair}" stroke-width="1"/>`+pts;
+  // a polar pickup pattern seen from above (front = up); grid only when grid=1
+  const polar=(fn,grid=1,rot=0,c=red)=>{const R=38,cx=W/2,cy=mid;let d='';for(let i=0;i<=120;i++){const th=i/120*2*Math.PI,r=R*fn(th),x=cx+r*Math.sin(th+rot),y=cy-r*Math.cos(th+rot);d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1);}
+    return (grid?`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${hair}" stroke-width="2"/><circle cx="${cx}" cy="${cy}" r="${R/2}" fill="none" stroke="${hair}" stroke-width="1"/><line x1="${cx}" y1="${cy-R-4}" x2="${cx}" y2="${cy+R+4}" stroke="${hair}" stroke-width="1"/><polygon points="${cx},${cy-R-2} ${cx-5},${cy-R+6} ${cx+5},${cy-R+6}" fill="${ink}"/>`:'')+P(d+'Z',c,3);};
+  // a console button with its label
+  const btn=(t,c)=>`<rect x="${W/2-40}" y="${mid-24}" width="80" height="48" rx="8" fill="#fff" stroke="${ink}" stroke-width="4"/><circle cx="${W/2+30}" cy="${mid-14}" r="4" fill="${c}"/><text x="${W/2}" y="${mid+9}" font-size="${t.length>3?18:26}" font-weight="900" text-anchor="middle" fill="${ink}" font-family="Archivo">${t}</text>`;
   const imp=(xs)=>axis+xs.map(([x,h])=>`<line x1="${x}" y1="${H-8}" x2="${x}" y2="${H-8-h}" stroke="${ink}" stroke-width="3"/>`).join('');
   let b='';
   switch(key){
@@ -150,9 +155,68 @@ function VIS(key){
     case 'square':b=P(path(u=>mid-(Math.sin(2*Math.PI*2*u)>=0?26:-26),400),red);break;
     case 'sine':b=P(path(u=>sine(u,2,26)),red);break;
     case 'saw':b=P(path(u=>mid+26-52*((u*3)%1),600),red);break;
+    // ---- filters & EQ
+    case 'bandpass':b=eq(u=>40+40*Math.min(1,Math.pow(Math.abs(u-.5)/.42,1.5)));break;
+    case 'lowshelf':b=eq(u=>40-22/(1+Math.exp((u-.38)*22)));break;
+    case 'highshelf':b=eq(u=>40-22/(1+Math.exp(-(u-.62)*22)));break;
+    case 'resonance':b=eq(u=>Math.min(84,40-26*Math.exp(-Math.pow((u-.55)/.045,2))+(u>.55?Math.pow((u-.55)/.45,1.3)*48:0)));break;
+    case 'tilt':b=eq(u=>58-36*u)+`<circle cx="${W/2}" cy="40" r="4" fill="${ink}"/>`;break;
+    case 'deess':b=eq(u=>40+26*Math.exp(-Math.pow((u-.8)/.06,2)))+`<text x="${W*.8}" y="20" font-size="15" font-weight="700" text-anchor="middle" fill="${ink}" font-family="Space Mono">sss</text>`;break;
+    case 'multiband':b=axis+[[6,52,24],[54,106,44],[106,154,14]].map(([x0,x1,h],i)=>`<rect x="${x0+3}" y="${H-8-h}" width="${x1-x0-6}" height="${h}" fill="${i===1?red:blue}" opacity="${i===1?1:.55}"/>`).join('')+`<line x1="54" y1="6" x2="54" y2="${H-8}" stroke="${ink}" stroke-width="2" stroke-dasharray="4 3"/><line x1="106" y1="6" x2="106" y2="${H-8}" stroke="${ink}" stroke-width="2" stroke-dasharray="4 3"/>`;break;
+    // ---- dynamics
+    case 'expander':b=tf(u=>u<.5?Math.max(0,.5-(.5-u)*2.2):u);break;
+    case 'transient':b=P(path(u=>{const k=(u*2)%1;return mid-(14*Math.exp(-k*4)+30*Math.exp(-k*28))*Math.sin(2*Math.PI*40*u);},500),red,2);break;
+    case 'headroom':b=`<rect x="50" y="36" width="40" height="${H-44}" fill="${blue}"/><rect x="50" y="12" width="40" height="${H-20}" fill="none" stroke="${ink}" stroke-width="3"/><line x1="40" y1="12" x2="100" y2="12" stroke="${red}" stroke-width="4"/><text x="104" y="17" font-size="11" font-weight="700" fill="${ink}" font-family="Space Mono">0 dB</text><line x1="96" y1="14" x2="96" y2="34" stroke="${ink}" stroke-width="2"/><text x="104" y="30" font-size="10" fill="${ink}" font-family="Space Mono">room</text>`;break;
+    // ---- modulation
+    case 'chorus':b=P(path(u=>sine(u,2,24)),ink,2.2)+P(path(u=>sine(u,2.12,24,.5)),red,2.2)+P(path(u=>sine(u,1.9,24,-.4)),blue,2.2);break;
+    case 'flanger':b=axis+P(path(u=>12+66*Math.pow(Math.abs(Math.cos(Math.PI*u*(3+9*u))),.6),300),red)+`<text x="${W-10}" y="16" font-size="14" text-anchor="end" fill="${ink}" font-family="Space Mono">→</text>`;break;
+    case 'phaser':b=eq(u=>40+34*[.18,.42,.64,.84].reduce((m,c)=>Math.max(m,Math.exp(-Math.pow((u-c)/.045,2))),0))+`<text x="${W-10}" y="18" font-size="14" text-anchor="end" fill="${ink}" font-family="Space Mono">↔</text>`;break;
+    case 'autopan':b=P(path(u=>mid-6-22*(.5+.5*Math.sin(2*Math.PI*2*u))),blue,3)+P(path(u=>mid+6+22*(.5+.5*Math.sin(2*Math.PI*2*u))-44),red,3)+`<text x="8" y="16" font-size="12" font-weight="700" fill="${blue}" font-family="Space Mono">L</text><text x="8" y="${H-6}" font-size="12" font-weight="700" fill="${red}" font-family="Space Mono">R</text>`;break;
+    case 'ringmod':b=P(path(u=>mid-30*Math.sin(2*Math.PI*3*u)*Math.sin(2*Math.PI*19*u),500),red,2.2);break;
+    case 'pitchup':b=P(path(u=>sine(u,2,24)),hair,3)+P(path(u=>sine(u,4,24)),red,3)+`<text x="${W-8}" y="16" font-size="16" font-weight="700" text-anchor="end" fill="${ink}" font-family="Space Mono">↑</text>`;break;
+    // ---- time & space
+    case 'slapback':b=imp([[18,64],[46,44]]);break;
+    case 'pingpong':b=`<line x1="6" y1="${mid}" x2="${W-6}" y2="${mid}" stroke="${hair}" stroke-width="2"/>`+[[16,36,1],[44,28,-1],[72,22,1],[100,16,-1],[128,10,1]].map(([x,h,d])=>`<line x1="${x}" y1="${mid}" x2="${x}" y2="${mid-d*h}" stroke="${d>0?blue:red}" stroke-width="4"/>`).join('')+`<text x="${W-8}" y="14" font-size="12" font-weight="700" text-anchor="end" fill="${blue}" font-family="Space Mono">L</text><text x="${W-8}" y="${H-4}" font-size="12" font-weight="700" text-anchor="end" fill="${red}" font-family="Space Mono">R</text>`;break;
+    case 'gatedverb':{const xs=[[14,66]];for(let i=0;i<26;i++)xs.push([22+i*2.8,Math.max(2,40*(.6+Math.random()*.4))]);b=imp(xs)+`<line x1="96" y1="10" x2="96" y2="${H-8}" stroke="${red}" stroke-width="3" stroke-dasharray="4 3"/>`;break;}
+    case 'reverseverb':{const xs=[];for(let i=0;i<40;i++){const x=14+i*2.8;xs.push([x,Math.max(2,46*Math.exp(-(39-i)/12)*(.5+Math.random()*.5))]);}xs.push([132,66]);b=imp(xs);break;}
+    case 'early':b=imp([[14,66],[24,34],[31,26],[40,30],[47,20],[58,22],[66,14]]);break;
+    case 'haas':b=`<line x1="6" y1="${mid}" x2="${W-6}" y2="${mid}" stroke="${hair}" stroke-width="2"/><line x1="60" y1="${mid}" x2="60" y2="${mid-34}" stroke="${blue}" stroke-width="5"/><line x1="76" y1="${mid}" x2="76" y2="${mid+34}" stroke="${red}" stroke-width="5"/><text x="68" y="${mid-38}" font-size="10" text-anchor="middle" fill="${ink}" font-family="Space Mono">20 ms</text><text x="44" y="16" font-size="12" font-weight="700" fill="${blue}" font-family="Space Mono">L</text><text x="86" y="${H-6}" font-size="12" font-weight="700" fill="${red}" font-family="Space Mono">R</text>`;break;
+    // ---- waves & synthesis
+    case 'triangle':b=P(path(u=>{const k=(u*2.5)%1;return mid-26*(k<.5?4*k-1:3-4*k);},400),red);break;
+    case 'noise':{let d='';for(let i=0;i<=120;i++)d+=(i?'L':'M')+(6+i*1.23).toFixed(1)+' '+(mid-(Math.random()*2-1)*30).toFixed(1);b=P(d,red,1.8);break;}
+    case 'pulse':b=P(path(u=>mid-((u*3)%1<.2?26:-26),600),red);break;
+    case 'fm':b=P(path(u=>mid-26*Math.sin(2*Math.PI*3*u+3*Math.sin(2*Math.PI*9*u)),500),red,2.4);break;
+    case 'fold':b=P(path(u=>{let x=2.4*Math.sin(2*Math.PI*2*u);while(x>1||x<-1)x=x>1?2-x:-2-x;return mid-28*x;},500),red,2.6);break;
+    case 'harmonics':b=axis+[1,2,3,4,5,6,7,8].map(n=>`<line x1="${8+n*17}" y1="${H-8}" x2="${8+n*17}" y2="${H-8-66/n}" stroke="${n===1?red:ink}" stroke-width="5"/>`).join('');break;
+    case 'arp':b=axis+[0,1,2,3,0,1,2,3].map((k,i)=>`<rect x="${8+i*18}" y="${H-20-k*15}" width="15" height="9" fill="${red}" stroke="${ink}" stroke-width="1.5"/>`).join('');break;
+    case 'glide':b=`<rect x="10" y="60" width="50" height="10" fill="${red}" stroke="${ink}" stroke-width="1.5"/><rect x="100" y="22" width="50" height="10" fill="${red}" stroke="${ink}" stroke-width="1.5"/>`+P('M60 65 C80 65 80 27 100 27',ink,2.5,'stroke-dasharray="5 4"');break;
+    case 'granular':{let d='';for(let i=0;i<34;i++){const x=10+Math.random()*140,y=mid+(Math.random()*2-1)*24,w=6+Math.random()*10;d+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(w/2).toFixed(1)}" ry="${(2+Math.random()*4).toFixed(1)}" fill="${i%3?red:blue}" opacity=".8"/>`;}b=d;break;}
+    // ---- microphones
+    case 'omni':b=polar(()=>1);break;
+    case 'cardioid':b=polar(th=>.5*(1+Math.cos(th)));break;
+    case 'supercard':b=polar(th=>Math.abs(.37+.63*Math.cos(th)));break;
+    case 'fig8':b=polar(th=>Math.abs(Math.cos(th)));break;
+    case 'shotgun':b=polar(th=>Math.max(.08*Math.abs(Math.cos(th)),Math.pow(Math.max(0,Math.cos(th)),7)));break;
+    case 'phantom':b=btn('+48V',red);break;
+    case 'pad':b=btn('−10 dB',blue);break;
+    case 'polarity':b=btn('Ø',ink);break;
+    // ---- stereo
+    case 'antiphase':b=scope(P(`M${W/2-32} ${mid}L${W/2+32} ${mid}`,red,5));break;
+    case 'panleft':b=`<circle cx="${W/2}" cy="${mid+4}" r="28" fill="#fff" stroke="${ink}" stroke-width="3.5"/><line x1="${W/2}" y1="${mid+4}" x2="${(W/2-19.8).toFixed(1)}" y2="${(mid+4+19.8).toFixed(1)}" stroke="${red}" stroke-width="5" stroke-linecap="round"/><text x="${W/2-44}" y="${H-4}" font-size="13" font-weight="700" fill="${ink}" font-family="Space Mono">L</text><text x="${W/2+36}" y="${H-4}" font-size="13" font-weight="700" fill="${ink}" font-family="Space Mono">R</text>`;break;
+    case 'midside':b=polar(th=>.5*(1+Math.cos(th)),1,0)+polar(th=>Math.abs(Math.cos(th)),0,Math.PI/2,blue);break;
+    // ---- editing & digital
+    case 'fadein':b=axis+P(path(u=>mid-28*Math.min(1,u*1.6)*Math.sin(2*Math.PI*9*u),400),red,2)+P(`M6 ${mid}L${6+148/1.6} ${mid-30}L${W-6} ${mid-30}`,ink,2,'stroke-dasharray="4 3"');break;
+    case 'crossfade':b=axis+P(`M10 14L${W-10} ${H-10}`,blue,4)+P(`M10 ${H-10}L${W-10} 14`,red,4);break;
+    case 'quantize':b=[0,1,2,3,4,5,6,7,8].map(i=>`<line x1="${8+i*18}" y1="8" x2="${8+i*18}" y2="${H-8}" stroke="${hair}" stroke-width="2"/>`).join('')+[[2,-5],[4,6],[6,-4],[8,3]].map(([g,off],i)=>`<rect x="${8+g*18-6+off}" y="${22+i*14}" width="12" height="9" fill="none" stroke="${ink}" stroke-width="1.5" stroke-dasharray="2 2"/><rect x="${8+g*18-6}" y="${22+i*14}" width="12" height="9" fill="${red}"/>`).join('');break;
+    case 'alias':b=P(path(u=>sine(u,9,26),400),hair,2)+P(path(u=>sine(u,1,26,Math.PI),200),red,2.5)+Array.from({length:11},(_,i)=>{const u=i/10,x=6+148*u,y=sine(u,9,26);return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${ink}"/>`;}).join('');break;
+    case 'samplerate':b=`<line x1="6" y1="${mid}" x2="${W-6}" y2="${mid}" stroke="${hair}" stroke-width="2"/>`+P(path(u=>sine(u,1.5,28)),hair,2)+Array.from({length:17},(_,i)=>{const u=i/16,x=6+148*u,y=sine(u,1.5,28);return `<line x1="${x.toFixed(1)}" y1="${mid}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${ink}" stroke-width="2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${red}"/>`;}).join('');break;
+    case 'dcoffset':b=`<line x1="6" y1="${mid}" x2="${W-6}" y2="${mid}" stroke="${ink}" stroke-width="2"/>`+P(path(u=>sine(u,2,22)-16),red);break;
+    case 'reverse':b=axis+P(path(u=>mid-30*Math.pow(u,2.4)*Math.sin(2*Math.PI*14*u),500),red,2)+P(`M${W-6} 12L${W-6} ${H-12}`,ink,3);break;
   }
   return `<svg class="vis" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${b}</svg>`;
 }
+const TG_TOPICS=[['eq','Filters & EQ','curves and shelves'],['dyn','Dynamics','compressors, gates, clipping'],['mod','Modulation','chorus, flanger, tremolo'],['space','Time & space','delays and reverbs'],
+  ['synth','Waves & synthesis','oscillators, envelopes, synths'],['mic','Mics & console','pickup patterns, buttons'],['stereo','Stereo & phase','width, panning, phase'],['digital','Digital & editing','samples, fades, timing']];
 game(roundGame({
   id:'translate',group:'brain',name:'The Translation Grid',tag:'Match the idea to what it looks like — or to what it feels like.',
   how:['Four audio ideas go up on the big screen, each with its colour and shape.','Your phone deals four cards, pictures or analogies, one at a time. Tap the shape of the idea each card belongs to.','Every correct pair scores. The reveal draws the lines. Speed adds a little on top.'],
@@ -160,14 +224,17 @@ game(roundGame({
   icon:`<svg viewBox="0 0 64 64"><rect x="4" y="6" width="18" height="12" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><rect x="4" y="26" width="18" height="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><rect x="4" y="46" width="18" height="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle cx="52" cy="12" r="7" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><circle cx="52" cy="32" r="7" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><circle cx="52" cy="52" r="7" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M22 12 L45 32 M22 32 L45 52 M22 52 L45 12" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
     {key:'mode',label:'Match to',choices:[['v','Pictures','waveforms, curves'],['a','Analogies','physical metaphors'],['mix','Both','alternate rounds']],def:'mix'},
-    {key:'n',label:'Rounds',choices:[[4,'4'],[6,'6'],[8,'8']],def:6},
+    {key:'tg',type:'multi',label:'Topics',choices:TG_TOPICS.map(([k,n,sub])=>[k,n,`${sub} · ${TRANSLATE.filter(x=>x.t===k).length}`]),def:TG_TOPICS.map(x=>x[0]),sub:v=>`${(v.tg||[]).length} of ${TG_TOPICS.length}`},
+    {key:'n',label:'Rounds',choices:[[4,'4'],[6,'6'],[8,'8'],[12,'12']],def:6},
     {key:'secs',label:'Time per grid',choices:[[30,'30','seconds'],[45,'45','seconds'],[60,'60','seconds']],def:45},
   ],
   prepMs:3000,prepLabel:'LOOK',prepSub:'at the grid',
   prepText:()=>({big:'Study the grid',small:'Match each idea to its partner. The grid opens on your phone in a moment.'}),
   secs:o=>o.secs,
-  build:o=>{const out=[];let deck=[];for(let i=0;i<o.n;i++){if(deck.length<4)deck=shuffle(TRANSLATE);const items=deck.splice(0,4);
-    const mode=o.mode==='mix'?(i%2?'a':'v'):o.mode;const right=shuffle([0,1,2,3]);out.push({mode,items,right});}return out;},
+  build:o=>{const pool0=TRANSLATE.filter(x=>(o.tg||[]).includes(x.t)),pool=pool0.length>=4?pool0:TRANSLATE,seen=store.get('tg.seen',{});
+    const fresh=()=>shuffle(pool).sort((a,b)=>(seen[a.c]||0)-(seen[b.c]||0));   // cards this browser has shown least come first
+    const out=[];let deck=[];for(let i=0;i<o.n;i++){if(deck.length<4)deck=deck.concat(fresh().filter(x=>!deck.includes(x)));const items=shuffle(deck.splice(0,4));items.forEach(x=>seen[x.c]=(seen[x.c]||0)+1);
+    const mode=o.mode==='mix'?(i%2?'a':'v'):o.mode;const right=shuffle([0,1,2,3]);out.push({mode,items,right});}store.set('tg.seen',seen);return out;},
   roundInfo:r=>r.mode==='v'?'pictures':'analogies',
   rightHTML:(r,k)=>{const it=r.items[r.right[k]];return r.mode==='v'?VIS(it.v):`<span class="anal">“${esc(it.a)}”</span>`;},
   // the big screen keeps the ideas; the pictures / analogies go to the phones
