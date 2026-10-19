@@ -33,12 +33,8 @@ em{font-style:normal;font-weight:800}
 .hero h1{font:900 clamp(64px,15vw,170px)/.8 var(--disp);font-stretch:62%;letter-spacing:-.01em}
 .hero h1 i{font-style:normal;color:var(--red);display:block}
 .hero .sub{font:800 clamp(20px,3vw,30px)/1.1 var(--disp);max-width:20em;margin-top:22px}
-.shapes{position:absolute;right:0;top:34px;width:min(38vw,330px);aspect-ratio:1;pointer-events:none}
-.shapes i{position:absolute;border:6px solid var(--ink)}
-.shapes i:nth-child(1){width:58%;height:58%;border-radius:50%;background:var(--red);left:4%;top:0}
-.shapes i:nth-child(2){width:46%;height:46%;background:var(--blue);right:0;top:14%;transform:rotate(8deg)}
-.shapes i:nth-child(3){width:0;height:0;border:0;border-left:90px solid transparent;border-right:0;border-bottom:150px solid var(--yel);left:38%;bottom:6%;filter:drop-shadow(6px 6px 0 var(--ink))}
-@media(max-width:700px){.shapes{opacity:.35;width:62vw;top:10px}}
+.orbit{position:absolute;right:0;top:20px;width:min(40vw,380px);aspect-ratio:1;pointer-events:none}
+@media(max-width:700px){.orbit{opacity:.35;width:62vw;top:10px}}
 
 /* contents */
 .toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:0 0 50px;padding:0;list-style:none;counter-reset:t}
@@ -114,14 +110,14 @@ details>div{padding:0 16px 14px}
 .foot p{font:900 26px var(--disp);text-transform:uppercase;font-stretch:70%;margin:0}
 .print{font:900 15px var(--disp);text-transform:uppercase;padding:12px 18px;border:3px solid var(--ink);background:var(--ink);color:var(--paper);box-shadow:5px 5px 0 var(--red);cursor:pointer}
 @media print{body{background:#fff;font-size:12pt}.toc,.print{display:none}section{break-inside:auto;margin-bottom:30px}.steps>li,.way,.note,.mod,details{break-inside:avoid;box-shadow:none}details>div{display:block}
-  details:not([open])>div{display:block}.shapes{opacity:1}}
+  details:not([open])>div{display:block}.orbit{opacity:1}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
 <header class="hero">
-  <div class="shapes"><i></i><i></i><i></i></div>
+  <canvas class="orbit" id="orbit" aria-hidden="true"></canvas>
   <span class="lab">Teacher handbook</span>
   <h1>Control<i>Room</i></h1>
   <p class="sub">A classroom playground for music production. One big screen, every phone in the room, and if you like, every student computer too.</p>
@@ -368,6 +364,17 @@ details>div{padding:0 16px 14px}
 <footer class="foot"><p>One room. One big screen. Everybody plays.</p><button class="print" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);print()">Print or save as PDF</button></footer>
 </div>
 <script>
+/* the splash screen's four answer shapes, orbiting (same drawing as Control Room's poster) */
+(()=>{const c=document.getElementById('orbit');if(!c)return;const ctx=c.getContext('2d'),cs=getComputedStyle(document.documentElement),
+  col=['--red','--blue','--yel','--green'].map(v=>cs.getPropertyValue(v).trim()),ink=cs.getPropertyValue('--ink').trim(),still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const size=()=>{const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);return r.width;};let W=size();addEventListener('resize',()=>{W=size();});
+  const draw=now=>{const t=still?2:now/1000,S=W*.5,R=S*.46,cx=W/2,cy=W/2;ctx.clearRect(0,0,W,W);
+    [0,1,2,3].forEach(i=>{const a=t*.25+i*Math.PI/2,x=cx+Math.cos(a)*R,y=cy+Math.sin(a)*R,sz=S*(.75+.06*Math.sin(t+i));
+      ctx.save();ctx.translate(x,y);ctx.rotate(i===1?t*.2:i===3?Math.PI/4:0);ctx.fillStyle=col[i];ctx.strokeStyle=ink;ctx.lineWidth=Math.max(4,S*.025);ctx.lineJoin='miter';ctx.beginPath();
+      if(i===0)ctx.arc(0,0,sz/2,0,Math.PI*2);else if(i===1||i===3)ctx.rect(-sz/2.6,-sz/2.6,sz/1.3,sz/1.3);else{ctx.moveTo(0,-sz/2);ctx.lineTo(sz/2,sz/2.4);ctx.lineTo(-sz/2,sz/2.4);ctx.closePath();}
+      ctx.fill();ctx.stroke();ctx.restore();});
+    if(!still)requestAnimationFrame(draw);};
+  requestAnimationFrame(draw);})();
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(!t)return;e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});try{history.replaceState(null,'',a.getAttribute('href'));}catch(x){}}));
 </script>
 </body>
