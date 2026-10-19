@@ -108,6 +108,11 @@ Phones and the host keep old files otherwise.
 - **Raise your hand** (phones only): `#pHand` in the phone header sends `{t:'hand', up}`; the host keeps `p.hand` (time raised),
   shows `#hands` in the header (first raised + count; click for the ordered list, lower one or all) and a yellow name chip.
   `handsUpdate()` updates in place and never re-renders a running game. Hands drop on disconnect; lowering is echoed back to the phone.
+- **Soundabout Roundabout relay**: after the sketch and each stop a `rec` phase: the phone's Record/Stop sends `{t:'rec'}`; the
+  host tells the computer `{t:'rec-start'|'rec-stop'}`; CADCAST/go records its capture stream (MediaRecorder, opus) and
+  uploads it with `{t:'file'}` chunks (core.js `pcSendFile` / `pcData` / `B64`, both directions, game hooks `onPcFile`,
+  `onPcMsg`, `onPcProg`). "Pass it on" sends each take (and in `pass:'project'` the dropped project zip) to the next
+  computer in `s.ring`, where it becomes a WAV. Takes stay in host memory for the listening party (`journeys()`).
 - **Room vote** (js/vote.js): `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
   `{t:'vote', v}` (not `act`). Votes are by player id and only count while the player is in the room. Close → 3-2-1 →
   winner card (ties: a spotlight picks one). Reuse it with `openVote({title, sub, kind:'text', opts:[{v,l,s,c}], win:{go, fn}})`.

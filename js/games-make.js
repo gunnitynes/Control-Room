@@ -315,20 +315,25 @@ function rbDeal(n){let used=new Set(store.get('rb.used',[]));const out=[];
   for(let i=0;i<n;i++){let left=RB_ALL.filter(c=>!used.has(c.text)&&!out.includes(c));if(!left.length){used=new Set();left=RB_ALL.filter(c=>!out.includes(c));}
     const seen=new Set(out.slice(-(RB_KINDS.length-1)).map(c=>c.kind)),fresh=left.filter(c=>!seen.has(c.kind)),c=pick(fresh.length?fresh:left);out.push(c);used.add(c.text);}
   store.set('rb.used',[...used]);return out;}
+/* Soundabout Roundabout. After each sketch or stop everyone records their track on their own computer (CADCAST/go,
+   started and stopped from the phone); "Pass it on" sends each recording (and with 'project' the project file) to the
+   next computer in the ring, where it arrives as a WAV to grow. The recordings stay here for the listening party. */
+const rbFmt=s=>`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
 game({
   id:'roundabout',group:'make',name:'Soundabout Roundabout',tag:'Start a track, pass it round the room. Every stop deals a new prompt card.',
-  how:['Everyone starts a short sketch on their own machine.','When the timer ends, move one seat on (or pass the project file). The track in front of you is now yours to grow.','A prompt card lands on your phone: a fun, specific idea to try. Add it, then pass the track on again.'],
-  badges:['Sprint','No score','Prompt cards'],kind:'free',
+  how:['Everyone starts a short sketch on their own computer.','When the timer ends, play your track from the start and record it from your phone. CADCAST sends it to the next computer.','A prompt card lands on your phone. Grow the track you were passed, then record and pass it on again. The listening party plays every journey.'],
+  badges:['Sprint','No score','Prompt cards','CADCAST'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="21" fill="none" stroke="var(--ink)" stroke-width="4" stroke-dasharray="26 7"/><path d="M50 14 L54 26 L42 25 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5"/><path d="M14 50 L10 38 L22 39 Z" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5"/><rect x="25" y="25" width="14" height="14" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" transform="rotate(12 32 32)"/></svg>`,
   options:[
     {key:'sketch',label:'First sketch',type:'step',min:1,max:30,step:1,def:8,unit:'min'},
     {key:'stop',label:'Time at each stop',type:'step',min:1,max:30,step:1,def:6,unit:'min'},
     {key:'rounds',label:'Stops',type:'step',min:1,max:20,step:1,def:3,unit:n=>n===1?'stop':'stops',help:'How many times each track moves on before the listening party.'},
+    {key:'pass',label:'Pass the track',choices:[['audio','As a recording','CADCAST sends it to the next computer'],['project','Recording + project','the next person also gets the project file (same DAW for everyone)'],['seats','Move seats','record for the party, then change seats']],def:'audio',help:'Recording and passing need each computer signed in through CADCAST (gunnitynes.github.io/CADCAST/go). Students who are not: they change seats.'},
     {key:'deal',label:'Cards',choices:[['each','Everyone different','a card per phone'],['room','One for the room','the same card on the big screen']],def:'each'},
   ],
   note:`${RB_ALL.length} prompt cards in ${RB_KINDS.length} kinds (${RB_KINDS.join(', ')}). A card is not dealt again until every card has been used (counted in this browser). Edit them in data/content.js → ROUNDABOUT.`,
-  topInfo(){const s=G.gs;return s?({brief:'Ready',sketch:'First sketch',pass:'Pass it on!',card:`Stop ${s.round} · your card`,build:`Stop ${s.round} of ${s.o.rounds}`,done:'Listening party'})[s.phase]:this.tag;},
-  start(o){G.gs={o,phase:'brief',round:0,cards:new Map(),room:null,done:new Set(),swapped:new Set()};},
+  topInfo(){const s=G.gs;return s?({brief:'Ready',sketch:'First sketch',rec:'Record your track',pass:'Pass it on!',card:`Stop ${s.round} · your card`,build:`Stop ${s.round} of ${s.o.rounds}`,done:'Listening party'})[s.phase]:this.tag;},
+  start(o){G.gs={o,phase:'brief',round:0,cards:new Map(),room:null,done:new Set(),swapped:new Set(),ring:[],rec:new Map(),takes:new Map(),projects:new Map(),got:new Map(),play:null};},
   logCard(p,c){logAdd(p,{kind:'card',game:this.name,title:`Stop ${G.gs.round} · ${c.kind}`,text:c.text});},
   draw(){const s=G.gs,ps=online();s.done=new Set();s.swapped=new Set();sfx.card();
     if(s.o.deal==='room'){s.room=rbDeal(1)[0];s.cards=new Map();ps.forEach(p=>this.logCard(p,s.room));}
@@ -336,38 +341,109 @@ game({
   cardFor(p){const s=G.gs;if(s.room)return s.room;if(s.phase!=='card'&&s.phase!=='build')return null;
     if(!s.cards.has(p.id)){const c=rbDeal(1)[0];s.cards.set(p.id,c);this.logCard(p,c);} // a late joiner gets a card too
     return s.cards.get(p.id);},
-  go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
-    if(ph==='sketch')startClock(s.o.sketch*60000,()=>{sfx.alarm();this.go('pass');});
-    if(ph==='pass'){s.round++;sfx.whoosh();startClock(30000,()=>this.go('card'));}
+  // the ring: everyone in the room when the sketch starts, in class-list order; late joiners join the end
+  ringOf(){const s=G.gs;online().forEach(p=>{if(!s.ring.includes(p.id))s.ring.push(p.id);});return s.ring.filter(id=>G.players.has(id));},
+  nextOf(id){const r=this.ringOf();const i=r.indexOf(id);return r.length>1&&i>=0?G.players.get(r[(i+1)%r.length]):null;},
+  prevOf(id){const r=this.ringOf();const i=r.indexOf(id);return r.length>1&&i>=0?G.players.get(r[(i-1+r.length)%r.length]):null;},
+  go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();this.stopPlay();
+    if(ph==='sketch'){this.ringOf();startClock(s.o.sketch*60000,()=>{sfx.alarm();this.go('rec');});}
+    if(ph==='rec')s.rec=new Map();
+    if(ph==='pass'){this.relay();s.round++;sfx.whoosh();startClock(30000,()=>this.go('card'));}
     if(ph==='card')this.draw();
-    if(ph==='build')startClock(s.o.stop*60000,()=>{sfx.alarm();this.go(s.round<s.o.rounds?'pass':'done');});
+    if(ph==='build')startClock(s.o.stop*60000,()=>{sfx.alarm();this.go('rec');});
     if(ph==='done')sfx.fanfare();
     render();syncAll();},
-  next(){const s=G.gs;({brief:()=>this.go('sketch'),sketch:()=>this.go('pass'),pass:()=>this.go('card'),card:()=>this.go('build'),build:()=>this.go(s.round<s.o.rounds?'pass':'done'),done:()=>exitGame(true)})[s.phase]();},
+  next(){const s=G.gs;({brief:()=>this.go('sketch'),sketch:()=>this.go('rec'),rec:()=>this.go(s.round<s.o.rounds?'pass':'done'),pass:()=>this.go('card'),card:()=>this.go('build'),build:()=>this.go('rec'),done:()=>exitGame(true)})[s.phase]();},
   frame(){clockFrame();},
+  stop(){this.stopPlay();online().forEach(p=>{if((G.gs.rec.get(p.id)||{}).st==='rec')pcSend(p,{t:'rec-stop'});});},
+  key:(r,id)=>r+':'+id,
+  // pass: every recording made at this stop goes to the next computer in the ring
+  relay(){const s=G.gs,r=s.round;s.got=new Map();
+    this.ringOf().forEach(id=>{const from=G.players.get(id),to=this.nextOf(id);if(!from||!to)return;s.got.set(to.id,{from:from.id,st:'none'});
+      if(s.o.pass==='seats')return;
+      const t=s.takes.get(this.key(r,id)),pr=s.projects.get(this.key(r,id));
+      if(!pcFor(to)){s.got.get(to.id).st='nopc';return;}
+      if(!t){s.got.get(to.id).st='notake';pcSend(to,{t:'relay-note',round:r,text:`${from.name} didn’t record this stop. Go to ${from.name}’s seat to hear it.`});return;}
+      const g=s.got.get(to.id);g.st='sending';
+      pcSendFile(to,{kind:'take',round:r,from:from.name},t.blob).then(ok=>{g.st=ok?'sent':'fail';
+        if(ok&&pr)pcSendFile(to,{kind:'project',round:r,from:from.name,name:pr.name},pr.blob).then(()=>{});
+        sync(to);this.live();});});},
   act(p,d){const s=G.gs;
     if(d.t==='got'&&(s.phase==='card'||s.phase==='build')){s.done.add(p.id);sfx.vote();sync(p);const e=$('#nDone');if(e)e.textContent=s.done.size;}
-    if(d.t==='swap'&&s.phase==='card'&&!s.room&&!s.swapped.has(p.id)){s.swapped.add(p.id);const c=rbDeal(1)[0];s.cards.set(p.id,c);this.logCard(p,c);sfx.card();sync(p);render();}},
+    if(d.t==='swap'&&s.phase==='card'&&!s.room&&!s.swapped.has(p.id)){s.swapped.add(p.id);const c=rbDeal(1)[0];s.cards.set(p.id,c);this.logCard(p,c);sfx.card();sync(p);render();}
+    if(d.t==='rec'&&s.phase==='rec'){
+      if(d.on){if(!pcFor(p)){s.rec.set(p.id,{st:'nopc'});sync(p);this.live();return;}
+        pcSend(p,{t:'rec-start',round:s.round,project:s.o.pass==='project'});s.rec.set(p.id,{st:'rec',t0:Date.now()});}
+      else{pcSend(p,{t:'rec-stop'});const r=s.rec.get(p.id)||{};s.rec.set(p.id,{...r,st:'up'});}
+      sync(p);this.live();}},
+  onPcMsg(p,m){const s=G.gs;if(!s||m.t!=='rec-state')return;const r=s.rec.get(p.id)||{};
+    if(m.state==='rec')s.rec.set(p.id,{...r,st:'rec',t0:r.t0||Date.now()});
+    if(m.state==='up')s.rec.set(p.id,{...r,st:'up',dur:m.dur});
+    if(m.state==='error')s.rec.set(p.id,{st:'err',msg:m.msg});
+    sync(p);this.live();},
+  onPcProg(p,f,meta){const s=G.gs;if(!s||!meta||meta.kind!=='take')return;const r=s.rec.get(p.id);if(r&&r.st==='up'){r.prog=f;this.live();}},
+  onPcFile(p,meta,blob){const s=G.gs;if(!s)return;const k=this.key(meta.round,p.id);
+    if(meta.kind==='take'){s.takes.set(k,{blob,dur:meta.dur||0,pid:p.id,name:p.name,round:meta.round});if(meta.round===s.round)s.rec.set(p.id,{st:'ok',dur:meta.dur});sfx.vote();}
+    if(meta.kind==='project'){s.projects.set(k,{blob,name:meta.name||'project.zip'});const r=s.rec.get(p.id);if(r)r.proj=meta.name;}
+    sync(p);this.live();},
+  // live updates without re-rendering the whole stage
+  live(){const s=G.gs;if(!s)return;if(s.phase==='rec'||s.phase==='pass'){const box=$('#rbLive');if(box)box.innerHTML=this.liveHTML();}},
+  liveHTML(){const s=G.gs,ids=this.ringOf();
+    if(s.phase==='rec'){const lab=p=>{const r=s.rec.get(p.id)||{};return r.st==='rec'?'● recording':r.st==='up'?`sending ${r.prog?Math.round(r.prog*100)+'%':'…'}`:r.st==='ok'?`✓ ${rbFmt(r.dur||0)}${r.proj?' + project':''}`:r.st==='nopc'?'no CADCAST':r.st==='err'?'mic blocked':pcFor(p)?'ready':'no CADCAST';};
+      const n=ids.filter(id=>(s.rec.get(id)||{}).st==='ok').length,can=ids.filter(id=>pcFor(G.players.get(id))).length;
+      return `<p class="rbcount"><b>${n}</b> of ${can} recorded${can<ids.length?` · ${ids.length-can} without CADCAST change seats`:''}</p><div class="rbrec">${ids.map(id=>{const p=G.players.get(id),r=s.rec.get(id)||{};return `<div class="rbr c${p.sh} st-${r.st||(pcFor(p)?'ready':'nopc')}"><b>${esc(p.name)}</b><span>${esc(lab(p))}</span></div>`;}).join('')}</div>`;}
+    return `<div class="rbrec">${ids.map(id=>{const to=G.players.get(id),g=s.got.get(id);if(!g)return '';const from=G.players.get(g.from);
+      const lab={sending:'sending…',sent:'✓ on their computer',fail:'not delivered',notake:'no recording · change seats',nopc:'no CADCAST · change seats',none:'change seats'}[g.st]||'';
+      return `<div class="rbr c${to.sh} st-${g.st}"><b>${esc(from?from.name:'?')} → ${esc(to.name)}</b><span>${esc(lab)}</span></div>`;}).join('')}</div>`;},
+  // the listening party: each track's journey, stop by stop, from the recordings
+  journeys(){const s=G.gs,ring=this.ringOf(),R=s.o.rounds;return ring.map((id,j)=>{const stops=[];for(let r=0;r<=R;r++){const h=ring[(j+r)%ring.length],t=s.takes.get(this.key(r,h));stops.push({r,pid:h,name:(G.players.get(h)||{}).name||'?',t});}return {origin:id,name:(G.players.get(id)||{}).name||'?',stops};});},
+  stopPlay(){const s=G.gs;if(s&&s.play){s.play.dead=true;if(s.play.h)s.play.h.stop();clearTimeout(s.play.tm);s.play=null;}$$('.rbstop.on').forEach(e=>e.classList.remove('on'));},
+  async playJourney(j,from=0){const s=G.gs;this.stopPlay();const J=this.journeys()[j];if(!J)return;const P=s.play={j,dead:false};
+    for(let k=from;k<J.stops.length;k++){const st=J.stops[k];if(!st.t)continue;if(P.dead)return;
+      $$('.rbstop.on').forEach(e=>e.classList.remove('on'));const el=$(`.rbstop[data-j="${j}"][data-k="${k}"]`);if(el)el.classList.add('on');
+      try{if(!st.t.buf)st.t.buf=await st.t.blob.arrayBuffer().then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej)));}catch(e){toast('Could not play '+st.name+'’s recording');continue;}
+      if(P.dead)return;P.h=playSample(st.t.buf,AU.music,{gain:.9});await new Promise(r=>{P.tm=setTimeout(r,st.t.buf.duration*1000+400);});}
+    if(!P.dead){$$('.rbstop.on').forEach(e=>e.classList.remove('on'));s.play=null;}},
   render(st){
-    const s=G.gs,o=s.o;
+    const s=G.gs,o=s.o,last=s.round>=o.rounds;
     const wall=()=>`<div class="rbwall">${online().map(p=>{const c=this.cardFor(p);return c?`<div class="rbc c${p.sh}${s.done.has(p.id)?' got':''}"><span class="lab">${esc(p.name)} · ${esc(c.kind)}</span><p>${esc(c.text)}</p></div>`:'';}).join('')}</div>`;
+    const J=s.phase==='done'?this.journeys():[];
     const bodies={
-      brief:`<div class="dbig"><span class="lab">Before the first stop</span><h2>Start a sketch</h2><p>${o.sketch} minute${o.sketch>1?'s':''}: a loop, a beat, a sound you love. Then it goes on a journey round the room, ${o.rounds} stop${o.rounds>1?'s':''} long.</p></div>`,
+      brief:`<div class="dbig"><span class="lab">Before the first stop</span><h2>Start a sketch</h2><p>${o.sketch} minute${o.sketch>1?'s':''}: a loop, a beat, a sound you love. Then it goes on a journey round the room, ${o.rounds} stop${o.rounds>1?'s':''} long.</p>${o.pass!=='seats'?'<p class="fine">Every computer signed in through CADCAST (gunnitynes.github.io/CADCAST/go) records and passes its track by itself.</p>':''}</div>`,
       sketch:`<div class="dbig"><span class="lab">First sketch</span>${clockHTML('huge')}<p>Start something worth passing on.</p></div>`,
-      pass:`<div class="dbig rot"><div class="arrows"><i></i><i></i><i></i><i></i></div><h2>Pass it on!</h2><p>Move one seat on, or send your project file to the next person. The track in front of you is now yours to grow.</p>${clockHTML()}</div>`,
+      rec:`<div class="rbreco"><div class="rbhead"><span class="lab">${s.round?`Stop ${s.round} of ${o.rounds}`:'The first sketch'} · record</span><h2>Play it, record it</h2><p>On your phone tap <b>Record</b>, play your track from the start, tap <b>Stop</b> when it ends.${o.pass==='project'?' Then drop your project on your computer.':''}</p></div><div id="rbLive">${this.liveHTML()}</div></div>`,
+      pass:`<div class="rbreco"><div class="rbhead"><div class="arrows"><i></i><i></i><i></i><i></i></div><h2>Pass it on!</h2><p>${o.pass==='seats'?'Move one seat on. The track in front of you is now yours to grow.':'Each track is on its way to the next computer. Drag it into your DAW.'}</p>${clockHTML()}</div><div id="rbLive">${this.liveHTML()}</div></div>`,
       card:s.room?`<div class="dbig"><span class="lab">Stop ${s.round} of ${o.rounds} · ${esc(s.room.kind)}</span><div class="scard"><b>${esc(s.room.text)}</b></div><p><b id="nDone">${s.done.size}</b> of ${online().length} ready</p><div class="frow"><button class="ghost" id="bRedraw">Draw another card</button></div></div>`
         :`<div class="rbcards"><div class="rbhead"><span class="lab">Stop ${s.round} of ${o.rounds} · everyone has their own card</span><h2>Check your phone</h2><p><b id="nDone">${s.done.size}</b> of ${online().length} ready</p></div>${wall()}</div>`,
       build:`<div class="dbig"><span class="lab">Stop ${s.round} of ${o.rounds}</span>${clockHTML('huge')}${s.room?`<div class="scard small"><b>${esc(s.room.text)}</b></div>`:'<p>Your card is on your phone.</p>'}</div>`,
-      done:`<div class="dbig"><span class="lab">Listening party</span><h2>Play them back</h2><p>Go round the room: play each track and tell its journey. Which card took it somewhere nobody expected?</p></div>`,
+      done:`<div class="rbparty"><div class="rbhead"><span class="lab">Listening party</span><h2>Every journey</h2><p>Click a track to hear it grow, stop by stop.</p></div>
+        <div class="rbjour">${J.map((j,ji)=>`<div class="rbj"><button class="rbplay" data-j="${ji}" ${j.stops.some(x=>x.t)?'':'disabled'}>▶</button><b>${esc(j.name)}’s track</b><div class="rbstops">${j.stops.map((x,k)=>`<button class="rbstop c${(G.players.get(x.pid)||{}).sh||0}${x.t?'':' none'}" data-j="${ji}" data-k="${k}" ${x.t?'':'disabled'}><i>${k?`Stop ${k}`:'Sketch'}</i><span>${esc(x.name)}</span><em>${x.t?rbFmt(x.t.dur):'—'}</em></button>`).join('<s>→</s>')}</div></div>`).join('')||'<p>No recordings this time. Go round the room and play each track.</p>'}</div></div>`,
     };
-    const lbl={brief:'Start the sketch',sketch:'Time: pass it on',pass:'Deal the cards',card:'Start the clock',build:s.round<o.rounds?'Pass it on again':'Listening party',done:'Back to the menu'}[s.phase];
-    const seq=['sketch',...[...Array(o.rounds)].flatMap(()=>['pass','card','build']),'done'],at=s.phase==='brief'?-1:s.phase==='sketch'?0:s.phase==='done'?seq.length-1:1+(s.round-1)*3+['pass','card','build'].indexOf(s.phase);
+    const lbl={brief:'Start the sketch',sketch:'Time: record',rec:last?'Listening party':'Pass it on',pass:'Deal the cards',card:'Start the clock',build:'Time: record',done:'Back to the menu'}[s.phase];
+    const seq=['sketch','rec',...[...Array(o.rounds)].flatMap(()=>['pass','card','build','rec']),'done'],at=s.phase==='brief'?-1:s.phase==='sketch'?0:s.phase==='done'?seq.length-1:s.phase==='rec'?(s.round?1+s.round*4:1):2+(s.round-1)*4+['pass','card','build'].indexOf(s.phase);
     st.innerHTML=`<div class="destruct roundabout dots ph-${s.phase}">${bodies[s.phase]}<div class="dfoot"><div class="steps2">${seq.map((p,i)=>`<i class="${i<at?'past':i===at?'cur':''}" title="${p}"></i>`).join('')}</div>${s.phase==='done'?againBtn():''}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
     $('#bNext').onclick=()=>this.next();bindAgain(st);if($('#bRedraw'))$('#bRedraw').onclick=()=>{s.room=rbDeal(1)[0];s.done=new Set();online().forEach(p=>this.logCard(p,s.room));sfx.card();render();syncAll();};
+    $$('.rbplay',st).forEach(b=>b.onclick=()=>this.playJourney(+b.dataset.j));
+    $$('.rbstop',st).forEach(b=>b.onclick=()=>this.playJourney(+b.dataset.j,+b.dataset.k));
   },
-  pstate(p){const s=G.gs,c=this.cardFor(p);return {k:s.phase+s.round+(c?c.text.length:0)+(s.done.has(p.id)?'d':'')+(s.swapped.has(p.id)?'s':''),ph:s.phase,round:s.round,rounds:s.o.rounds,card:c,done:s.done.has(p.id),canSwap:!s.room&&s.phase==='card'&&!s.swapped.has(p.id),clock:pClock()};},
+  pstate(p){const s=G.gs,c=this.cardFor(p),r=s.rec.get(p.id)||{},g=s.got.get(p.id),from=g&&G.players.get(g.from);
+    return {k:s.phase+s.round+(c?c.text.length:0)+(s.done.has(p.id)?'d':'')+(s.swapped.has(p.id)?'s':'')+(r.st||'')+(g?g.st:''),ph:s.phase,round:s.round,rounds:s.o.rounds,card:c,done:s.done.has(p.id),
+      canSwap:!s.room&&s.phase==='card'&&!s.swapped.has(p.id),clock:pClock(),pc:!!pcFor(p),rec:r.st||'',dur:r.dur||0,mode:s.o.pass,
+      from:from?from.name:'',got:g?g.st:'',to:(this.nextOf(p.id)||{}).name||''};},
   player(root,st){pClockStart(st.clock);
-    const T={brief:['Get ready','Start a sketch when the timer starts.'],sketch:['Sketch!','Start something worth passing on.'],pass:['Pass it on!','Move one seat on, or pass your project file. Your card arrives in a moment.'],card:['Your card','Read it, then make it happen in the track in front of you.'],build:['Make it happen',''],done:['Listening party','Play your track back to the room.']}[st.ph];
+    if(st.ph==='rec'){
+      const body=!st.pc?`<p>Your computer isn’t signed in through CADCAST, so it can’t record. Play your track to ${esc(st.to||'your neighbour')} when it’s time to pass.</p>`
+        :st.rec==='rec'?`<div class="rbbig on"><i></i>Recording</div><p>Play your track from the start. Tap Stop when it ends.</p><button class="big rbstopb" id="pRec">■ Stop</button>`
+        :st.rec==='up'?`<div class="rbbig">Sending…</div><p>Your recording is on its way.${st.mode==='project'?' Drop your project on your computer too.':''}</p>`
+        :st.rec==='ok'?`<div class="rbbig ok">✓ Recorded · ${rbFmt(st.dur)}</div><p>Wait for “Pass it on”.</p><button class="ghost" id="pRec">Record again</button>`
+        :st.rec==='err'?`<p>Your computer blocked the microphone. Allow it in Chrome (left of the address bar), then try again.</p><button class="big go" id="pRec">● Record</button>`
+        :`<p>Get your track ready to play from the start. Tap Record, then press play in your DAW.</p><button class="big rbrecb" id="pRec">● Record</button>`;
+      root.innerHTML=`<div class="pcol2"><h2 class="pbigt">Record your track</h2>${body}</div>`;
+      const b=$('#pRec',root);if(b)b.onclick=()=>{papi.send({t:'rec',on:st.rec!=='rec'});papi.vibe(st.rec==='rec'?[20,40,20]:40);b.disabled=true;};return;}
+    const passTxt=st.mode==='seats'||!st.pc?`Move one seat on${st.from?` to ${st.from}’s computer`:''}. Your card arrives in a moment.`
+      :st.got==='sent'?`${st.from}’s track is on your computer. Drag it into your DAW.`:st.got==='sending'?`${st.from}’s track is arriving on your computer…`
+      :st.got==='notake'||st.got==='nopc'||st.got==='fail'?`${st.from} has no recording for you. Go to ${st.from}’s seat to hear it.`:'Your card arrives in a moment.';
+    const T={brief:['Get ready','Start a sketch when the timer starts.'],sketch:['Sketch!','Start something worth passing on.'],pass:['Pass it on!',passTxt],card:['Your card','Read it, then make it happen in the track in front of you.'],build:['Make it happen',''],done:['Listening party','Listen to every journey on the big screen.']}[st.ph];
     root.innerHTML=`<div class="pcol2 ${st.ph==='pass'?'rotating':''}">${pClockHTML(st.clock)}<h2 class="pbigt">${esc(T[0])}</h2>${T[1]?`<p>${esc(T[1])}</p>`:''}
       ${st.card?`<div class="scard rbphone"><span class="lab">Stop ${st.round} of ${st.rounds} · ${esc(st.card.kind)}</span><b>${esc(st.card.text)}</b></div>`:''}
       ${st.ph==='card'?`<button class="big go" id="pGot" ${st.done?'disabled':''}>${st.done?'Ready ✓':'Got it'}</button>${st.canSwap?'<button class="ghost" id="pSwap">Different card (once)</button>':''}`:''}</div>`;

@@ -243,8 +243,26 @@ function pcFor(p){const a=store.get('cadcast.allow',{});let best=null;for(const 
 const PCC=new Map();
 function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)return false;let e=PCC.get(pc);
   if(!e||e.dead){const conn=G.peer.connect('cadcast-pc-'+pc,{serialization:'json',reliable:true});e={conn,q:[],dead:false};PCC.set(pc,e);
-    conn.on('open',()=>{e.q.forEach(m=>{try{conn.send(m);}catch(x){}});e.q=[];});conn.on('close',()=>{e.dead=true;});conn.on('error',()=>{e.dead=true;});}
+    conn.on('open',()=>{e.q.forEach(m=>{try{conn.send(m);}catch(x){}});e.q=[];});conn.on('close',()=>{e.dead=true;});conn.on('error',()=>{e.dead=true;});
+    conn.on('data',m=>pcData(pc,m));}
   if(e.conn.open){try{e.conn.send(msg);}catch(x){e.q.push(msg);}}else e.q.push(msg);return true;}
+/* files over the same connection, both ways: base64 chunks small enough for a data channel ({t:'file', fid, i, n, meta, data}),
+   sent no faster than the channel drains. The computer (CADCAST/go) speaks the same format. */
+const B64=u8=>{let s='';for(let i=0;i<u8.length;i+=8192)s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));return btoa(s);};
+const UNB64=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;};
+async function pcSendFile(p,meta,blob,onProg){const u8=new Uint8Array(await blob.arrayBuffer()),CH=48000,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);
+  for(let i=0;i<n;i++){const pc=pcFor(p),e=pc&&PCC.get(pc);
+    for(let k=0;e&&e.conn.dataChannel&&e.conn.dataChannel.bufferedAmount>1.5e6&&k<600;k++)await new Promise(r=>setTimeout(r,50));
+    if(!pcSend(p,{t:'file',fid,i,n,meta:i?null:{...meta,size:u8.length,mime:blob.type},data:B64(u8.subarray(i*CH,(i+1)*CH))}))return false;if(onProg)onProg((i+1)/n);}
+  return true;}
+const PCF=new Map();
+function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadcast.allow',{})[pc],p=a&&G.players.get(a.pid);if(!p)return;
+  if(m.t==='file'){let f=PCF.get(m.fid);if(!f)PCF.set(m.fid,f={parts:[],got:0,n:m.n,meta:null});if(m.meta)f.meta=m.meta;
+    if(!f.parts[m.i]){f.parts[m.i]=UNB64(m.data);f.got++;}
+    if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f.got/f.n,f.meta);
+    if(f.got===f.n&&f.meta){PCF.delete(m.fid);const b=new Blob(f.parts,{type:f.meta.mime||''});if(G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,f.meta,b);}
+    return;}
+  if(G.view==='play'&&G.game&&G.game.onPcMsg)G.game.onPcMsg(p,m);}
 /* ---------- the class lobby: a relay address named after the TEACHER (controlroom-lobby-<name>) that tells any device
    which room that teacher has open right now. Student computers (CADCAST/go?t=<name>) ask it, so two teachers teaching
    at the same time never meet. The host asks the teacher's name once; a phone gets it from the QR (&t=). */
