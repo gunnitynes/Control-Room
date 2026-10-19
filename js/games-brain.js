@@ -25,48 +25,43 @@ function mcSpec(spec){return Object.assign({
 function shuffledOpts(opts,c){const order=shuffle([0,1,2,3]);return {opts:order.map(k=>opts[k]),c:order.indexOf(c)};}
 
 /* ---------- 01 · THE QUIZ ---------- */
-const catOf=id=>CATS.find(c=>c.id===id)||{name:'',sub:''},vcatOf=id=>VAULT_CATS.find(c=>c.id===id)||{name:'',sub:''};
+// three banks (data/quiz-questions.js): The Workbench, The Machine Room, The Studio Vault, each in categories.
+// A bank's categories are the multi option c_<bank id>; an unknown bank (an old saved setup) falls back to the first.
+const bankOf=id=>BANKS.find(b=>b.id===id)||BANKS[0],bankN=b=>b.cats.reduce((a,c)=>a+c.qs.length,0);
+const qcatOf=(bank,id)=>bankOf(bank).cats.find(c=>c.id===id)||{name:'',sub:''};
+const qtag=r=>`<div class="dawtag">${esc(bankOf(r.bank).name)} · ${esc(qcatOf(r.bank,r.cat).name)}</div>`;
 function buildQuizDeck(o){
-  const pool=[],seen=new Set();CATS.filter(c=>o.cats.includes(c.id)).forEach(c=>c.qs.forEach(q=>pool.push({cat:c.id,q})));
-  const out=[];
+  const b=bankOf(o.bank),pick=o['c_'+b.id]||b.cats.map(c=>c.id),pool=[],seen=new Set(),out=[];
+  b.cats.filter(c=>pick.includes(c.id)).forEach(c=>c.qs.forEach(q=>pool.push({cat:c.id,q})));
   for(const {cat,q} of shuffle(pool)){
     // same right answer, or the same topic tag (q[3]), counts as the same question
     const keys=[q[2][q[1]].toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,48)];if(q[3])keys.push('#'+q[3]);
     if(keys.some(k=>seen.has(k)))continue;keys.forEach(k=>seen.add(k));
-    out.push({cat,text:q[0],...shuffledOpts(q[2],q[1])});if(o.n&&out.length>=o.n)break;
+    out.push({bank:b.id,cat,text:q[0],...shuffledOpts(q[2],q[1])});if(o.n&&out.length>=o.n)break;
   }
   return out;
 }
 game(roundGame(mcSpec({
-  id:'quiz',group:'brain',name:'The Quiz',tag:'The question on the big screen, the four answers on every phone. Two banks: The Workbench (production know-how) or The Studio Vault (studio history).',
-  how:['Pick a bank: The Workbench (production know-how) or The Studio Vault (the stories behind famous records, rooms and machines).','The question shows alone for a few seconds, then the answers open on the phones.','Fast right answers score more. Streaks add a bonus.'],
-  badges:['Scored',`${CATS.reduce((a,c)=>a+c.qs.length,0)+Object.values(VAULT).reduce((a,v)=>a+v.length,0)} questions`],
+  id:'quiz',group:'brain',name:'The Quiz',tag:'The question on the big screen, the four answers on every phone. Three banks: The Workbench, The Machine Room and The Studio Vault.',
+  how:['Pick a bank: The Workbench (how to do it: mixing, recording, mastering, the business), The Machine Room (how the gear works) or The Studio Vault (the stories behind records, producers and pioneers). Then pick its categories.','The question shows alone for a few seconds, then the answers open on the phones.','Fast right answers score more. Streaks add a bonus.'],
+  badges:['Scored',`${BANKS.reduce((a,b)=>a+bankN(b),0)} questions`],
   icon:`<svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="14" fill="var(--red)" stroke="var(--ink)" stroke-width="3"/><rect x="36" y="6" width="22" height="22" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><polygon points="20,38 34,60 6,60" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/><polygon points="47,36 60,49 47,62 34,49" fill="var(--green)" stroke="var(--ink)" stroke-width="3"/></svg>`,
   options:[
-    {key:'bank',label:'Question bank',choices:[['quiz','The Workbench',`production · ${CATS.reduce((a,c)=>a+c.qs.length,0)} qs`],['vault','The Studio Vault',`studio history · ${Object.values(VAULT).reduce((a,v)=>a+v.length,0)} qs`]],def:'quiz'},
-    {key:'cats',type:'multi',label:'Categories',show:v=>v.bank!=='vault',choices:CATS.map(c=>[c.id,c.name,c.sub+' · '+c.qs.length]),def:CATS.map(c=>c.id),sub:v=>`${v.cats.length} of ${CATS.length}`},
-    {key:'vcats',type:'multi',label:'Categories',show:v=>v.bank==='vault',choices:VAULT_CATS.map(c=>[c.id,c.name,c.sub+' · '+VAULT[c.id].length]),def:VAULT_CATS.map(c=>c.id),sub:v=>`${v.vcats.length} of ${VAULT_CATS.length}`},
+    {key:'bank',label:'Question bank',choices:BANKS.map(b=>[b.id,b.name,`${b.sub.split(':')[0]} · ${bankN(b)} qs`]),def:BANKS[0].id},
+    ...BANKS.map(b=>({key:'c_'+b.id,type:'multi',label:'Categories',show:v=>bankOf(v.bank)===b,choices:b.cats.map(c=>[c.id,c.name,c.sub+' · '+c.qs.length]),def:b.cats.map(c=>c.id),sub:v=>`${(v['c_'+b.id]||[]).length} of ${b.cats.length}`})),
     {key:'n',label:'Questions',choices:[[10,'10','qs'],[15,'15','qs'],[20,'20','qs'],[30,'30','qs'],[0,'ALL','of them']],def:15},
     AUTO_OPT,
     {key:'secs',label:'Answer time',choices:[[10,'10','seconds'],[20,'20','seconds'],[30,'30','seconds'],[45,'45','seconds'],[0,'OFF','no clock']],def:20,help:'Faster right answers score more: 1000 points at once, sliding to 500 at the buzzer, +100 for every answer in a streak (up to +500).'},
   ],
-  check:v=>v.bank==='vault'?(v.vcats.length?'':'Pick at least one category'):(v.cats.length?'':'Pick at least one category'),
-  prepMs:r=>r&&r.vol?5000:4000,prepLabel:'READ',prepSub:'the question',
+  check:v=>(v['c_'+bankOf(v.bank).id]||[]).length?'':'Pick at least one category',
+  prepMs:r=>r&&r.text.length>130?5000:4000,prepLabel:'READ',prepSub:'the question',
   prepText:()=>({big:'Eyes up',small:'Read the question on the big screen. The answers appear here in a moment.'}),
-  secs:o=>o.secs,build:o=>o.bank==='vault'?buildVaultDeck(o):buildQuizDeck(o),roundInfo:r=>r.vol?'Studio Vault · '+vcatOf(r.vol).name:catOf(r.cat).name,
-  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc">${r.vol?`<div class="dawtag">The Studio Vault · ${esc(vcatOf(r.vol).name)}</div>`:''}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
+  secs:o=>o.secs,build:buildQuizDeck,roundInfo:r=>bankOf(r.bank).name+' · '+qcatOf(r.bank,r.cat).name,
+  stage:(m,r,ctx)=>{m.innerHTML=`<div class="mc">${qtag(r)}<h2 class="qtext${r.text.length>130?' long':''}">${esc(r.text)}</h2>${mcTiles(r,ctx)}</div>`;},
   // the reveal: the question shrinks to a line, the right answer takes its place, big
-  reveal:(m,r,ctx)=>{const ans=r.opts[r.c];m.innerHTML=`<div class="mc reveal">${r.vol?`<div class="dawtag">The Studio Vault · ${esc(vcatOf(r.vol).name)}</div>`:''}<p class="qsmall">${esc(r.text)}</p>
+  reveal:(m,r,ctx)=>{const ans=r.opts[r.c];m.innerHTML=`<div class="mc reveal">${qtag(r)}<p class="qsmall">${esc(r.text)}</p>
     <div class="bigans c${r.c}${ans.length>60?' long':ans.length>32?' mid':''}">${shape(r.c,64,'var(--ink)','var(--paper)')}<span>${esc(ans)}</span></div>${mcTiles(r,ctx)}</div>`;animateBars(m);},
 })));
-
-/* ---------- THE STUDIO VAULT · audio history & production trivia ---------- */
-function buildVaultDeck(o){
-  const pool=(o.vcats||VAULT_CATS.map(c=>c.id)).flatMap(v=>(VAULT[v]||[]).map(q=>({vol:v,q}))),out=[],seen=new Set();
-  for(const {vol,q} of shuffle(pool)){const keys=q[3]?['#'+q[3]]:[];if(keys.some(k=>seen.has(k)))continue;keys.forEach(k=>seen.add(k));
-    out.push({vol,text:q[0],...shuffledOpts(q[2],q[1])});if(o.n&&out.length>=o.n)break;}
-  return out;
-}
 
 
 /* ---------- DAW SHORTCUT SHOWDOWN ---------- */

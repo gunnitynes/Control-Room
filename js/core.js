@@ -417,7 +417,11 @@ function rMenu(st){
 }
 
 /* setup: the game's poster on the left, its options on the right */
-function optVals(g){const saved=store.get('opt.'+g.id,{}),v={};(g.options||[]).forEach(o=>{v[o.key]=saved[o.key]!==undefined?saved[o.key]:o.def;});return v;}
+function optVals(g){const saved=store.get('opt.'+g.id,{}),v={};(g.options||[]).forEach(o=>{let x=saved[o.key]!==undefined?saved[o.key]:o.def;
+  // a saved choice that no longer exists (renamed or removed) falls back to the default
+  if(o.choices&&o.type!=='multi'&&!o.choices.some(c=>JSON.stringify(c[0])===JSON.stringify(x)))x=o.def;
+  if(o.choices&&o.type==='multi'&&Array.isArray(x)){x=x.filter(y=>o.choices.some(c=>c[0]===y));if(!x.length)x=o.def;}
+  v[o.key]=x;});return v;}
 function rSetup(st){
   const g=G.game,v=optVals(g);
   const optHTML=(o,k)=>{

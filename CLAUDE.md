@@ -13,12 +13,13 @@ Sister project of Meter Lab (embedded in `meterlab/`). Bauhaus poster look.
 ```
 index.html          loads everything; every <script>/<link> carries ?v=N
 css/style.css       all styles (tokens on :root, light + night theme)
-data/               content anyone may edit: quiz-questions.js, vault-questions.js, content.js
+data/               content anyone may edit: quiz-questions.js (window.BANKS), content.js
 js/core.js          helpers, game registry, host room + menu + setup, roundGame framework, phone shell, boot
 js/audio.js         WebAudio engine: buses, drums (DR), voices (VO), rig/seq sequencer, sample loading, Telephone synth
 js/assets.js        Constraint Generator files: seeded recipes → MIDI (written byte by byte) or WAV (offline render); also loaded by CADCAST/go
-js/games-brain.js   Know your stuff: The Quiz (banks: The Workbench = CATS in quiz-questions.js, The Studio Vault =
-                    VAULT in vault-questions.js, nine categories named in VAULT_CATS), Shortcut Showdown, Translation Grid
+js/games-brain.js   Know your stuff: The Quiz, Shortcut Showdown, Translation Grid. The Quiz has three banks in
+                    window.BANKS, no subject in two: The Workbench (how to do it), The Machine Room (how the gear works),
+                    The Studio Vault (the stories), each 7 categories; option c_<bank id> picks a bank's categories
 js/games-ears.js    Train your ears: Detective, Decay, Sculptor, Envelope, Presets, Meter Lab, Sample Chronologist
                     (Envelope Sculptor: envPts/envApply in audio.js are the ONE shape drawn and played — straight lines,
                     gain = level^1.7, no vibrato or reverb; options share one time axis with a tick per second)
@@ -56,7 +57,7 @@ Phones and the host keep old files otherwise.
 - **Free games** (slots, sprints, Roundabout, Metaphor, Telephone) implement `start, render, pstate, player, act,
   next, frame` themselves; `startClock`/`clockFrame` give sprint clocks.
 - Setup options: `choices` (segmented), `type:'multi'`, `type:'step'` (+/− with min/max/step/unit),
-  `show:v=>bool` to hide an option; `setupExtra(v)` / `setupBind(st, redraw)` add custom setup panels.
+  `show:v=>bool` to hide an option (a saved value that is no longer a choice falls back to `def`, see `optVals`); `setupExtra(v)` / `setupBind(st, redraw)` add custom setup panels.
 - The phone **notebook**: the host calls `logAdd(player, {kind, game, title, text})`. `openNotebook` (core.js) draws it as a
   full-screen scrapbook: a hero (name sized to its longest word, sticker stats), a colour band per game, and one look per
   kind via `nbEntry` (brief = ticket, pick = KEPT stamp, card = taped index card, rules = photo + numbered rules,
