@@ -74,6 +74,8 @@ Teacher/index.html  The Teacher handbook (self-contained page, same look) at /Co
 js/pick.js          The Picker (header Pick, after Vote): G.view==='pick', state PK. One student / a group (spotlight hops a set
                     number of times and lands on a pre-chosen name; fair mode PK.done = nobody twice until everyone has had a turn)
                     or teams (2–8, dealt evenly, named colour + shape via pkTeam). Phones: pickState → pPick ("You're up!" / your team).
+js/timer.js         The room timer (header Timer, every view): TMR on the host, {t:'timer',left,T,paused,done} to phones (also on join);
+                    phones show a countdown pill (pTmrPaint/pTmrFrame) and on done vibrate + a Time's up screen; the host flashes TIME!
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
                     "Get in" shows both ways (A: big-screen QR, B: CADCAST computer QR); new modules need a GUIDE entry in content.js
 images/quiz/        Machine Room photos (webp) + CREDITS.txt

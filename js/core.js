@@ -348,7 +348,7 @@ function hostData(conn,m){
     if(p){if(p.conn&&p.conn!==conn)try{p.conn.close();}catch(e){}p.conn=conn;}
     else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP(),in:Date.now()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
     attCheckIn(p);lobbyNames();
-    sync(p);sendLog(p);saveRoom();
+    sync(p);sendLog(p);saveRoom();tmrJoin(p);
     if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else if(G.view==='vote'){voteLive();syncAll();}else if(G.view==='pick'){pickLive();sync(p);}else render();
     return;
   }
@@ -395,6 +395,7 @@ function topBar(){
   const room=G.code?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${G.view!=='menu'?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button><div id="hands">${handsHTML()}</div>
     ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
+    ${tmrBtnHTML()}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">Mixer</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
     <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
@@ -411,7 +412,7 @@ function render(){
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
-  if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
+  tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
   $('#bMix').onclick=openMixer;
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
@@ -785,6 +786,7 @@ function pData(m){
   if(m.t==='log'){const had=(PL.log||[]).length;PL.log=Array.isArray(m.log)?m.log:[];const b=$('.nbcount');if(b){b.textContent=PL.log.length;if(PL.log.length>had){const n=$('#nbBtn');if(n){n.classList.remove('ping');void n.offsetWidth;n.classList.add('ping');}}}if($('#nb'))openNotebook();return;}
   if(m.t==='names'){PL.names=m;if(!PL.joined)pRender();return;}
   if(m.t==='hand'){PL.hand=!!m.up;pHandShow();return;}
+  if(m.t==='timer'){pTmrMsg(m);return;}
   if(m.t==='paired'){showPaired(m);return;}
   if(m.t==='clock'){if(PL.timer){PL.timer.end=now()+(+m.left||0);PL.timer.frozen=m.paused?(+m.left||0):null;}return;}
   if(m.t==='taken'){PL.joined=false;PL.st=null;store.del('proom');PL.status=m.name+' is already in the room on another phone. Tell your teacher if that isn’t you.';pRender();return;}
@@ -805,7 +807,7 @@ function pRender(){
   if(ROLE!=='player')return;
   const app=$('#app');app.className='ply';const s=PL.st;
   const top=`<header class="ptop">${logo()}${PL.joined&&s&&s.view!=='kicked'?`<button class="nbbtn" id="nbBtn" aria-label="Your notebook">${NB_ICON}<b class="nbcount">${(PL.log||[]).length}</b></button><button class="phand${PL.hand?' up':''}" id="pHand" aria-pressed="${!!PL.hand}" aria-label="Raise your hand">${HAND_ICON}</button><div class="who"><span>${esc(PL.name)}</span><b class="pscore">${s.total||0}</b></div>`:''}</header>`;
-  app.innerHTML=top+`<main class="pbody" id="pbody"></main>`;
+  app.innerHTML=top+`<main class="pbody" id="pbody"></main>`;pTmrPaint();
   if($('#nbBtn'))$('#nbBtn').onclick=openNotebook;
   if($('#pHand'))$('#pHand').onclick=()=>{PL.hand=!PL.hand;pHandShow();papi.vibe(PL.hand?[15,40,15]:10);const m={t:'hand',up:PL.hand};if(PL.conn&&PL.conn.open)try{PL.conn.send(m);}catch(e){}};
   
@@ -905,6 +907,7 @@ function openNotebook(){
 }
 const T_=esc;
 function pFrame(){
+  pTmrFrame();
   const c=PL.clock;if(c){const left=Math.max(0,c.end-now());$$('.pclk').forEach(e=>e.textContent=fmtClock(left));$$('.pclkbar i').forEach(e=>e.style.width=(100*left/c.T)+'%');}
   const t=PL.timer;if(t){const left=t.frozen!=null?t.frozen:Math.max(0,t.end-now()),b=$('#pBar'),l=$('#pLeft');if(b)b.style.width=(100*left/t.T)+'%';if(l)l.textContent=t.frozen!=null?'paused':Math.ceil(left/1000)+' s';}
   const s=PL.st;if(s&&s.view==='play'){const g=gameById(s.g);if(g&&g.pframe)try{g.pframe($('#pbody'),s.s);}catch(e){}}
