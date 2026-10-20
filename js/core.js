@@ -471,7 +471,7 @@ function rMenu(st){
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
     </aside>
-    <section class="games">${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b><span>${esc(gr.sub)}</span></div>
+    <section class="games">${GROUPS.map(gr=>`<div class="ggroup" style="--c:var(${gr.col})"><div class="ghead"><i></i><b>${esc(gr.name)}</b></div>
       <div class="gtiles">${GAMES.filter(g=>g.group===gr.id).map(g=>`<button class="gt" data-g="${g.id}" style="--c:var(${g.col})"><span class="no">${numOf(g)}</span><span class="ico">${g.icon||''}</span><strong>${esc(g.name)}</strong><p>${esc(g.tag)}</p><span class="meta">${(g.badges||[]).map(b=>`<span>${esc(b)}</span>`).join('')}</span></button>`).join('')}</div></div>`).join('')}</section>
   </div>`;
   $$('.mchip',st).forEach(b=>b.onclick=()=>{if(confirm('Remove '+b.textContent+' from the room?'))kick(b.dataset.id);});
