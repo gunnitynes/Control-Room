@@ -1747,3 +1747,6 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
 .pkwall{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}.pkchip{padding:18px 16px}.pkchip b{font-size:clamp(22px,2vw,32px)}.pkchip .shape,.pkchip svg{width:34px;height:34px}
 .pkchip.picked{color:var(--ink)}.pkchip.picked.c1{color:#fff}
 @media(max-width:900px){.picker{grid-template-columns:minmax(0,1fr)}.pkctl{min-width:0}.pkctl h1{font-size:56px}}
+/* header: the student count sits left of the divider, the Catalyst logo right after the room QR */
+.tmid>.count{margin-left:auto;align-self:center;padding:0 18px}
+.tright>.catlogo{margin:0 6px}
