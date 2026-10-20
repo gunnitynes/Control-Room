@@ -1,8 +1,8 @@
 /* ====================================================================
    THE ROOM VOTE — the teacher opens a ballot, every phone votes, the
    big screen counts it live and crowns a winner.
-   openVote(spec) is the whole system; voteGames() is its first use:
-   "What do we play next?" over every module.
+   openVote(spec) is the whole system. The Vote button (openVoteChooser) offers two uses: voteGames(), "What do we
+   play next?" over every module, and openCustomVote(), the teacher's own question with any number of answers.
    spec: {title, sub, kind:'game'|'text', opts:[{v, l, s?, c?}],
           win:{go:label, fn(opt)}}   (c = a colour token like '--red')
    ==================================================================== */
@@ -19,10 +19,43 @@ function voteGames(){
     opts:ordered().map(g=>({v:g.id,l:g.name,s:g.tag,c:g.col})),
     win:{go:'Set it up',fn:o=>{G.game=gameById(o.v);G.view='setup';render();syncAll();}}});
 }
+/* the Vote button: what do we play next (every module) or the teacher's own question with any number of answers */
+const VOTE_COLS=['--red','--blue','--yel','--green'];
+function openVoteChooser(){let ov=$('#votechoose');if(ov)ov.remove();ov=el('div','sheetov');ov.id='votechoose';document.body.appendChild(ov);
+  const close=()=>ov.remove();
+  ov.innerHTML=`<div class="sheetcard vchoose" role="dialog" aria-label="Room vote"><button class="guideX" id="vcX" aria-label="Close">✕</button>
+    <span class="lab">Room vote</span><h2>What should<br><i>the room vote on?</i></h2>
+    <div class="vcopts"><button class="vcopt" id="vcGames" style="--c:var(--red)"><span class="vcico">${shape(0,46,'var(--ink)','var(--red)')}</span><b>The next module</b><span>Every module is on the ballot. Most votes wins, then you set it up.</span></button>
+      <button class="vcopt" id="vcCustom" style="--c:var(--blue)"><span class="vcico">${shape(1,46,'var(--ink)','var(--blue)')}</span><b>Your own question</b><span>Type a question and as many answers as you like. The phones vote.</span></button></div></div>`;
+  ov.onclick=e=>{if(e.target===ov)close();};$('#vcX').onclick=close;
+  $('#vcGames').onclick=()=>{close();voteGames();};$('#vcCustom').onclick=()=>{close();openCustomVote();};}
+/* the custom ballot editor: a question and its answers (the last one is remembered in this browser) */
+function openCustomVote(){let ov=$('#votecustom');if(ov)ov.remove();ov=el('div','sheetov');ov.id='votecustom';document.body.appendChild(ov);
+  const last=store.get('vote.custom',{q:'',opts:['','']}),close=()=>ov.remove();
+  ov.innerHTML=`<form class="sheetcard vcustom" id="vcForm" autocomplete="off"><button type="button" class="guideX" id="vuX" aria-label="Close">✕</button>
+    <span class="lab">Room vote · your own question</span><h2>Ask<br><i>the room</i></h2>
+    <label class="vuq"><span class="lab">The question</span><input id="vuQ" maxlength="90" placeholder="e.g. Which track should we finish first?" value="${esc(last.q||'')}"></label>
+    <div class="lab">The answers <small>(Enter adds another)</small></div><ol class="vulist" id="vuList"></ol>
+    <div class="frow"><button type="button" class="ghost" id="vuAdd">＋ Add an answer</button><button type="button" class="ghost" id="vuClear">Clear all</button></div>
+    <p class="shst" id="vuSt"></p><div class="frow"><button class="big go" type="submit">Start the vote</button><button type="button" class="ghost" id="vuBack">← Back</button></div></form>`;
+  const list=$('#vuList',ov),row=(v='')=>{const li=el('li','vurow');li.innerHTML=`<i class="vush">${shape(list.children.length%4,22)}</i><input maxlength="60" placeholder="Answer ${list.children.length+1}" value="${esc(v)}"><button type="button" class="vudel" aria-label="Remove">✕</button>`;
+      list.appendChild(li);const inp=$('input',li);
+      inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const rows=$$('.vurow input',list);if(inp===rows[rows.length-1]){if(inp.value.trim())row().querySelector('input').focus();else $('#vcForm button[type=submit]',ov).focus();}else rows[rows.indexOf(inp)+1].focus();}};
+      $('.vudel',li).onclick=()=>{if(list.children.length<=2){inp.value='';inp.focus();return;}li.remove();renum();};return li;},
+    renum=()=>$$('.vurow',list).forEach((li,k)=>{$('.vush',li).innerHTML=shape(k%4,22);$('input',li).placeholder='Answer '+(k+1);});
+  (last.opts&&last.opts.length>=2?last.opts:['','']).forEach(v=>row(v));
+  ov.onclick=e=>{if(e.target===ov)close();};$('#vuX').onclick=close;$('#vuBack').onclick=()=>{close();openVoteChooser();};
+  $('#vuAdd').onclick=()=>row().querySelector('input').focus();
+  $('#vuClear').onclick=()=>{$('#vuQ').value='';list.innerHTML='';row();row();$('#vuQ').focus();};
+  setTimeout(()=>($('#vuQ').value?$$('.vurow input',list)[0]:$('#vuQ')).focus(),50);
+  $('#vcForm').onsubmit=e=>{e.preventDefault();const q=$('#vuQ').value.replace(/\s+/g,' ').trim(),seen=new Set(),opts=$$('.vurow input',list).map(i=>i.value.replace(/\s+/g,' ').trim()).filter(x=>x&&!seen.has(x.toLowerCase())&&seen.add(x.toLowerCase()));
+    if(opts.length<2){$('#vuSt').textContent='Give the room at least two answers to choose from.';$('#vuSt').classList.add('bad');return;}
+    store.set('vote.custom',{q,opts});close();
+    openVote({title:q||'Which one?',sub:`${opts.length} answers · most votes wins`,kind:'text',opts:opts.map((l,k)=>({v:'o'+k,l,c:VOTE_COLS[k%4]}))});};}
 /* only people still in the room count */
 function voteTally(){const t=new Map(V.opts.map(o=>[o.v,0]));V.votes.forEach((v,pid)=>{if(G.players.has(pid)&&t.has(v))t.set(v,t.get(v)+1);});return t;}
 const voteCast=()=>[...V.votes.keys()].filter(id=>G.players.has(id)).length;
-const voteIcon=(o,kind)=>kind==='game'?((gameById(o.v)||{}).icon||''):shape(V?V.opts.indexOf(o)%4:0,40);
+const voteIcon=(o,kind)=>kind==='game'?((gameById(o.v)||{}).icon||''):shape(V?V.opts.indexOf(o)%4:0,40,'var(--ink)',`var(${o.c||'--red'})`);
 
 function voteState(p){
   const s={k:V.id+'|'+V.phase,title:V.title,kind:V.kind,ph:V.phase,mine:V.votes.get(p.id)||null,n:voteCast(),of:online().length,
@@ -83,7 +116,7 @@ function voteClose(){
 /* a tie: the spotlight hops between the tied modules, slows down and lands */
 function voteTieBreak(){
   const ids=V.tied.map(o=>o.v),pickO=pick(V.tied),land=ids.indexOf(pickO.v),hops=ids.length*4+land;
-  $('#vote').classList.add('tie');const lab=$('#vOver');lab.hidden=false;lab.className='vover tieban';lab.innerHTML=`<div class="vtieb">Tie! ${V.tied.length} modules · the spotlight decides</div>`;
+  $('#vote').classList.add('tie');const lab=$('#vOver');lab.hidden=false;lab.className='vover tieban';lab.innerHTML=`<div class="vtieb">Tie! ${V.tied.length} ${V.kind==='game'?'modules':'answers'} · the spotlight decides</div>`;
   let i=0;const hop=()=>{$$('.vt').forEach(e=>e.classList.toggle('spot',e.dataset.v===ids[i%ids.length]));try{sfx.spin();}catch(e){}
     if(i>=hops){later(()=>{lab.hidden=true;$('#vote').classList.remove('tie');voteDecide(pickO);},700);return;}
     i++;later(hop,90+Math.pow(i/hops,2.2)*520);};
@@ -112,7 +145,7 @@ function pVote(root,s){
   if(s.ph==='won'){
     if(!s.win){root.innerHTML=`<div class="pcenter dots"><h2>No winner</h2><p>Nobody voted. Watch the big screen.</p></div>`;return;}
     const mine=s.mine===s.win.v,g=s.kind==='game'?gameById(s.win.v):null,o=s.opts.find(x=>x.v===s.win.v)||{};
-    root.innerHTML=`<div class="pvwon" style="--c:var(${o.c||'--red'})"><span class="lab">The room chose</span><div class="pvwico">${g?g.icon:shape(0,80)}</div><h2>${esc(s.win.l)}</h2>
+    root.innerHTML=`<div class="pvwon" style="--c:var(${o.c||'--red'})"><span class="lab">The room chose</span><div class="pvwico">${g?g.icon:shape(Math.max(0,s.opts.indexOf(o))%4,80,'var(--ink)',`var(${o.c||'--red'})`)}</div><h2>${esc(s.win.l)}</h2>
       <p class="pvwn"><b>${s.win.n}</b> vote${s.win.n===1?'':'s'}${s.win.tie?' · won the tie':''}</p>
       <p class="pvyou ${mine?'yes':''}">${mine?'✓ Your pick won':s.mine?`You voted ${esc((s.opts.find(x=>x.v===s.mine)||{}).l||'')}`:'You didn’t vote'}</p></div>`;
     if(mine)papi.vibe([40,40,40]);return;
@@ -121,7 +154,7 @@ function pVote(root,s){
   const grp=[...new Set(s.opts.map(o=>o.g))];
   root.innerHTML=`<div class="pvote"><div class="pvhead"><span class="lab">Room vote</span><h2>${esc(s.title)}</h2><p>Tap one. Change your mind until the vote closes.</p></div>
     ${grp.map(gn=>`${gn?`<div class="pvgh">${esc(gn)}</div>`:''}<div class="pvtiles">${s.opts.filter(o=>o.g===gn).map(o=>{const g=s.kind==='game'?gameById(o.v):null;
-      return `<button class="pvt" data-v="${esc(o.v)}" style="--c:var(${o.c||'--red'})" aria-pressed="false"><span class="pvico">${g?g.icon:shape(s.opts.indexOf(o)%4,34)}</span><strong>${esc(o.l)}</strong><i class="pvchk">✓</i></button>`;}).join('')}</div>`).join('')}
+      return `<button class="pvt" data-v="${esc(o.v)}" style="--c:var(${o.c||'--red'})" aria-pressed="false"><span class="pvico">${g?g.icon:shape(s.opts.indexOf(o)%4,34,'var(--ink)',`var(${o.c||'--red'})`)}</span><strong>${esc(o.l)}</strong><i class="pvchk">✓</i></button>`;}).join('')}</div>`).join('')}
     <div class="pvfoot"><span id="pvMine"></span><b id="pvN"></b></div></div>`;
   $$('.pvt',root).forEach(b=>b.onclick=()=>{const v=b.dataset.v,cur=PL.st&&PL.st.s&&PL.st.s.mine;const nv=cur===v?null:v;
     if(PL.st&&PL.st.s)PL.st.s.mine=nv;pVoteUpdate(root,PL.st.s);papi.vibe(nv?20:8);pSendVote(nv);});
@@ -132,6 +165,6 @@ function pVoteUpdate(root,s){
   if(!root||s.ph!=='open')return;
   $$('.pvt',root).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===s.mine));
   const o=s.opts.find(x=>x.v===s.mine),m=$('#pvMine',root),n=$('#pvN',root);
-  if(m)m.innerHTML=o?`Your vote <b>${esc(o.l)}</b>`:'Pick a module';if(n)n.textContent=`${s.n}/${Math.max(s.of,s.n)} voted`;
+  if(m)m.innerHTML=o?`Your vote <b>${esc(o.l)}</b>`:s.kind==='game'?'Pick a module':'Pick one';if(n)n.textContent=`${s.n}/${Math.max(s.of,s.n)} voted`;
   root.querySelector('.pvfoot').classList.toggle('set',!!o);
 }

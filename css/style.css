@@ -1684,3 +1684,16 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
   -webkit-mask:url(../images/catalyst-logo.png) center/contain no-repeat;mask:url(../images/catalyst-logo.png) center/contain no-repeat}
 .saverhint{position:absolute;bottom:24px;left:0;right:0;text-align:center;font:700 12px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#888;animation:saverhint 3s forwards}
 @keyframes saverhint{0%,60%{opacity:1}100%{opacity:0}}
+/* Room vote: the chooser and the custom question editor */
+.vchoose,.vcustom{box-shadow:12px 12px 0 var(--red)}.vchoose h2 i,.vcustom h2 i{color:var(--red)}
+.vcopts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.vcopt{display:grid;gap:6px;justify-items:start;text-align:left;padding:16px;border:4px solid var(--ink);background:color-mix(in srgb,var(--c) 14%,var(--paper));box-shadow:6px 6px 0 var(--ink);cursor:pointer;transition:transform .1s}
+.vcopt:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+.vcopt b{font:900 28px/.95 var(--disp);font-stretch:66%;text-transform:uppercase}.vcopt span{font-size:14px;line-height:1.35}
+.vcico svg{width:46px;height:46px}
+.vuq{display:grid;gap:6px}.vuq input,.vurow input{font:800 20px var(--disp);padding:10px 12px;border:3px solid var(--ink);background:#fff;min-width:0;width:100%}
+.vcustom .lab small{text-transform:none;letter-spacing:0;opacity:.7}
+.vulist{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:46vh;overflow:auto;padding-right:4px}
+.vurow{display:grid;grid-template-columns:30px minmax(0,1fr) 40px;gap:8px;align-items:center}.vush svg{width:22px;height:22px}
+.vudel{height:40px;border:3px solid var(--ink);background:var(--paper);font:900 16px var(--disp);cursor:pointer}.vudel:hover{background:var(--red);color:#fff}
+@media(max-width:620px){.vcopts{grid-template-columns:1fr}}

@@ -156,7 +156,8 @@ Phones and the host keep old files otherwise.
   uploads it with `{t:'file'}` chunks (core.js `pcSendFile` / `pcData` / `B64`, both directions, game hooks `onPcFile`,
   `onPcMsg`, `onPcProg`). "Pass it on" sends each take (and in `pass:'project'` the dropped project zip) to the next
   computer in `s.ring`, where it becomes a WAV. Takes stay in host memory for the listening party (`journeys()`).
-- **Room vote** (js/vote.js): `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
+- **Room vote** (js/vote.js): the Vote button opens `openVoteChooser()`: The next module (`voteGames`) or Your own question
+  (`openCustomVote`: a question + any number of answers, Enter adds the next, the last one saved as `vote.custom`, kind 'text'). `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
   `{t:'vote', v}` (not `act`). Votes are by player id and only count while the player is in the room. Close → 3-2-1 →
   winner card (ties: a spotlight picks one). Reuse it with `openVote({title, sub, kind:'text', opts:[{v,l,s,c}], win:{go, fn}})`.
 - **Guide** (js/guide.js, copy in `GUIDE` in content.js): `?guide` is a standalone page; `openGuide()` overlays it
