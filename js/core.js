@@ -273,9 +273,10 @@ function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadca
    at the same time never meet. The host asks the teacher's name once; a phone gets it from the QR (&t=). */
 const teacherKey=n=>String(n||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').slice(0,40);
 // copy to the clipboard (with a fallback for browsers that refuse navigator.clipboard)
-/* the screensaver: a white screen with the Catalyst logo, full screen; Esc (or leaving full screen) brings Control Room back.
+/* the screensaver: the Catalyst logo on black (click flips to white, remembered), full screen; Esc (or leaving full screen) brings Control Room back.
    The room keeps running underneath: phones stay connected. */
-function openSaver(){if($('#saver'))return;const o=el('div','saver');o.id='saver';o.innerHTML='<i class="saverlogo" role="img" aria-label="Catalyst"></i><p class="saverhint">Esc to come back</p>';document.body.appendChild(o);
+function openSaver(){if($('#saver'))return;const o=el('div','saver');o.id='saver';o.innerHTML='<i class="saverlogo" role="img" aria-label="Catalyst"></i><p class="saverhint">Click to switch black / white · Esc to come back</p>';
+  if(store.get('saver.light',false))o.classList.add('light');o.onclick=()=>{store.set('saver.light',o.classList.toggle('light'));};document.body.appendChild(o);
   const fs=document.documentElement.requestFullscreen;if(fs&&!document.fullscreenElement)document.documentElement.requestFullscreen().then(()=>{o.dataset.fs='1';}).catch(()=>{});}
 function closeSaver(){const o=$('#saver');if(!o)return;o.remove();if(document.fullscreenElement&&o.dataset.fs)document.exitFullscreen().catch(()=>{});}
 document.addEventListener('fullscreenchange',()=>{const o=$('#saver');if(o&&o.dataset.fs&&!document.fullscreenElement)closeSaver();});   // Esc in full screen is taken by the browser

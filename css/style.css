@@ -1676,8 +1676,11 @@ body:has(#app.guidepage){overflow:auto}
 .form>.fsec{grid-template-columns:minmax(0,1fr)}
 /* the logo is a button: the screensaver */
 button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}button.catlogo:hover{transform:scale(1.08)}
-.saver{position:fixed;inset:0;z-index:9999;background:#fff;display:grid;place-items:center;cursor:none}
-.saverlogo{width:min(56vw,92vh*2.56);aspect-ratio:389/152;background:#000;
+.saver{position:fixed;inset:0;z-index:9999;background:#000;display:grid;place-items:center;cursor:none;transition:background .4s}
+.saver.light{background:#fff}
+.saverlogo{width:min(56vw,92vh*2.56);aspect-ratio:389/152;background:#fff;transition:background .4s}
+.saver.light .saverlogo{background:#000}
+.saverlogo{
   -webkit-mask:url(../images/catalyst-logo.png) center/contain no-repeat;mask:url(../images/catalyst-logo.png) center/contain no-repeat}
-.saverhint{position:absolute;bottom:24px;left:0;right:0;text-align:center;font:700 12px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#999;animation:saverhint 3s forwards}
+.saverhint{position:absolute;bottom:24px;left:0;right:0;text-align:center;font:700 12px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:#888;animation:saverhint 3s forwards}
 @keyframes saverhint{0%,60%{opacity:1}100%{opacity:0}}
