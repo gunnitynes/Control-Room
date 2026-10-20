@@ -349,15 +349,16 @@ function hostData(conn,m){
     else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP(),in:Date.now()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
     attCheckIn(p);lobbyNames();
     sync(p);sendLog(p);saveRoom();
-    if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else if(G.view==='vote'){voteLive();syncAll();}else render();
+    if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else if(G.view==='vote'){voteLive();syncAll();}else if(G.view==='pick'){pickLive();sync(p);}else render();
     return;
   }
   if(m.t==='act'){const p=players().find(x=>x.conn===conn);if(!p||G.view!=='play'||!G.game||m.g!==G.game.id)return;G.game.act(p,m.d||{});}
 }
 function stateFor(p){
   const rk=rankBy('total').map,g=G.game&&G.view!=='menu'?G.game:null;
-  const m={t:'st',name:p.name,total:p.total||0,rank:rk.get(p.id)||0,of:G.players.size,view:G.view==='play'?'play':G.view==='vote'&&V?'vote':'menu',g:g&&G.view!=='vote'?g.id:null,gname:g?g.name:''};
+  const m={t:'st',name:p.name,total:p.total||0,rank:rk.get(p.id)||0,of:G.players.size,view:G.view==='play'?'play':G.view==='vote'&&V?'vote':G.view==='pick'&&PK?'pick':'menu',g:g&&G.view!=='vote'&&G.view!=='pick'?g.id:null,gname:g?g.name:''};
   if(G.view==='vote'&&V)m.s=voteState(p);
+  else if(G.view==='pick'&&PK)m.s=pickState(p);
   else if(G.view==='play'){try{m.s=G.game.pstate(p);}catch(e){console.error(e);m.s={k:'err'};}}
   return m;
 }
@@ -383,16 +384,17 @@ function liveUpdate(){
   const n=$('#nOn');if(n)n.textContent=online().length;
   if(G.view==='play'&&G.game&&G.game.live)G.game.live();
   if(G.view==='vote')voteLive();
+  if(G.view==='pick')pickLive();
 }
 
 /* ---------- views ---------- */
 function topBar(){
-  const g=G.game,inG=G.view!=='menu'&&G.view!=='vote'&&g;
+  const g=G.game,inG=G.view!=='menu'&&G.view!=='vote'&&G.view!=='pick'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
-    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
+    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
   const room=G.code?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${G.view!=='menu'?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<button class="catlogo" id="bSaver" title="Screensaver: a white screen with the Catalyst logo (Esc to come back)" aria-label="Screensaver"></button></div><div class="tright">${room}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div>
-    ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button>`:''}
+    ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">Mixer</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
     <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
@@ -405,15 +407,15 @@ function render(){
   if(G.splash){rSplash(app);return;}
   app.innerHTML=topBar()+`<main class="stage" id="stage"></main>`;
   const st=$('#stage');
-  try{if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
+  try{if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else if(G.view==='pick')rPick(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
-  if($('#bVote'))$('#bVote').onclick=openVoteChooser;
+  if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
   $('#bMix').onclick=openMixer;
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
-  home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
+  home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote'||G.view==='pick')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
   const mq=$('#miniQR');if(mq){drawQR(mq,G.code,160);mq.onclick=()=>showBigQR(G.code);}
   const sv=$('#bSaver');if(sv)sv.onclick=openSaver;
 }
@@ -531,6 +533,7 @@ function exitGame(force){
   if(!force&&G.view==='play'&&G.gs&&!(G.gs.phase==='end')&&!confirm('Leave this game and go back to the menu? Points won so far are kept.'))return;
   if(G.view==='play')try{G.game&&G.game.stop&&G.game.stop();}catch(e){}
   if(typeof V!=='undefined')V=null;
+  if(typeof PK!=='undefined')PK=null;
   clearLater();AU_stopAll();G.view='menu';G.gs=null;saveRoom();render();syncAll();
 }
 
@@ -841,6 +844,7 @@ function pRender(){
   PL.key=s.view+'|'+s.g+'|'+(s.s?s.s.k:'');
   if(PL.synH&&!(s.view==='play'&&s.g==='telephone')&&typeof synStop==='function')synStop();
   if(s.view==='vote'&&s.s){pVote(body,s.s);return;}
+  if(s.view==='pick'&&s.s){pPick(body,s.s);return;}
   if(s.view==='play'){
     const g=gameById(s.g);if(!g){body.innerHTML=`<div class="pcenter"><h2>Update</h2><p>Reload this page to get the newest version of the games.</p></div>`;return;}
     try{g.player(body,s.s,papi);}catch(e){console.error(e);body.innerHTML=`<div class="pcenter"><h2>Hmm</h2><p>${esc(e.message)}</p></div>`;}

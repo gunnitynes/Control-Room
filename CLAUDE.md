@@ -71,6 +71,9 @@ js/vote.js          The room vote: openVote(spec) — a ballot on every phone, l
 Teacher/index.html  The Teacher handbook (self-contained page, same look) at /Control-Room/Teacher/. NOT linked from the app
                     (the owner sends the link). School setup assumed: CADCAST/go bookmarked on student computers, BlackHole installed,
                     a Multi-Output Device named CADCAST. Keep it in step with the sheet card (openSheetSetup) and the module list.
+js/pick.js          The Picker (header Pick, after Vote): G.view==='pick', state PK. One student / a group (spotlight hops a set
+                    number of times and lands on a pre-chosen name; fair mode PK.done = nobody twice until everyone has had a turn)
+                    or teams (2–8, dealt evenly, named colour + shape via pkTeam). Phones: pickState → pPick ("You're up!" / your team).
 js/guide.js         The Guide to the Control Room (poster page, ?guide or overlay)
                     "Get in" shows both ways (A: big-screen QR, B: CADCAST computer QR); new modules need a GUIDE entry in content.js
 images/quiz/        Machine Room photos (webp) + CREDITS.txt
