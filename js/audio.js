@@ -11,7 +11,7 @@
    · patch     the Parameter Telephone synth (identical on host + phones)
    Real samples can replace any recreation later (see data/content.js).
    ==================================================================== */
-const SFX={on:store.get('sfx',true)};
+const SFX={on:store.get('sfx.on',false)};   // off by default (a new key, so earlier saved choices start over off)
 const AU={ac:null,live:new Set(),ir:{},ks:{}};
 function audio(){
   if(AU.ac){if(AU.ac.state==='suspended')AU.ac.resume();return AU.ac;}

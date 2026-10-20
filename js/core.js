@@ -406,7 +406,7 @@ function render(){
   app.innerHTML=topBar()+`<main class="stage" id="stage"></main>`;
   const st=$('#stage');
   try{if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
-  $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
+  $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
   if($('#bVote'))$('#bVote').onclick=voteGames;
