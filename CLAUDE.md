@@ -147,6 +147,7 @@ Phones and the host keep old files otherwise.
   named tab; it must be this same browser. The patch bay lists paired-but-silent students as "Paired · no sound yet".
 - **Copy attendance** (room panel, `copyAttendance`): everyone who joined this room (p.in = join time, saved with the room), sorted, tab-separated with a dated heading; for teachers without a sheet. New room warns to copy first.
 - **Teacher link** (Teacher box ▸ ⧉ Copy teacher link, `teacherLink()`): `?host#teacher=NAME&sheet=/exec URL`; `applyTeacherLink()` at host boot stores both and wipes the hash. Private (holds the sheet link). No login. Class list ▸ ⧉ Copy your sheet link and the sheet card copy the /exec link alone. Copy attendance sits right under the Teacher box.
+- **Screensaver**: the Catalyst logo in the header (`#bSaver`, images/catalyst-logo.png, drawn as a CSS mask) opens `openSaver()`: a white full-screen page with the logo; every key is swallowed, Esc (or leaving full screen) calls `closeSaver()`. The room keeps running underneath.
 - **Raise your hand** (phones only): `#pHand` in the phone header sends `{t:'hand', up}`; the host keeps `p.hand` (time raised),
   shows `#hands` in the header (first raised + count; click for the ordered list, lower one or all) and a yellow name chip.
   `handsUpdate()` updates in place and never re-renders a running game. Hands drop on disconnect; lowering is echoed back to the phone.

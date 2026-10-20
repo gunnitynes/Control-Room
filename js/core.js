@@ -273,6 +273,12 @@ function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadca
    at the same time never meet. The host asks the teacher's name once; a phone gets it from the QR (&t=). */
 const teacherKey=n=>String(n||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'').slice(0,40);
 // copy to the clipboard (with a fallback for browsers that refuse navigator.clipboard)
+/* the screensaver: a white screen with the Catalyst logo, full screen; Esc (or leaving full screen) brings Control Room back.
+   The room keeps running underneath: phones stay connected. */
+function openSaver(){if($('#saver'))return;const o=el('div','saver');o.id='saver';o.innerHTML='<i class="saverlogo" role="img" aria-label="Catalyst"></i><p class="saverhint">Esc to come back</p>';document.body.appendChild(o);
+  const fs=document.documentElement.requestFullscreen;if(fs&&!document.fullscreenElement)document.documentElement.requestFullscreen().then(()=>{o.dataset.fs='1';}).catch(()=>{});}
+function closeSaver(){const o=$('#saver');if(!o)return;o.remove();if(document.fullscreenElement&&o.dataset.fs)document.exitFullscreen().catch(()=>{});}
+document.addEventListener('fullscreenchange',()=>{const o=$('#saver');if(o&&o.dataset.fs&&!document.fullscreenElement)closeSaver();});   // Esc in full screen is taken by the browser
 function copyText(t,done){const ok=()=>{toast(done||'Copied');};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>fb());else fb();
   function fb(){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy');ok();}catch(e){prompt('Copy this link:',t);}a.remove();}}
@@ -384,7 +390,7 @@ function topBar(){
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
     :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
   const room=G.code?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${G.view!=='menu'?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
-  return `<header class="top">${logo()}<div class="tmid">${mid}<i class="catlogo" role="img" aria-label="Catalyst"></i></div><div class="tright">${room}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div>
+  return `<header class="top">${logo()}<div class="tmid">${mid}<button class="catlogo" id="bSaver" title="Screensaver: a white screen with the Catalyst logo (Esc to come back)" aria-label="Screensaver"></button></div><div class="tright">${room}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div>
     ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote on the next game">Vote</button>`:''}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">Mixer</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
@@ -408,6 +414,7 @@ function render(){
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
   home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
   const mq=$('#miniQR');if(mq){drawQR(mq,G.code,160);mq.onclick=()=>showBigQR(G.code);}
+  const sv=$('#bSaver');if(sv)sv.onclick=openSaver;
 }
 /* splash: the original Control Room poster — faders breathing like a live mix,
    the four answer shapes orbiting — until the first click or key */
@@ -902,6 +909,7 @@ function boot(){
   if(QS.has('guide')){const app=$('#app');app.className='guidepage';app.innerHTML=guideHTML();return;}
   document.addEventListener('keydown',e=>{
     if(ROLE!=='host'||G.splash||e.target.closest('input,textarea,select'))return;
+    if($('#saver')){e.preventDefault();if(e.key==='Escape')closeSaver();return;}   // the screensaver swallows every key; Esc ends it
     if(e.key==='Escape'){const o=$('#qrbig');if(o)o.remove();return;}
     if((e.key==='p'||e.key==='P')&&G.view==='play'&&G.game&&G.game.pause){G.game.pause();return;}
     if((e.key==='a'||e.key==='A')&&!e.metaKey&&!e.ctrlKey&&G.view==='play'&&G.game&&G.game.autoFlip&&!(e.target.closest&&e.target.closest('input,textarea,select'))){G.game.autoFlip();return;}
