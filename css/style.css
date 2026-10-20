@@ -1664,3 +1664,8 @@ body:has(#app.guidepage){overflow:auto}
 .mixroom.ph-reveal .mx0{border-top:4px solid var(--green);left:-18px;width:32px}
 .mixroom.ph-reveal .mx0::after{content:"target";position:absolute;left:34px;top:-9px;font:700 9px var(--mono);text-transform:uppercase;color:var(--green)}
 .mxfdb{font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.08em;opacity:.6}
+/* the Catalyst logo, just left of the room QR divider; drawn as a mask so it follows the ink colour in both themes */
+.catlogo{flex:none;align-self:center;margin:0 18px 0 auto;width:72px;height:28px;background:var(--ink);
+  -webkit-mask:url(../images/catalyst-logo.png) center/contain no-repeat;mask:url(../images/catalyst-logo.png) center/contain no-repeat}
+@media(max-width:700px){.catlogo{display:none}}
+@media(max-width:1100px){.tmid:has(.cat) .catlogo{display:none}}
