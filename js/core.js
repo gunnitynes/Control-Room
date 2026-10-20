@@ -301,7 +301,7 @@ function setTeacher(n){n=String(n||'').replace(/\s+/g,' ').trim().slice(0,40);if
 function askTeacher(){if($('#teachov'))return;const ov=el('div','sheetov');ov.id='teachov';document.body.appendChild(ov);
   ov.innerHTML=`<form class="sheetcard teachcard" id="teachForm"><span class="lab">Welcome</span><h2>Who’s<br><i>teaching?</i></h2>
     <p class="shlead">Student computers find <b>your</b> class by your name, so several teachers can run Control Room at the same time.</p>
-    <input id="teachIn" maxlength="40" placeholder="Your name, e.g. Gunnar Tynes" value="${esc(teacherName())}" autocomplete="name">
+    <input id="teachIn" maxlength="40" placeholder="Your name" value="${esc(teacherName())}" autocomplete="name">
     <p class="fine">If a colleague has the same first name, add your last name.</p>
     <div class="frow"><button class="big go" type="submit">That’s me</button></div></form>`;
   const f=$('#teachForm');setTimeout(()=>$('#teachIn').focus(),50);
