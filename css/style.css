@@ -1669,3 +1669,8 @@ body:has(#app.guidepage){overflow:auto}
   -webkit-mask:url(../images/catalyst-logo.png) center/contain no-repeat;mask:url(../images/catalyst-logo.png) center/contain no-repeat}
 @media(max-width:700px){.catlogo{display:none}}
 @media(max-width:1100px){.tmid:has(.cat) .catlogo{display:none}}
+/* setup options never push the column wider than the window: long choice texts wrap instead */
+.form>.fsec{min-width:0}
+.form .seg button{flex:1 1 auto;min-width:0}
+.form .seg{min-width:0}
+.form>.fsec{grid-template-columns:minmax(0,1fr)}
