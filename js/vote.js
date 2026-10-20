@@ -134,6 +134,14 @@ function voteShowWinner(fresh){
   if(V.win)$('#vGo').onclick=()=>{const w=V.win,ow=V.winner;V=null;clearLater();w.fn(ow);};
   $('#vAgain').onclick=()=>{const {title,sub,kind,opts,win}=V;openVote({title,sub,kind,opts,win});};
   $('#vMenu').onclick=()=>{V=null;exitGame(true);};
+  // a long answer: shrink the title until its longest word fits the card
+  const h=ov.querySelector('.vwin h2'),card=ov.querySelector('.vwin');if(h&&card){const cs=getComputedStyle(card),room=card.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+    h.style.overflowWrap='normal';h.style.width='max-content';let f=parseFloat(getComputedStyle(h).fontSize);
+    const span=document.createElement('span');span.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font:inherit';h.appendChild(span);
+    const widest=()=>Math.max(...h.textContent.replace(span.textContent,'').split(/\s+/).filter(Boolean).map(w=>{span.textContent=w;return span.offsetWidth;}));   // offsetWidth: the card is still mid-animation (scaled)
+    while(f>26&&widest()>room){f-=3;h.style.fontSize=f+'px';}
+    h.style.width='';while(f>30&&h.offsetHeight>f*1.95){f-=3;h.style.fontSize=f+'px';}   // and no more than two lines
+    span.remove();h.style.width='';h.style.overflowWrap='';}
   if(fresh){try{sfx.fanfare();}catch(e){}}
   confetti($('#conf'));
 }

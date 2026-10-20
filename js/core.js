@@ -428,7 +428,8 @@ function rSplash(app){
 `;
   const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
   const enter=()=>{if(!G.splash)return;G.splash=false;POSTER=null;removeEventListener('keydown',key);try{audio();}catch(e){}sfx.open();render();};
-  const key=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();enter();}};
+  // only while the splash is up, and never inside a text field (a splash drawn twice must not leave a Space-eating listener behind)
+  const key=e=>{if(!G.splash){removeEventListener('keydown',key);return;}if(e.target.closest&&e.target.closest('input,textarea,select'))return;if(e.key===' '||e.key==='Enter'){e.preventDefault();enter();}};
   app.onclick=enter;addEventListener('keydown',key);
 }
 function posterSize(){if(!POSTER)return;const r=POSTER.c.getBoundingClientRect(),d=devicePixelRatio||1;POSTER.c.width=r.width*d;POSTER.c.height=r.height*d;POSTER.ctx.setTransform(d,0,0,d,0,0);POSTER.w=r.width;POSTER.h=r.height;}
