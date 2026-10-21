@@ -13,7 +13,7 @@ const tmrFmt=ms=>{const s=Math.ceil(ms/1000),m=Math.floor(s/60);return m>=60?`${
 const TMR_ICON=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="8" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M12 13.5V9M9 2.5h6" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg>`;
 
 /* ---------- host */
-function tmrMsg(){return {t:'timer',left:tmrLeft(),T:TMR.T,paused:TMR.paused!=null,done:TMR.done};}
+function tmrMsg(){return {t:'timer',left:tmrLeft(),T:TMR.T,paused:TMR.paused!=null,done:TMR.done,sfx:!!SFX.on};}
 function tmrSendAll(){const m=tmrMsg();G.players.forEach(p=>{if(p.conn&&p.conn.open)try{p.conn.send(m);}catch(e){}});}
 function tmrJoin(p){if(tmrOn()||TMR.done)try{p.conn.send(tmrMsg());}catch(e){}}
 function tmrStart(min){const ms=Math.round(min*60000);if(!(ms>0))return;TMR.T=ms;TMR.end=Date.now()+ms;TMR.paused=null;TMR.done=false;tmrSendAll();tmrPaint();tmrMenuClose();}
@@ -44,20 +44,26 @@ function tmrMenu(keep){let m=$('#tmrMenu');if(m&&!keep)return;if(!m){m=el('div',
 function tmrOutside(e){const m=$('#tmrMenu');if(!m){document.removeEventListener('click',tmrOutside);return;}if(!m.contains(e.target)&&!e.target.closest('#bTmr'))tmrMenuClose();}
 function tmrMenuClose(){const m=$('#tmrMenu');if(m)m.remove();document.removeEventListener('click',tmrOutside);}
 
-// time's up on the big screen: always audible (not tied to the SFX switch)
-function tmrBeep(n=3){try{const ac=audio();for(let k=0;k<n;k++)[0,.18].forEach(d=>{const t=ac.currentTime+.05+k*.7+d,o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=k===n-1?1320:988;
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.01);g.gain.setValueAtTime(.18,t+.12);g.gain.linearRampToValueAtTime(0,t+.15);o.connect(g).connect(AU.music||ac.destination);o.start(t);o.stop(t+.2);});}catch(e){}}
-function tmrFire(){tmrBeep(3);let o=$('#tmrDone');if(o)o.remove();o=el('div','tmrdone');o.id='tmrDone';
+// time's up: a soft three-note chime, only when the teacher's SFX switch is on (phones follow it)
+function tmrChime(){try{const ac=audio();[[72,0],[76,.22],[79,.44],[84,.7]].forEach(([n,d])=>{const t=ac.currentTime+.05+d,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=440*Math.pow(2,(n-69)/12);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.09,t+.02);g.gain.exponentialRampToValueAtTime(.0008,t+1.6);o.connect(g).connect(AU.music||ac.destination);o.start(t);o.stop(t+1.7);});}catch(e){}}
+function tmrFire(){if(SFX.on)tmrChime();let o=$('#tmrDone');if(o)o.remove();o=el('div','tmrdone');o.id='tmrDone';
   o.innerHTML=`<div class="tmrdcard"><span class="lab">Room timer · ${tmrFmt(TMR.T)}</span><h1>Time!</h1><p>Every phone just got the message.</p><button class="big go" id="tmrOk">OK <small>ESC</small></button></div>`;
   document.body.appendChild(o);const close=()=>{o.remove();TMR.done=false;tmrSendAll();};$('#tmrOk',o).onclick=close;o.onclick=e=>{if(e.target===o)close();};}
 addEventListener('keydown',e=>{if(ROLE!=='host')return;if(e.key==='Escape'){if($('#tmrDone')){e.stopPropagation();$('#tmrOk').click();}else tmrMenuClose();}},true);
 
 /* ---------- phones */
-function pTmrMsg(m){PL.tmr=m.T||m.done?{end:Date.now()+(+m.left||0),T:+m.T||0,paused:m.paused?+m.left:null,done:!!m.done}:null;pTmrPaint();
+function pTmrMsg(m){PL.tmr=m.T||m.done?{end:Date.now()+(+m.left||0),T:+m.T||0,paused:m.paused?+m.left:null,done:!!m.done,sfx:!!m.sfx}:null;pTmrPaint();
   if(m.done)pTmrFire();else{const d=$('#pTmrDone');if(d)d.remove();}}
-function pTmrPill(){const t=PL.tmr;if(!t||t.done)return '';const l=t.paused!=null?t.paused:Math.max(0,t.end-Date.now());
+function pTmrPill(){const t=PL.tmr;if(!t||t.done||pTmrBigOn())return '';const l=t.paused!=null?t.paused:Math.max(0,t.end-Date.now());
   return `<div class="ptmr${t.paused!=null?' paused':''}" id="pTmr">${TMR_ICON}<b id="pTmrTxt">${tmrFmt(l)}</b></div>`;}
-function pTmrPaint(){const h=$('.ptop');if(!h)return;let p=$('#pTmr');const html=pTmrPill();if(!html){if(p)p.remove();return;}if(p)p.outerHTML=html;else{const who=$('.who',h);if(who)who.insertAdjacentHTML('beforebegin',html);else h.insertAdjacentHTML('beforeend',html);}}
-function pTmrFrame(){const t=PL.tmr;if(!t||t.done)return;const l=t.paused!=null?t.paused:Math.max(0,t.end-Date.now()),e=$('#pTmrTxt'),p=$('#pTmr');if(e)e.textContent=tmrFmt(l);if(p)p.classList.toggle('hot',l<=10000&&t.paused==null);}
-function pTmrFire(){if($('#pTmrDone'))return;try{navigator.vibrate&&navigator.vibrate([500,180,500,180,900]);}catch(e){}tmrBeep(2);
-  const o=el('div','ptmrdone');o.id='pTmrDone';o.innerHTML=`<div><span class="lab">Your teacher’s timer</span><h1>Time’s<br>up!</h1><p>Tap to close</p></div>`;document.body.appendChild(o);o.onclick=()=>o.remove();}
+// between games (the phone's idle screen) the countdown fills the screen under the header; in a game it stays a pill
+const pTmrBigOn=()=>{const t=PL.tmr,s=PL.st;return !!(t&&!t.done&&PL.joined&&s&&(s.view==='menu'||!s.view));};
+function pTmrBig(){let b=$('#pTmrBig');if(!pTmrBigOn()){if(b)b.remove();return;}const h=$('.ptop');
+  if(!b){b=el('div','ptmrbig');b.id='pTmrBig';b.innerHTML=`<span class="lab">Your teacher’s timer</span><b id="pTmrBigTxt"></b><i class="ptmrbar"><i id="pTmrBigBar"></i></i><span class="ptmrst" id="pTmrBigSt"></span>`;document.body.appendChild(b);}
+  b.style.top=(h?h.getBoundingClientRect().bottom:0)+'px';pTmrFrame();}
+function pTmrPaint(){pTmrBig();const h=$('.ptop');if(!h)return;let p=$('#pTmr');const html=pTmrPill();if(!html){if(p)p.remove();return;}if(p)p.outerHTML=html;else{const who=$('.who',h);if(who)who.insertAdjacentHTML('beforebegin',html);else h.insertAdjacentHTML('beforeend',html);}}
+function pTmrFrame(){const t=PL.tmr;if(!t||t.done)return;const l=t.paused!=null?t.paused:Math.max(0,t.end-Date.now()),e=$('#pTmrTxt'),p=$('#pTmr'),hot=l<=10000&&t.paused==null;if(e)e.textContent=tmrFmt(l);if(p)p.classList.toggle('hot',hot);
+  const B=$('#pTmrBig');if(B){$('#pTmrBigTxt').textContent=tmrFmt(l);$('#pTmrBigBar').style.width=(t.T?100*l/t.T:0)+'%';$('#pTmrBigSt').textContent=t.paused!=null?'paused':'';B.classList.toggle('hot',hot);B.classList.toggle('paused',t.paused!=null);}}
+function pTmrFire(){if($('#pTmrDone'))return;try{navigator.vibrate&&navigator.vibrate([500,180,500,180,900]);}catch(e){}if(PL.tmr&&PL.tmr.sfx)tmrChime();
+  const big=$('#pTmrBig');if(big)big.remove();const o=el('div','ptmrdone');o.id='pTmrDone';const hd=$('.ptop');if(hd)o.style.top=hd.getBoundingClientRect().bottom+'px';o.innerHTML=`<div><span class="lab">Your teacher’s timer</span><h1>Time’s<br>up!</h1><p>Tap to close</p></div>`;document.body.appendChild(o);o.onclick=()=>o.remove();}

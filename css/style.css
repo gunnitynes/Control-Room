@@ -1779,3 +1779,13 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
 .tmrmenu{width:min(340px,calc(100vw - 16px))}
 .tmrdcard{max-width:92vw}
 .ptmrdone{color:var(--ink)}
+/* phones: the full-screen countdown under the header (between games) */
+.ptmrbig{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;align-content:center;justify-items:center;gap:14px;padding:20px;background:var(--paper);
+  background-image:radial-gradient(var(--hair) 1.2px,transparent 1.4px);background-size:24px 24px;text-align:center}
+.ptmrbig b{font:900 clamp(96px,34vw,200px)/.8 var(--disp);font-stretch:62%;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ptmrbar{display:block;width:min(80vw,420px);height:16px;border:4px solid var(--ink);background:#fff;box-shadow:5px 5px 0 var(--ink)}.ptmrbar i{display:block;height:100%;background:var(--blue);transition:width .25s linear}
+.ptmrst{font:700 13px var(--mono);text-transform:uppercase;min-height:1em}
+.ptmrbig.hot b{color:var(--red);animation:tmrbeat 1s ease-in-out infinite}.ptmrbig.hot .ptmrbar i{background:var(--red)}
+.ptmrbig.paused b{opacity:.45}
+@keyframes tmrbeat{50%{transform:scale(1.06)}}
+.ptmrdone{inset:auto 0 0 0;top:0}
