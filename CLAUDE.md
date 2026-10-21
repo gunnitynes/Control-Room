@@ -194,9 +194,10 @@ under copyright, the teacher adds their own clips in the browser instead.
 School Wi-Fi often blocks device-to-device traffic. Every PeerJS peer and RTCPeerConnection (core.js `peerCfg()`/`iceReady()`,
 CADCAST go/patch `peerCfg()`/`rtcCfg()`) gets ICE servers from the owner's Cloudflare Worker
 `https://controlroom-turn.gunnitynes.workers.dev` (code: integrations/turn/worker.js; secrets TURN_KEY_ID / TURN_KEY_API_TOKEN live in
-Cloudflare, never here; it answers only gunnitynes.github.io and localhost). Credentials are cached 20 h in localStorage. Direct is
-tried first; relay includes turns:…:443 (TLS), which passes almost any firewall. CADCAST audio drops to 128 kb/s when relayed.
-`?relay` in any URL forces relay-only (test with it: a host + phone tab here connected only that way, also over TLS 443).
+Cloudflare, never here; it answers only gunnitynes.github.io and localhost). Credentials are cached 20 h in localStorage. For now EVERY
+connection is relay-only (the owner's school still blocked phones with direct-first); `?direct` in any URL tries direct first. Relay includes
+turns:…:443 (TLS), which passes almost any firewall. CADCAST audio drops to 128 kb/s when relayed. If the Worker can't be reached
+(3 tries, 8 s each), connections fall back to trying anything.
 Cloudflare TURN free tier: 1,000 GB/month.
 
 ## Testing

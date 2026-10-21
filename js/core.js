@@ -39,13 +39,13 @@ let toastT=0;function toast(t){let e=$('.toast');if(!e){e=el('div','toast');docu
 function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.async=true;sc.onload=res;sc.onerror=()=>rej(new Error('Could not load '+src));document.head.appendChild(sc);});}
 /* relay passwords (TURN) from the owner's Cloudflare Worker (integrations/turn): devices still connect directly when the network
    allows it, and through Cloudflare's relay on port 443 when a school network blocks device-to-device traffic. Cached 20 h.
-   ?relay in the address forces the relay (for testing). */
+   For now EVERY connection goes through the relay (school networks block the direct route); ?direct in the address tries direct first. */
 const TURN_URL='https://controlroom-turn.gunnitynes.workers.dev';let ICE=null;
 async function iceReady(){if(ICE)return ICE;const c=store.get('ice',null);if(c&&Date.now()-c.at<20*3600e3&&c.s&&c.s.length){ICE=c.s;return ICE;}
-  try{const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),4000);const j=await (await fetch(TURN_URL,{signal:ctl.signal,cache:'no-store'})).json();clearTimeout(t);
-    if(j.iceServers&&j.iceServers.length){ICE=j.iceServers;store.set('ice',{at:Date.now(),s:ICE});}}catch(e){}
+  for(let k=0;k<3&&!ICE;k++){try{const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),8000);const j=await (await fetch(TURN_URL,{signal:ctl.signal,cache:'no-store'})).json();clearTimeout(t);
+    if(j.iceServers&&j.iceServers.length){ICE=j.iceServers;store.set('ice',{at:Date.now(),s:ICE});}}catch(e){await new Promise(r=>setTimeout(r,800));}}
   return ICE||[];}
-const peerCfg=()=>({debug:0,config:{iceServers:ICE&&ICE.length?ICE:[{urls:'stun:stun.cloudflare.com:3478'},{urls:'stun:stun.l.google.com:19302'}],...(QS.has('relay')?{iceTransportPolicy:'relay'}:{})}});
+const peerCfg=()=>({debug:0,config:{iceServers:ICE&&ICE.length?ICE:[{urls:'stun:stun.cloudflare.com:3478'},{urls:'stun:stun.l.google.com:19302'}],...(!QS.has('direct')&&ICE&&ICE.length?{iceTransportPolicy:'relay'}:{})}});   // relay-only needs relay passwords: without them, try anything
 async function needPeer(){if(!window.Peer)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js');await iceReady();}
 async function needQR(){if(!window.QRCode)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');}
 const CODE_ABC='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
