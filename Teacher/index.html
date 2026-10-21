@@ -397,6 +397,10 @@ details>div{padding:0 16px 14px}
     <li>Check the phone has internet (school Wi-Fi sometimes blocks new devices: mobile data works too).</li>
     <li>Press <kbd>Q</kbd> and scan again, or open <span class="url">gunnitynes.github.io/Control-Room</span> on the phone and type the four-letter room code from the big screen.</li>
     <li>“Already in the room on another phone”: the name is taken by a phone that is still connected. Remove the wrong one by clicking its name chip on the room panel.</li></ul></div></details>
+  <details><summary>On school Wi-Fi, phones or computers can’t connect</summary><div><ul>
+    <li>Many school networks stop devices in a room from talking to each other. Control Room and CADCAST then send the traffic through a relay on the internet (Cloudflare), on the same port as ordinary websites. This happens by itself: nothing to set up, and at home or on open networks the devices still connect directly.</li>
+    <li>Audio that goes through the relay is sent at 128 kb/s instead of 320 kb/s; the student’s CADCAST page says “through the relay”.</li>
+    <li>Still stuck? Try one phone on mobile data. If even that fails, the school may be blocking the internet services themselves: ask IT to allow <code>peerjs.com</code> and <code>cloudflare.com</code>.</li></ul></div></details>
   <details><summary>A computer doesn’t pair or shows the wrong class</summary><div><ul>
     <li>The CADCAST page must know your name: use the link from your main menu (it carries <code>?t=Your+Name</code>), or type your name in “Your teacher’s name”.</li>
     <li>If the main menu warns that another Control Room is open with your name, close the other tab, or add your last name.</li>

@@ -37,7 +37,16 @@ const fmtClock=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/6
 const now=()=>performance.now();
 let toastT=0;function toast(t){let e=$('.toast');if(!e){e=el('div','toast');document.body.appendChild(e);}e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2800);}
 function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.async=true;sc.onload=res;sc.onerror=()=>rej(new Error('Could not load '+src));document.head.appendChild(sc);});}
-async function needPeer(){if(!window.Peer)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js');}
+/* relay passwords (TURN) from the owner's Cloudflare Worker (integrations/turn): devices still connect directly when the network
+   allows it, and through Cloudflare's relay on port 443 when a school network blocks device-to-device traffic. Cached 20 h.
+   ?relay in the address forces the relay (for testing). */
+const TURN_URL='https://controlroom-turn.gunnitynes.workers.dev';let ICE=null;
+async function iceReady(){if(ICE)return ICE;const c=store.get('ice',null);if(c&&Date.now()-c.at<20*3600e3&&c.s&&c.s.length){ICE=c.s;return ICE;}
+  try{const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),4000);const j=await (await fetch(TURN_URL,{signal:ctl.signal,cache:'no-store'})).json();clearTimeout(t);
+    if(j.iceServers&&j.iceServers.length){ICE=j.iceServers;store.set('ice',{at:Date.now(),s:ICE});}}catch(e){}
+  return ICE||[];}
+const peerCfg=()=>({debug:0,config:{iceServers:ICE&&ICE.length?ICE:[{urls:'stun:stun.cloudflare.com:3478'},{urls:'stun:stun.l.google.com:19302'}],...(QS.has('relay')?{iceTransportPolicy:'relay'}:{})}});
+async function needPeer(){if(!window.Peer)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js');await iceReady();}
 async function needQR(){if(!window.QRCode)await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');}
 const CODE_ABC='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const newCode=()=>[...Array(4)].map(()=>CODE_ABC[Math.floor(Math.random()*CODE_ABC.length)]).join('');
@@ -117,7 +126,7 @@ async function openRoom(code){
   try{await needPeer();}catch(e){G.status='Could not reach the room service. Check the internet connection.';render();return false;}
   return new Promise(res=>{
     const tryOpen=left=>{
-      G.code=code||newCode();const peer=new Peer(peerId(G.code),{debug:0});G.peer=peer;
+      G.code=code||newCode();const peer=new Peer(peerId(G.code),peerCfg());G.peer=peer;
       peer.on('open',()=>{G.status='';saveRoom();startLobby();if(!G.splash)render();else splashQR();res(true);});
       peer.on('error',e=>{
         if(e.type==='unavailable-id'&&left>0){peer.destroy();if(code)setTimeout(()=>tryOpen(left-1),1500);else tryOpen(left-1);return;}
@@ -309,13 +318,13 @@ function askTeacher(){if($('#teachov'))return;const ov=el('div','sheetov');ov.id
 // the CADCAST patch bay must run in this same browser: it reads the room code and the paired computers from localStorage
 function openMixer(){const w=window.open(new URL('../CADCAST/patch/',location.href).href,'cadcast-patch');if(w)try{w.focus();}catch(e){}else toast('Allow pop-ups for this page to open the mixer');}
 function startLobby(){const id=lobbyId();if(!id||!window.Peer||(G.lobbyPeer&&!G.lobbyPeer.destroyed))return;
-  const lp=new Peer(id,{debug:0});G.lobbyPeer=lp;
+  const lp=new Peer(id,peerCfg());G.lobbyPeer=lp;
   lp.on('open',()=>{if(G.lobbyErr){G.lobbyErr=false;if(G.view==='menu')render();}});
   lp.on('connection',c=>{c.on('data',m=>{if(m&&m.t==='room?')try{c.send({t:'room',code:G.code});}catch(e){}});c.on('error',()=>{});});
   lp.on('error',e=>{if(e.type==='unavailable-id'){if(!G.lobbyErr){G.lobbyErr=true;if(G.view==='menu')render();}}if(e.type==='unavailable-id')setTimeout(()=>{if(G.lobbyPeer===lp){lp.destroy();G.lobbyPeer=null;startLobby();}},20000);});   // another host tab holds it
   lp.on('disconnected',()=>{setTimeout(()=>{if(!lp.destroyed)try{lp.reconnect();}catch(e){}},1500);});}
 async function lobbyRoom(){const id=lobbyId();if(!id)return null;try{await needPeer();}catch(e){return null;}
-  return new Promise(res=>{const p=new Peer({debug:0});let done=false;const fin=v=>{if(done)return;done=true;res(v);setTimeout(()=>{try{p.destroy();}catch(e){}},500);};
+  return new Promise(res=>{const p=new Peer(peerCfg());let done=false;const fin=v=>{if(done)return;done=true;res(v);setTimeout(()=>{try{p.destroy();}catch(e){}},500);};
     setTimeout(()=>fin(null),9000);p.on('error',e=>{if(e.type==='peer-unavailable')fin(null);});
     p.on('open',()=>{const c=p.connect(id,{serialization:'json',reliable:true});c.on('open',()=>c.send({t:'room?'}));c.on('data',m=>{if(m&&m.t==='room'&&m.code)fin(String(m.code).toUpperCase());});});});}
 function copyAttendance(){const L=players().slice().sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base'}));if(!L.length){toast('Nobody has joined yet');return;}
@@ -766,7 +775,7 @@ async function pConnect(){
   PL.status='Connecting to '+PL.code+'…';pRender();
   try{await needPeer();}catch(e){PL.status='No internet connection?';pRender();return;}
   if(PL.peer&&!PL.peer.destroyed)PL.peer.destroy();
-  const peer=new Peer({debug:0});PL.peer=peer;
+  const peer=new Peer(peerCfg());PL.peer=peer;
   clearTimeout(PL.wd);PL.wd=setTimeout(()=>{if(PL.peer===peer&&(!PL.conn||!PL.conn.open))pRetry();},10000);
   peer.on('open',()=>{const conn=peer.connect(peerId(PL.code),{serialization:'json',reliable:true});PL.conn=conn;PL.connCode=PL.code;
     // the room answered the relay but the direct link never opened: the network is blocking device-to-device traffic
