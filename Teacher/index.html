@@ -71,6 +71,23 @@ section>header p{font:700 13px var(--mono);text-transform:uppercase;letter-spaci
 .attfirst{margin:18px 0 22px;padding:20px 22px;border:6px solid var(--ink);background:var(--yel);box-shadow:10px 10px 0 var(--red);display:grid;gap:6px}
 .attfirst strong{font:900 clamp(34px,6vw,58px)/.9 var(--disp);font-stretch:62%;text-transform:uppercase}.attfirst p{margin:0;font-size:18px}
 a.sec{font-weight:800;color:var(--blue);text-decoration-thickness:2px}
+/* section 7: the top bar picture and the tool cards */
+.tbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border:4px solid var(--ink);background:var(--paper);box-shadow:7px 7px 0 var(--ink);margin:6px 0 24px;font:700 11px var(--mono);text-transform:uppercase}
+.tb-logo{font:900 15px/.85 var(--disp);font-stretch:70%}.tb-logo i{font-style:normal;color:var(--red)}
+.tb-n{display:grid;justify-items:center;margin-left:auto;font-size:8px}.tb-n b{font:900 22px/.9 var(--disp)}
+.tb-sep{width:3px;align-self:stretch;background:var(--ink)}.tb-qr{width:30px;height:30px;background:repeating-conic-gradient(var(--ink) 0 25%,#fff 0 50%) 0 0/10px 10px;border:2px solid var(--ink)}
+.tb-c{font:900 22px var(--disp);letter-spacing:-.02em}
+.tb-b{padding:6px 9px;border:2px solid var(--ink);background:#fff}.tb-b.hot{background:var(--yel);box-shadow:3px 3px 0 var(--ink)}.tb-b.tmr{background:var(--ink);color:var(--paper)}
+.tool{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start;padding:22px;border:5px solid var(--ink);background:color-mix(in srgb,var(--c) 12%,#fff);box-shadow:9px 9px 0 var(--ink);margin:0 0 22px;scroll-margin-top:20px}
+.tool h3{margin:2px 0 8px;font-size:clamp(30px,4.4vw,46px)}.tool .lead{font-size:19px}.tool p:last-child{margin-bottom:0}
+.tico{width:76px;height:76px;display:grid;place-items:center}.shp{display:block;border:5px solid var(--ink);background:var(--c)}
+.shp.c{width:66px;height:66px;border-radius:50%}.shp.s{width:62px;height:62px}.shp.d{width:52px;height:52px;transform:rotate(45deg)}
+.shp.t{width:0;height:0;border:0;border-left:36px solid transparent;border-right:36px solid transparent;border-bottom:62px solid var(--c);filter:drop-shadow(0 0 0 var(--ink)) drop-shadow(3px 3px 0 var(--ink))}
+.ttwo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 12px}.ttwo div{display:grid;gap:4px;padding:12px 14px;border:3px solid var(--ink);background:#fff}
+.ttwo b{font:900 20px/1 var(--disp);text-transform:uppercase;font-stretch:80%}.ttwo span{font-size:15px;line-height:1.4}
+.tools2{display:grid;grid-template-columns:1fr 1fr;gap:20px}.tools2 .tool{margin:0;grid-template-columns:1fr}.tools2 .tico{width:60px;height:60px}
+@media(max-width:760px){.ttwo,.tools2{grid-template-columns:1fr}.tool{grid-template-columns:1fr}}
+@media(max-width:520px){kbd{white-space:normal;overflow-wrap:anywhere}.mock{overflow-x:auto}.wrap{padding:0 14px 50px}}
 .note{border:4px solid var(--ink);padding:14px 16px;margin:16px 0;background:color-mix(in srgb,var(--c,var(--yel)) 22%,#fff);box-shadow:5px 5px 0 var(--ink)}
 .note b:first-child{font:900 18px var(--disp);text-transform:uppercase;display:block;margin-bottom:4px}
 .note.red{--c:var(--red)}.note.green{--c:var(--green)}.note.blue{--c:var(--blue)}
@@ -130,8 +147,9 @@ details>div{padding:0 16px 14px}
   <li><a href="#cadcast" style="--c:var(--green)"><b>4</b>Student computers</a></li>
   <li><a href="#sheet" style="--c:var(--red)"><b>5</b>Attendance sheet</a></li>
   <li><a href="#lesson" style="--c:var(--blue)"><b>6</b>Running a lesson</a></li>
-  <li><a href="#modules" style="--c:var(--yel)"><b>7</b>The 20 modules</a></li>
-  <li><a href="#help" style="--c:var(--green)"><b>8</b>Help &amp; privacy</a></li>
+  <li><a href="#tools" style="--c:var(--red)"><b>7</b>Vote, timer &amp; more</a></li>
+  <li><a href="#modules" style="--c:var(--yel)"><b>8</b>The 20 modules</a></li>
+  <li><a href="#help" style="--c:var(--green)"><b>9</b>Help &amp; privacy</a></li>
 </ol>
 
 <!-- 1 -->
@@ -139,6 +157,7 @@ details>div{padding:0 16px 14px}
   <header><h2><span class="no">1</span>What it is</h2><p>gunnitynes.github.io/Control-Room</p></header>
   <p class="lead">Control Room runs on your computer and the projector.</p>
   <div class="attfirst"><span class="lab">First of all</span><strong>Joining is checking in.</strong><p>When a student joins with their phone and picks their name, their attendance is marked. Control Room is an <b>attendance tool</b> first, with the games on top: every lesson starts with everyone checking in. With a Google Sheet the list is written for you (<a class="sec" href="#sheet">section 5</a>); without one, you copy it with one click (<a class="sec" href="#nosheet">no sheet</a>).</p></div>
+  <p class="lead">Next to the games there are everyday classroom tools in the top bar: <a class="sec" href="#tools">a room vote, a timer, a random picker and a screensaver</a>.</p>
   <p class="lead">Students join with their phones, and the phones become buzzers, faders, knobs, voting cards and remix pads. Twenty modules: quizzes, ear training and creative sprints.</p>
   <p>Nothing to install, no accounts. It is a website: open it in <em>Google Chrome</em> on the computer connected to the projector and speakers. Students only need a phone with a camera and a browser. Phones and your computer need internet (they find each other through a free relay, then talk directly).</p>
   <div class="note"><b>What you need</b>
@@ -278,7 +297,7 @@ details>div{padding:0 16px 14px}
   <header><h2><span class="no">6</span>Running a lesson</h2><p>the rhythm of a Control Room class</p></header>
   <ol class="steps">
     <li class="c-red"><div><strong>Students join</strong><p>Way A, Way B or both (<a class="sec" href="#ways">section 3</a>). You see each name appear on the room panel.</p></div></li>
-    <li class="c-blue"><div><strong>Pick a module, set it up</strong><p>Click a module. Its setup screen has the options (rounds, time, difficulty, categories …) and a short “how it works”. Your choices are remembered for next time. Or let the class choose: the <kbd>Vote</kbd> button on the main menu asks what to vote on. <b>The next module</b> puts every module on every phone. <b>Your own question</b> lets you type a question and as many answers as you like (press Enter to add the next one); the phones vote, the big screen counts live and crowns the winner, with a spotlight if it’s a tie. Your last question is remembered, so you can run it again.</p></div></li>
+    <li class="c-blue"><div><strong>Pick a module, set it up</strong><p>Click a module. Its setup screen has the options (rounds, time, difficulty, categories …) and a short “how it works”. Your choices are remembered for next time. Or let the class choose with a <a class="sec" href="#vote">room vote</a>.</p></div></li>
     <li class="c-yel"><div><strong>Play</strong><p><kbd>Space</kbd> moves on. Phones follow by themselves. Click the logo top left to go back to the menu.</p></div></li>
     <li class="c-green"><div><strong>Finish</strong><p>Every end screen offers <em>Play another round</em> (<kbd>R</kbd>). Points across the lesson add up in the room standings; the leaderboard only appears when you click <em>Show the leaderboard</em>. No Google Sheet? Click <kbd>⧉ Copy attendance</kbd> on the main menu before you close (<a class="sec" href="#nosheet">no sheet</a>).</p></div></li>
   </ol>
@@ -291,11 +310,6 @@ details>div{padding:0 16px 14px}
     <div><kbd>Q</kbd><span>Show the join code big</span></div>
     <div><kbd>Esc</kbd><span>Close the big code, or end the screensaver</span></div>
   </div>
-  <div class="note green"><b>Room timer</b>Click <kbd>Timer</kbd> in the top bar (it’s there in every game too). Pick 1–30 minutes or type any time, then <kbd>Start</kbd>. The button counts down. Phones waiting between games show the countdown full screen; during a game it sits small at the top so it doesn’t cover anything. Click the button again to pause, add a minute or stop. When it runs out, the big screen flashes <em>TIME!</em> (silently), and every phone vibrates, gives one soft boop and shows <em>Time’s up!</em> until the student taps it away. iPhones don’t allow websites to vibrate, so they only get the screen and the boop.</div>
-  <div class="note blue"><b>Pick at random</b>The <kbd>Pick</kbd> button (top right, next to <kbd>Vote</kbd>) picks at random from everyone in the room, in three ways:
-    <b style="font:inherit;display:inline">One student</b> (a spotlight hops over the names and lands on someone), <b style="font:inherit;display:inline">A group</b> (choose how many, 2–12) or <b style="font:inherit;display:inline">Teams</b> (choose 2–8 teams; everyone is dealt out evenly into teams named after a colour and a shape, like “Red Circle”, and you can copy the teams).
-    With <em>Fair turns</em> on, nobody is picked twice until everyone has had a turn. The picked student’s phone says <em>You’re up!</em>, and in Teams every phone shows its team and teammates. Press <kbd>Space</kbd> to pick again.</div>
-  <div class="note"><b>Screensaver</b>Need the projector to go quiet, during a break or while you explain something? Click the <b>C///</b> Catalyst logo at the top right of Control Room, next to the join code. The whole screen turns black with the white Catalyst logo in the middle. Click the screen to switch to white with a black logo (it remembers your choice). Press <kbd>Esc</kbd> to come back. The room keeps running underneath: phones stay connected and nothing is lost.</div>
   <h3>On every phone</h3>
   <div class="keys">
     <div><b style="color:var(--yel);font-size:26px">▲</b><span><b>Raise your hand</b>: names light up on your screen in the order hands went up. Click the hand counter to lower them.</span></div>
@@ -306,8 +320,40 @@ details>div{padding:0 16px 14px}
 </section>
 
 <!-- 7 -->
+<section id="tools" style="--c:var(--red)">
+  <header><h2><span class="no">7</span>Vote, timer &amp; more</h2><p>the classroom tools in the top bar · on every screen</p></header>
+  <div class="tbar" aria-hidden="true"><span class="tb-logo">CONTROL<br><i>ROOM</i></span><span class="tb-n"><b>14</b>students</span><span class="tb-sep"></span><span class="tb-qr"></span><span class="tb-c">C///</span>
+    <span class="tb-b hot">Vote</span><span class="tb-b hot">Pick</span><span class="tb-b hot tmr">⏱ 4:59</span><span class="tb-b">Mixer</span><span class="tb-b">SFX</span><span class="tb-b">Theme</span></div>
+
+  <article class="tool big" id="vote" style="--c:var(--red)"><div class="tico"><i class="shp c"></i></div><div>
+    <span class="lab">Top bar ▸ Vote</span><h3>The room vote</h3>
+    <p class="lead">Every phone becomes a ballot. The big screen counts live and crowns the winner, with a spotlight if it’s a tie. Click <kbd>Vote</kbd> and choose what to vote on:</p>
+    <div class="ttwo"><div><b>The next module</b><span>Every module is on the ballot. Most votes wins, then you set it up.</span></div>
+      <div><b>Your own question</b><span>Type a question and as many answers as you like. Press <kbd>Enter</kbd> for the next answer. Your last question is remembered, so you can run it again.</span></div></div>
+    <p>Use it for anything: which track to finish first, the next topic, a band name, a quick “did that make sense?”. <em>Secret ballot</em> hides the counts until you close the vote. <kbd>Enter</kbd> closes it.</p></div></article>
+
+  <article class="tool big" id="timer" style="--c:var(--blue)"><div class="tico"><i class="shp s"></i></div><div>
+    <span class="lab">Top bar ▸ Timer · in every game too</span><h3>The room timer</h3>
+    <p class="lead">Pick 1–30 minutes, or type any time, and press <kbd>Start</kbd>. The button counts down, and so does every phone.</p>
+    <div class="ttwo"><div><b>While it runs</b><span>Phones waiting between games show the countdown full screen; during a game it sits small at the top. Click the button to pause, add a minute or stop. The last 10 seconds turn red.</span></div>
+      <div><b>When it ends</b><span>The big screen flashes <em>TIME!</em> (silently). Every phone vibrates, gives one soft boop and shows <em>Time’s up!</em> until the student taps it away. (iPhones can’t vibrate from a website: they get the screen and the boop.)</span></div></div></div></article>
+
+  <div class="tools2">
+    <article class="tool" id="pick" style="--c:var(--yel)"><div class="tico"><i class="shp t"></i></div><div>
+      <span class="lab">Top bar ▸ Pick</span><h3>Pick at random</h3>
+      <p><b>One student</b>: a spotlight hops over the names and lands on someone. <b>A group</b> of 2–12. <b>Teams</b>: 2–8 teams, dealt out evenly and named after a colour and a shape (“Red Circle”); copy them with one click.</p>
+      <p>With <em>Fair turns</em>, nobody is picked twice until everyone has had a turn. The picked phone says <em>You’re up!</em>; in Teams every phone shows its team. <kbd>Space</kbd> picks again.</p></div></article>
+    <article class="tool" id="saver" style="--c:var(--green)"><div class="tico"><i class="shp d"></i></div><div>
+      <span class="lab">Top bar ▸ the C/// logo</span><h3>Screensaver</h3>
+      <p>Need the projector to go quiet? Click the Catalyst logo: the screen turns black with the white logo in the middle. Click to switch to white. <kbd>Esc</kbd> brings Control Room back.</p>
+      <p>The room keeps running underneath: phones stay connected and nothing is lost.</p></div></article>
+  </div>
+  <p class="fine">Also on the main menu: <kbd>⧉ Copy attendance</kbd> (<a class="sec" href="#nosheet">no sheet</a>) and your <a class="sec" href="#tlink">teacher link</a>. Raised hands show in the top bar too.</p>
+</section>
+
+<!-- 8 -->
 <section id="modules" style="--c:var(--yel)">
-  <header><h2><span class="no">7</span>The 20 modules</h2><p>what each needs · <i class="need"><i class="cc">CADCAST</i></i> = student computers (Way B) · <i class="need"><i class="own">Your folder</i></i> = works best with your own media</p></header>
+  <header><h2><span class="no">8</span>The 20 modules</h2><p>what each needs · <i class="need"><i class="cc">CADCAST</i></i> = student computers (Way B) · <i class="need"><i class="own">Your folder</i></i> = works best with your own media</p></header>
   <div class="grp" style="--c:var(--blue)">Know your stuff</div>
   <div class="mods">
     <div class="mod" style="--c:var(--blue)"><b>01</b><div><strong>The Quiz</strong><span>Big-screen questions, phone answers. Three banks: how to do it, how the gear works, the stories.</span></div><div class="need"><i>Phones</i></div></div>
@@ -340,9 +386,9 @@ details>div{padding:0 16px 14px}
   <div class="note"><b>Your own music stays with you</b>Modules marked “your …” have a <em>Load a folder</em> button in their setup. The files are kept inside <b>your</b> Chrome on <b>your</b> computer and are never uploaded anywhere, so you can use commercial music for teaching. They work without your files too, with the built-in free recordings where there are some.</div>
 </section>
 
-<!-- 8 -->
+<!-- 9 -->
 <section id="help" style="--c:var(--green)">
-  <header><h2><span class="no">8</span>Help &amp; privacy</h2><p>quick answers</p></header>
+  <header><h2><span class="no">9</span>Help &amp; privacy</h2><p>quick answers</p></header>
   <details><summary>A phone can’t join</summary><div><ul>
     <li>Check the phone has internet (school Wi-Fi sometimes blocks new devices: mobile data works too).</li>
     <li>Press <kbd>Q</kbd> and scan again, or open <span class="url">gunnitynes.github.io/Control-Room</span> on the phone and type the four-letter room code from the big screen.</li>
