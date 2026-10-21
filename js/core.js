@@ -769,7 +769,8 @@ async function pConnect(){
   const peer=new Peer({debug:0});PL.peer=peer;
   clearTimeout(PL.wd);PL.wd=setTimeout(()=>{if(PL.peer===peer&&(!PL.conn||!PL.conn.open))pRetry();},10000);
   peer.on('open',()=>{const conn=peer.connect(peerId(PL.code),{serialization:'json',reliable:true});PL.conn=conn;PL.connCode=PL.code;
-    const fail=setTimeout(()=>{if(!conn.open){PL.status='No room '+PL.code+' found. Check the code on the big screen.';pRender();}},9000);
+    // the room answered the relay but the direct link never opened: the network is blocking device-to-device traffic
+    const fail=setTimeout(()=>{if(!conn.open){PL.status='Found room '+PL.code+', but this Wi-Fi blocks the connection to it. Switch Wi-Fi off and use mobile data, or ask your teacher.';pRender();}},12000);
     conn.on('open',()=>{clearTimeout(fail);PL.retry=0;PL.heard=now();PL.status='';conn.send(PL.joined?{t:'hi',id:PL.id,name:PL.name}:{t:'who'});if(!PL.joined)pRender();const q=PL.q;PL.q=[];q.forEach(m=>{try{conn.send(m);}catch(e){}});});
     conn.on('data',m=>{PL.heard=now();pData(m);});
     conn.on('close',()=>{if(PL.kicked)return;PL.hand=false;PL.status='Lost the room — reconnecting…';pRender();pRetry();});});
