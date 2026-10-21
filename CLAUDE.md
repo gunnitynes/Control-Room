@@ -67,6 +67,20 @@ js/games-album.js   The Class Album (Make something, the last module): everyone 
                     phones switch their own row + level + suggest titles; playback schedules sections as segments half a second
                     ahead (a looped section is scheduled again). The album: one offline render per stem, the mix is their sum at
                     one gain (stems add up to the mix), store-only zip (alZip), downloaded on the big screen (nothing sent back).
+js/midi-engine.js   The teacher's MIDI library (clipDB dec -7, never in the repo; index in localStorage midi.idx): mdParse (SMF),
+                    mdParts (per track+channel, so type-0 files split), mdRoles (drums = ch10 → name → a logistic model on playing
+                    style, 95.5 % right per song; bass/melody/chords/extra by name, GM program, register, polyphony), mdKey
+                    (Krumhansl), mdFeel (double/half-time files → 70–150 BPM), mdWindow/mdClip (busiest N bars, in beats),
+                    mdBand (looping WebAudio band, swaps parts on the loop), mdWrite (multi-track .mid), mdLibPanel/mdLibBind.
+                    Tested on the owner's 5,378-file bank (~/CATALIST/MIDI COLLECTION): all read, ~5 ms each.
+js/games-franken.js The Frankenhit (Make): phones spin a part each (drums/bass/chords/melody/extra) → that part of a random song,
+                    transposed to the room key (set by the first pitched part) at the room tempo; keep/reroll; guess the sources;
+                    export MIDI / send to computers.
+js/games-blind.js   Blind Orchestra (Make, CADCAST): a secret song's parts dealt as MIDI (kind 'drop', meta.head) + the Class Album
+                    hand-in box ({t:'album', m.head}); parts fitted by alFit; the orchestra plays (missing parts from MIDI), phones
+                    guess, reveal A/Bs with the original.
+js/games-teleport.js Genre Teleporter (Ears, scored): melody kept, harmony read per 2 beats (tpHarmony), drums/bass/comp rebuilt
+                    by TP_GENRES machines (10 genres, half-time feel for trap/dnb); reveal plays the original.
 js/vote.js          The room vote: openVote(spec) — a ballot on every phone, live tally, tie spotlight; voteGames() picks the next module
 Teacher/index.html  The Teacher handbook (self-contained page, same look) at /Control-Room/Teacher/. NOT linked from the app
                     (the owner sends the link). School setup assumed: CADCAST/go bookmarked on student computers, BlackHole installed,
