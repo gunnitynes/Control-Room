@@ -1853,3 +1853,9 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
 .hside .attcopy{justify-self:stretch;display:block;text-align:center;background:var(--yel)}
 .hact{font-size:24px;padding:18px;display:grid;gap:2px}.hact small{font-size:11px}
 @media(max-width:900px){.home{grid-template-columns:1fr;overflow:auto}.hside{border-left:0;border-top:3px solid var(--ink)}}
+/* splash: today's date, bottom right, in the title's black / red */
+.spdate{position:absolute;right:clamp(24px,4vw,64px);bottom:clamp(24px,5vh,64px);display:grid;gap:12px;justify-items:end;text-align:right;pointer-events:none}
+.spdate h2{font:900 clamp(48px,6.4vw,120px)/.8 var(--disp);font-stretch:62%;text-transform:uppercase;letter-spacing:-.02em;margin:0}
+.spdate h2 i{font-style:normal;color:var(--red)}
+.spdate .kick{display:flex;gap:8px;align-items:center;font:700 11px var(--mono);text-transform:uppercase}.spdate .kick::before{content:"";width:10px;height:10px;background:var(--red)}
+@media(max-width:700px){.spdate{display:none}}

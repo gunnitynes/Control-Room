@@ -439,7 +439,8 @@ let POSTER=null;
 function rSplash(app){
   app.className='splash';
   app.innerHTML=`<canvas id="poster"></canvas><div class="sptt"><div class="kick">Catalyst</div><h1>Control<br><i>Room</i></h1>
-    <p>The big screen asks, the phones answer.</p><button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
+    <button class="big go" id="bEnter">Enter <small>click anywhere</small></button></div>
+  <div class="spdate" aria-label="Today"><div class="kick">Today · ${new Date().getFullYear()}</div><h2>${esc(new Date().toLocaleDateString('en-GB',{weekday:'long'}))}<br><i>${esc(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long'}))}</i></h2></div>
 
 `;
   const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
