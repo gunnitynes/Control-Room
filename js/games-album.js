@@ -194,7 +194,7 @@ game({
     const add=$('#alAdd',g);if(add)add.onclick=()=>{if(s.secs.length>=12){toast('12 sections is the most');return;}s.secs.push(['Drop 3','Bridge','Hook','Breakdown','Finale'][Math.min(4,s.secs.length-7)]||'Extra');
       const k=s.secs.length-1,d=s.secs.indexOf('Drop');s.on.forEach((set,pid)=>{if(set.has(d))set.add(k);});this.live();syncAll();};},
   titles(){const s=G.gs;const L=[...s.titles.values()];return `<span class="lab">The title</span><button class="altitle" id="alTitle" title="Click to type a title">${esc(s.title)}</button>
-      <div class="altchips">${L.map(t=>`<button class="${t===s.title?'on':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('')||'<span class="fine">Phones can suggest titles. Click one to pick it.</span>'}</div>`;},
+      <div class="altchips">${L.map(t=>`<button class="${t===s.title?'on':''}" data-t="${esc(t)}">${esc(t)}</button>`).join('')||'<span class="fine">Students can suggest titles. Click one to pick it.</span>'}</div>`;},
   bindTitles(t){const s=G.gs;$$('.altchips button',t).forEach(b=>b.onclick=()=>{s.title=b.dataset.t;this.live();syncAll();});
     const ti=$('#alTitle',t);if(ti)ti.onclick=()=>{const n=prompt('The song title',s.title);if(n&&n.trim()){s.title=n.trim().slice(0,40);this.live();syncAll();}};},
   render(st){const s=G.gs,o=s.o,nIn=s.parts.size;let body='',lbl='',dis=false;
@@ -205,7 +205,7 @@ game({
         <div class="alwall" id="alWall">${this.wall()}</div></div>`;}
     if(s.phase==='arrange'){lbl=s.rendering?'Making the album…':'Make the album';dis=!!s.rendering;const tot=this.secLen()*s.secs.length;
       body=`<div class="alarr"><div class="altop"><div><span class="lab">Arrange it · ${s.secs.length} sections · ${alFmt(tot)}</span><h2>Who plays where?</h2>
-          <p>Phones switch their own part on and off per section. Click a section to play from it, again to loop it. Double-click to rename it.</p></div>
+          <p>Students switch their own part on and off per section from their phones. Click a section to play from it, again to loop it. Double-click to rename it.</p></div>
           <div class="altitles" id="alTitles">${this.titles()}</div></div>
         <div class="algrid" id="alGrid">${this.grid()}</div>
         <div class="frow"><button class="big go" id="alPlay">${s.play?'■ Stop':'▶ Play the song'}</button></div></div>`;}

@@ -12,8 +12,8 @@ const rxFx=id=>RX_FX.find(f=>f.id===id);
 const RX_CATS={time:'Time',tone:'Tone',space:'Space',layer:'Layers'};
 
 game({
-  id:'remix',group:'make',name:'Live Remix',tag:'One song, the whole room at the controls. Every phone fires stutters, tape stops, filters and 808s.',
-  how:['The song is analysed: tempo, beat grid, bars and key.','Every phone holds four moves. Take turns round the room: on your turn, tap one and it lands on the next beat.','A move you use is replaced by a new one. Or switch to everyone at once for chaos.'],
+  id:'remix',group:'make',name:'Live Remix',tag:'One song, the whole room at the controls. Every student fires stutters, tape stops, filters and 808s.',
+  how:['The song is analysed: tempo, beat grid, bars and key.','Every student holds four moves. Take turns round the room: on your turn, tap one and it lands on the next beat.','A move you use is replaced by a new one. Or switch to everyone at once for chaos.'],
   badges:['Live','No score','Remix'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="25" fill="var(--ink)"/><circle cx="32" cy="32" r="17" fill="none" stroke="var(--paper)" stroke-width="1.5" opacity=".5"/><path d="M32 32 L52 14" stroke="var(--red)" stroke-width="5"/><circle cx="32" cy="32" r="6" fill="var(--yel)" stroke="var(--paper)" stroke-width="2"/>${[0,1,2,3].map(i=>`<rect x="${4+i*15}" y="56" width="11" height="6" fill="var(${['--red','--blue','--yel','--green'][i]})"/>`).join('')}</svg>`,
   options:[
@@ -85,14 +85,14 @@ game({
         const h=(m/255)*H*.95,w=W/n;x.fillStyle=cols[Math.floor(i/n*4)];x.fillRect(i*w+2,H-h,w-4,h);x.strokeStyle=ink;x.lineWidth=2;x.strokeRect(i*w+2,H-h,w-4,h);}}
     if(s.dirty){s.dirty=false;const box=$('#rxActive');if(box){const L=[...s.active.values()];box.innerHTML=L.length?L.map(f=>`<div class="rxtile${f.cat==='space'?' dark':''}" style="--c:var(${RX_CAT[f.cat]||'--ink'})"><b>${esc(f.name)}</b><span>${esc(f.who||'')}</span></div>`).join(''):'<p class="fine">Tap a move on your phone.</p>';}
       const tb=$('#rxTurn');if(tb){const t=s.turn,p=t&&G.players.get(t.pid),L=this.turnOrder(),i=t?L.indexOf(t.pid):-1,nx=[1,2,3].map(k=>L.length>k?G.players.get(L[(i+k)%L.length]):null).filter(Boolean);
-        tb.innerHTML=p?`<span class="lab">Turn ${t.n}</span><b class="c${p.sh}">${esc(p.name)}</b><div class="rxtbar"><i id="rxTbar"></i></div>${nx.length?`<span class="rxnext">next: ${nx.map(x=>esc(x.name)).join(' · ')}</span>`:''}`:'<span class="lab">Waiting for phones</span>';}
+        tb.innerHTML=p?`<span class="lab">Turn ${t.n}</span><b class="c${p.sh}">${esc(p.name)}</b><div class="rxtbar"><i id="rxTbar"></i></div>${nx.length?`<span class="rxnext">next: ${nx.map(x=>esc(x.name)).join(' · ')}</span>`:''}`:'<span class="lab">Waiting for students</span>';}
       const fd=$('#rxFeed');if(fd)fd.innerHTML=s.feed.map(f=>`<li style="--c:var(${RX_CAT[f.cat]})"><b>${esc(f.who||'')}</b><span>${esc(f.name)}</span></li>`).join('');}},
   render(st){const s=G.gs,A=s.A;
     if(s.phase==='load'){st.innerHTML=`<div class="dbig"><span class="lab">Live Remix · ${esc(s.title)}</span><h2>Listening to the song</h2><div class="mxbar"><i id="rxLoad" style="width:${Math.round(s.prog*100)}%"></i></div><p id="rxStep">${esc(s.step||'')}</p></div>`;return;}
     const map=`<div class="rxmap">${A.bars.map((_,i)=>`<i style="--h:${Math.round(8+A.energy[i]*92)}%" class="${i===s.startBar&&s.phase==='ready'?'start':''}"></i>`).join('')}</div>`;
     const stats=`<div class="rxstats"><div><b>${A.bpm}</b><span>BPM</span></div><div><b>${esc(A.key.name)}</b><span>key</span></div><div><b>${A.bars.length}</b><span>bars</span></div><div><b>${Math.floor(A.dur/60)}:${pad2(Math.round(A.dur%60))}</b><span>long</span></div></div>`;
     if(s.phase==='ready'){st.innerHTML=`<div class="remix ph-ready"><div class="rxhead"><span class="lab">Live Remix · analysed</span><h2>${esc(s.title)}</h2>${stats}</div>${map}
-      <p class="rxnote">The beat grid, the bars and the key are ready: every move lands on the beat, and the 808 and sub play in ${esc(A.key.name)}. ${online().length} phone${online().length===1?'':'s'} in the room.</p>
+      <p class="rxnote">The beat grid, the bars and the key are ready: every move lands on the beat, and the 808 and sub play in ${esc(A.key.name)}. ${online().length} student${online().length===1?'':'s'} in the room.</p>
       <div class="dfoot"><span></span><button class="big go" id="bNext">Drop the needle <small>SPACE</small></button></div></div>`;$('#bNext').onclick=()=>this.next();return;}
     if(s.phase==='end'){const top=[...s.count].sort((a,b)=>b[1]-a[1]).slice(0,5),crew=[...s.by].sort((a,b)=>b[1]-a[1]).slice(0,5),mins=Math.max(1,Math.round((Date.now()-s.t0)/60000));
       st.innerHTML=`<div class="remix ph-end"><div class="rxhead"><span class="lab">Live Remix · ${esc(s.title)}</span><h2>The remix in numbers</h2></div>

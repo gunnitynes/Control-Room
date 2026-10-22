@@ -10,7 +10,7 @@ const fkName=()=>pick(['The Frankenhit','Stitches','It’s Alive!','Spare Parts'
 
 game({
   id:'franken',group:'make',name:'The Frankenhit',tag:'Steal a drum beat here, a bassline there. The room stitches famous songs into one monster hit.',
-  how:['Every phone owns one part of the band: drums, bass, chords or melody.','Spin it: your part lands on that part of a random famous song, moved into the room’s tempo and key. Reroll or keep it.','When the monster is alive, guess where each part was stolen from. Then everyone takes the MIDI home.'],
+  how:['Every student owns one part of the band: drums, bass, chords or melody.','Spin it: your part lands on that part of a random famous song, moved into the room’s tempo and key. Reroll or keep it.','When the monster is alive, guess where each part was stolen from. Then everyone takes the MIDI home.'],
   badges:['MIDI library','Whole room','Live'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><rect x="8" y="8" width="48" height="48" fill="var(--green)" stroke="var(--ink)" stroke-width="3"/><path d="M8 26 H56 M8 40 H56" stroke="var(--ink)" stroke-width="3"/>${[14,24,34,44].map((x,i)=>`<path d="M${x} 22 v8 M${x+4} 22 v8" stroke="var(--paper)" stroke-width="2.5"/>`).join('')}<path d="M16 40 l6 6 l6 -6 l6 6 l6 -6 l6 6" fill="none" stroke="var(--yel)" stroke-width="3"/><circle cx="22" cy="16" r="3" fill="var(--paper)"/><circle cx="42" cy="16" r="3" fill="var(--paper)"/></svg>`,
   options:[
@@ -19,7 +19,7 @@ game({
     {key:'bpm',label:'Tempo',choices:[[85,'85'],[95,'95'],[105,'105'],[115,'115'],[124,'124']],def:105},
     {key:'rolls',label:'Rerolls',choices:[[3,'3','each'],[6,'6','each'],[0,'∞','unlimited']],def:6},
   ],
-  note:'Uses your MIDI library (a folder of .mid files). It stays in this browser: nothing is uploaded. Students without a phone slot guess at the end.',
+  note:'Uses your MIDI library (a folder of .mid files). It stays in this browser: nothing is uploaded. Students without a part guess at the end.',
   check(){return mdPool(['drums']).length>=4?'':'Load your MIDI folder first';},
   setupExtra(){return mdLibPanel();},setupBind(st,redraw){mdLibBind(st,redraw);},
   topInfo(){const s=G.gs;if(!s)return this.tag;return `${s.o.bpm} BPM${s.key?' · '+MD_NOTE[s.key.root]+(s.key.mode==='minor'?' minor':' major'):''} · ${s.o.bars} bars`;},
@@ -74,7 +74,7 @@ game({
   render(st){const s=G.gs,o=s.o,lbl={build:s.slots.some(sl=>sl.song)?'Who stole what?':'Spin every part',guess:'Reveal the sources',reveal:'Back to the menu'}[s.phase];
     st.innerHTML=`<div class="franken ph-${s.phase}" id="fkWrap"><div class="fktop"><div><span class="lab">The Frankenhit · ${o.bpm} BPM${s.key?' · '+MD_NOTE[s.key.root]+(s.key.mode==='minor'?' minor':' major'):''}</span>
         <h2>${s.phase==='reveal'?esc(s.title):s.phase==='guess'?'Who stole what?':'It’s alive!'}</h2>
-        <p>${s.phase==='build'?'Every part comes from a different famous song. Phones spin, reroll and keep. Changes land on the next loop.':s.phase==='guess'?'On your phones: where was each part stolen from?':'The monster, and its parents.'}</p></div>
+        <p>${s.phase==='build'?'Every part comes from a different famous song. Students spin, reroll and keep. Changes land on the next loop.':s.phase==='guess'?'On your phones: where was each part stolen from?':'The monster, and its parents.'}</p></div>
         ${s.phase==='build'?`<button class="ghost" id="fkAll">Spin all the open slots</button>`:s.phase==='guess'?`<span class="fine" id="fkGuessN">${s.guess.size} of ${online().length} guessed</span>`:''}</div>
       <div class="fkslots n${s.slots.length}" id="fkSlots">${this.slotsHTML()}</div>
       <div class="dfoot">${s.phase==='reveal'?`<button class="ghost" id="fkDl">⬇ The Frankenhit (MIDI)</button><button class="ghost" id="fkSend">Send it to every computer</button>${againBtn()}`:'<span class="fine">The room’s tempo and key: every part is moved into them</span>'}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;

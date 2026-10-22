@@ -235,3 +235,8 @@ brave, playful design. Phones must always fit the screen with nothing cut off.
 - Asks for changes in batches; do all of them, test in the browser, then ask before pushing.
 - Prompts and generators should be fun, unique and specific, not cruel. Prefer well-known, real genres and terms.
 - Attendance should stay low-friction (picking a name is the whole check-in).
+
+## Wording
+
+Say **students**, not phones, when you mean the people ("Waiting for the first student", "the students vote"). Say phone only for the
+device itself ("on your phone", "the phones count down too", "Uses phone speakers").

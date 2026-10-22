@@ -1,5 +1,5 @@
 /* =====================================================================
-   THE MIX ROOM — one song in stems, every phone a fader, the whole room mixes
+   THE MIX ROOM — one song in stems, every student a fader, the whole room mixes
    Stems come from a folder the teacher loads in this browser (IndexedDB clipDB, dec -4, one song per folder):
    commercial multitracks never go in the repo. A section of the song loops on the big speakers; the phones pull
    the faders (several people on one stem = their average); the reveal compares the room's balance with the
@@ -29,15 +29,15 @@ function mxMatch(levels,pans,withPan,held){const all=levels.map(l=>Math.max(-40,
   return {pct:Math.round(100*Math.max(0,Math.min(1,1-err/12))),rel:all.map((x,i)=>!held||held.has(i)?x-ref:null)};}
 
 game({
-  id:'mixroom',group:'ears',name:'The Mix Room',tag:'One song in stems, every phone a fader. Mix it together, then hear how close you got.',
-  how:['The original plays on the big speakers. Then the faders get scrambled.','Every phone becomes a fader for one part of the song. More students than parts? You share a part. Fewer? The other parts stay mixed for you.','Mix it back together as a room. The reveal shows how close your balance got to the original, and you can switch between the two.'],
+  id:'mixroom',group:'ears',name:'The Mix Room',tag:'One song in stems, every student a fader. Mix it together, then hear how close you got.',
+  how:['The original plays on the big speakers. Then the faders get scrambled.','Every student gets a fader for one part of the song. More students than parts? You share a part. Fewer? The other parts stay mixed for you.','Mix it back together as a room. The reveal shows how close your balance got to the original, and you can switch between the two.'],
   badges:['Live','No score','Stems'],kind:'free',
   icon:`<svg viewBox="0 0 64 64">${[0,1,2,3].map(i=>`<line x1="${12+i*13}" y1="8" x2="${12+i*13}" y2="56" stroke="var(--ink)" stroke-width="3"/><rect x="${6+i*13}" y="${[34,16,40,24][i]}" width="12" height="9" fill="var(${MX_COLS[i]})" stroke="var(--ink)" stroke-width="2.5"/>`).join('')}</svg>`,
   options:[
     {key:'at',label:'Section',choices:[[0.04,'Start','from the top'],[0.25,'¼ in','often the first verse'],[0.5,'Middle','often a chorus'],[0.72,'¾ in','late in the song']],def:0.25},
     {key:'len',label:'Loop',choices:[[30,'30','seconds'],[45,'45','seconds'],[60,'60','seconds']],def:45},
     {key:'mins',label:'Mixing time',type:'step',min:1,max:10,step:1,def:3,unit:'min'},
-    {key:'ctl',label:'Phones control',choices:[['level','Level','a fader each'],['both','Level + pan','a fader and a pan knob']],def:'level'},
+    {key:'ctl',label:'Students control',choices:[['level','Level','a fader each'],['both','Level + pan','a fader and a pan knob']],def:'level'},
   ],
   note:'Multitracks stay in this browser and are never uploaded. One folder with a subfolder per song, one audio file per part (MP3 loads fastest). Parts that sum to the original mix work best.',
   check(){return mxSong()?'':'Load your multitracks folder first';},

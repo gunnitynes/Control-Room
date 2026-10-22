@@ -24,7 +24,7 @@ const durChoices=[[5,'5','min'],[10,'10','min'],[20,'20','min'],[30,'30','min'],
    ===================================================================== */
 function slotGame(spec){
   const g=Object.assign({kind:'free',badges:['Generator','No score']},spec);
-  g.topInfo=()=>{const s=G.gs;return !s?g.tag:s.phase==='sprint'?'Sprint running':s.phase==='solo'?'Everyone spins on their phone':s.spins?`Spin ${s.spins}`:'Phones tap to spin';};
+  g.topInfo=()=>{const s=G.gs;return !s?g.tag:s.phase==='sprint'?'Sprint running':s.phase==='solo'?'Everyone spins on their phone':s.spins?`Spin ${s.spins}`:'Students tap to spin';};
   g.start=o=>{const reels=g.reels(o).map(r=>({...r,val:null,locked:false}));
     G.gs={o,phase:o.mode==='room'?'slots':'solo',reels,spinning:false,charge:0,spins:0,lastT:now(),ind:new Map()};};
   /* ---- "everyone spins": each student has their own reels, max 3 spins, one lock after each spin ---- */
@@ -67,7 +67,7 @@ function slotGame(spec){
           ${ttl?`<div class="sc2t">${esc(ttl.split(' · ')[0])}</div>`:''}<ol>${s.reels.map((r,k)=>`<li class="c${k} ${m.locked[k]?'lk':m.vals[k]?'roll':''}"><span>${esc(r.title)}</span><b>${esc(m.vals[k]||'—')}</b></li>`).join('')}</ol></div>`;};
       const sprint=s.phase==='sprint';
       st.innerHTML=`<div class="solo dots"><div class="solohead">${sprint?`<span class="lab">${esc(g.name)} · everyone has their own brief</span>${clockHTML('mid')}`:`<div><h2>${fin===ps.length&&ps.length?'Everyone’s brief':'Spin on your phones'}</h2><p class="fine">Tap to spin · keep one result after each spin · ${maxSpins()} spins each. Finished: <b>${fin}</b> of ${ps.length}</p></div>`}</div>
-        <div class="sowall ${fin===ps.length&&ps.length?'final':''}">${ps.map(card).join('')||'<p class="empty">Waiting for phones…</p>'}</div>
+        <div class="sowall ${fin===ps.length&&ps.length?'final':''}">${ps.map(card).join('')||'<p class="empty">Waiting for students…</p>'}</div>
         <div class="dfoot">${sprint?`<button class="ghost" id="bBack">← Back to the spins</button><button class="ghost" id="bPlus">+5 min</button>`:`<div class="sprintgo"><span class="lab">Sprint</span><div class="seg" id="segD">${durChoices.map(([mm,l])=>`<button data-m="${mm}" aria-pressed="${(s.o.mins||20)===mm}">${l}<small>min</small></button>`).join('')}</div></div>`}<span></span>
           ${sprint?'':`<button class="big go" id="bSprint">Start the sprint <small>SPACE</small></button>`}</div></div>`;
       if(sprint){$('#bBack').onclick=()=>{stopClock();s.phase='solo';render();syncAll();};$('#bPlus').onclick=()=>extendClock(300000);}
@@ -80,7 +80,7 @@ function slotGame(spec){
     st.innerHTML=`<div class="slots dots"><div class="reels">${s.reels.map((r,k)=>`<div class="reel c${k} ${r.val?'landed':''}"><div class="rhead"><b>${pad2(k+1)}</b><span>${esc(r.title)}</span></div><div class="rwin"><div class="rstrip"><div class="ritem">${esc(r.val||'?')}</div></div></div>
         <button class="ghost rlock" data-k="${k}" aria-pressed="${r.locked}">${r.locked?'Locked':'Lock'}</button></div>`).join('')}</div>
       ${g.title&&done?`<h2 class="mashname">${esc(g.title(s.reels))}</h2>`:''}
-      <div class="slotbar"><div class="lever"><span class="lab">Phones tap to spin</span><i class="chargebar"><i id="charge" style="width:${100*s.charge/need()}%"></i></i><span class="fine">${need()} taps spin the reels</span></div>
+      <div class="slotbar"><div class="lever"><span class="lab">Students tap to spin</span><i class="chargebar"><i id="charge" style="width:${100*s.charge/need()}%"></i></i><span class="fine">${need()} taps spin the reels</span></div>
         <button class="big" id="bSpin">Spin <small>SPACE</small></button>
         <div class="sprintgo"><span class="lab">Sprint</span><div class="seg" id="segD">${durChoices.map(([m,l])=>`<button data-m="${m}" aria-pressed="${(s.o.mins||20)===m}">${l}<small>min</small></button>`).join('')}</div><button class="big go" id="bSprint" ${done?'':'disabled'}>Start sprint</button></div></div></div>`;
     $$('.rlock',st).forEach(b=>b.onclick=()=>{const r=s.reels[+b.dataset.k];r.locked=!r.locked;b.setAttribute('aria-pressed',r.locked);b.textContent=r.locked?'Locked':'Lock';});
@@ -98,7 +98,7 @@ function slotGame(spec){
     if(st.ph==='sprint'){pClockStart(st.clock);root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}${st.title?(()=>{const [nm,...rest]=st.title.split(' · ');return `<div class="pmashbox"><span class="lab">Your hybrid</span><h2>${esc(nm)}</h2>${rest.length?`<p>${esc(rest.join(' · '))}</p>`:''}</div>`;})():''}${cards}<p class="fine">Make it. The clock is on the big screen too.</p></div>`;return;}
     root.innerHTML=`<div class="pcol2">${st.title?(()=>{const [nm,...rest]=st.title.split(' · ');return `<div class="pmashbox"><span class="lab">Your hybrid</span><h2>${esc(nm)}</h2>${rest.length?`<p>${esc(rest.join(' · '))}</p>`:''}</div>`;})():''}${cards}
       <button class="leverbtn" ${st.spinning?'disabled':''}><span>${st.spinning?'Spinning…':'TAP'}</span><i class="pcharge"><i style="width:${st.charge}%"></i></i></button>
-      <p class="fine">Everyone taps together — the more phones, the faster it spins.</p></div>`;
+      <p class="fine">Everyone taps together — the more students, the faster it spins.</p></div>`;
     const b=$('.leverbtn',root);b.onclick=()=>{papi.send({t:'pull'});papi.vibe(12);b.classList.remove('yank');void b.offsetWidth;b.classList.add('yank');};
   };
   g.pupdate=(root,st)=>{const c=$('.pcharge i',root);if(c)c.style.width=st.charge+'%';};
@@ -234,7 +234,7 @@ game({
       const ms=[...s.now.entries()];
       st.innerHTML=`<div class="cg cggen"><div class="cggenhead">${machine(false)}<div><span class="lab">The constraint machine · everyone rolls their own</span><h2>${ms.length} constraint${ms.length===1?'':'s'} in the room</h2><p class="fine">Students roll a new one, or just a new rule, from their phone.</p></div></div>
         <div class="cgwall">${ms.map(([id,m],j)=>`<div class="cgcard c${j%4}" style="--tilt:${((j*37)%7-3)*.6}deg"><div class="cgch"><b>${esc(P(id))}</b><span>${esc(m.label)} · ${esc(m.tempo)}</span></div>
-          <div class="cgasset">${cgRoll(m)}</div><p>${esc(m.task)}</p><span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>`).join('')||'<p class="fine">Waiting for phones…</p>'}</div>
+          <div class="cgasset">${cgRoll(m)}</div><p>${esc(m.task)}</p><span class="cgrule" style="--rc:var(${CG_RULE_COL[m.cat]||'--ink'})">${esc(m.cat)} · ${esc(m.rule)}</span></div>`).join('')||'<p class="fine">Waiting for students…</p>'}</div>
         <div class="dfoot"><span></span><button class="big go" id="bNext">New constraints for everyone <small>SPACE</small></button></div></div>`;
       $('#bNext').onclick=()=>this.next();return;}
     if(s.phase==='brief')body=`<div class="cgbrief">${machine(false)}<div><span class="lab">The constraint machine</span><h2>Missions, files, fast rounds</h2>
@@ -299,7 +299,7 @@ game(slotGame({
   id:'genres',group:'make',name:'Genre Cross-Pollinator',tag:'Roll two genres that should never meet — and make them meet.',
   how:['Everyone spins on their own phone: Genre A, Genre B and any extra reels.','After each spin, keep one result — three spins, then the machine names your hybrid.','The big screen shows everyone’s hybrid. Start the sprint and make it.'],
   icon:`<svg viewBox="0 0 64 64"><circle cx="24" cy="32" r="18" fill="var(--red)" stroke="var(--ink)" stroke-width="3" opacity=".9"/><circle cx="40" cy="32" r="18" fill="var(--blue)" stroke="var(--ink)" stroke-width="3" style="mix-blend-mode:multiply"/><path d="M32 18 Q40 32 32 46 Q24 32 32 18" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/></svg>`,
-  options:[{key:'mode',label:'Spinning',choices:[['solo','Everyone spins','3 spins each, keep one per spin'],['room','Whole room','one shared brief, phones tap together']],def:'solo'},{key:'extra',label:'Extra reels',choices:[[0,'None','just A × B'],[1,'+ Tempo'],[2,'+ Setting'],[3,'+ Everything','tempo, setting, ingredient']],def:2},{key:'mins',label:'Default sprint length',choices:durChoices,def:20}],
+  options:[{key:'mode',label:'Spinning',choices:[['solo','Everyone spins','3 spins each, keep one per spin'],['room','Whole room','one shared brief, students tap together']],def:'solo'},{key:'extra',label:'Extra reels',choices:[[0,'None','just A × B'],[1,'+ Tempo'],[2,'+ Setting'],[3,'+ Everything','tempo, setting, ingredient']],def:2},{key:'mins',label:'Default sprint length',choices:durChoices,def:20}],
   reels:o=>{const r=[{title:'Genre A',items:GENRES.a},{title:'Genre B',items:GENRES.b}];if(o.extra===1||o.extra===3)r.push({title:'Tempo',items:GENRES.tempo});if(o.extra>=2)r.push({title:'Setting',items:GENRES.setting});if(o.extra===3)r.push({title:'Secret ingredient',items:GENRES.ingredient});return r;},
   title:reels=>`${mash(reels[0].val,reels[1].val)} · ${reels[0].val} × ${reels[1].val}`,
 }));
@@ -329,7 +329,7 @@ game({
     {key:'stop',label:'Time at each stop',type:'step',min:1,max:30,step:1,def:6,unit:'min'},
     {key:'rounds',label:'Stops',type:'step',min:1,max:20,step:1,def:3,unit:n=>n===1?'stop':'stops',help:'How many times each track moves on before the listening party.'},
     {key:'pass',label:'Pass the track',choices:[['audio','As a recording','CADCAST sends it to the next computer'],['project','Recording + project','the next person also gets the project file (same DAW for everyone)'],['seats','Move seats','record for the party, then change seats']],def:'audio',help:'Recording and passing need each computer signed in through CADCAST (gunnitynes.github.io/CADCAST/go). Students who are not: they change seats.'},
-    {key:'deal',label:'Cards',choices:[['each','Everyone different','a card per phone'],['room','One for the room','the same card on the big screen']],def:'each'},
+    {key:'deal',label:'Cards',choices:[['each','Everyone different','a card per student'],['room','One for the room','the same card on the big screen']],def:'each'},
   ],
   note:`${RB_ALL.length} prompt cards in ${RB_KINDS.length} kinds (${RB_KINDS.join(', ')}). A card is not dealt again until every card has been used (counted in this browser). Edit them in data/content.js → ROUNDABOUT.`,
   topInfo(){const s=G.gs;return s?({brief:'Ready',sketch:'First sketch',rec:'Record your track',pass:'Pass it on!',card:`Stop ${s.round} · your card`,build:`Stop ${s.round} of ${s.o.rounds}`,done:'Listening party'})[s.phase]:this.tag;},
@@ -607,7 +607,7 @@ game({
   options:[{key:'gens',label:'Generations',choices:[[3,'3','make + 2 copies'],[4,'4'],[5,'5']],def:3},{key:'csecs',label:'Design time',choices:[[60,'1','min'],[90,'1.5','min'],[120,'2','min']],def:90},{key:'rsecs',label:'Recreate time',choices:[[120,'2','min'],[180,'3','min'],[240,'4','min']],def:180},AUTO_OPT,
     {key:'test',label:'Test mode',choices:[[0,'Off','real students only'],[1,'Bots','two bots join the chain']],def:0}],
   note:'Students listen on their own phones, so ask everyone to put headphones on before you start. Play loops until pressed again, and every knob turn is heard at once. Needs at least two students, or turn on Test mode: two bots join the chain so you can try it with one phone.',
-  check:v=>online().length>=2||(v&&v.test&&online().length>=1)?'':'At least two phones need to be in the room (or turn on Test mode)',
+  check:v=>online().length>=2||(v&&v.test&&online().length>=1)?'':'At least two students need to be in the room (or turn on Test mode)',
   topInfo(){const s=G.gs;return !s?this.tag:s.phase==='brief'?'Ready':s.phase==='create'?'Generation 1 · design':s.phase==='recreate'?`Generation ${s.r+1} of ${s.gens} · recreate`:s.phase==='reveal'?`Chain ${s.c+1} of ${s.N}`:'Final';},
   start(o){const bots=o.test?['Bot Moog','Bot Buchla']:[],botNames={};bots.forEach((n,i)=>botNames['bot:'+i]=n);
     const ids=shuffle([...online().map(p=>p.id),...Object.keys(botNames)]),N=ids.length;G.gs={o,opts:o,phase:'brief',ids,N,gens:Math.min(o.gens,N),r:0,c:0,chains:ids.map(()=>[]),subs:new Set(),botNames};},

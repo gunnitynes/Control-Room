@@ -92,7 +92,7 @@ const ROLE=QS.has('room')||QS.has('pair')||(matchMedia('(max-width:700px)').matc
 /* ---------- registry ---------- */
 const GROUPS=[
   {id:'brain',name:'Know your stuff',short:'Know',sub:'Fast answers on your phone, big points',col:'--blue'},
-  {id:'ears',name:'Train your ears',short:'Ears',sub:'The room listens, the phones answer',col:'--red'},
+  {id:'ears',name:'Train your ears',short:'Ears',sub:'The room listens, the students answer',col:'--red'},
   {id:'make',name:'Make something',sub:'Creative sprints, generators and party games',short:'Make',col:'--yel'},
 ];
 const GAMES=[];
@@ -404,7 +404,7 @@ function liveUpdate(){
 function topBar(){
   const g=G.game,inG=!atRest()&&G.view!=='vote'&&G.view!=='pick'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
-    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
+    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
   const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button><div id="hands">${handsHTML()}</div>
     ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}${G.view==='menu'?`<button class="ghost" id="bDrop" title="Supply Drop: deal your materials to every student computer">Supply drop</button>`:''}
@@ -512,7 +512,7 @@ function rMenu(st){
         <button class="ghost tlink" id="bCopyTeach" title="Your own link: opens Control Room set up as you (name${attOwn()?' and Google Sheet':''}) on any computer">⧉ Copy teacher link</button></div></div>
       <button class="ghost attcopy" id="bAttCopy" title="Copy the names of everyone who joined this room, with the time they joined">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
       ${attBoxHTML()}
-      <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
+      <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first student…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
     </aside>
@@ -547,7 +547,7 @@ function rSetup(st){
       <ol class="how">${(g.how||[]).map(h=>`<li><span>${h}</span></li>`).join('')}</ol></section>
     <section class="form">${(g.options||[]).filter(o=>!o.show||o.show(v)).map(optHTML).join('')}${g.setupExtra?g.setupExtra(v):''}
       <div class="frow"><button class="ghost" id="bBack">← Menu</button><button class="big go" id="bGo">${esc(g.startLabel||'Start')} <small>SPACE</small></button>
-      <span class="fine">${online().length?online().length+' online':'Nobody online yet — phones can join any time.'}</span></div>
+      <span class="fine">${online().length?online().length+' online':'Nobody online yet — students can join any time.'}</span></div>
       ${g.note?`<p class="fine">${g.note}</p>`:''}</section></div>`;
   const save=()=>{store.set('opt.'+g.id,v);rSetup(st);};
   $$('.seg',st).forEach(sg=>{const o=g.options.find(x=>x.key===sg.dataset.k);$$('button',sg).forEach(b=>b.onclick=()=>{v[o.key]=o.choices[+b.dataset.i][0];save();});});

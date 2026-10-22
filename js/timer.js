@@ -48,7 +48,7 @@ function tmrMenuClose(){const m=$('#tmrMenu');if(m)m.remove();document.removeEve
 function tmrBoop(){try{const ac=audio();const t=ac.currentTime+.05,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(520,t);o.frequency.exponentialRampToValueAtTime(330,t+.25);
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.03);g.gain.exponentialRampToValueAtTime(.0008,t+.5);o.connect(g).connect(AU.music||ac.destination);o.start(t);o.stop(t+.55);}catch(e){}}
 function tmrFire(){let o=$('#tmrDone');if(o)o.remove();o=el('div','tmrdone');o.id='tmrDone';
-  o.innerHTML=`<div class="tmrdcard"><span class="lab">Room timer · ${tmrFmt(TMR.T)}</span><h1>Time!</h1><p>Every phone just got the message.</p><button class="big go" id="tmrOk">OK <small>ESC</small></button></div>`;
+  o.innerHTML=`<div class="tmrdcard"><span class="lab">Room timer · ${tmrFmt(TMR.T)}</span><h1>Time!</h1><p>Every student just got the message.</p><button class="big go" id="tmrOk">OK <small>ESC</small></button></div>`;
   document.body.appendChild(o);const close=()=>{o.remove();TMR.done=false;TMR.T=0;TMR.end=0;TMR.paused=null;tmrSendAll();tmrPaint();};$('#tmrOk',o).onclick=close;o.onclick=e=>{if(e.target===o)close();};}
 addEventListener('keydown',e=>{if(ROLE!=='host')return;if(e.key==='Escape'){if($('#tmrDone')){e.stopPropagation();$('#tmrOk').click();}else tmrMenuClose();}},true);
 

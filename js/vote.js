@@ -26,7 +26,7 @@ function openVoteChooser(){let ov=$('#votechoose');if(ov)ov.remove();ov=el('div'
   ov.innerHTML=`<div class="sheetcard vchoose" role="dialog" aria-label="Room vote"><button class="guideX" id="vcX" aria-label="Close">✕</button>
     <span class="lab">Room vote</span><h2>What should<br><i>the room vote on?</i></h2>
     <div class="vcopts"><button class="vcopt" id="vcGames" style="--c:var(--red)"><span class="vcico">${shape(0,46,'var(--ink)','var(--red)')}</span><b>The next module</b><span>Every module is on the ballot. Most votes wins, then you set it up.</span></button>
-      <button class="vcopt" id="vcCustom" style="--c:var(--blue)"><span class="vcico">${shape(1,46,'var(--ink)','var(--blue)')}</span><b>Your own question</b><span>Type a question and as many answers as you like. The phones vote.</span></button></div></div>`;
+      <button class="vcopt" id="vcCustom" style="--c:var(--blue)"><span class="vcico">${shape(1,46,'var(--ink)','var(--blue)')}</span><b>Your own question</b><span>Type a question and as many answers as you like. The students vote.</span></button></div></div>`;
   ov.onclick=e=>{if(e.target===ov)close();};$('#vcX').onclick=close;
   $('#vcGames').onclick=()=>{close();voteGames();};$('#vcCustom').onclick=()=>{close();openCustomVote();};}
 /* the custom ballot editor: a question and its answers (the last one is remembered in this browser) */
