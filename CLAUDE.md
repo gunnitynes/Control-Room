@@ -104,7 +104,7 @@ Phones and the host keep old files otherwise.
 
 ## Architecture
 
-- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`), room code, check-in count, teacher name ("Not you?"), the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, Copy attendance, and **Activities** → the module menu (`G.view==='menu'`). The menu's top bar has **Attendance** back; the logo also goes home. `atRest()` = home or menu. Most teachers only use this screen.
+- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`), room code, check-in count, teacher name ("Not you?"), the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, New room, Copy attendance, and **Activities** → the module menu (`G.view==='menu'`). The side panel is on the left; the Teacher box is `.teachbox.tight` on both screens. The logo goes home (no Attendance button). The header shows Vote/Pick when `atRest()`, and **Supply drop** (`#bDrop`, straight to its setup) only on the menu. `atRest()` = home or menu. Most teachers only use this screen.
 - `ROLE` is `player` when the URL has `?room=CODE` (or on a narrow screen without `?host`), otherwise `host`.
 - PeerJS connects phones to the host; the host is the only source of truth (`G` on the host, `PL` on phones).
   - host → phone: `{t:'st', view, g, s:pstate}`, `{t:'names'}` (class list), `{t:'log'}` (notebook), `{t:'kick'}`, `{t:'taken'}`
@@ -163,7 +163,7 @@ Phones and the host keep old files otherwise.
   joined sends `{t:'pair', id, pc}`; `cadcastPair()` (host) writes `controlroom.cadcast.allow` and tells the computer
   `{t:'paired', name, desk}`; the phone gets `{t:'paired'}` and shows "Your computer is now NAME". One scan signs the
   student into both. Joining via the room QR still works on its own. The patch bay reads room + allow-list from
-  localStorage (same site, same Chrome). The header's **Mixer** button (`openMixer`) opens it as ../CADCAST/patch/ in a
+  localStorage (same site, same Chrome). The header's **CADCAST** button (`openMixer`, called Mixer before) opens it as ../CADCAST/patch/ in a
   named tab; it must be this same browser. The patch bay lists paired-but-silent students as "Paired · no sound yet".
 - **Copy attendance** (room panel, `copyAttendance`): everyone who joined this room (p.in = join time, saved with the room), sorted, tab-separated with a dated heading; for teachers without a sheet. New room warns to copy first.
 - **Teacher link** (Teacher box ▸ ⧉ Copy teacher link, `teacherLink()`): `?host#teacher=NAME&sheet=/exec URL`; `applyTeacherLink()` at host boot stores both and wipes the hash. Private (holds the sheet link). No login. Class list ▸ ⧉ Copy your sheet link and the sheet card copy the /exec link alone. Copy attendance sits right under the Teacher box.

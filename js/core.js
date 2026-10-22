@@ -407,12 +407,12 @@ function topBar(){
     :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
   const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button><div id="hands">${handsHTML()}</div>
-    ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
+    ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}${G.view==='menu'?`<button class="ghost" id="bDrop" title="Supply Drop: deal your materials to every student computer">Supply drop</button>`:''}
     ${tmrBtnHTML()}
-    <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">Mixer</button>
+    <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">CADCAST</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
     <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
-    ${G.view==='menu'?`<button class="ghost" id="bHome" title="The attendance screen: big join code and who is checked in">Attendance</button>`:G.view!=='home'?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
+    ${!atRest()?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
 }
 function render(){
   if(ROLE!=='host')return;
@@ -424,7 +424,7 @@ function render(){
   try{if(G.view==='home')rHome(st);else if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else if(G.view==='pick')rPick(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
-  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bHome'))$('#bHome').onclick=()=>{G.view='home';render();syncAll();};
+  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
   $('#bMix').onclick=openMixer;
   // the CONTROL ROOM wordmark is the home button
@@ -484,31 +484,32 @@ function attBoxBind(st){  if($('#selCls',st))$('#selCls',st).onchange=e=>{const 
    code, the class list and who has checked in; Activities is one click away. */
 function rHome(st){const ps=players(),inN=attUrl()&&ATT.cls?attCount():ps.length,on=online().length;
   st.innerHTML=`<div class="home">
-    <section class="hatt"><span class="lab">Attendance${ATT.cls?' · '+esc(ATT.cls):''}</span>
-      <div class="hqr" id="homeQR" aria-label="Scan to check in"></div>
-      <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b><small>${esc(joinURL(G.code||'').replace(/^https?:\/\//,'').replace(/\?room=.*$/,''))} · code ${G.code||''}</small></div>
-      <div class="hcount"><b>${inN}</b><span>${attUrl()&&ATT.cls?'checked in today':'in the room'}${on&&on!==inN?` · ${on} online`:''}</span></div></section>
     <aside class="hside">
-      <div class="teachbox${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">${teacherName()?'Not you?':'Set your name'}</button></div>
+      <div class="teachbox tight${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">${teacherName()?'Not you?':'Set your name'}</button></div>
         ${G.lobbyErr?`<p class="tbwarn">Another Control Room is already open as “${esc(teacherName())}”: add your last name.</p>`:''}</div>
       ${attBoxHTML()}
       <div class="hnames">${ps.length?ps.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<span class="hname c${p.sh}${p.att==='in'?' att':''}${p.conn&&p.conn.open?'':' off'}">${p.att==='in'?'✓ ':''}${esc(p.name)}</span>`).join(''):'<p class="fine">Names appear here as students check in.</p>'}</div>
+      <div class="frow hroom"><button class="ghost" id="bNew" title="A fresh room with a new code: everyone scans again">New room</button></div>
       <button class="ghost attcopy" id="bAttCopy">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
-      <button class="big go hact" id="bAct">Activities <small>games &amp; tools</small></button></aside></div>`;
+      <button class="big go hact" id="bAct">Activities <small>games &amp; tools</small></button></aside>
+    <section class="hatt"><span class="lab">Attendance${ATT.cls?' · '+esc(ATT.cls):''}</span>
+      <div class="hqr" id="homeQR" aria-label="Scan to check in"></div>
+      <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b><small>${esc(joinURL(G.code||'').replace(/^https?:\/\//,'').replace(/\?room=.*$/,''))} · code ${G.code||''}</small></div>
+      <div class="hcount"><b>${inN}</b><span>${attUrl()&&ATT.cls?'checked in today':'in the room'}${on&&on!==inN?` · ${on} online`:''}</span></div></section></div>`;
   const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-420,innerWidth*.36,620));   // leaves room for the code and the count under it
   if(G.code){if(G.homeQR&&G.homeQR.code===G.code&&G.homeQR.size===size)q.appendChild(G.homeQR.node);
     else{const n=document.createElement('div');drawQR(n,G.code,size);G.homeQR={code:G.code,size,node:n};q.appendChild(n);}}
-  $('#bAct',st).onclick=()=>{G.view='menu';render();syncAll();};$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
+  $('#bAct',st).onclick=()=>{G.view='menu';render();syncAll();};$('#bNew',st).onclick=newRoom;$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
   if(!teacherName())setTimeout(askTeacher,300);}
 
 function rMenu(st){
   const ps=players(),tot=rankBy('total');
   st.innerHTML=`<div class="menu">
     <aside class="roomp">
-      <div class="teachbox${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">Change</button></div>
+      <div class="teachbox tight${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">Change</button></div>
         ${G.lobbyErr?`<p class="tbwarn">Another Control Room is already open as “${esc(teacherName())}” (another tab, or a colleague with the same name). Student computers may find that room instead: add your last name.</p>`:''}
-        <span class="fine"><a href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST</a></span>
-        <button class="ghost tlink" id="bCopyTeach" title="Your own link: opens Control Room set up as you (name${attOwn()?' and Google Sheet':''}) on any computer">⧉ Copy teacher link</button></div>
+        <div class="tbfoot"><a class="fine" href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST page</a>
+        <button class="ghost tlink" id="bCopyTeach" title="Your own link: opens Control Room set up as you (name${attOwn()?' and Google Sheet':''}) on any computer">⧉ Copy teacher link</button></div></div>
       <button class="ghost attcopy" id="bAttCopy" title="Copy the names of everyone who joined this room, with the time they joined">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
       ${attBoxHTML()}
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
