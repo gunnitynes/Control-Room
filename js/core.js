@@ -36,7 +36,9 @@ const fmtS=s=>s<10?s.toFixed(1)+' s':Math.round(s)+' s';
 const fmtClock=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+pad2(s%60);};
 const now=()=>performance.now();
 let toastT=0;function toast(t){let e=$('.toast');if(!e){e=el('div','toast');document.body.appendChild(e);}e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2800);}
-function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.async=true;sc.onload=res;sc.onerror=()=>rej(new Error('Could not load '+src));document.head.appendChild(sc);});}
+// outside scripts are pinned AND checked: a changed file on the CDN is refused (checksums from cdnjs, verified 2026-10-22)
+const SRI={'peerjs/1.5.4/peerjs.min.js':'sha512-iFU+yF1keEaLDC9HEwPfLMSRaS0unBHE14GEgx6pQKJXjp5v0tvX8xpfp2lgJ62XEjbYp/M5C3CAmej/PWXMyA==','qrcodejs/1.0.0/qrcode.min.js':'sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=='};
+function loadScript(src){return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=src;sc.async=true;const k=Object.keys(SRI).find(x=>src.endsWith(x));if(k){sc.integrity=SRI[k];sc.crossOrigin='anonymous';}sc.onload=res;sc.onerror=()=>rej(new Error('Could not load '+src));document.head.appendChild(sc);});}
 /* relay passwords (TURN) from the owner's Cloudflare Worker (integrations/turn): devices still connect directly when the network
    allows it, and through Cloudflare's relay on port 443 when a school network blocks device-to-device traffic. Cached 20 h.
    For now EVERY connection goes through the relay (school networks block the direct route); ?direct in the address tries direct first. */
@@ -271,7 +273,8 @@ async function pcSendFile(p,meta,blob,onProg){const u8=new Uint8Array(await blob
   return true;}
 const PCF=new Map();
 function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadcast.allow',{})[pc],p=a&&G.players.get(a.pid);if(!p)return;
-  if(m.t==='file'){let f=PCF.get(m.fid);if(!f)PCF.set(m.fid,f={parts:[],got:0,n:m.n,meta:null});if(m.meta)f.meta=m.meta;
+  if(m.t==='file'){if(!(Number.isInteger(m.n)&&m.n>0&&m.n<=8000&&Number.isInteger(m.i)&&m.i>=0&&m.i<m.n&&typeof m.data==='string'&&m.data.length<70000))return;   // ≤ ~380 MB, sane chunks
+    let f=PCF.get(m.fid);if(!f){if(PCF.size>=24)return;PCF.set(m.fid,f={parts:[],got:0,n:m.n,meta:null});}if(m.meta)f.meta=m.meta;
     if(!f.parts[m.i]){f.parts[m.i]=UNB64(m.data);f.got++;}
     if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f.got/f.n,f.meta);
     if(f.got===f.n&&f.meta){PCF.delete(m.fid);const b=new Blob(f.parts,{type:f.meta.mime||''});if(G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,f.meta,b);}

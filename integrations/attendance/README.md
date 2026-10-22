@@ -27,7 +27,7 @@ POST text/plain JSON to the web app (no CORS preflight; Apps Script's redirect a
 
 Web app URL. Since 2026-10-18 it is NOT built into the site (`window.ATTENDANCE.url` is `''`): the owner connects it on
 the main menu like every other teacher (Class list ▸ Connect your own Google Sheet), so it lives only in that browser:
-`https://script.google.com/macros/s/AKfycbyf7HfaXossjes5l4Fz569eXIYkwx5NmLrOsX444GUlIUHNfqI5RWcsDar_WLf1Jhof/exec`
+(kept private: it is the owner's own sheet link. Never put a real /exec link in this public repo.)
 
 Test from any terminal:
 

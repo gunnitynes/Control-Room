@@ -200,6 +200,16 @@ turns:…:443 (TLS), which passes almost any firewall. CADCAST audio drops to 12
 (3 tries, 8 s each), connections fall back to trying anything.
 Cloudflare TURN free tier: 1,000 GB/month.
 
+## Security notes (checked 2026-10-22)
+
+- Never commit a real Apps Script /exec link, TURN token or other secret: the repo is public. (The owner's sheet link was in
+  integrations/attendance/README.md until 2026-10-22 and is still in git history: the owner should redeploy the script to get a new link.)
+- Everything a student types is shown with `esc()` or `textContent`; keep it that way in new code.
+- Files from computers (core `pcData`) and to computers (CADCAST/go `gotChunk`) are capped: 48 KB chunks, ≤ 8000 chunks, few at once.
+- CADCAST/go accepts teacher messages only from `controlroom-v1-<room>` (the room it paired in, or the teacher's current room from the lobby).
+- Outside scripts are pinned and SRI-checked (`SRI` in core.js, `integrity` in CADCAST); a new version needs a new hash from cdnjs.
+- The TURN Worker answers only gunnitynes.github.io / localhost Origins.
+
 ## Testing
 
 - Preview: `.claude/launch.json` → `controlroom` (python http.server on port 8768, from the repo root).
