@@ -104,6 +104,7 @@ Phones and the host keep old files otherwise.
 
 ## Architecture
 
+- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`), room code, check-in count, teacher name ("Not you?"), the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, Copy attendance, and **Activities** → the module menu (`G.view==='menu'`). The menu's top bar has **Attendance** back; the logo also goes home. `atRest()` = home or menu. Most teachers only use this screen.
 - `ROLE` is `player` when the URL has `?room=CODE` (or on a narrow screen without `?host`), otherwise `host`.
 - PeerJS connects phones to the host; the host is the only source of truth (`G` on the host, `PL` on phones).
   - host → phone: `{t:'st', view, g, s:pstate}`, `{t:'names'}` (class list), `{t:'log'}` (notebook), `{t:'kick'}`, `{t:'taken'}`

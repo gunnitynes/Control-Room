@@ -1836,3 +1836,20 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
 @keyframes tpbeam{from{transform:translateX(-60%)}to{transform:translateX(60%)}}
 .tpbeam.back{background:var(--paper)}.tpbeam.back i{display:none}
 @media(max-width:900px){.fkslots{grid-template-columns:1fr 1fr}.botop{grid-template-columns:1fr}}
+
+/* ---------- the home screen: attendance first */
+.home{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);height:100%;min-height:0}
+.hatt{display:grid;justify-items:center;align-content:center;gap:14px;padding:20px;overflow:auto;text-align:center;min-height:0}
+.hatt>.lab{font-size:14px}
+.hqr{background:#fff;padding:18px;border:6px solid var(--ink);box-shadow:14px 14px 0 var(--ink)}
+.hqr canvas,.hqr img{display:block;image-rendering:pixelated}
+.hcode{display:grid;justify-items:center;gap:2px}.hcode span{font:900 clamp(22px,2.4vw,34px)/1 var(--disp);text-transform:uppercase;font-stretch:70%}
+.hcode b{font:900 clamp(56px,7vw,110px)/.9 var(--disp);font-stretch:62%;letter-spacing:.06em;color:var(--red)}
+.hcode small{font:700 12px var(--mono);color:var(--ink2)}
+.hcount{display:flex;align-items:baseline;gap:10px}.hcount b{font:900 clamp(40px,4vw,64px)/.9 var(--disp);font-variant-numeric:tabular-nums}.hcount span{font:700 13px var(--mono);text-transform:uppercase}
+.hside{display:flex;flex-direction:column;gap:12px;padding:18px;border-left:3px solid var(--ink);min-height:0;overflow:auto}
+.hnames{flex:1;min-height:80px;overflow:auto;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.hname{font:800 15px var(--disp);padding:4px 10px;border:3px solid var(--ink);background:var(--paper)}.hname.att{background:color-mix(in srgb,var(--green) 25%,var(--paper))}.hname.off{opacity:.45}
+.hside .attcopy{justify-self:stretch;display:block;text-align:center;background:var(--yel)}
+.hact{font-size:24px;padding:18px;display:grid;gap:2px}.hact small{font-size:11px}
+@media(max-width:900px){.home{grid-template-columns:1fr;overflow:auto}.hside{border-left:0;border-top:3px solid var(--ink)}}

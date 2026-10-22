@@ -108,7 +108,8 @@ const numOf=g=>pad2(ordered().indexOf(g)+1);
 /* =====================================================================
    HOST
    ===================================================================== */
-const G={lobby:new Set(),splash:!QS.has('nosplash'),code:'',peer:null,status:'',players:new Map(),banned:new Set(),view:'menu',game:null,gs:null,timers:[]};
+const atRest=()=>G.view==='menu'||G.view==='home';   // the two screens between activities
+const G={lobby:new Set(),splash:!QS.has('nosplash'),code:'',peer:null,status:'',players:new Map(),banned:new Set(),view:'home',game:null,gs:null,timers:[]};
 function later(fn,ms){const t=setTimeout(fn,ms);G.timers.push(t);return t;}
 function clearLater(){G.timers.forEach(clearTimeout);G.timers=[];}
 const players=()=>[...G.players.values()];
@@ -165,10 +166,10 @@ function attCall(fn,args,url=attUrl()){if(!url)return Promise.reject(new Error('
     .then(r=>r.text()).then(t=>{let j;try{j=JSON.parse(t);}catch(e){throw new Error('The attendance sheet did not answer (is the new version deployed?)');}if(!j.ok)throw new Error(j.error||'Sheet error');return j;});}
 function attLoad(){if(!attUrl())return;
   attCall('classes').then(j=>{ATT.classes=j.classes||[];ATT.err='';if(ATT.cls&&!ATT.classes.includes(ATT.cls))ATT.cls='';return attRoster();})
-    .catch(e=>{ATT.classes=null;ATT.err=e.message;}).finally(()=>{if(G.view==='menu'&&!G.splash)render();});}
+    .catch(e=>{ATT.classes=null;ATT.err=e.message;}).finally(()=>{if(atRest()&&!G.splash)render();});}
 function attRoster(){const c=ATT.cls;if(!c){ATT.names=[];lobbyNames();return Promise.resolve();}
-  return attCall('roster',{className:c}).then(j=>{if(ATT.cls!==c)return;ATT.names=(j.names||[]).map(n=>String(n).trim()).filter(Boolean);ATT.err='';lobbyNames();if(G.view==='menu')render();})
-    .catch(e=>{ATT.err=e.message;if(G.view==='menu')render();});}
+  return attCall('roster',{className:c}).then(j=>{if(ATT.cls!==c)return;ATT.names=(j.names||[]).map(n=>String(n).trim()).filter(Boolean);ATT.err='';lobbyNames();if(atRest())render();})
+    .catch(e=>{ATT.err=e.message;if(atRest())render();});}
 function attUse(url){if(url)store.set('att.url',url);else store.del('att.url');ATT.classes=null;ATT.cls='';ATT.names=[];ATT.err='';store.set('cls','');lobbyNames();render();attLoad();}
 /* another teacher connects their own sheet: three steps and a paste box, checked before it is saved */
 function openSheetSetup(){let ov=$('#sheetov');if(!ov){ov=el('div','sheetov');ov.id='sheetov';document.body.appendChild(ov);}
@@ -228,8 +229,8 @@ const attMatch=n=>{const k=String(n||'').trim().toLowerCase();return ATT.names.f
 const attCount=()=>Object.keys(ATT_DONE).filter(k=>k.startsWith(attDay()+'|'+ATT.cls+'|')).length;
 function attCheckIn(p){if(!ATT.cls||!attMatch(p.name))return;const k=attDay()+'|'+ATT.cls+'|'+p.name;if(ATT_DONE[k]){p.att='in';return;}
   if(p.att==='…')return;p.att='…';let tries=0;
-  const go=()=>attCall('checkIn',{className:ATT.cls,name:p.name}).then(j=>{ATT_DONE[k]=j.result;store.set('attDone',ATT_DONE);p.att='in';if(G.view==='menu')render();})
-    .catch(e=>{if(++tries<4)setTimeout(go,3000*tries);else{p.att='fail';console.warn('attendance',p.name,e.message);if(G.view==='menu')render();}});
+  const go=()=>attCall('checkIn',{className:ATT.cls,name:p.name}).then(j=>{ATT_DONE[k]=j.result;store.set('attDone',ATT_DONE);p.att='in';if(atRest())render();})
+    .catch(e=>{if(++tries<4)setTimeout(go,3000*tries);else{p.att='fail';console.warn('attendance',p.name,e.message);if(atRest())render();}});
   go();}
 // phones that are connected but haven't picked a name yet
 function namesMsg(){return {t:'names',cls:ATT.cls,names:ATT.cls?ATT.names.map(n=>({n,here:players().some(p=>p.name===n&&p.conn&&p.conn.open)})):[]};}
@@ -322,9 +323,9 @@ function askTeacher(){if($('#teachov'))return;const ov=el('div','sheetov');ov.id
 function openMixer(){const w=window.open(new URL('../CADCAST/patch/',location.href).href,'cadcast-patch');if(w)try{w.focus();}catch(e){}else toast('Allow pop-ups for this page to open the mixer');}
 function startLobby(){const id=lobbyId();if(!id||!window.Peer||(G.lobbyPeer&&!G.lobbyPeer.destroyed))return;
   const lp=new Peer(id,peerCfg());G.lobbyPeer=lp;
-  lp.on('open',()=>{if(G.lobbyErr){G.lobbyErr=false;if(G.view==='menu')render();}});
+  lp.on('open',()=>{if(G.lobbyErr){G.lobbyErr=false;if(atRest())render();}});
   lp.on('connection',c=>{c.on('data',m=>{if(m&&m.t==='room?')try{c.send({t:'room',code:G.code});}catch(e){}});c.on('error',()=>{});});
-  lp.on('error',e=>{if(e.type==='unavailable-id'){if(!G.lobbyErr){G.lobbyErr=true;if(G.view==='menu')render();}}if(e.type==='unavailable-id')setTimeout(()=>{if(G.lobbyPeer===lp){lp.destroy();G.lobbyPeer=null;startLobby();}},20000);});   // another host tab holds it
+  lp.on('error',e=>{if(e.type==='unavailable-id'){if(!G.lobbyErr){G.lobbyErr=true;if(atRest())render();}}if(e.type==='unavailable-id')setTimeout(()=>{if(G.lobbyPeer===lp){lp.destroy();G.lobbyPeer=null;startLobby();}},20000);});   // another host tab holds it
   lp.on('disconnected',()=>{setTimeout(()=>{if(!lp.destroyed)try{lp.reconnect();}catch(e){}},1500);});}
 async function lobbyRoom(){const id=lobbyId();if(!id)return null;try{await needPeer();}catch(e){return null;}
   return new Promise(res=>{const p=new Peer(peerCfg());let done=false;const fin=v=>{if(done)return;done=true;res(v);setTimeout(()=>{try{p.destroy();}catch(e){}},500);};
@@ -367,7 +368,7 @@ function hostData(conn,m){
   if(m.t==='act'){const p=players().find(x=>x.conn===conn);if(!p||G.view!=='play'||!G.game||m.g!==G.game.id)return;G.game.act(p,m.d||{});}
 }
 function stateFor(p){
-  const rk=rankBy('total').map,g=G.game&&G.view!=='menu'?G.game:null;
+  const rk=rankBy('total').map,g=G.game&&!atRest()?G.game:null;
   const m={t:'st',name:p.name,total:p.total||0,rank:rk.get(p.id)||0,of:G.players.size,view:G.view==='play'?'play':G.view==='vote'&&V?'vote':G.view==='pick'&&PK?'pick':'menu',g:g&&G.view!=='vote'&&G.view!=='pick'?g.id:null,gname:g?g.name:''};
   if(G.view==='vote'&&V)m.s=voteState(p);
   else if(G.view==='pick'&&PK)m.s=pickState(p);
@@ -401,17 +402,17 @@ function liveUpdate(){
 
 /* ---------- views ---------- */
 function topBar(){
-  const g=G.game,inG=G.view!=='menu'&&G.view!=='vote'&&G.view!=='pick'&&g;
+  const g=G.game,inG=!atRest()&&G.view!=='vote'&&G.view!=='pick'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
     :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the phones decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
-  const room=G.code?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${G.view!=='menu'?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
+  const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button><div id="hands">${handsHTML()}</div>
     ${G.view==='menu'?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
     ${tmrBtnHTML()}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">Mixer</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
     <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
-    ${G.view!=='menu'?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
+    ${G.view==='menu'?`<button class="ghost" id="bHome" title="The attendance screen: big join code and who is checked in">Attendance</button>`:G.view!=='home'?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
 }
 function render(){
   if(ROLE!=='host')return;
@@ -420,15 +421,15 @@ function render(){
   if(G.splash){rSplash(app);return;}
   app.innerHTML=topBar()+`<main class="stage" id="stage"></main>`;
   const st=$('#stage');
-  try{if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else if(G.view==='pick')rPick(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
+  try{if(G.view==='home')rHome(st);else if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else if(G.view==='pick')rPick(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
-  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();
+  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bHome'))$('#bHome').onclick=()=>{G.view='home';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
   $('#bMix').onclick=openMixer;
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
-  home.onclick=()=>{if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote'||G.view==='pick')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
+  home.onclick=()=>{if(G.view==='menu'){G.view='home';render();syncAll();}else if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote'||G.view==='pick')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
   const mq=$('#miniQR');if(mq){drawQR(mq,G.code,160);mq.onclick=()=>showBigQR(G.code);}
   const sv=$('#bSaver');if(sv)sv.onclick=openSaver;
 }
@@ -442,7 +443,7 @@ function rSplash(app){
 
 `;
   const c=$('#poster');POSTER={c,ctx:c.getContext('2d')};posterSize();
-  const enter=()=>{if(!G.splash)return;G.splash=false;POSTER=null;removeEventListener('keydown',key);try{audio();}catch(e){}sfx.open();render();};
+  const enter=()=>{if(!G.splash)return;G.splash=false;G.view='home';POSTER=null;removeEventListener('keydown',key);try{audio();}catch(e){}sfx.open();render();};
   // only while the splash is up, and never inside a text field (a splash drawn twice must not leave a Space-eating listener behind)
   const key=e=>{if(!G.splash){removeEventListener('keydown',key);return;}if(e.target.closest&&e.target.closest('input,textarea,select'))return;if(e.key===' '||e.key==='Enter'){e.preventDefault();enter();}};
   app.onclick=enter;addEventListener('keydown',key);
@@ -469,6 +470,36 @@ function posterDraw(now){
 }
 function setTopInfo(){const t=$('#tinfo');if(t&&G.game&&G.game.topInfo)t.textContent=G.game.topInfo();}
 
+function attBoxHTML(){return `<div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__copy">⧉ Copy your sheet link</option><option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
+        <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>`;}
+function attBoxBind(st){  if($('#selCls',st))$('#selCls',st).onchange=e=>{const v=e.target.value;
+    if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}
+    if(v==='__copy'){e.target.value=ATT.cls;copyText(store.get('att.url',''),'Sheet link copied. Keep it private: paste it only into Control Room.');return;}
+    if(v==='__off'){e.target.value=ATT.cls;if(confirm('Disconnect your Google Sheet in this browser? Students will type their names instead.'))attUse('');return;}
+    if(v==='__def'){e.target.value=ATT.cls;if(confirm('Stop using your own sheet in this browser and go back to the built-in class list?'))attUse('');return;}
+    attSetClass(v);};}
+
+/* THE HOME SCREEN: attendance first (most teachers only take attendance). A big, clear join QR in the middle, the room
+   code, the class list and who has checked in; Activities is one click away. */
+function rHome(st){const ps=players(),inN=attUrl()&&ATT.cls?attCount():ps.length,on=online().length;
+  st.innerHTML=`<div class="home">
+    <section class="hatt"><span class="lab">Attendance${ATT.cls?' · '+esc(ATT.cls):''}</span>
+      <div class="hqr" id="homeQR" aria-label="Scan to check in"></div>
+      <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b><small>${esc(joinURL(G.code||'').replace(/^https?:\/\//,'').replace(/\?room=.*$/,''))} · code ${G.code||''}</small></div>
+      <div class="hcount"><b>${inN}</b><span>${attUrl()&&ATT.cls?'checked in today':'in the room'}${on&&on!==inN?` · ${on} online`:''}</span></div></section>
+    <aside class="hside">
+      <div class="teachbox${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">${teacherName()?'Not you?':'Set your name'}</button></div>
+        ${G.lobbyErr?`<p class="tbwarn">Another Control Room is already open as “${esc(teacherName())}”: add your last name.</p>`:''}</div>
+      ${attBoxHTML()}
+      <div class="hnames">${ps.length?ps.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<span class="hname c${p.sh}${p.att==='in'?' att':''}${p.conn&&p.conn.open?'':' off'}">${p.att==='in'?'✓ ':''}${esc(p.name)}</span>`).join(''):'<p class="fine">Names appear here as students check in.</p>'}</div>
+      <button class="ghost attcopy" id="bAttCopy">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
+      <button class="big go hact" id="bAct">Activities <small>games &amp; tools</small></button></aside></div>`;
+  const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-420,innerWidth*.36,620));   // leaves room for the code and the count under it
+  if(G.code){if(G.homeQR&&G.homeQR.code===G.code&&G.homeQR.size===size)q.appendChild(G.homeQR.node);
+    else{const n=document.createElement('div');drawQR(n,G.code,size);G.homeQR={code:G.code,size,node:n};q.appendChild(n);}}
+  $('#bAct',st).onclick=()=>{G.view='menu';render();syncAll();};$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
+  if(!teacherName())setTimeout(askTeacher,300);}
+
 function rMenu(st){
   const ps=players(),tot=rankBy('total');
   st.innerHTML=`<div class="menu">
@@ -478,8 +509,7 @@ function rMenu(st){
         <span class="fine"><a href="${esc(goURL())}" target="_blank" rel="noopener" title="The page for the student computers">CADCAST</a></span>
         <button class="ghost tlink" id="bCopyTeach" title="Your own link: opens Control Room set up as you (name${attOwn()?' and Google Sheet':''}) on any computer">⧉ Copy teacher link</button></div>
       <button class="ghost attcopy" id="bAttCopy" title="Copy the names of everyone who joined this room, with the time they joined">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
-      <div class="attbox"><label><span class="lab">Class list</span><select id="selCls"><option value="">No list (students type names)</option>${attUrl()?(ATT.classes||(ATT.cls?[ATT.cls]:[])).map(c=>`<option ${c===ATT.cls?'selected':''}>${esc(c)}</option>`).join(''):''}<option disabled>──────────</option><option value="__own">${attOwn()?'⚙ Your Google Sheet: change link…':'＋ Connect your own Google Sheet…'}</option>${attOwn()?'<option value="__copy">⧉ Copy your sheet link</option><option value="__off">✕ Disconnect this sheet</option>':''}${attOwn()&&(window.ATTENDANCE||{}).url?'<option value="__def">↩ Back to the built-in list</option>':''}</select></label>
-        <span class="fine">${!attUrl()?'Connect a Google Sheet to show your class on the phones':ATT.err?esc(ATT.err):!ATT.classes?'Loading classes…':ATT.cls?`${ATT.names.length} names on phones · <b>${attCount()}</b> checked in today`:'Pick a class: phones show its names and take attendance'}</span></div>
+      ${attBoxHTML()}
       <div class="mchips">${ps.length?ps.map(p=>`<button class="mchip c${p.sh}${p.conn&&p.conn.open?'':' off'}${p.att==='in'?' att':p.att==='fail'?' attx':''}${p.hand?' hand':''}" data-id="${esc(p.id)}" title="${p.att==='in'?'Checked in on the attendance sheet · ':p.att==='fail'?'Attendance not recorded · ':''}Click to remove">${shape(p.sh,14)}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</button>`).join(''):`<p class="empty">Waiting for the first phone…</p>`}</div>
       ${tot.list.some(p=>p.total>0)?`<div class="standings"><span class="lab">Room standings</span>${tot.list.slice(0,8).map(p=>`<div class="srow"><b>${tot.map.get(p.id)}</b><span>${esc(p.name)}</span><em>${p.total}</em></div>`).join('')}</div>`:''}
       <div class="frow"><button class="ghost" id="bReset">Reset points</button><button class="ghost" id="bNew">New room</button></div>
@@ -491,12 +521,7 @@ function rMenu(st){
   $$('.gt',st).forEach(b=>b.onclick=()=>{G.game=gameById(b.dataset.g);G.view='setup';render();syncAll();});
   $('#bReset').onclick=resetPoints;$('#bAttCopy').onclick=copyAttendance;$('#bNew').onclick=newRoom;
   $('#bTeach').onclick=askTeacher;$('#bCopyTeach').onclick=()=>copyText(teacherLink(),'Teacher link copied. Keep it private: it opens Control Room as you'+(attOwn()?', with your sheet':''));if(!teacherName())setTimeout(askTeacher,300);
-  if($('#selCls'))$('#selCls').onchange=e=>{const v=e.target.value;
-    if(v==='__own'){e.target.value=ATT.cls;openSheetSetup();return;}
-    if(v==='__copy'){e.target.value=ATT.cls;copyText(store.get('att.url',''),'Sheet link copied. Keep it private: paste it only into Control Room.');return;}
-    if(v==='__off'){e.target.value=ATT.cls;if(confirm('Disconnect your Google Sheet in this browser? Students will type their names instead.'))attUse('');return;}
-    if(v==='__def'){e.target.value=ATT.cls;if(confirm('Stop using your own sheet in this browser and go back to the built-in class list?'))attUse('');return;}
-    attSetClass(v);};
+  attBoxBind(st);
 }
 
 /* setup: the game's poster on the left, its options on the right */
