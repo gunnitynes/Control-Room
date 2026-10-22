@@ -1859,13 +1859,14 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
 .spdate h2 i{font-style:normal;color:var(--red)}
 .spdate .kick{display:flex;gap:8px;align-items:center;font:700 11px var(--mono);text-transform:uppercase}.spdate .kick::before{content:"";width:10px;height:10px;background:var(--red)}
 @media(max-width:700px){.spdate{display:none}}
-/* home: the panel on the left; a tight teacher box (home and Activities) */
-.home{grid-template-columns:minmax(260px,330px) minmax(0,1fr)}
-.home .hside{border-left:0;border-right:3px solid var(--ink)}
+/* the Teacher panel sits on the right on both screens (home and Activities); a tight teacher box */
+.home{grid-template-columns:minmax(0,1fr) minmax(260px,330px)}
+.home .hside{order:2}
+@media(min-width:1101px){.menu{grid-template-columns:minmax(0,1fr) clamp(250px,21vw,330px)}.menu .roomp{order:2;border-right:0;border-left:3px solid var(--ink)}}
 .teachbox.tight{gap:2px;padding:6px 10px;box-shadow:3px 3px 0 var(--ink)}
 .teachbox.tight .tbrow{gap:10px}.teachbox.tight .tbrow b{font-size:20px;line-height:1.05}
 .teachbox.tight .tbrow .ghost{padding:5px 8px;font-size:10px}
 .teachbox .tbfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}.teachbox .tbfoot a{color:inherit}
 .teachbox .tbfoot .tlink{margin:0;padding:5px 8px;font-size:10px}
 .home .hroom .ghost{flex:1}
-@media(max-width:900px){.home .hside{border-right:0;border-bottom:3px solid var(--ink)}}
+@media(max-width:900px){.home .hside{order:0;border-left:0;border-top:0;border-bottom:3px solid var(--ink)}}
