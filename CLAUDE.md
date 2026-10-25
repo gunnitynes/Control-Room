@@ -212,7 +212,8 @@ Phones and the host keep old files otherwise.
   (`pcFor` skips it, the patch bay ignores it). Such a page reaches us itself with `{t:'pc-hello', pc}` (accepted only from
   `cadcast-pc-<pc>` that is in the allow list; the connection then feeds `pcData`).
 - **Selfies** (js/selfie.js, to learn names; optional, never shown in the room): on join the host sends `{t:'selfie-has', has}`; a phone
-  without one offers it ONCE (`selfieOffer`, `selfie.offered` in its store) and keeps a small `#pSelfie` link on the idle screen to redo it.
+  without one offers it ONCE (`selfieOffer`, `selfie.offered` in its store); taking a new one is the button in the notebook header (`#nbSelfie`,
+  where the Guide button was). Wording: "your teachers" (plural).
   `sfCrop`: a square stage with a face guide, drag + slider/pinch zoom → a 240 px JPEG data URL sent in ≤ 11,000-char pieces `{t:'selfie',i,n,d}`
   (the 16 KB json limit); the host checks it, keeps it in clipDB (dec -8, id `sf:<name key>`, by NAME so it lasts across lessons) and answers
   `{t:'selfie-ok'}`. ⋯ ▸ **Faces** (`openFaces`): students in the room first, Quiz me (names hidden until clicked), delete one / all.

@@ -1,6 +1,6 @@
 /* ====================================================================
    SELFIES — so the teacher can learn names. Optional and quiet: a phone offers it once (the first time it joins after
-   this feature arrived) and keeps a small "your selfie" button on the idle screen to redo it. The student frames their
+   this feature arrived); the notebook's header has the button to take a new one. The student frames their
    face in a square face box (drag to move, slider or pinch to zoom); the phone sends a 240 px JPEG in pieces (PeerJS
    json messages must stay under 16 KB). The teacher's computer keeps them in this browser (clipDB, dec -8), never shows
    them in the room, and opens them only from ⋯ ▸ Faces.
@@ -45,13 +45,13 @@ function facesDraw(){const ov=$('#faces');if(!ov)return;const here=new Set(onlin
 /* ---------- phone ---------- */
 // the gentle first offer, once per phone (the idle screen also keeps a small "Your selfie" button)
 function selfieOffer(){if(store.get('selfie.offered',false)||PL.selfieHas!==false||$('#sfOffer'))return;store.set('selfie.offered',true);
-  const d=el('div','sfoffer');d.id='sfOffer';d.innerHTML=`<div><b>Help your teacher learn your name</b><span>Add a selfie? Only your teacher sees it, on their computer.</span></div><button class="ghost" id="sfYes">Add one</button><button class="sfno" id="sfNo" aria-label="Not now">Not now</button>`;
+  const d=el('div','sfoffer');d.id='sfOffer';d.innerHTML=`<div><b>Help your teachers learn your name</b><span>Add a selfie? Only your teachers see it, on their computer. You can change it later in your notebook.</span></div><button class="ghost" id="sfYes">Add one</button><button class="sfno" id="sfNo" aria-label="Not now">Not now</button>`;
   document.body.appendChild(d);$('#sfYes',d).onclick=()=>{d.remove();selfieEditor();};$('#sfNo',d).onclick=()=>d.remove();}
 // take or pick a photo, then frame the face in the square box
 function selfieEditor(){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('capture','user');
   inp.onchange=()=>{const f=inp.files[0];if(!f)return;const img=new Image();img.onload=()=>sfCrop(img);img.onerror=()=>toastP('That photo couldn’t be opened.');img.src=URL.createObjectURL(f);};inp.click();}
 function toastP(t){let n=$('#sfToast');if(!n){n=el('div','sftoast');n.id='sfToast';document.body.appendChild(n);}n.textContent=t;n.classList.add('on');clearTimeout(toastP.t);toastP.t=setTimeout(()=>n.classList.remove('on'),3200);}
-function sfCrop(img){const ov=el('div','sfov');ov.innerHTML=`<div class="sfcard"><span class="lab">Your selfie · only your teacher sees it</span><h2>Fit your face in the box</h2>
+function sfCrop(img){const ov=el('div','sfov');ov.innerHTML=`<div class="sfcard"><span class="lab">Your selfie · only your teachers see it</span><h2>Fit your face in the box</h2>
     <div class="sfstage" id="sfStage"><canvas id="sfCv"></canvas><i class="sfbox"></i></div>
     <label class="sfzoom">Zoom<input type="range" id="sfZ" min="100" max="400" value="100"></label>
     <p class="fine">Drag to move. Pinch or slide to zoom.</p>
@@ -81,4 +81,4 @@ function sfCrop(img){const ov=el('div','sfov');ov.innerHTML=`<div class="sfcard"
     const n=Math.ceil(url.length/SF_PART),send=m=>{if(PL.conn&&PL.conn.open)try{PL.conn.send(m);return true;}catch(e){}return false;};
     let ok=true;for(let i=0;i<n;i++)ok=send({t:'selfie',i,n,d:url.slice(i*SF_PART,(i+1)*SF_PART)})&&ok;
     close();toastP(ok?'Sending your selfie…':'Not connected to the room: try again in a moment.');};}
-function selfieOk(){PL.selfieHas=true;store.set('selfie.offered',true);toastP('✓ Sent. Only your teacher sees it.');if(typeof pRender==='function')pRender();}
+function selfieOk(){PL.selfieHas=true;store.set('selfie.offered',true);toastP('✓ Sent. Only your teachers see it.');if(typeof pRender==='function')pRender();}
