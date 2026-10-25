@@ -1998,3 +1998,47 @@ body.annon .tdate{opacity:0;transform:scale(.9)}
 /* home: Activities under the QR, centred on it */
 .hatt .hact{justify-self:center;min-width:min(440px,34vw);font-size:26px;padding:14px 40px;display:grid;justify-items:center;gap:2px;margin-top:4px}
 .hatt .hact small{font-size:11px}
+/* Supply Drop wall: wider cards (a class is ≤ 14), the name may wrap, the status sits under it, nothing leaves the card */
+.drwall{grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
+.drcard{min-width:0}
+.drwall{grid-auto-rows:max-content}
+.drwho{display:grid;gap:4px;justify-content:stretch}
+.drwho b{white-space:normal;overflow-wrap:anywhere;font-size:22px;line-height:1.02}
+.drwho span{white-space:normal}
+.dritem{min-width:0}
+/* The Class Album: the tracklist (one row per song) */
+.altracks{list-style:none;counter-reset:tr;padding:0;margin:14px 0 0;display:grid;gap:8px}
+.altracks li{counter-increment:tr;display:grid;grid-template-columns:38px minmax(0,1fr);gap:3px 10px;align-items:center;padding:8px 10px;border:3px solid var(--ink);background:var(--paper)}
+.altracks li::before{content:counter(tr,decimal-leading-zero);font:900 24px var(--disp);grid-row:1/span 3;align-self:start}
+.altracks li b{font:900 22px/1 var(--disp);text-transform:uppercase;font-stretch:75%;overflow-wrap:anywhere}
+.altracks li span{font:700 10px var(--mono);text-transform:uppercase}
+.altb{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.altb .ghost{text-decoration:none}
+#alAnother{margin-left:auto;margin-right:12px}
+/* Blind layers (one tempo, one key, everyone alone) */
+.bltempo{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.bltempo div{display:grid;gap:2px;padding:10px 18px;border:4px solid var(--ink);background:var(--paper);box-shadow:5px 5px 0 var(--ink);text-align:center}
+.bltempo i{font:700 10px var(--mono);font-style:normal;text-transform:uppercase}.bltempo b{font:900 clamp(26px,3vw,44px)/1 var(--disp);font-stretch:62%;text-transform:uppercase}
+.bltempo div:first-child{background:var(--yel)}.bltempo div:nth-child(2){background:var(--red);color:#fff}
+.bllanes{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px}
+.bllane{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;border:3px solid var(--ink);background:var(--green);color:#fff;text-align:left;box-shadow:3px 3px 0 var(--ink)}
+.bllane b{font:900 16px var(--disp);text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bllane span{font:700 10px var(--mono)}
+.bllane.off{background:var(--paper);color:var(--ink2);text-decoration:line-through;box-shadow:none}
+.bllane:disabled{cursor:default}
+/* the Listening party: Review button and page */
+.rvbtn em{font-style:normal;margin-left:4px;padding:1px 5px;background:var(--ink);color:var(--paper)}.rvbtn em.new{background:var(--red);color:#fff}
+.reviewov{position:fixed;inset:0;z-index:400;background:var(--paper);overflow-y:auto;padding:28px clamp(18px,3vw,44px) 110px;display:grid;gap:20px;align-content:start}
+.rvhead{display:flex;align-items:end;gap:18px;flex-wrap:wrap;border-bottom:4px solid var(--ink);padding-bottom:12px}
+.rvhead h1{font:900 clamp(56px,7vw,110px)/.8 var(--disp);font-stretch:62%;text-transform:uppercase;margin-top:4px}.rvhead .fine{flex:1;min-width:16em}
+.rvgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:20px;align-items:start}
+.rvg{border:4px solid var(--ink);background:var(--paper);box-shadow:8px 8px 0 var(--ink);display:grid}
+.rvgh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--c);border-bottom:4px solid var(--ink);color:#fff}
+.rvg[style*="--yel"] .rvgh{color:#161514}
+.rvgh b{display:block;font:900 30px/1 var(--disp);font-stretch:66%;text-transform:uppercase;overflow-wrap:anywhere}.rvgh span{font:700 10px var(--mono);text-transform:uppercase}
+.rvgh .ghost{border-color:currentColor;background:transparent;color:inherit}
+.rvf{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 12px;border-bottom:2px solid var(--hair)}.rvf:last-child{border-bottom:0}
+.rvf i{font:900 11px var(--mono);font-style:normal;padding:7px 6px;background:var(--c);color:#fff;border:2px solid var(--ink)}
+.rvf b{display:block;font:800 16px/1.15 var(--disp);overflow-wrap:anywhere}.rvf span{font:700 10px var(--mono);color:var(--ink2);text-transform:uppercase}
+.rvf .ghost{min-width:40px;text-align:center;text-decoration:none;font-size:14px;padding:8px}.rvplay.on{background:var(--ink);color:var(--paper)}
+.rvempty{border:4px dashed var(--ink3);padding:40px;text-align:center}.rvempty h2{font:900 44px var(--disp);text-transform:uppercase}
+.rvnow{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;padding:10px 18px;background:var(--ink);color:var(--paper);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--red)}
+.rvnow:empty{display:none}.rvnow b{font:900 18px var(--disp);text-transform:uppercase}.rvnow span:last-child{font:700 10px var(--mono);text-transform:uppercase;opacity:.8}

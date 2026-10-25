@@ -323,20 +323,19 @@ game({
   id:'roundabout',group:'make',name:'Soundabout Roundabout',tag:'Start a track, pass it round the room — or build one blind, layer by layer, and hear it for the first time together.',
   // two modes: Pass it round (a track travels the room) and Blind layers (RBB: groups record from memory, nobody listens back)
   get how(){return optVals(this).mode==='blind'
-    ?['Groups of 3–4 agree a starting point: tempo with a click, a key, the sounds. All channels start muted.','Layer by layer, one plays from memory (a cue card on their phone) while the next one records. Nobody listens back.','The reveal: each group unmutes everything and plays it to the room. Phones mark the moments that jump out; develop two or three of them, then share.']
+    ?['The room gets one tempo and one key. Everyone makes their own track, alone, with a cue card on their phone.','When the time is up, everyone exports their track from bar 1 and drops it on CADCAST.','The reveal: every track plays together for the first time on the big speakers. Phones mark the moments that jump out.']
     :['Everyone starts a short sketch on their own computer.','When the timer ends, export your track (MP3 is fastest) and drop it on your CADCAST page. Control Room passes it to the next computer.','A prompt card lands on your phone. Grow the track you were passed, then hand it in and pass it on again. The listening party plays every journey.'];},
   badges:['Sprint','No score','Prompt cards','CADCAST'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="21" fill="none" stroke="var(--ink)" stroke-width="4" stroke-dasharray="26 7"/><path d="M50 14 L54 26 L42 25 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5"/><path d="M14 50 L10 38 L22 39 Z" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5"/><rect x="25" y="25" width="14" height="14" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" transform="rotate(12 32 32)"/></svg>`,
   options:[
-    {key:'mode',label:'Mode',choices:[['journey','Pass it round','a track travels the room, a card at every stop'],['blind','Blind layers','record from memory, hear it for the first time together']],def:'journey'},
+    {key:'mode',label:'Mode',choices:[['journey','Pass it round','a track travels the room, a card at every stop'],['blind','Blind layers','one tempo, one key, everyone alone: hear it all together at the end']],def:'journey'},
     {key:'sketch',label:'First sketch',type:'step',min:1,max:30,step:1,def:8,unit:'min',show:v=>v.mode!=='blind'},
     {key:'stop',label:'Time at each stop',type:'step',min:1,max:30,step:1,def:6,unit:'min',show:v=>v.mode!=='blind'},
     {key:'rounds',label:'Stops',type:'step',min:1,max:20,step:1,def:3,unit:n=>n===1?'stop':'stops',help:'How many times each track moves on before the listening party.',show:v=>v.mode!=='blind'},
-    {key:'size',label:'Group size',choices:[[3,'3','students'],[4,'4','students']],def:4,show:v=>v.mode==='blind'},
-    {key:'parts',label:'Parts each',choices:[[1,'One','everyone plays once'],[2,'Two','round the group twice']],def:1,show:v=>v.mode==='blind'},
-    {key:'layer',label:'Time per layer',type:'step',min:1,max:15,step:1,def:4,unit:'min',show:v=>v.mode==='blind',help:'Set it up, record one take, mute it, next performer. The clock rings but waits for you.'},
-    {key:'start',label:'Starting point',choices:[['deal','Dealt','a tempo, key and sounds for each group'],['own','Groups decide','they agree it together']],def:'deal',show:v=>v.mode==='blind'},
-    {key:'dev',label:'Develop',type:'step',min:5,max:60,step:5,def:20,unit:'min',show:v=>v.mode==='blind',help:'Time to make something from the moments the room marked at the reveal.'},
+    {key:'bbpm',label:'Tempo',choices:[['deal','Deal one','a random tempo'],[80,'80'],[90,'90'],[100,'100'],[110,'110'],[120,'120'],[128,'128']],def:'deal',show:v=>v.mode==='blind'},
+    {key:'bkey',label:'Key',choices:[['deal','Deal one','a random key'],['A minor','A minor'],['C major','C major'],['D minor','D minor'],['G major','G major']],def:'deal',show:v=>v.mode==='blind'},
+    {key:'bbars',label:'Length',choices:[[16,'16','bars'],[32,'32','bars'],[0,'Free','any length']],def:32,show:v=>v.mode==='blind'},
+    {key:'mins',label:'Making time',type:'step',min:5,max:60,step:5,def:20,unit:'min',show:v=>v.mode==='blind'},
     {key:'pass',label:'Pass the track',choices:[['audio','As an export','students drop their track on CADCAST, it goes to the next computer'],['project','Export + project','the next person also gets the project file (same DAW for everyone)'],['seats','Move seats','hand in for the party, then change seats']],def:'audio',help:'Handing in and passing need each computer signed in through CADCAST (gunnitynes.github.io/CADCAST/go). Students who are not: they change seats.',show:v=>v.mode!=='blind'},
     {key:'deal',label:'Cards',choices:[['each','Everyone different','a card per student'],['room','One for the room','the same card on the big screen']],def:'each',show:v=>v.mode!=='blind'},
   ],
@@ -364,7 +363,7 @@ game({
     render();syncAll();},
   next(){const s=G.gs;if(s.bl)return RBB.next();({brief:()=>this.go('sketch'),sketch:()=>this.go('rec'),rec:()=>this.go(s.round<s.o.rounds?'pass':'done'),pass:()=>this.go('card'),card:()=>this.go('build'),build:()=>this.go('rec'),done:()=>exitGame(true)})[s.phase]();},
   frame(){clockFrame();if(G.gs&&G.gs.bl)RBB.frame();},
-  stop(){if(G.gs.bl)return;this.stopPlay();if(G.gs.phase==='rec')online().forEach(p=>pcSend(p,{t:'take-end'}));},
+  stop(){if(G.gs.bl)return RBB.stop();this.stopPlay();if(G.gs.phase==='rec')online().forEach(p=>pcSend(p,{t:'take-end'}));},
   key:(r,id)=>r+':'+id,
   // pass: every recording made at this stop goes to the next computer in the ring
   relay(){const s=G.gs,r=s.round;s.got=new Map();
@@ -383,14 +382,14 @@ game({
     // d.t==='rec' (record from the phone) is gone: students hand in an export on CADCAST/go now
   },
   // a computer that signs in during the hand-in gets the hand-in card too
-  onPair(p){const s=G.gs;if(!s||s.bl||s.phase!=='rec')return;pcSend(p,{t:'take-in',round:s.round,label:s.round?`Stop ${s.round} of ${s.o.rounds}`:'The first sketch',project:s.o.pass==='project',next:(this.nextOf(p.id)||{}).name||''});this.live();},
+  onPair(p){const s=G.gs;if(s&&s.bl)return RBB.onPair(p);if(!s||s.phase!=='rec')return;pcSend(p,{t:'take-in',round:s.round,label:s.round?`Stop ${s.round} of ${s.o.rounds}`:'The first sketch',project:s.o.pass==='project',next:(this.nextOf(p.id)||{}).name||''});this.live();},
   onPcMsg(p,m){const s=G.gs;if(!s||s.bl||m.t!=='rec-state')return;const r=s.rec.get(p.id)||{};
     if(m.state==='rec')s.rec.set(p.id,{...r,st:'rec',t0:r.t0||Date.now()});
     if(m.state==='up')s.rec.set(p.id,{...r,st:'up',dur:m.dur});
     if(m.state==='error')s.rec.set(p.id,{st:'err',msg:m.msg});
     sync(p);this.live();},
-  onPcProg(p,f,meta){const s=G.gs;if(!s||s.bl||!meta||meta.kind!=='take'||meta.round!==s.round)return;s.rec.set(p.id,{st:'up',prog:f});this.live();},
-  onPcFile(p,meta,blob){const s=G.gs;if(!s||s.bl)return;const k=this.key(meta.round,p.id);
+  onPcProg(p,f,meta){const s=G.gs;if(s&&s.bl)return RBB.onPcProg(p,f,meta);if(!s||!meta||meta.kind!=='take'||meta.round!==s.round)return;s.rec.set(p.id,{st:'up',prog:f});this.live();},
+  onPcFile(p,meta,blob){const s=G.gs;if(s&&s.bl)return RBB.onPcFile(p,meta,blob);if(!s)return;const k=this.key(meta.round,p.id);
     if(meta.kind==='take'){const t={blob,dur:meta.dur||0,pid:p.id,name:p.name,round:meta.round,file:meta.name||''};s.takes.set(k,t);if(meta.round===s.round)s.rec.set(p.id,{st:'ok',dur:t.dur});sfx.vote();
       // the length (and a decoded copy for the listening party), then the receipt on their computer
       blob.arrayBuffer().then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej))).then(buf=>{t.buf=buf;t.dur=buf.duration;const r=s.rec.get(p.id);if(r&&meta.round===s.round)r.dur=t.dur;this.live();sync(p);},()=>{})
@@ -485,117 +484,81 @@ function blMoments(marks){const m=(marks||[]).slice().sort((a,b)=>a.t-b.t),out=[
     .sort((a,b)=>b.n-a.n||a.t-b.t);}
 const blTime=ms=>rbFmt(Math.max(0,ms)/1000);
 const RBB={
-  start(o){G.gs={o,bl:true,phase:'brief',groups:[],layer:0,layers:0,gi:0,rv:'ready',t0:0,el:0,marks:new Map(),cues:new Map(),last:new Map()};},
-  // even groups of about o.size (no group of one or two when it can be avoided), class-list names shuffled
-  deal(){const s=G.gs,ps=shuffle(online()),N=ps.length,G_=Math.max(1,Math.round(N/s.o.size)),groups=[...Array(G_)].map((_,k)=>({...pkTeam(k),k,ids:[],start:null}));
-    ps.forEach((p,i)=>groups[i%G_].ids.push(p.id));
-    groups.forEach(g=>{g.start={bpm:pick(BLIND.tempo),tonal:pick(BLIND.tonal),palette:pick(BLIND.palette)};
-      g.ids.forEach(id=>{const p=G.players.get(id);if(p)logAdd(p,{kind:'brief',game:'Blind layers',title:g.name,text:s.o.start==='deal'?`${g.start.bpm} BPM · ${g.start.tonal} · ${g.start.palette}`:'Agree on a tempo, a key and your sounds. All channels start muted.'});});});
-    s.groups=groups.filter(g=>g.ids.length);s.layers=Math.max(...s.groups.map(g=>g.ids.length),1)*s.o.parts;},
-  groupOf(id){return G.gs.groups.find(g=>g.ids.includes(id));},
-  // a late joiner goes into the smallest group, playing last
-  seat(p){const s=G.gs;if(!s.groups.length||this.groupOf(p.id))return;const g=s.groups.slice().sort((a,b)=>a.ids.length-b.ids.length)[0];g.ids.push(p.id);
-    logAdd(p,{kind:'brief',game:'Blind layers',title:g.name,text:'You joined late: you play last in your group. Never listen back.'});},
-  roles(g,L){const n=g.ids.length;return {perf:g.ids[(L-1)%n],op:g.ids[L%n]};},
-  cueFor(g,L){const s=G.gs,key=g.k+':'+L;if(!s.cues.has(key)){const kinds=L===1?['Start']:['Memory','Memory','Space','Variation'],kind=pick(kinds);
-      const used=new Set([...s.cues.values()].map(c=>c.text)),left=BLIND.cues[kind].filter(t=>!used.has(t));s.cues.set(key,{kind,text:pick(left.length?left:BLIND.cues[kind])});}
-    return s.cues.get(key);},
-  topInfo(){const s=G.gs,g=s.groups[s.gi];return ({brief:'Blind layers',groups:'Agree on a starting point',layer:`Layer ${s.layer} of ${s.layers}`,reveal:`The reveal · ${g?g.name:''}`,develop:'Make something from it',share:`Share · ${g?g.name:''}`,done:'Blind layers'})[s.phase];},
-  go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();
-    if(ph==='groups'){this.deal();sfx.card();}
-    if(ph==='layer'){online().forEach(p=>this.seat(p));s.layer++;sfx.whoosh();
-      s.groups.forEach(g=>{const r=this.roles(g,s.layer),p=G.players.get(r.perf),c=this.cueFor(g,s.layer);if(p)logAdd(p,{kind:'card',game:'Blind layers',title:`Layer ${s.layer} · ${c.kind}`,text:c.text});});
-      startClock(s.o.layer*60000,()=>{sfx.alarm();render();syncAll();});}
-    if(ph==='reveal'){s.gi=s.gi||0;s.rv='ready';}
-    if(ph==='develop'){s.groups.forEach((g,gi)=>{const M=blMoments(s.marks.get(gi)).slice(0,3);g.moments=M;
-        g.ids.forEach(id=>{const p=G.players.get(id);if(p)logAdd(p,{kind:'card',game:'Blind layers',title:'Your moments',text:M.length?M.map(m=>`${blTime(m.t)} · ${BLK[m.k].name} (${m.n})`).join(' · '):'Nobody marked a moment: find your own two or three.'});});});
-      startClock(s.o.dev*60000,()=>{sfx.alarm();render();syncAll();});}
-    if(ph==='share')s.gi=0;
-    if(ph==='done')sfx.fanfare();
+  // Blind layers: one tempo and one key for the room; everyone makes their own track without hearing anyone else's,
+  // hands it in on CADCAST (the take hand-in), and the big speakers play every track together for the first time.
+  start(o){const keys=BLIND.tonal.filter(k=>/major|minor|Dorian|Lydian|Phrygian/.test(k));
+    G.gs={o,bl:true,id:Date.now()%1e9,phase:'brief',bpm:o.bbpm==='deal'?pick(BLIND.tempo):+o.bbpm,key:o.bkey==='deal'?pick(keys):o.bkey,cues:new Map(),rec:new Map(),takes:new Map(),marks:[],last:new Map(),rv:'ready',t0:0,el:0,P:null,mute:new Set()};},
+  cueFor(p){const s=G.gs;if(!s.cues.has(p.id)){const kind=pick(['Start','Space','Variation']),used=new Set([...s.cues.values()].map(c=>c.text)),left=BLIND.cues[kind].filter(t=>!used.has(t));s.cues.set(p.id,{kind,text:pick(left.length?left:BLIND.cues[kind])});}return s.cues.get(p.id);},
+  topInfo(){const s=G.gs;return `Blind layers · ${s.bpm} BPM · ${s.key}`+({brief:'',make:' · making',hand:' · hand in',reveal:' · the reveal',done:''})[s.phase];},
+  takeIn(p){const s=G.gs;if(pcFor(p))pcSend(p,{t:'take-in',round:s.id,label:`Blind layers · ${s.bpm} BPM · ${s.key}`,project:false,next:''});},
+  go(ph){const s=G.gs;if(s.phase==='hand'&&ph!=='hand')online().forEach(p=>pcSend(p,{t:'take-end'}));s.phase=ph;stopClock();clearLater();
+    if(ph==='make'){online().forEach(p=>{const c=this.cueFor(p);logAdd(p,{kind:'card',game:'Blind layers',title:`${s.bpm} BPM · ${s.key} · ${c.kind}`,text:c.text});});
+      startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('hand');});}
+    if(ph==='hand'){online().forEach(p=>this.takeIn(p));sfx.whoosh();}
+    if(ph==='reveal'){this.halt();s.rv='ready';s.marks=[];this.prep();}
+    if(ph==='done'){this.halt();sfx.fanfare();}
     render();syncAll();},
   next(){const s=G.gs;
-    if(s.phase==='brief')return this.go('groups');
-    if(s.phase==='groups')return this.go('layer');
-    if(s.phase==='layer')return this.go(s.layer<s.layers?'layer':'reveal');
-    if(s.phase==='reveal'){if(s.rv==='ready')return this.play();if(s.rv==='play')return this.halt();
-      if(s.gi<s.groups.length-1){s.gi++;s.rv='ready';render();syncAll();return;}return this.go('develop');}
-    if(s.phase==='develop'){s.gi=0;return this.go('share');}
-    if(s.phase==='share'){if(s.gi<s.groups.length-1){s.gi++;render();syncAll();return;}return this.go('done');}
+    if(s.phase==='brief')return this.go('make');
+    if(s.phase==='make')return this.go('hand');
+    if(s.phase==='hand'){if(!s.takes.size){toast('No tracks yet: wait for the first hand-in');return;}return this.go('reveal');}
+    if(s.phase==='reveal'){if(s.rv==='ready'||s.rv==='stopped')return this.play();return this.halt(true);}
     if(s.phase==='done')exitGame(true);},
-  // the reveal clock: started when the group presses play on their multitrack, so the marks carry their time in the track
-  play(){const s=G.gs;s.rv='play';s.t0=now();s.el=0;if(!s.marks.has(s.gi))s.marks.set(s.gi,[]);sfx.whoosh();render();syncAll();},
-  halt(){const s=G.gs;s.rv='stopped';s.el=now()-s.t0;render();syncAll();},
-  frame(){const s=G.gs;if(s.phase!=='reveal'||s.rv!=='play')return;const t=now()-s.t0,e=$('#blT');if(e)e.textContent=blTime(t);
-    const span=Math.max(60000,t*1.15);$$('#blTL .blpin').forEach(x=>x.style.left=(100*x.dataset.t/span)+'%');const h=$('#blHead');if(h)h.style.left=(100*t/span)+'%';},
-  stop(){},
+  onPair(p){if(G.gs.phase==='hand')this.takeIn(p);this.live();},
+  onPcProg(p,f,meta){const s=G.gs;if(!meta||meta.kind!=='take'||meta.round!==s.id)return;s.rec.set(p.id,{st:'up',prog:f});this.live();},
+  onPcFile(p,meta,blob){const s=G.gs;if(meta.kind!=='take'||meta.round!==s.id)return;const t={blob,name:p.name,pid:p.id,file:meta.name||'',dur:0};s.takes.set(p.id,t);s.rec.set(p.id,{st:'ok'});sfx.vote();
+    blob.arrayBuffer().then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej))).then(buf=>{t.buf=buf;t.dur=buf.duration;s.rec.set(p.id,{st:'ok',dur:buf.duration});this.live();sync(p);},()=>{s.rec.set(p.id,{st:'bad'});this.live();})
+      .finally(()=>pcSend(p,{t:'take-got',round:s.id,dur:t.dur}));this.live();sync(p);},
+  // the reveal: every track from its very start, together, through the big speakers
+  prep(){const s=G.gs;s.lanes=[...s.takes.values()].filter(t=>t.buf).sort((a,b)=>a.name.localeCompare(b.name));s.len=Math.max(1,...s.lanes.map(t=>t.dur));},
+  play(){const s=G.gs;this.halt();this.prep();if(!s.lanes.length){toast('No tracks could be read');return;}const ac=audio(),bus=gn(ac,Math.min(.9,1.6/Math.sqrt(s.lanes.length)));bus.connect(AU.music);
+    const at=ac.currentTime+.25;s.P={ac,bus,at,src:s.lanes.map(t=>{const g=gn(ac,s.mute.has(t.pid)?0:1),x=ac.createBufferSource();x.buffer=t.buf;x.connect(g).connect(bus);x.start(at);return {x,g,pid:t.pid};}),stop:()=>this.halt()};AU.live.add(s.P);
+    s.rv='play';s.t0=now()+250;sfx.whoosh&&sfx.whoosh();render();syncAll();},
+  halt(sync_){const s=G.gs,P=s&&s.P;if(P){P.src.forEach(o=>{try{o.x.stop();}catch(e){}});try{P.bus.disconnect();}catch(e){}AU.live.delete(P);s.P=null;}
+    if(s&&s.rv==='play'){s.rv='stopped';s.el=now()-s.t0;if(sync_){render();syncAll();}}},
+  frame(){const s=G.gs;if(s.phase!=='reveal')return;if(s.rv==='play'){const t=now()-s.t0;if(t>s.len*1000+400){this.halt(true);return;}const e=$('#blT');if(e)e.textContent=blTime(Math.max(0,t));const h=$('#blHead');if(h)h.style.left=(100*Math.max(0,t)/(s.len*1000))+'%';}},
   act(p,d){const s=G.gs;
-    if(d.t==='mark'&&s.phase==='reveal'&&s.rv==='play'&&BLK[d.k]){const t=now()-s.t0,l=s.last.get(p.id)||0;if(t-l<1200&&l)return;s.last.set(p.id,t);
-      s.marks.get(s.gi).push({t,k:d.k,pid:p.id});sfx.vote();this.live();}},
-  live(){const s=G.gs,box=$('#blTL');if(!box)return;box.innerHTML=this.pins();const m=$('#blTop');if(m)m.innerHTML=this.topHTML();},
-  pins(){const s=G.gs,ms=s.marks.get(s.gi)||[],T=s.rv==='play'?now()-s.t0:s.el,span=Math.max(60000,T*1.15);
-    return ms.map(x=>`<i class="blpin" data-t="${x.t}" style="left:${100*x.t/span}%">${blIco(x.k,20)}</i>`).join('')+`<i class="blhead" id="blHead" style="left:${100*T/span}%"></i>`;},
-  topHTML(){const s=G.gs,M=blMoments(s.marks.get(s.gi)).slice(0,3);
-    return M.length?M.map((m,i)=>`<div class="blmom"><b>${'ABC'[i]}</b>${blIco(m.k,26)}<div><strong>${blTime(m.t)}</strong><span>${esc(BLK[m.k].name)} · ${m.n} ${m.n===1?'student':'students'}</span></div></div>`).join(''):'<p class="fine">No marks yet. Tap a moment on your phone when something jumps out.</p>';},
-  gcard(g,inner){return `<div class="blg" style="--c:var(${g.c})"><div class="blgh">${shape(g.sh,24,'var(--ink)','#fff')}<b>${esc(g.name)}</b><span>${g.ids.length}</span></div>${inner}</div>`;},
-  names(g){return g.ids.map(id=>esc((G.players.get(id)||{}).name||'?')).join(' · ');},
-  render(st){const s=G.gs,o=s.o,g=s.groups[s.gi];let body='',lbl='Next';
-    if(s.phase==='brief'){body=`<div class="dbig"><span class="lab">Blind layers · record with intuition</span><h2>Making music you can’t hear yet</h2>
-      <p>In groups of ${o.size}, build a multitrack part by part. <b>All channels start muted.</b> No previewing, no soloing, no listening back while tracking. A click is allowed.</p>
-      <div class="blrules"><div><b>Space</b><span>Resist filling every moment.</span></div><div><b>Memory</b><span>Draw on what you remember, without reproducing it exactly.</span></div><div><b>Slight variation</b><span>Recurring gestures with small changes.</span></div></div>
-      <p class="fine">“The infinite undo button and the relentless loop-playback trap are the greatest enemies of intuition.”</p></div>`;lbl='Deal the groups';}
-    if(s.phase==='groups'){body=`<div class="blwrap"><div class="rbhead"><span class="lab">Agree on a starting point</span><h2>${o.start==='deal'?'Your starting points':'Agree on a starting point'}</h2><p>${o.start==='deal'?'Set up the session: the tempo with a click, the key, the sounds. Then mute everything.':'Choose a tempo (with a click), a key or tonal area, and the instruments. Then mute everything.'} The order is set: see your phones.</p></div>
-      <div class="blgs">${s.groups.map(g=>this.gcard(g,`${o.start==='deal'?`<div class="blsp"><div><i>Tempo</i><b>${g.start.bpm} BPM</b></div><div><i>Key</i><b>${esc(g.start.tonal)}</b></div><div><i>Sounds</i><b>${esc(g.start.palette)}</b></div></div>`:''}<ol class="blord">${g.ids.map(id=>`<li>${esc((G.players.get(id)||{}).name||'?')}</li>`).join('')}</ol>`)).join('')}</div></div>`;lbl='Layer 1';}
-    if(s.phase==='layer'){body=`<div class="blwrap"><div class="rbhead"><span class="lab">Layer ${s.layer} of ${s.layers} · record, mute, next performer</span><h2>Only the current instrument is audible</h2>${clockHTML('mid')}</div>
-      <div class="blgs">${s.groups.map(g=>{const r=this.roles(g,s.layer),c=this.cueFor(g,s.layer),P=G.players.get(r.perf),O=G.players.get(r.op);
-        return this.gcard(g,`<div class="blrole"><i>Plays</i><b>${esc(P?P.name:'?')}</b></div><div class="blrole op"><i>Records</i><b>${esc(O&&O!==P?O.name:'themselves')}</b></div><div class="blcue"><span class="lab">${esc(c.kind)}</span><p>${esc(c.text)}</p></div>`);}).join('')}</div>
-      <p class="blnever">No playback · no checking fit · no correcting timing · never listen back</p></div>`;lbl=s.layer<s.layers?`Layer ${s.layer+1}`:'The reveal';}
-    if(s.phase==='reveal'){const T=s.rv==='play'?now()-s.t0:s.el;
-      body=`<div class="blwrap blrev"><div class="rbhead"><span class="lab">The big reveal · ${s.gi+1} of ${s.groups.length}</span><h2>${esc(g.name)}</h2><p>${this.names(g)}</p></div>
-      ${s.rv==='ready'?`<div class="blready" style="--c:var(${g.c})"><b>Unmute every track at once.</b><span>Hands off the spacebar: no soloing, no previewing. Start from the top, through the speakers. Click Start when they press play.</span></div>`:''}
+    if(d.t==='mark'&&s.phase==='reveal'&&s.rv==='play'&&BLK[d.k]){const t=now()-s.t0,l=s.last.get(p.id)||0;if(t<0||(l&&t-l<1200))return;s.last.set(p.id,t);s.marks.push({t,k:d.k,pid:p.id});sfx.vote();this.live();}},
+  stop(){this.halt();if(G.gs.phase==='hand')online().forEach(p=>pcSend(p,{t:'take-end'}));},
+  live(){const s=G.gs;if(s.phase==='hand'||s.phase==='make'){const w=$('#blWall');if(w)w.innerHTML=this.wall();const n=$('#blN');if(n)n.textContent=s.takes.size;return;}
+    if(s.phase==='reveal'){const tl=$('#blTL');if(tl)tl.innerHTML=this.pins();const m=$('#blTop');if(m)m.innerHTML=this.topHTML();}},
+  wall(){const s=G.gs;return online().map(p=>{const r=s.rec.get(p.id)||{},st=r.st||(pcFor(p)?'wait':'nopc');
+    const lab={up:`arriving ${r.prog?Math.round(r.prog*100)+'%':'…'}`,ok:`✓ ${r.dur?rbFmt(r.dur):'in'}`,bad:'can’t read it',wait:s.phase==='make'?'making…':'exporting…',nopc:'no CADCAST'}[st];
+    return `<div class="rbr c${p.sh} st-${st==='wait'?'ready':st}"><b>${esc(p.name)}</b><span>${esc(lab)}</span></div>`;}).join('')||'<p class="fine">Waiting for students…</p>';},
+  pins(){const s=G.gs,span=(s.len||60)*1000;return s.marks.map(x=>`<i class="blpin" style="left:${Math.min(100,100*x.t/span)}%">${blIco(x.k,20)}</i>`).join('')+`<i class="blhead" id="blHead" style="left:${s.rv==='play'?0:Math.min(100,100*s.el/span)}%"></i>`;},
+  topHTML(){const s=G.gs,M=blMoments(s.marks).slice(0,3);
+    return M.length?M.map((m,i)=>`<div class="blmom"><b>${'ABC'[i]}</b>${blIco(m.k,26)}<div><strong>${blTime(m.t)}</strong><span>${esc(BLK[m.k].name)} · ${m.n} ${m.n===1?'student':'students'}</span></div></div>`).join(''):'<p class="fine">Tap a moment on your phone when something jumps out.</p>';},
+  render(st){const s=G.gs,o=s.o;let body='',lbl='Next';const head=`<div class="bltempo"><div><i>Tempo</i><b>${s.bpm} BPM</b></div><div><i>Key</i><b>${esc(s.key)}</b></div>${o.bbars?`<div><i>Length</i><b>${o.bbars} bars</b></div>`:''}</div>`;
+    if(s.phase==='brief'){body=`<div class="dbig"><span class="lab">Blind layers · record with intuition</span><h2>Making music you can’t hear yet</h2>${head}
+      <p>Everyone makes <b>one track</b> on their own computer, at this tempo and in this key. Nobody hears anyone else’s part until the end, when every track plays together for the first time.</p>
+      <div class="blrules"><div><b>Space</b><span>Resist filling every moment.</span></div><div><b>Start at bar 1</b><span>Export from the very start, so every track lines up.</span></div><div><b>Slight variation</b><span>Recurring gestures with small changes.</span></div></div></div>`;lbl='Start the clock';}
+    if(s.phase==='make'){body=`<div class="blwrap"><div class="rbhead"><span class="lab">Blind layers · your own track</span><h2>Make it. Don’t share it.</h2>${clockHTML('mid')}</div>${head}
+      <p class="blnever">Headphones on · start at bar 1 · nobody listens to anyone else</p><div class="rbrec" id="blWall">${this.wall()}</div></div>`;lbl='Time: hand in';}
+    if(s.phase==='hand'){body=`<div class="blwrap"><div class="rbhead"><span class="lab">Blind layers · hand in</span><h2>Export it, drop it</h2><p>Export your whole track <b>from bar 1</b> (MP3 is fastest) and drop it on your CADCAST page. <b id="blN">${s.takes.size}</b> in.</p></div>
+      <div class="rbrec" id="blWall">${this.wall()}</div></div>`;lbl='The reveal';}
+    if(s.phase==='reveal'){const T=s.rv==='play'?Math.max(0,now()-s.t0):s.el;
+      body=`<div class="blwrap blrev"><div class="rbhead"><span class="lab">The reveal · ${s.lanes.length} tracks · ${s.bpm} BPM · ${esc(s.key)}</span><h2>${s.rv==='ready'?'All together, for the first time':s.rv==='play'?'Listen':'Again?'}</h2></div>
       <div class="bltlbox"><b class="blclock" id="blT">${blTime(T)}</b><div class="bltl" id="blTL">${this.pins()}</div></div>
-      <div class="blgrid"><div class="bllisten"><span class="lab">Listen for · mark it on your phone</span>${BLIND.listen.map(x=>`<div>${blIco(x.k,26)}<b>${esc(x.name)}</b><span>${esc(x.sub)}</span></div>`).join('')}</div>
+      <div class="blgrid"><div><span class="lab">The tracks${s.rv!=='play'?' · click to mute one for the next listen':''}</span><div class="bllanes">${s.lanes.map(t=>`<button class="bllane${s.mute.has(t.pid)?' off':''}" data-pid="${esc(t.pid)}" ${s.rv==='play'?'disabled':''}><b>${esc(t.name)}</b><span>${rbFmt(t.dur)}</span></button>`).join('')}</div>
+        <span class="lab" style="margin-top:12px;display:block">Listen for · mark it on your phone</span><div class="bllisten">${BLIND.listen.map(x=>`<div>${blIco(x.k,22)}<b>${esc(x.name)}</b><span>${esc(x.sub)}</span></div>`).join('')}</div></div>
         <div><span class="lab">The moments</span><div class="bltop" id="blTop">${this.topHTML()}</div></div></div></div>`;
-      lbl=s.rv==='ready'?'Start: they pressed play':s.rv==='play'?'Stop':s.gi<s.groups.length-1?'Next group':'Make something';}
-    if(s.phase==='develop'){body=`<div class="blwrap"><div class="rbhead"><span class="lab">Make something from what you discover</span><h2>Two or three moments</h2>${clockHTML('mid')}<p>Back in groups: pick two or three moments and agree every decision together. A messy 4-second accident is often enough.</p></div>
-      <div class="blmoves">${BLIND.moves.map((m,i)=>`<div><span class="no">${i+1}</span><b>${esc(m.name)}</b><span>${esc(m.text)}</span></div>`).join('')}</div>
-      <div class="blgs">${s.groups.map(g=>this.gcard(g,(g.moments||[]).map(m=>`<div class="blmom sm">${blIco(m.k,20)}<div><strong>${blTime(m.t)}</strong><span>${esc(BLK[m.k].name)} · ${m.n}</span></div></div>`).join('')||'<p class="fine">No marks: find your own.</p>')).join('')}</div></div>`;lbl='Share';}
-    if(s.phase==='share'){body=`<div class="blwrap"><div class="rbhead"><span class="lab">Final playback · ${s.gi+1} of ${s.groups.length}</span><h2>${esc(g.name)}</h2><p>${this.names(g)}</p></div>
-      <ol class="blq">${BLIND.questions.map(q=>`<li>${esc(q)}</li>`).join('')}</ol></div>`;lbl=s.gi<s.groups.length-1?'Next group':'Finish';}
-    if(s.phase==='done'){body=`<div class="dbig"><span class="lab">Blind layers</span><h2>Unexpected is the material</h2><p>Recording without listening generates possibilities. Listening closely reveals moments worth pursuing. Production decisions turn them into music.</p></div>`;lbl='Back to the menu';}
-    const tip={brief:'Mode · Blind layers',groups:'Mute everything before layer 1',layer:'Record · mute · next performer',reveal:'Radical listening starts now',develop:'A messy 4-second accident is enough',share:'Listen, then talk',done:''}[s.phase];
-    st.innerHTML=`<div class="destruct roundabout blind dots ph-${s.phase}">${body}<div class="dfoot"><span class="lab bltip">${tip}</span>${s.phase==='done'?againBtn():''}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
-    $('#bNext').onclick=()=>this.next();bindAgain(st);},
-  pstate(p){const s=G.gs,g=this.groupOf(p.id),st={bl:true,ph:s.phase,clock:pClock(),layer:s.layer,layers:s.layers};
-    if(g){st.g={name:g.name,c:g.c,sh:g.sh,names:g.ids.map(id=>(G.players.get(id)||{}).name||'?'),start:s.o.start==='deal'?g.start:null,me:g.ids.indexOf(p.id)};}
-    if(s.phase==='layer'&&g){const r=this.roles(g,s.layer),n=g.ids.length,i=g.ids.indexOf(p.id);st.role=r.perf===p.id?'play':r.op===p.id?'rec':'wait';
-      st.who=(G.players.get(r.perf)||{}).name||'';st.cue=st.role==='play'?this.cueFor(g,s.layer):null;
-      let k=1;while(k<=n&&g.ids[(s.layer-1+k)%n]!==p.id)k++;st.wait=s.layer+k<=s.layers?k:0;}
-    if(s.phase==='reveal'){const rg=s.groups[s.gi];st.rv=s.rv;st.rg=rg?{name:rg.name,c:rg.c,mine:rg===g}:null;}
-    if(s.phase==='develop'&&g)st.moments=(g.moments||[]).map(m=>({t:blTime(m.t),k:m.k,n:m.n}));
-    if(s.phase==='share'){const rg=s.groups[s.gi];st.rg=rg?{name:rg.name,c:rg.c,mine:rg===g}:null;}
-    st.k=[s.phase,s.layer,s.gi,s.rv,st.role||'',g?g.name+g.ids.length:''].join('|');return st;},
-  player(root,st){pClockStart(st.clock);const g=st.g;
-    const tag=g?`<div class="blpg" style="--c:var(${g.c})">${shape(g.sh,20,'var(--ink)','#fff')}<b>${esc(g.name)}</b></div>`:'';
-    let h='';
-    if(st.ph==='brief')h=`<h2 class="pbigt">Blind layers</h2><p>You’ll record in a group, one part each, from memory. Nobody listens back until the reveal.</p>`;
-    else if(!g)h=`<h2 class="pbigt">Hang on</h2><p>You’ll join a group at the next layer.</p>`;
-    else if(st.ph==='groups')h=`${tag}<h2 class="pbigt">Your group</h2>${g.start?`<div class="blsp ph"><div><i>Tempo</i><b>${g.start.bpm} BPM</b></div><div><i>Key</i><b>${esc(g.start.tonal)}</b></div><div><i>Sounds</i><b>${esc(g.start.palette)}</b></div></div>`:'<p>Agree on a tempo (with a click), a key or tonal area, and your sounds.</p>'}
-      <ol class="blord ph">${g.names.map((n,i)=>`<li class="${i===g.me?'me':''}">${esc(n)}</li>`).join('')}</ol><p class="fine">That’s the order you play in. All channels start muted.</p>`;
-    else if(st.ph==='layer'){
-      if(st.role==='play')h=`${tag}${pClockHTML(st.clock)}<div class="blyou play"><i>Layer ${st.layer}</i><b>You play</b></div><div class="scard rbphone"><span class="lab">${esc(st.cue.kind)}</span><b>${esc(st.cue.text)}</b></div><p>From memory. Don’t listen back. A click is fine.</p>`;
-      else if(st.role==='rec')h=`${tag}${pClockHTML(st.clock)}<div class="blyou rec"><i>Layer ${st.layer}</i><b>You record</b></div><p>Arm a new track for <b>${esc(st.who)}</b>, mute every other track, press record. Keep the session moving.</p><p class="fine">Never press play on the old tracks.</p>`;
-      else h=`${tag}${pClockHTML(st.clock)}<div class="blyou"><i>Layer ${st.layer}</i><b>Listen to the room</b></div><p>${esc(st.who)} is playing. Remember what you hear: ${st.wait?`you play in ${st.wait} layer${st.wait>1?'s':''}`:'it all comes back at the reveal'}.</p>`;}
-    else if(st.ph==='reveal'){const rg=st.rg||{};
-      if(st.rv==='play')h=`<div class="blpg" style="--c:var(${rg.c})"><b>${esc(rg.name)}${rg.mine?' · yours!':''}</b></div><p class="blphint">Tap when something jumps out <b id="pMk"></b></p><div class="blmarks">${BLIND.listen.map(x=>`<button class="blmk" data-k="${x.k}">${blIco(x.k,30)}<b>${esc(x.name)}</b></button>`).join('')}</div>`;
-      else h=`<div class="blpg" style="--c:var(${rg.c})"><b>${esc(rg.name)}</b></div><h2 class="pbigt">${st.rv==='ready'?(rg.mine?'Your reveal':'Get ready'):'Marked'}</h2><p>${st.rv==='ready'?(rg.mine?'Unmute every track at once and play it from the top through the speakers. Hands off the spacebar.':'When it starts, tap the moments that jump out.'):'See the moments on the big screen.'}</p>`;}
-    else if(st.ph==='develop')h=`${tag}${pClockHTML(st.clock)}<h2 class="pbigt">Make something</h2>${(st.moments||[]).map(m=>`<div class="blmom sm">${blIco(m.k,22)}<div><strong>${m.t}</strong><span>${esc(BLK[m.k].name)} · ${m.n}</span></div></div>`).join('')||'<p>Nobody marked a moment: find two or three of your own.</p>'}
-      <p class="fine">Isolate and loop · remove and extend · silence and rearrange. Agree every decision together.</p>`;
-    else if(st.ph==='share'){const rg=st.rg||{};h=`<div class="blpg" style="--c:var(${rg.c})"><b>${esc(rg.name)}${rg.mine?' · your turn':''}</b></div><h2 class="pbigt">${rg.mine?'Play it and tell us':'Listen'}</h2><ol class="blq ph">${BLIND.questions.map(q=>`<li>${esc(q)}</li>`).join('')}</ol>`;}
-    else h=`<h2 class="pbigt">Unexpected is the material</h2><p>Your moments are in your notebook.</p>`;
+      lbl=s.rv==='play'?'Stop':s.rv==='ready'?'▶ Play them all':'▶ Play again';}
+    if(s.phase==='done'){body=`<div class="dbig"><span class="lab">Blind layers</span><h2>Unexpected is the material</h2><p>Recording without listening generates possibilities. Listening closely reveals moments worth pursuing.</p></div>`;lbl='Back to the menu';}
+    const tip={brief:'Mode · Blind layers',make:'Nobody hears anyone else',hand:'Export from bar 1',reveal:'Radical listening starts now',done:''}[s.phase];
+    st.innerHTML=`<div class="destruct roundabout blind dots ph-${s.phase}">${body}<div class="dfoot"><span class="lab bltip">${tip}</span>${s.phase==='done'?againBtn():''}${s.phase==='reveal'&&s.rv!=='play'?'<button class="big" id="blDone">Finish</button>':''}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
+    $('#bNext').onclick=()=>this.next();bindAgain(st);const d=$('#blDone',st);if(d)d.onclick=()=>this.go('done');
+    $$('.bllane',st).forEach(b=>b.onclick=()=>{const id=b.dataset.pid;s.mute.has(id)?s.mute.delete(id):s.mute.add(id);b.classList.toggle('off');});},
+  pstate(p){const s=G.gs,c=s.phase==='brief'?null:this.cueFor(p),r=s.rec.get(p.id)||{};
+    return {bl:true,k:[s.phase,s.rv,r.st||'',Math.round(r.dur||0)].join('|'),ph:s.phase,bpm:s.bpm,key:s.key,bars:s.o.bbars,cue:c,clock:pClock(),rv:s.rv,pc:!!pcFor(p),rec:r.st||'',dur:r.dur||0};},
+  player(root,st){pClockStart(st.clock);const facts=`<div class="alpfacts"><span><small>Tempo</small><b>${st.bpm}</b></span><span><small>Key</small><b>${esc(st.key)}</b></span>${st.bars?`<span><small>Bars</small><b>${st.bars}</b></span>`:''}</div>`;let h='';
+    if(st.ph==='brief')h=`<h2 class="pbigt">Blind layers</h2>${facts}<p>You’ll make one track on your own. Nobody hears it until the end.</p>`;
+    else if(st.ph==='make')h=`${pClockHTML(st.clock)}<h2 class="pbigt">Your track</h2>${facts}${st.cue?`<div class="scard rbphone"><span class="lab">${esc(st.cue.kind)}</span><b>${esc(st.cue.text)}</b></div>`:''}<p>Start at bar 1. Headphones on.</p>`;
+    else if(st.ph==='hand')h=`<h2 class="pbigt">Hand it in</h2>${!st.pc?'<p>Your computer isn’t signed in through CADCAST: open gunnitynes.github.io/CADCAST/go and scan its code.</p>':st.rec==='ok'?`<div class="rbbig ok">✓ Handed in${st.dur?' · '+rbFmt(st.dur):''}</div><p>Wait for the reveal.</p>`:st.rec==='up'?'<div class="rbbig">Arriving…</div>':`<div class="rbsteps"><div><b>1</b>Export your whole track <i>from bar 1</i></div><div><b>2</b><i>MP3</i> is fastest</div><div><b>3</b>Drop it on your <i>CADCAST</i> page</div></div>`}`;
+    else if(st.ph==='reveal'){if(st.rv==='play')h=`<p class="blphint">Tap when something jumps out <b id="pMk"></b></p><div class="blmarks">${BLIND.listen.map(x=>`<button class="blmk" data-k="${x.k}">${blIco(x.k,30)}<b>${esc(x.name)}</b></button>`).join('')}</div>`;
+      else h=`<h2 class="pbigt">${st.rv==='ready'?'Get ready':'Listen again?'}</h2><p>Every track plays together on the big speakers. Tap the moments that jump out.</p>`;}
+    else h=`<h2 class="pbigt">Unexpected is the material</h2><p>Your moments are on the big screen.</p>`;
     root.innerHTML=`<div class="pcol2 blp">${h}</div>`;
-    let n=0;$$('.blmk',root).forEach(b=>b.onclick=()=>{papi.send({t:'mark',k:b.dataset.k});papi.vibe(25);n++;const e=$('#pMk',root);if(e)e.textContent=`· ${n} marked`;b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),300);});
-    if(st.ph==='layer'&&st.role==='play')papi.vibe([40,60,40]);
-  },
+    let n=0;$$('.blmk',root).forEach(b=>b.onclick=()=>{papi.send({t:'mark',k:b.dataset.k});papi.vibe(25);n++;const e=$('#pMk',root);if(e)e.textContent=`· ${n} marked`;b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),300);});},
 };
 
 // the teacher's own photos for Metaphor Translation (one object URL per photo, kept for the session)

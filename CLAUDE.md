@@ -193,13 +193,21 @@ Phones and the host keep old files otherwise.
   leaving the phase sends `{t:'take-end'}`. Files travel with `{t:'file'}` chunks or file links (core.js `pcSendFile` / `pcData` / `B64`, both directions, game hooks `onPcFile`,
   `onPcMsg`, `onPcProg`). "Pass it on" sends each take (and in `pass:'project'` the dropped project zip) to the next
   computer in `s.ring`, where it becomes a WAV. Takes stay in host memory for the listening party (`journeys()`).
-- **Soundabout Roundabout ▸ Blind layers** (option `mode:'blind'`, the owner's Week 4 "Record with intuition" PDF): `RBB` in
-  games-make.js, state `G.gs.bl`; the roundabout spec hands every hook to RBB when `bl` is set, and `how` is a getter per mode.
-  Groups of `size` (pkTeam names), a starting point per group (BLIND.tempo/tonal/palette, or `start:'own'`), then layers: performer
-  `ids[(L-1)%n]`, operator `ids[L%n]`, a cue card (BLIND.cues: Start / Memory / Space / Variation). The reveal goes group by group: the
-  teacher starts the clock when the group presses play, phones tap one of six moments (BLIND.listen, `{t:'mark',k}`), `blMoments`
-  clusters marks within 5 s and ranks by students → the group's top 3 go to their phones + notebooks for Develop, then Share.
-  Content in data/content.js → BLIND. No CADCAST needed (each group works on one computer).
+- **Soundabout Roundabout ▸ Blind layers** (option `mode:'blind'`; reworked 2026-10-25 at the owner's request): `RBB` in games-make.js,
+  state `G.gs.bl`; the roundabout spec hands every hook to RBB. One tempo (`bbpm`) and key (`bkey`) for the room, a length hint (`bbars`),
+  a making clock (`mins`); everyone makes ONE track alone with a cue card (BLIND.cues Start/Space/Variation); hand-in = the same CADCAST
+  take hand-in (`take-in`, kind 'take', round = s.id); the reveal plays every decoded take from its start, together (`RBB.play`), phones
+  mark moments (BLIND.listen, `blMoments`), lanes can be muted between listens. Content in data/content.js → BLIND.
+- **The Class Album, several songs**: `s.songs` holds finished songs; Arrange shows **Create another song** (`renderAll('another')` →
+  `newSong()`: new key and tempo (`s.bpm`, `s.key`), roles re-dealt avoiding last time's) left of Make the album; the album phase lists
+  every song (play, mix, mix + stems) and zips the whole album, a folder per song.
+- **The Listening party** (js/party.js): CADCAST/go has a Listening party button; students upload files/folders (+ an optional group
+  name) as kind 'party' (file link or chunks), handled in core `pcData` in ANY view → `partyAdd` (PARTY.list, links kept 24 h in
+  localStorage `controlroom.party`) and acked `{t:'party-got', uid}` to that computer (`pcSendPc`). Header **Review** (`openReview`) =
+  a full-screen page by group/student: play, play all, download. A computer that isn't signed in shows the pairing QR with `&lp=1`:
+  the phone sends `{t:'pair', lp:true}` and the allow entry gets `party:true`, so it never becomes the student's CADCAST computer
+  (`pcFor` skips it, the patch bay ignores it). Such a page reaches us itself with `{t:'pc-hello', pc}` (accepted only from
+  `cadcast-pc-<pc>` that is in the allow list; the connection then feeds `pcData`).
 - **Room vote** (js/vote.js): the Vote button opens `openVoteChooser()`: The next module (`voteGames`) or Your own question
   (`openCustomVote`: a question + any number of answers, Enter adds the next, the last one saved as `vote.custom`, kind 'text'). `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
   `{t:'vote', v}` (not `act`). Votes are by player id and only count while the player is in the room. Close → 3-2-1 →

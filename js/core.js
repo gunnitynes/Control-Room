@@ -249,19 +249,20 @@ function cadcastPair(conn,m){
   const reply=o=>{try{conn.send({t:'paired',...o});}catch(e){}};
   if(!pc)return reply({ok:false,why:'That code is not a CADCAST computer.'});
   if(!p)return reply({ok:false,why:'Your phone is not in this room yet. Scan the big screen and pick your name first.'});
-  const allow=store.get('cadcast.allow',{});allow[pc]={name:p.name,pid:p.id,at:Date.now()};
+  const lp=!!m.lp,allow=store.get('cadcast.allow',{});allow[pc]={name:p.name,pid:p.id,at:Date.now(),...(lp?{party:true}:{})};   // party: a laptop that only uploads to the Listening party
   for(const k in allow)if(Date.now()-allow[k].at>12*3600e3)delete allow[k];
   store.set('cadcast.allow',allow);if(CADCAST_BC)CADCAST_BC.postMessage({t:'allow',pc,name:p.name});
   let told=false;const tell=()=>{const c=G.peer.connect('cadcast-pc-'+pc,{serialization:'json',reliable:true});
-    c.on('open',()=>{told=true;c.send({t:'paired',name:p.name,desk:cadcastDesk()});setTimeout(()=>{try{c.close();}catch(e){}},4000);});c.on('error',()=>{});};
+    c.on('open',()=>{told=true;c.send({t:'paired',name:p.name,desk:cadcastDesk(),party:lp});setTimeout(()=>{try{c.close();}catch(e){}},4000);});c.on('error',()=>{});};
   tell();setTimeout(()=>{if(!told)tell();},3000);
-  reply({ok:true,name:p.name});toast(p.name+'’s computer is paired with CADCAST');
+  reply({ok:true,name:p.name,party:lp});toast(lp?p.name+' can upload to the Listening party':p.name+'’s computer is paired with CADCAST');if(lp)return;
   if(G.view==='play'&&G.game&&G.game.onPair)setTimeout(()=>{try{G.game.onPair(p);}catch(e){}},1500);
 }
 // the student's paired computer (the most recent pairing) and a lasting connection to it, for sending missions and files
-function pcFor(p){const a=store.get('cadcast.allow',{});let best=null;for(const [pc,v] of Object.entries(a))if(v.pid===p.id&&(!best||v.at>best.at))best={pc,at:v.at};return best?best.pc:null;}
+function pcFor(p){const a=store.get('cadcast.allow',{});let best=null;for(const [pc,v] of Object.entries(a))if(v.pid===p.id&&!v.party&&(!best||v.at>best.at))best={pc,at:v.at};return best?best.pc:null;}
 const PCC=new Map();
-function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)return false;let e=PCC.get(pc);
+function pcSend(p,msg){return pcSendPc(pcFor(p),msg);}
+function pcSendPc(pc,msg){if(!pc||!G.peer||G.peer.destroyed)return false;let e=PCC.get(pc);
   if(!e||e.dead){const conn=G.peer.connect('cadcast-pc-'+pc,{serialization:'json',reliable:true});e={conn,q:[],dead:false};PCC.set(pc,e);
     conn.on('open',()=>{e.q.forEach(m=>{try{conn.send(m);}catch(x){}});e.q=[];});conn.on('close',()=>{e.dead=true;});conn.on('error',()=>{e.dead=true;});
     conn.on('data',m=>pcData(pc,m));}
@@ -308,9 +309,10 @@ function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadca
       if(PCF.size>=24)return;PCF.set(m.fid,f={parts:[],got:0,n:m.n,meta:null,at:Date.now()});}f.at=Date.now();if(m.meta)f.meta=m.meta;
     if(!f.parts[m.i]){f.parts[m.i]=UNB64(m.data);f.got++;}
     if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f.got/f.n,f.meta);
-    if(f.got===f.n&&f.meta){PCF.delete(m.fid);const b=new Blob(f.parts,{type:f.meta.mime||''});if(G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,f.meta,b);}
+    if(f.got===f.n&&f.meta){PCF.delete(m.fid);const b=new Blob(f.parts,{type:f.meta.mime||''});if(f.meta.kind==='party'){partyAdd(pc,p,f.meta,{blob:b});return;}if(G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,f.meta,b);}
     return;}
   if(m.t==='file-link'){if(!m.meta||typeof m.url!=='string'||!(m.url.startsWith(FILES_URL+'/drop/')||m.url.startsWith(TURN_URL+'/drop/')))return;   // only our own Worker's links
+    if(m.meta.kind==='party'){partyAdd(pc,p,m.meta,{url:m.url});return;}
     const meta=m.meta,prog=f=>{if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f,meta);};prog(0);
     filesGet(m.url,prog).then(b=>{if(b&&G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,meta,new Blob([b],{type:meta.mime||''}));});return;}
   if(m.t==='pong'){const e=PCC.get(pc);if(e&&e.pong&&e.pong.k===m.k)e.pong.f();return;}
@@ -381,6 +383,9 @@ function uniqueName(name,id,max=30){
 }
 function hostData(conn,m){
   if(!m||typeof m!=='object')return;
+  if(conn.pc){pcData(conn.pc,m);return;}
+  if(m.t==='pc-hello'){const pc=String(m.pc||'').replace(/[^a-z0-9]/gi,'').slice(0,24);if(!pc||conn.peer!=='cadcast-pc-'+pc||!store.get('cadcast.allow',{})[pc])return;
+    conn.pc=pc;const e={conn,q:[],dead:false};const old=PCC.get(pc);if(old&&old.conn!==conn)try{old.conn.close();}catch(x){}PCC.set(pc,e);conn.on('close',()=>{e.dead=true;});try{conn.send({t:'pc-ok'});}catch(x){}return;}
   if(m.t==='ping'){try{conn.send({t:'pong'});}catch(e){}return;}
   if(m.t==='who'){G.lobby.add(conn);try{conn.send(namesMsg());}catch(e){}return;}
   if(m.t==='pair'){cadcastPair(conn,m);return;}
@@ -464,6 +469,7 @@ function topBar(){
     ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
     ${tmrBtnHTML()}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">CADCAST</button>
+    <button class="ghost rvbtn" id="bReview" title="The Listening party: what students uploaded from CADCAST">${partyBtnHTML()}</button>
     ${G.view==='menu'?`<button class="ghost" id="bDrop" title="Supply Drop: deal your materials to every student computer">Supply drop</button>`:''}
     ${!atRest()?`<button class="ghost" id="bMenu">Menu</button>`:''}
     <div class="util" id="util"><button class="ghost utilb" id="bUtil" aria-expanded="${!!G.utilOpen}" title="Utilities: sound effects, theme, the manual" aria-label="Utilities"><i></i><i></i><i></i></button>
@@ -486,7 +492,7 @@ function render(){
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bManual'))$('#bManual').onclick=e=>{e.preventDefault();G.utilOpen=false;render();window.open('Teacher/','cr-manual');};   // a script-opened tab, so the manual's Back can close it
   if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
-  $('#bMix').onclick=openMixer;
+  $('#bMix').onclick=openMixer;$('#bReview').onclick=openReview;
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
   home.onclick=()=>{if(G.view==='menu'){G.view='home';render();syncAll();}else if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote'||G.view==='pick')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
@@ -892,7 +898,7 @@ function pData(m){
   if(m.t==='taken'){PL.joined=false;PL.st=null;store.del('proom');PL.status=m.name+' is already in the room on another phone. Tell your teacher if that isn’t you.';pRender();return;}
   if(m.t==='kick'){PL.kicked=true;PL.st={view:'kicked',why:m.why};try{PL.conn.close();}catch(e){}pRender();return;}
   if(m.t!=='st')return;
-  if(PL.pairPc&&PL.joined&&m.view!=='kicked'&&PL.conn&&PL.conn.open){const pc=PL.pairPc;PL.pairPc=null;try{PL.conn.send({t:'pair',id:PL.id,pc});}catch(e){PL.pairPc=pc;}}
+  if(PL.pairPc&&PL.joined&&m.view!=='kicked'&&PL.conn&&PL.conn.open){const pc=PL.pairPc;PL.pairPc=null;try{PL.conn.send({t:'pair',id:PL.id,pc,lp:!!PL.pairLp});}catch(e){PL.pairPc=pc;}}
   const prev=PL.st;PL.st=m;PL.name=m.name;if(m.name&&m.view!=='kicked'&&store.get('pname','')!==m.name)store.set('pname',m.name);
   const key=m.view+'|'+m.g+'|'+(m.s?m.s.k:'');
   if(prev&&key===PL.key&&m.view==='vote'){const top=$('.pscore');if(top)top.textContent=m.total;pVoteUpdate($('#pbody'),m.s);return;}
@@ -1043,7 +1049,7 @@ function boot(){
     addEventListener('beforeunload',e=>{if(G.view==='play'){e.preventDefault();e.returnValue='';}});
   }else{
     if(QS.has('pair')){ // scanned a computer's CADCAST code: log in here, and the computer comes along
-      PL.pairPc=String(QS.get('pair')||'').replace(/[^a-z0-9]/gi,'').slice(0,24);
+      PL.pairPc=String(QS.get('pair')||'').replace(/[^a-z0-9]/gi,'').slice(0,24);PL.pairLp=QS.has('lp');
       const go=code=>{PL.code=code;try{history.replaceState(null,'',location.pathname+'?room='+code+(QS.get('as')?'&as='+QS.get('as'):''));}catch(e){}
         if(PL.name&&store.get('proom','')===code)PL.joined=true;PL.status='';pConnect();pRender();};
       const r=String(QS.get('room')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);

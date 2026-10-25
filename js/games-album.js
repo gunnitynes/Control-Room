@@ -78,12 +78,15 @@ game({
     {key:'mins',label:'Making time',choices:[[15,'15','min'],[20,'20','min'],[30,'30','min'],[45,'45','min'],[0,'Open','no clock'],[-10,'10 s','test run']],def:30},
   ],
   note:'Students hand in through CADCAST (gunnitynes.github.io/CADCAST/go): they drop their exported part on that page. Nothing is sent to the computers. A student without CADCAST can AirDrop the file to you: drag it onto their card.',
-  topInfo(){const s=G.gs;if(!s)return this.tag;return `${s.o.bpm} BPM · ${s.key} · ${s.o.bars} bars each`+({make:' · making',arrange:' · arranging',album:''})[s.phase];},
-  start(o){const key=o.key==='random'?pick(alKeys()):o.key;
-    G.gs={o,key,id:Date.now()%1e9,phase:'make',roles:new Map(),parts:new Map(),prog:new Map(),secs:AL_SECS.slice(),on:new Map(),lvl:new Map(),mute:new Set(),
-      titles:new Map(),title:`${pick(AL_ADJ)} ${pick(AL_NOUN)}`,play:null,out:null};
-    if(o.mins)startClock(o.mins<0?-o.mins*1000:o.mins*60000,()=>{sfx.alarm();toast('Time! Export your part and drop it on CADCAST.');});this.dealAll();
-  },
+  topInfo(){const s=G.gs;if(!s)return this.tag;return `${s.songs.length&&s.phase!=='album'?`Song ${s.songs.length+1} · `:''}${s.bpm} BPM · ${s.key} · ${s.o.bars} bars each`+({make:' · making',arrange:' · arranging',album:''})[s.phase];},
+  start(o){G.gs={o,songs:[]};this.newSong();},
+  // a song: its own key, tempo, roles, parts and arrangement. The album is every finished song (s.songs).
+  newSong(){const s=G.gs,o=s.o,last=s.songs[s.songs.length-1],prevRoles=s.roles||new Map();
+    const keys=alKeys().filter(k=>!last||k!==last.key),bpms=[85,95,100,110,120,128,140].filter(b=>!last||b!==last.bpm);
+    Object.assign(s,{key:last?pick(keys):o.key==='random'?pick(alKeys()):o.key,bpm:last?pick(bpms):o.bpm,id:Date.now()%1e9,phase:'make',roles:new Map(),parts:new Map(),prog:new Map(),secs:AL_SECS.slice(),on:new Map(),lvl:new Map(),mute:new Set(),
+      titles:new Map(),title:`${pick(AL_ADJ)} ${pick(AL_NOUN)}`,play:null,out:null,fail:null,rendering:false});
+    stopClock();if(o.mins)startClock(o.mins<0?-o.mins*1000:o.mins*60000,()=>{sfx.alarm();toast('Time! Export your part and drop it on CADCAST.');});
+    shuffle(online()).forEach(p=>{if(!s.roles.has(p.id))this.deal(p,prevRoles.get(p.id));});},   // a new song gives everyone a different role than last time
   stop(){this.halt();stopClock();const s=G.gs;if(s)online().forEach(p=>pcSend(p,{t:'album-end'}));},
   leave(){},
   // ---------- roles: dealt in order of need (drums and bass first), then doubled up
@@ -95,14 +98,14 @@ game({
   roleName(pid){const s=G.gs,id=s.roles.get(pid),same=[...s.roles].filter(([,r])=>r===id).map(([k])=>k);const r=this.role(pid);return same.length>1?`${r.name} ${same.indexOf(pid)+1}`:r.name;},
   // only a few words and the drop zone: no files go out
   brief(p){const s=G.gs;if(s.phase!=='make')return;const r=this.role(p.id);
-    pcSend(p,{t:'album',m:{round:s.id,at:Date.now(),title:s.title,role:this.roleName(p.id),tip:r.tip,bpm:s.o.bpm,key:s.key,bars:s.o.bars,files:[],ends:s.clockEnd?Date.now()+clockLeft():0}});},
+    pcSend(p,{t:'album',m:{round:s.id,at:Date.now(),title:s.title,role:this.roleName(p.id),tip:r.tip,bpm:s.bpm,key:s.key,bars:s.o.bars,files:[],ends:s.clockEnd?Date.now()+clockLeft():0}});},
   onJoin(p){const s=G.gs;if(s.phase==='make'&&!s.roles.has(p.id)){this.deal(p);render();sync(p);}},
   onPair(p){const s=G.gs;if(s.phase==='make'&&s.roles.has(p.id))this.brief(p);this.live();},
   // ---------- hand-in
   onPcProg(p,f,meta){const s=G.gs;if(!meta||meta.kind!=='part'||meta.round!==s.id)return;s.prog.set(p.id,f);this.live();},
   onPcFile(p,meta,blob){const s=G.gs;if(meta.kind!=='part'||meta.round!==s.id)return;s.prog.delete(p.id);this.take(p,blob,meta.name);},
   async take(p,blob,name){const s=G.gs;if(!s.roles.has(p.id))this.deal(p);s.prog.set(p.id,-1);this.live();
-    const f=await alFit(blob,s.o.bpm,s.o.bars);if(G.gs!==s)return;s.prog.delete(p.id);
+    const f=await alFit(blob,s.bpm,s.o.bars);if(G.gs!==s)return;s.prog.delete(p.id);
     pcSend(p,{t:'album-got',ok:f.ok&&!f.warn,text:f.ok?(f.warn?f.text:f.text+'. It’s on the big screen.'):f.text});
     if(!f.ok){(s.fail||(s.fail=new Map())).set(p.id,f.text);toast(`${p.name}: ${f.text}`);this.live();return;}s.fail&&s.fail.delete(p.id);
     const had=s.parts.has(p.id);s.parts.set(p.id,{buf:f.buf,text:f.text,warn:!!f.warn,name,at:Date.now()});
@@ -112,7 +115,7 @@ game({
     if(s.phase==='make')this.live();else render();sync(p);},
   // ---------- playback: sections scheduled just ahead, each part through its own gain
   rows(){const s=G.gs;return [...s.parts.keys()].filter(pid=>s.roles.has(pid)).sort((a,b)=>AL_ROLES.findIndex(r=>r.id===s.roles.get(a))-AL_ROLES.findIndex(r=>r.id===s.roles.get(b))||String(a).localeCompare(b));},
-  secLen(){const s=G.gs;return s.o.bars*4*60/s.o.bpm;},
+  secLen(){const s=G.gs;return s.o.bars*4*60/s.bpm;},
   gainOf(pid){const s=G.gs;return s.mute.has(pid)?0:(s.lvl.get(pid)??.8);},
   play(from=0){const s=G.gs;this.halt();if(!s.parts.size)return;const ac=audio(),bus=gn(ac,.9);bus.connect(AU.music);
     const P={ac,bus,next:from,nextAt:ac.currentTime+.15,segs:[],sid:0,src:new Map(),g:new Map(),loop:null,stop:()=>this.halt()};s.play=P;AU.live.add(P);
@@ -142,8 +145,8 @@ game({
     else{P.loop=k;P.next=k;}this.live();},
   toggle(pid,k){const s=G.gs,set=s.on.get(pid);if(!set||k<0||k>=s.secs.length)return;if(set.has(k))set.delete(k);else set.add(k);this.reschedule(pid);
     const p=G.players.get(pid);if(p)sync(p);this.live();},
-  // ---------- the song as a file: one offline render per stem, the mix is their sum
-  async renderAll(){const s=G.gs;if(s.out||s.rendering)return;s.rendering=true;render();
+  // ---------- the song as a file: one offline render per stem, the mix is their sum. It joins the album (s.songs).
+  async renderAll(then){const s=G.gs;if(s.rendering)return;s.rendering=true;render();
     const rows=this.rows(),len=this.secLen(),N=Math.ceil(len*s.secs.length*AL_SR),tail=Math.ceil(.05*AL_SR);
     const stem=async pid=>{const ac=new OfflineAudioContext(2,N+tail,AL_SR),g=ac.createGain();g.gain.value=this.gainOf(pid);g.connect(ac.destination);
       s.secs.forEach((_,k)=>{if(s.on.get(pid)&&s.on.get(pid).has(k)){const x=ac.createBufferSource();x.buffer=s.parts.get(pid).buf;x.connect(g);x.start(k*len);}});return ac.startRendering();};
@@ -152,14 +155,18 @@ game({
     for(let c=0;c<2;c++){const m=mix.getChannelData(c);bufs.forEach(b=>{const d=b.getChannelData(c);for(let i=0;i<m.length;i++)m[i]+=d[i];});for(let i=0;i<m.length;i++)peak=Math.max(peak,Math.abs(m[i]));}
     const gain=peak>0?.89/peak:1,t=alSafe(s.title);   // the mix peaks at −1 dB; stems share its gain, so they add up to it
     const stems=rows.map((pid,i)=>({pid,name:`${t} - Stems/${pad2(i+1)} ${alSafe(this.roleName(pid))} - ${alSafe((G.players.get(pid)||{}).name||'')}.wav`,blob:alWav(bufs[i],gain)}));
-    s.out={mix:alWav(mix,gain),stems,dur:mix.duration,title:s.title,names:rows.map(pid=>[(G.players.get(pid)||{}).name||'?',this.roleName(pid)])};s.rendering=false;
-    s.out.mixURL=URL.createObjectURL(s.out.mix);s.out.stemURLs=stems.map(x=>URL.createObjectURL(x.blob));
+    const O={mix:alWav(mix,gain),stems,dur:mix.duration,title:s.title,key:s.key,bpm:s.bpm,names:rows.map(pid=>[(G.players.get(pid)||{}).name||'?',this.roleName(pid)])};s.rendering=false;
+    O.mixURL=URL.createObjectURL(O.mix);O.stemURLs=stems.map(x=>URL.createObjectURL(x.blob));s.songs.push(O);
+    if(then==='another'){sfx.card&&sfx.card();toast(`“${O.title}” is on the album. Song ${s.songs.length+1}: new roles, new key.`);this.newSong();render();syncAll();return;}
     s.phase='album';sfx.fanfare&&sfx.fanfare();render();syncAll();},
-  async zip(){const s=G.gs,O=s.out;if(!O)return;const b=$('#alZip');if(b){b.disabled=true;b.textContent='Packing…';}
-    const z=await alZip([{name:`${alSafe(O.title)} - Mix.wav`,blob:O.mix},...O.stems]);const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=`${alSafe(O.title)} - Class Album.zip`;a.click();
-    if(b){b.disabled=false;b.textContent='⬇ Mix + all stems (.zip)';}},
+  // one song's mix + stems, or the whole album (a folder per song)
+  async zip(i){const s=G.gs,L=i==null?s.songs:[s.songs[i]];if(!L.length)return;const b=$(i==null?'#alZipAll':`.alzip[data-i="${i}"]`);const was=b&&b.textContent;if(b){b.disabled=true;b.textContent='Packing…';}
+    const files=L.flatMap((O,k)=>{const dir=i==null&&s.songs.length>1?`${pad2(k+1)} ${alSafe(O.title)}/`:'';return [{name:`${dir}${alSafe(O.title)} - Mix.wav`,blob:O.mix},...O.stems.map(x=>({name:dir+x.name,blob:x.blob}))];});
+    const z=await alZip(files);const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=i==null?'The Class Album.zip':`${alSafe(L[0].title)} - Class Album.zip`;a.click();
+    if(b){b.disabled=false;b.textContent=was;}},
   next(){const s=G.gs;if(s.phase==='make'){if(!s.parts.size){toast('No parts yet: wait for the first export');return;}s.phase='arrange';stopClock();online().forEach(p=>pcSend(p,{t:'album-end'}));render();syncAll();return;}
     if(s.phase==='arrange'){this.halt();this.renderAll();return;}
+    if(s.phase==='album'&&s.aud)stopAud();
     exitGame(true);},
   act(p,d){const s=G.gs;
     if(d.t==='cell'&&s.phase==='arrange'&&s.parts.has(p.id))this.toggle(p.id,+d.k);
@@ -210,21 +217,22 @@ game({
           <div class="altitles" id="alTitles">${this.titles()}</div></div>
         <div class="algrid" id="alGrid">${this.grid()}</div>
         <div class="frow"><button class="big go" id="alPlay">${s.play?'■ Stop':'▶ Play the song'}</button></div></div>`;}
-    if(s.phase==='album'){const O=s.out;lbl='Back to the menu';
-      body=`<div class="alalbum"><div class="alcover"><div class="alvinyl"><i></i></div><div class="alsleeve"><span class="lab">The Class Album</span><h2>${esc(O.title)}</h2><p>${o.bpm} BPM · ${esc(s.key)} · ${alFmt(O.dur)}</p>
-          <ol>${O.names.map(([n,r])=>`<li><b>${esc(n)}</b><span>${esc(r)}</span></li>`).join('')}</ol></div></div>
-        <div class="aldl"><button class="big go" id="alPlayMix">▶ Play the album</button><a class="big" href="${O.mixURL}" download="${esc(alSafe(O.title))} - Mix.wav">⬇ The mix (WAV)</a><button class="big" id="alZip">⬇ Mix + all stems (.zip)</button>
-<details><summary>Stems one by one</summary>${O.stems.map((x,i)=>`<a href="${O.stemURLs[i]}" download="${esc(x.name.split('/').pop())}">${esc(x.name.split('/').pop())}</a>`).join('')}</details></div></div>`;}
-    st.innerHTML=`<div class="album ph-${s.phase}">${body}<div class="dfoot"><span class="fine" id="alCount">${nIn} of ${s.roles.size} parts in</span>${s.phase==='album'?againBtn():''}<button class="big go" id="bNext" ${dis?'disabled':''}>${esc(lbl)} <small>SPACE</small></button></div></div>`;
+    if(s.phase==='album'){const S=s.songs,tot=S.reduce((a,O)=>a+O.dur,0),who=[...new Set(S.flatMap(O=>O.names.map(([n])=>n)))];lbl='Back to the menu';
+      body=`<div class="alalbum"><div class="alcover"><div class="alvinyl"><i></i></div><div class="alsleeve"><span class="lab">The Class Album · ${S.length} song${S.length===1?'':'s'} · ${alFmt(tot)}</span><h2>${esc(S.length===1?S[0].title:'The Class Album')}</h2><p>${esc(who.join(' · '))}</p>
+          <ol class="altracks">${S.map((O,k)=>`<li><b>${esc(O.title)}</b><span>${O.bpm} BPM · ${esc(O.key)} · ${alFmt(O.dur)}</span><div class="altb"><button class="ghost alplay" data-i="${k}">▶ Play</button><a class="ghost" href="${O.mixURL}" download="${esc(alSafe(O.title))} - Mix.wav">⬇ Mix</a><button class="ghost alzip" data-i="${k}">⬇ Mix + stems</button></div></li>`).join('')}</ol></div></div>
+        <div class="aldl"><button class="big go" id="alZipAll">⬇ The whole album (.zip)</button><p class="fine">A folder per song: the mix and every stem. The stems of a song add up to its mix.</p></div></div>`;}
+    st.innerHTML=`<div class="album ph-${s.phase}">${body}<div class="dfoot"><span class="fine" id="alCount">${s.phase==='album'?'':`${s.songs.length?`Song ${s.songs.length+1} · `:''}${nIn} of ${s.roles.size} parts in`}</span>${s.phase==='album'?againBtn():''}${s.phase==='arrange'?`<button class="big" id="alAnother" ${dis?'disabled':''} title="Put this song on the album and start the next one: new roles, new key">Create another song</button>`:''}<button class="big go" id="bNext" ${dis?'disabled':''}>${esc(lbl)} <small>SPACE</small></button></div></div>`;
     $('#bNext').onclick=()=>this.next();bindAgain(st);this.bindWall(st);
     const g=$('#alGrid',st);if(g)this.bindGrid(g);const t=$('#alTitles',st);if(t)this.bindTitles(t);
     const pb=$('#alPlay',st);if(pb)pb.onclick=()=>{if(s.play)this.halt();else this.play(0);this.live();};
-    const pm=$('#alPlayMix',st);if(pm)pm.onclick=async()=>{if(s.aud){stopAud();pm.textContent='▶ Play the album';return;}const b=s.out.dec||(s.out.dec=await audio().decodeAudioData(await s.out.mix.arrayBuffer()));setAud(playSample(b,AU.music,{gain:.95,maxDur:1200}));pm.textContent='■ Stop';};
-    const z=$('#alZip',st);if(z)z.onclick=()=>this.zip();
+    const an=$('#alAnother',st);if(an)an.onclick=()=>{this.halt();this.renderAll('another');};
+    $$('.alplay',st).forEach(pm=>pm.onclick=async()=>{const on=pm.textContent.startsWith('■');stopAud();$$('.alplay',st).forEach(x=>x.textContent='▶ Play');if(on)return;const O=s.songs[+pm.dataset.i];
+      const b=O.dec||(O.dec=await audio().decodeAudioData(await O.mix.arrayBuffer()));setAud(playSample(b,AU.music,{gain:.95,maxDur:1200}));pm.textContent='■ Stop';});
+    $$('.alzip',st).forEach(z=>z.onclick=()=>this.zip(+z.dataset.i));const za=$('#alZipAll',st);if(za)za.onclick=()=>this.zip();
     this._k=null;},
   // ---------- phones
   pstate(p){const s=G.gs,part=s.parts.get(p.id),on=s.on.get(p.id);
-    return {k:'al'+s.phase+(s.roles.get(p.id)||'')+(part?part.at:'')+(on?[...on].join('.'):'')+s.secs.join('|')+(s.titles.get(p.id)||'')+s.title,ph:s.phase,bpm:s.o.bpm,key:s.key,bars:s.o.bars,
+    return {k:'al'+s.phase+(s.roles.get(p.id)||'')+(part?part.at:'')+(on?[...on].join('.'):'')+s.secs.join('|')+(s.titles.get(p.id)||'')+s.title,ph:s.phase,bpm:s.bpm,key:s.key,bars:s.o.bars,
       role:s.roles.has(p.id)?this.roleName(p.id):'',tip:s.roles.has(p.id)?this.role(p.id).tip:'',part:part?{text:part.text,warn:part.warn}:null,pc:!!pcFor(p),
       secs:s.secs,on:on?[...on]:[],lvl:s.lvl.get(p.id)??.8,title:s.title,mine:s.titles.get(p.id)||'',clock:pClock()};},
   player(root,st){pClockStart(st.clock);
