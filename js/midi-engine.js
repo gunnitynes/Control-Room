@@ -118,6 +118,10 @@ function mdWindow(S,roles,bars,f=1){const len=bars*S.barBeats/f,ps=roles.map(r=>
   let best=0,bs=-1;for(let s=0;s+len<=Math.max(len,S.beats);s+=S.barBeats){let sc=0;
     ps.forEach(p=>{let c=0;for(const x of p.notes){if(x.t>=s+len)break;if(x.t>=s)c++;}sc+=Math.min(1,c/(2*bars/f))*10+Math.log1p(c);});
     if(sc>bs){bs=sc;best=s;}}
+  // no long silence at the start: if the lead part (roles[0], e.g. the tune) only enters later in the window, start at the
+  // bar where it enters (a bar-aligned move keeps the downbeats; at most a few beats before the first note remain)
+  const lead=ps[0],first=lead.notes.find(x=>x.t>=best&&x.t<best+len);
+  if(first&&first.t-best>=1){const nb=best+Math.floor((first.t-best)/S.barBeats)*S.barBeats;if(nb>best&&nb+len<=Math.max(len,S.beats)+S.barBeats)best=nb;}
   return best;}
 function mdClip(S,role,start,bars,shift=0,f=1){const p=S.roles[role];if(!p)return null;const len=bars*S.barBeats/f;
   const notes=p.notes.filter(x=>x.t>=start&&x.t<start+len).map(x=>({t:(x.t-start)*f,d:Math.min(x.d,start+len-x.t)*f,n:role==='drums'?x.n:x.n+shift,v:x.v}));
@@ -135,16 +139,45 @@ const MD_DRUM=(ac,d,t,n,v)=>{
 // which synth voice plays a part: by role, General MIDI program and track name
 function mdVoice(clip){const p=clip.prog,nm=clip.name||'';
   if(clip.voice)return clip.voice;if(clip.role==='bass')return 'bass';if(/vocal|voice|vox|sing|choir/i.test(nm))return 'vocal';
-  if(p==null)return clip.role==='chords'?'ep':'lead';
-  if(p<8)return 'ep';if(p<16)return 'bell';if(p<24)return 'organ';if(p<32)return 'pluck';if(p<40)return 'bass';if(p<56)return 'pad';if(p<64)return 'lead';if(p<80)return 'lead';if(p<88)return 'lead';if(p<96)return 'pad';return 'ep';}
+  if(/piano|keys/i.test(nm))return 'piano';if(/string|violin|viola|cello/i.test(nm))return 'strings';if(/brass|horn|trumpet|trombone|sax/i.test(nm))return 'brass';
+  if(p==null)return clip.role==='chords'?'piano':'lead';
+  if(p<4)return 'piano';if(p<8)return 'ep';if(p<16)return 'bell';if(p<24)return 'organ';if(p<32)return 'pluck';if(p<40)return 'bass';
+  if(p<52)return 'strings';if(p<56)return 'pad';if(p<64)return 'brass';if(p<72)return 'brass';if(p<80)return 'lead';if(p<88)return 'lead';if(p<96)return 'pad';return 'ep';}
+/* the grand piano: the University of Iowa samples (audio/atlas/piano, every semitone C2–C6, public domain), loaded once on
+   first use; a note plays the nearest sample, re-pitched, and is damped when it ends. Until they're in, the FM piano plays. */
+const MD_PIANO={bufs:new Map(),p:null};
+function mdPianoLoad(){if(MD_PIANO.p)return MD_PIANO.p;const ac=audio(),NN=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'],jobs=[];
+  for(let m=36;m<=84;m++)jobs.push(fetch(`audio/atlas/piano/${NN[m%12]}${Math.floor(m/12)-1}.mp3`).then(r=>r.arrayBuffer()).then(b=>new Promise((res,rej)=>ac.decodeAudioData(b,res,rej))).then(buf=>MD_PIANO.bufs.set(m,buf)).catch(()=>{}));
+  return MD_PIANO.p=Promise.all(jobs);}
+function mdPiano(ac,d,t,n,len,v){let m=Math.max(36,Math.min(84,Math.round(n)));if(!MD_PIANO.bufs.has(m)){let k=1;while(k<12&&!MD_PIANO.bufs.has(m+k)&&!MD_PIANO.bufs.has(m-k))k++;m=MD_PIANO.bufs.has(m+k)?m+k:m-k;}
+  const buf=MD_PIANO.bufs.get(m);if(!buf){mdPianoLoad();VO.ep(ac,d,t,{n,len:Math.max(.15,len),v:v*.9});return;}
+  const src=ac.createBufferSource(),g=gn(ac,0),hold=Math.min(buf.duration,Math.max(.12,len));src.buffer=buf;src.playbackRate.value=Math.pow(2,(n-m)/12);
+  const pk=.78*Math.pow(v,1.4);g.gain.setValueAtTime(pk,t);g.gain.setTargetAtTime(0,t+hold,.12);   // the damper falls when the key comes up
+  src.connect(g).connect(d);src.start(t);src.stop(t+hold+.8);}
+const MD_VOX={
+  // a string section: five detuned saws, a slow bow, gentle vibrato that comes in late
+  strings(ac,d,t,n,len,v){const f=bq(ac,'lowpass',2600,.7),hp=bq(ac,'highpass',180,.7),g=gn(ac,0),L=Math.max(.25,len);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.066,t+.09);g.gain.setValueAtTime(v*.066,t+L);g.gain.linearRampToValueAtTime(0,t+L+.25);
+    const lfo=osc(ac,'sine',5.2),lg=gn(ac,0);lg.gain.setValueAtTime(0,t);lg.gain.linearRampToValueAtTime(hz(n)*.004,t+.5);lfo.connect(lg);
+    [-9,-4,0,4,9].forEach(c=>{const o=osc(ac,'sawtooth',hz(n));o.detune.value=c;lg.connect(o.frequency);o.connect(f);o.start(t);o.stop(t+L+.3);});
+    lfo.start(t);lfo.stop(t+L+.3);f.connect(hp).connect(g).connect(d);},
+  // brass: two saws and a square, the filter opening with the breath
+  brass(ac,d,t,n,len,v){const f=bq(ac,'lowpass',500,1.2),g=gn(ac,0),L=Math.max(.12,len);
+    f.frequency.setValueAtTime(500,t);f.frequency.linearRampToValueAtTime(900+2600*v,t+.06);f.frequency.setTargetAtTime(1200+1200*v,t+.08,.2);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.11,t+.035);g.gain.setTargetAtTime(v*.085,t+.06,.1);g.gain.setValueAtTime(v*.085,t+L);g.gain.linearRampToValueAtTime(0,t+L+.08);
+    [[ 'sawtooth',-6],['sawtooth',6],['square',0]].forEach(([w,c])=>{const o=osc(ac,w,hz(n));o.detune.value=c;o.connect(f);o.start(t);o.stop(t+L+.1);});f.connect(g).connect(d);},
+};
 function mdPlayNote(ac,d,t,voice,n,len,v){
+  if(voice==='piano')return mdPiano(ac,d,t,n,len,v);if(MD_VOX[voice])return MD_VOX[voice](ac,d,t,n,len,v);
   switch(voice){case 'bass':VO.bass(ac,d,t,{n,len,v});break;case 'sub':VO.sub(ac,d,t,{n,len,v});break;case 'ep':VO.ep(ac,d,t,{n,len:Math.max(.15,len),v:v*.9});break;
     case 'organ':VO.organ(ac,d,t,{n,len,v});break;case 'pluck':VO.pluck(ac,d,t,{n,v,dec:.993});break;case 'bell':VO.bellv(ac,d,t,{n,v:v*.8});break;
     case 'vocal':VO.vocal(ac,d,t,{n,len,v:v*.7});break;case 'pad':VO.pad(ac,d,t,{notes:[n],len:Math.max(.3,len),v,a:.05,r:.3});break;case 'saw':VO.supersaw(ac,d,t,{notes:[n],len,v});break;
     default:VO.lead(ac,d,t,{n,len,v:v*.9});}}
+const MD_ROOM={ir:null};
 /* a looping band: layers {clip, gain, voice}; set(slot, clip) swaps a layer at the next loop. Returns a handle. */
-function mdBand({bpm,bars,barBeats=4,dest,swing=0}){const ac=audio(),out=gn(ac,.9);out.connect(dest||AU.music);
-  const L=bars*barBeats,spb=60/bpm,B={ac,out,bpm,layers:{},pending:{},gains:{},t0:ac.currentTime+.15,next:0,loopN:0,stop(){clearInterval(B.tick);try{out.disconnect();}catch(e){}AU.live.delete(B);},
+function mdBand({bpm,bars,barBeats=4,dest,swing=0}){const ac=audio(),out=gn(ac,.9);out.connect(dest||AU.music);mdPianoLoad();
+  const room=ac.createConvolver();room.buffer=MD_ROOM.ir||(MD_ROOM.ir=makeIR(ac,1.1,{damp:.55}));const rg=gn(ac,.16);out.connect(room).connect(rg).connect(dest||AU.music);   // a small room
+  const L=bars*barBeats,spb=60/bpm,B={ac,out,bpm,layers:{},pending:{},gains:{},t0:ac.currentTime+.15,next:0,loopN:0,stop(){clearInterval(B.tick);try{out.disconnect();rg.disconnect();}catch(e){}AU.live.delete(B);},
     set(slot,clip){B.pending[slot]=clip;},setNow(slot,clip){B.layers[slot]=clip;},level(slot,v){const g=B.gain(slot);g.gain.setTargetAtTime(v,ac.currentTime,.05);},
     gain(slot){if(!B.gains[slot]){B.gains[slot]=gn(ac,1);B.gains[slot].connect(out);}return B.gains[slot];},
     pos(){return Math.max(0,(ac.currentTime-B.t0)/(L*spb))%1;},loopLen:L*spb};

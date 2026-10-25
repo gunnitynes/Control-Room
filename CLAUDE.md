@@ -70,7 +70,10 @@ js/games-album.js   The Class Album (Make something, the last module): everyone 
 js/midi-engine.js   The teacher's MIDI library (clipDB dec -7, never in the repo; index in localStorage midi.idx): mdParse (SMF),
                     mdParts (per track+channel, so type-0 files split), mdRoles (drums = ch10 → name → a logistic model on playing
                     style, 95.5 % right per song; bass/melody/chords/extra by name, GM program, register, polyphony), mdKey
-                    (Krumhansl), mdFeel (double/half-time files → 70–150 BPM), mdWindow/mdClip (busiest N bars, in beats),
+                    (Krumhansl), mdFeel (double/half-time files → 70–150 BPM), mdWindow/mdClip (busiest N bars, in beats; then moved to the bar where
+                    roles[0] (e.g. the tune) enters, so there's no long silence before it: worst case on the test set 11 s → 2 s),
+                    voices: a sampled grand piano (mdPiano, the Iowa samples in audio/atlas/piano, loaded on first band), MD_VOX strings +
+                    brass, the rest from VO; GM programs map 0–3 piano, 40–51 strings, 56–71 brass; every band has a small room (makeIR 1.1 s),
                     mdBand (looping WebAudio band, swaps parts on the loop), mdWrite (multi-track .mid), mdLibPanel/mdLibBind.
                     Tested on the owner's 5,378-file bank (~/CATALIST/MIDI COLLECTION): all read, ~5 ms each.
 js/games-franken.js The Frankenhit (Make): phones spin a part each (drums/bass/chords/melody/extra) → that part of a random song,

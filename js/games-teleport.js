@@ -11,11 +11,11 @@ const TP_GENRES={
   trap:{name:'Trap',bpm:140,feel:2,c:'--red',k:'x......x..x.....',s:'........x.......',sv:'clap',h:'x.x.x.x.xxxx.x.x',o:'',bass:'x......x..x.....',bv:'sub',comp:'pad',cv:'pad',lead:'bell'},
   reggaeton:{name:'Reggaeton',bpm:95,feel:1,c:'--yel',k:'x...x...x...x...',s:'...x..x....x..x.',sv:'rim',h:'..x...x...x...x.',o:'',bass:'x.....x.x.......',bv:'bass',comp:'stab',cv:'pluck',lead:'lead'},
   dnb:{name:'Drum & Bass',bpm:174,feel:2,c:'--blue',k:'x.........x.....',s:'....x.......x...',sv:'snare',h:'x.x.x.x.x.x.x.x.',o:'',bass:'x.......x.......',bv:'sub',comp:'pad',cv:'pad',lead:'ep'},
-  house:{name:'House',bpm:124,feel:1,c:'--green',k:'x...x...x...x...',s:'....x.......x...',sv:'clap',h:'',o:'..x...x...x...x.',bass:'..x...x...x...x.',bv:'bass',comp:'stab',cv:'organ',lead:'lead'},
+  house:{name:'House',bpm:124,feel:1,c:'--green',k:'x...x...x...x...',s:'....x.......x...',sv:'clap',h:'',o:'..x...x...x...x.',bass:'..x...x...x...x.',bv:'bass',comp:'stab',cv:'piano',lead:'lead'},
   lofi:{name:'Lo-fi',bpm:78,feel:1,swing:.33,c:'--blue',k:'x......x..x.....',s:'....x.......x...',sv:'rim',h:'x.x.x.x.x.x.x.x.',o:'',bass:'x.....x...x.....',bv:'bass',comp:'pad',cv:'ep',lead:'ep'},
   bossa:{name:'Bossa Nova',bpm:128,feel:1,c:'--yel',k:'x..x..x.x..x..x.',s:'x..x..x...x..x..',sv:'rim',h:'xxxxxxxxxxxxxxxx',hv:'shaker',o:'',bass:'x.....f.x.....f.',bv:'bass',comp:'syncopate',cv:'pluck',lead:'vocal'},
   reggae:{name:'Reggae',bpm:76,feel:1,c:'--green',k:'........x.......',s:'........x.......',sv:'rim',h:'x.x.x.x.x.x.x.x.',o:'',bass:'x..x....x.x.....',bv:'bass',comp:'skank',cv:'organ',lead:'lead'},
-  disco:{name:'Disco',bpm:118,feel:1,c:'--red',k:'x...x...x...x...',s:'....x.......x...',sv:'snare',h:'x.x.x.x.x.x.x.x.',o:'..x...x...x...x.',bass:'x.o.x.o.x.o.x.o.',bv:'bass',comp:'pad',cv:'pad',lead:'lead'},
+  disco:{name:'Disco',bpm:118,feel:1,c:'--red',k:'x...x...x...x...',s:'....x.......x...',sv:'snare',h:'x.x.x.x.x.x.x.x.',o:'..x...x...x...x.',bass:'x.o.x.o.x.o.x.o.',bv:'bass',comp:'pad',cv:'strings',lead:'lead'},
   rock:{name:'Hard Rock',bpm:150,feel:1,c:'--red',k:'x.x...x.xx....x.',s:'....x.......x...',sv:'snare',h:'x.x.x.x.x.x.x.x.',o:'',bass:'x.x.x.x.x.x.x.x.',bv:'bass',comp:'power',cv:'power',lead:'lead'},
   polka:{name:'Polka',bpm:120,feel:1,c:'--yel',k:'x.......x.......',s:'....x.......x...',sv:'snare',h:'',o:'',bass:'x.......f.......',bv:'bass',comp:'oompah',cv:'organ',lead:'organ'},
 };
