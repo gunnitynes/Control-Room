@@ -177,7 +177,10 @@ Phones and the host keep old files otherwise.
   the other side downloads (`filesGet`, retries 404s for a minute: KV is eventually consistent) and carries on exactly as with chunks
   (receipts `{t:'file-ok'}` included). Both directions (CADCAST/go `sendFile` uses it too). No binding → chunks, as before. Links are only
   accepted from our Worker's /drop/. `?files=<url>` (localhost only) points both pages at another Worker for testing.
-- Header centre on home + menu: today's date (`.tdate`, like the splash); hidden under 1100 px and while announcements play. Activities is
+- Today's date (`.tdate`, like the splash) only on the home screen, absolutely positioned over the big QR's centre (`dateOverQR()`, on render and
+  resize); hidden under 1100 px and while announcements play. Clicking the big QR opens `showBigQR` (fills the screen, class name when a sheet class is picked).
+  Review's number = uploads since Review was last opened (`PARTY.seen`), nothing otherwise. Supply Drop: **Create new drop** → back to its setup;
+  drop numbers continue through the lesson (`G.dropRound`). Blind layers reveal: a mixer row per track (`s.vol`, `s.mute`, live `setGain`) + `zipAll()`. Activities is
   under the big QR on home (`.hatt .hact`). Phones: `fitWords(el,max,min)` shrinks a name until its longest word fits (the paired card).
 - **pcSendFile**: take the connection to watch only AFTER chunk 0 is sent (the first message to a computer opens it).
   It first calls `pcAlive(p)`: ping the computer (CADCAST/go answers `{t:'pong'}`), no answer in 4 s → close and reconnect (a reloaded

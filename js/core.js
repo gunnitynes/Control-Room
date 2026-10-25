@@ -74,7 +74,8 @@ function artQR(text,label=''){const M=qrMatrix(text),n=M.length,Q=4,W=n+Q*2,inF=
 function splashQR(){const box=$('#spqr');if(!box||!G.code)return;needQR().then(()=>{box.innerHTML=artQR(joinURL(G.code),G.code);const c=$('#spcode');if(c)c.textContent=G.code;}).catch(()=>{});}
 function showBigQR(code){
   let ov=$('#qrbig');if(!ov){ov=el('div','qrbig');ov.id='qrbig';ov.setAttribute('role','dialog');document.body.appendChild(ov);ov.onclick=()=>ov.remove();}
-  ov.innerHTML=`<div><figure id="qrbigImg"></figure><b>${esc(code)}</b><small>Scan to join · click anywhere to close</small></div>`;drawQR($('#qrbigImg'),code,720);
+  const cls=typeof ATT!=='undefined'&&attUrl()&&ATT.cls?ATT.cls:'';   // the class, when a class list is picked
+  ov.innerHTML=`<div>${cls?`<span class="qrcls">${esc(cls)}</span>`:''}<figure id="qrbigImg"></figure><b>${esc(code)}</b><small>Scan to check in · click anywhere to close</small></div>`;drawQR($('#qrbigImg'),code,900);
 }
 /* the four answer shapes: A circle · B square · C triangle · D diamond */
 function shape(i,s=34,stroke='var(--ink)',fill='var(--paper)'){
@@ -463,7 +464,7 @@ function liveUpdate(){
 function topBar(){
   const g=G.game,inG=!atRest()&&G.view!=='vote'&&G.view!=='pick'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
-    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>${atRest()?`<div class="tdate" aria-label="Today"><b>${esc(new Date().toLocaleDateString('en-GB',{weekday:'long'}))}</b><i>${esc(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long'}))}</i></div>`:''}`;
+    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>${G.view==='home'?`<div class="tdate" aria-label="Today"><b>${esc(new Date().toLocaleDateString('en-GB',{weekday:'long'}))}</b><i>${esc(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long'}))}</i></div>`:''}`;
   const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button>
     ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
@@ -478,6 +479,8 @@ function topBar(){
         <button id="bTheme"><b>Theme</b><em>${document.documentElement.dataset.theme==='night'?'Night':'Paper'}</em></button>
         <a id="bManual" href="Teacher/" target="_blank"><b>Manual</b><em>teacher handbook ↗</em></a></div>`:''}</div></div></header>`;
 }
+// the Attendance screen's date sits centred over the big QR code (the header's middle isn't the QR's middle)
+function dateOverQR(){const d=$('.top .tdate'),q=$('#homeQR');if(!d||!q)return;const t=$('.top').getBoundingClientRect(),r=q.getBoundingClientRect();d.style.left=(r.left+r.width/2-t.left)+'px';}
 function render(){
   if(ROLE!=='host')return;
   document.body.classList.add('hostb');
@@ -497,6 +500,7 @@ function render(){
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
   home.onclick=()=>{if(G.view==='menu'){G.view='home';render();syncAll();}else if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote'||G.view==='pick')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
   const mq=$('#miniQR');if(mq){drawQR(mq,G.code,160);mq.onclick=()=>showBigQR(G.code);}
+  dateOverQR();
   const sv=$('#bSaver');if(sv)sv.onclick=openSaver;
 }
 /* splash: the original Control Room poster — faders breathing like a live mix,
@@ -562,7 +566,7 @@ function rHome(st){const ps=players();
       <div class="hqr" id="homeQR" aria-label="Scan to check in"></div>
       <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b></div>
       <button class="big go hact" id="bAct">Activities <small>games &amp; tools</small></button></section></div>`;
-  const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-420,innerWidth*.36,620));   // leaves room for the code and Activities under it
+  const q=$('#homeQR',st);q.title='Click to make it bigger';q.onclick=()=>{if(G.code)showBigQR(G.code);};const size=Math.round(Math.min(innerHeight-420,innerWidth*.36,620));   // leaves room for the code and Activities under it
   if(G.code){if(G.homeQR&&G.homeQR.code===G.code&&G.homeQR.size===size)q.appendChild(G.homeQR.node);
     else{const n=document.createElement('div');drawQR(n,G.code,size);G.homeQR={code:G.code,size,node:n};q.appendChild(n);}}
   $('#bNew',st).onclick=newRoom;$('#bAct',st).onclick=()=>{G.view='menu';render();syncAll();};$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
@@ -662,7 +666,7 @@ function ringDraw(r,t){
     ctx.globalAlpha=b.a??1;ctx.lineWidth=2;ctx.strokeStyle=ink;ctx.fillStyle=b.f?(b.f[0]==='-'?css(b.f):b.f):paper;
     ctx.beginPath();ctx.arc(x,y,b.big?z*1.15:z,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.globalAlpha=1;});
 }
-addEventListener('resize',()=>{RINGS.forEach(ringSize);posterSize();if(G.game&&G.game.resize)G.game.resize();});
+addEventListener('resize',()=>{dateOverQR();RINGS.forEach(ringSize);posterSize();if(G.game&&G.game.resize)G.game.resize();});
 function frame(t){if(ROLE==='host'){if(POSTER)posterDraw(t);RINGS.forEach(r=>ringDraw(r,t));if(G.view==='play'&&G.game&&G.game.frame)try{G.game.frame(t);}catch(e){console.error(e);}}else pFrame(t);requestAnimationFrame(frame);}
 
 /* ---------- leaderboard + podium (shared by every scored game) ---------- */

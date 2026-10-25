@@ -39,9 +39,9 @@ game({
     $$('.drx',st).forEach(b=>b.onclick=async()=>{await clipDB.del(b.dataset.id);await loadMyClips();redraw();});
     const cl=$('#drClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Take everything out of the crate?'))return;for(const c of dropPool())await clipDB.del(c.id);await loadMyClips();redraw();};},
   topInfo(){const s=G.gs;return !s?this.tag:s.round?(s.o.n==='all'?`Drop ${s.round} · the whole crate`:`Drop ${s.round} · ${s.o.n} item${s.o.n>1?'s':''} each`):'Ready to drop';},
-  start(o){G.gs={o,round:0,got:new Map(),status:new Map(),swapped:new Set(),used:new Set(),phase:'ready',landing:false};this.go();},
+  start(o){G.gs={o,round:G.dropRound||0,got:new Map(),status:new Map(),swapped:new Set(),used:new Set(),phase:'ready',landing:false};this.go();},
   // what each student gets this round
-  deal(){const s=G.gs,pool=dropPool(),ps=online(),n=s.o.n==='all'?pool.length:s.o.n;s.round++;s.got=new Map();s.status=new Map();s.swapped=new Set();
+  deal(){const s=G.gs,pool=dropPool(),ps=online(),n=s.o.n==='all'?pool.length:s.o.n;s.round++;G.dropRound=s.round;s.got=new Map();s.status=new Map();s.swapped=new Set();
     if(!pool.length)return;
     if(s.o.n==='all')ps.forEach(p=>s.got.set(p.id,pool.map(c=>c.id)));
     else if(s.o.mode==='same'){const set=shuffle(pool).slice(0,n);ps.forEach(p=>s.got.set(p.id,set.map(c=>c.id)));}
@@ -74,8 +74,10 @@ game({
       <div class="dfoot"><span class="fine">Students without CADCAST see their items on the phone</span><button class="big go" id="bNext">Drop it <small>SPACE</small></button></div></div>`;$('#bNext').onclick=()=>this.next();return;}
     st.innerHTML=`<div class="drop ph-dealt"><div class="drhead"><span class="lab">Supply Drop ${s.round}</span><h2>Make something with it</h2><p>${s.o.swap?'One swap each, from the phone. ':''}Drag your files from the CADCAST page into your DAW.</p></div>
       <div class="drwall" id="drWall">${this.wall()}</div>
-      <div class="dfoot"><span class="fine">${P.length} items in the crate</span><button class="big go" id="bNext">Drop again <small>SPACE</small></button></div></div>`;
-    $('#bNext').onclick=()=>this.next();},
+      <div class="dfoot"><span class="fine">${P.length} items in the crate</span><button class="big" id="drNew" title="Back to the crate: change the files and the options, then drop">Create new drop</button><button class="big go" id="bNext">Drop again <small>SPACE</small></button></div></div>`;
+    $('#bNext').onclick=()=>this.next();
+    // a new drop: back to the setup with the crate (what already landed stays on the students' computers, under Earlier drops)
+    $('#drNew').onclick=()=>{exitGame(true);G.game=this;G.view='setup';render();syncAll();};},
   pstate(p){const s=G.gs,P=dropPool(),L=(s.got.get(p.id)||[]).map(id=>P.find(c=>c.id===id)).filter(Boolean),st=s.status.get(p.id)||{};
     return {k:'dr'+s.round+L.map(c=>c.id).join('|')+(st.st||'')+(s.swapped.has(p.id)?'s':''),ph:s.phase,round:s.round,
       items:L.map(c=>({name:dropName(c),ext:dropExt(c.name),kind:dropKind(c.name),label:dropLabel(c)})),st:st.st||'',canSwap:!!s.o.swap&&s.o.n!=='all'&&!s.swapped.has(p.id)};},

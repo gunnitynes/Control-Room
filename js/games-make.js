@@ -487,7 +487,7 @@ const RBB={
   // Blind layers: one tempo and one key for the room; everyone makes their own track without hearing anyone else's,
   // hands it in on CADCAST (the take hand-in), and the big speakers play every track together for the first time.
   start(o){const keys=BLIND.tonal.filter(k=>/major|minor|Dorian|Lydian|Phrygian/.test(k));
-    G.gs={o,bl:true,id:Date.now()%1e9,phase:'brief',bpm:o.bbpm==='deal'?pick(BLIND.tempo):+o.bbpm,key:o.bkey==='deal'?pick(keys):o.bkey,cues:new Map(),rec:new Map(),takes:new Map(),marks:[],last:new Map(),rv:'ready',t0:0,el:0,P:null,mute:new Set()};},
+    G.gs={o,bl:true,id:Date.now()%1e9,phase:'brief',bpm:o.bbpm==='deal'?pick(BLIND.tempo):+o.bbpm,key:o.bkey==='deal'?pick(keys):o.bkey,cues:new Map(),rec:new Map(),takes:new Map(),marks:[],last:new Map(),rv:'ready',t0:0,el:0,P:null,mute:new Set(),vol:new Map()};},
   cueFor(p){const s=G.gs;if(!s.cues.has(p.id)){const kind=pick(['Start','Space','Variation']),used=new Set([...s.cues.values()].map(c=>c.text)),left=BLIND.cues[kind].filter(t=>!used.has(t));s.cues.set(p.id,{kind,text:pick(left.length?left:BLIND.cues[kind])});}return s.cues.get(p.id);},
   topInfo(){const s=G.gs;return `Blind layers · ${s.bpm} BPM · ${s.key}`+({brief:'',make:' · making',hand:' · hand in',reveal:' · the reveal',done:''})[s.phase];},
   takeIn(p){const s=G.gs;if(pcFor(p))pcSend(p,{t:'take-in',round:s.id,label:`Blind layers · ${s.bpm} BPM · ${s.key}`,project:false,next:''});},
@@ -512,8 +512,15 @@ const RBB={
   // the reveal: every track from its very start, together, through the big speakers
   prep(){const s=G.gs;s.lanes=[...s.takes.values()].filter(t=>t.buf).sort((a,b)=>a.name.localeCompare(b.name));s.len=Math.max(1,...s.lanes.map(t=>t.dur));},
   play(){const s=G.gs;this.halt();this.prep();if(!s.lanes.length){toast('No tracks could be read');return;}const ac=audio(),bus=gn(ac,Math.min(.9,1.6/Math.sqrt(s.lanes.length)));bus.connect(AU.music);
-    const at=ac.currentTime+.25;s.P={ac,bus,at,src:s.lanes.map(t=>{const g=gn(ac,s.mute.has(t.pid)?0:1),x=ac.createBufferSource();x.buffer=t.buf;x.connect(g).connect(bus);x.start(at);return {x,g,pid:t.pid};}),stop:()=>this.halt()};AU.live.add(s.P);
+    const at=ac.currentTime+.25;s.P={ac,bus,at,src:s.lanes.map(t=>{const g=gn(ac,this.gainOf(t.pid)),x=ac.createBufferSource();x.buffer=t.buf;x.connect(g).connect(bus);x.start(at);return {x,g,pid:t.pid};}),stop:()=>this.halt()};AU.live.add(s.P);
     s.rv='play';s.t0=now()+250;sfx.whoosh&&sfx.whoosh();render();syncAll();},
+  // every track has its own level (0–150 %) and mute, live while it plays
+  gainOf(pid){const s=G.gs;return s.mute.has(pid)?0:(s.vol.get(pid)??1);},
+  setGain(pid){const s=G.gs,P=s.P;if(!P)return;const o=P.src.find(x=>x.pid===pid);if(o)o.g.gain.setTargetAtTime(this.gainOf(pid),P.ac.currentTime,.03);},
+  fileName(t){const ext=(t.file.match(/\.([a-z0-9]+)$/i)||[,'wav'])[1];return `${alSafe(t.name)}.${ext}`;},
+  async zipAll(){const s=G.gs,b=$('#blZip');if(b){b.disabled=true;b.textContent='Packing…';}
+    const z=await alZip([...s.takes.values()].map(t=>({name:`Blind layers ${s.bpm} BPM ${alSafe(s.key)}/${this.fileName(t)}`,blob:t.blob})));
+    const a=document.createElement('a');a.href=URL.createObjectURL(z);a.download=`Blind layers - ${s.bpm} BPM - ${alSafe(s.key)}.zip`;a.click();if(b){b.disabled=false;b.textContent='⬇ Download all tracks (.zip)';}},
   halt(sync_){const s=G.gs,P=s&&s.P;if(P){P.src.forEach(o=>{try{o.x.stop();}catch(e){}});try{P.bus.disconnect();}catch(e){}AU.live.delete(P);s.P=null;}
     if(s&&s.rv==='play'){s.rv='stopped';s.el=now()-s.t0;if(sync_){render();syncAll();}}},
   frame(){const s=G.gs;if(s.phase!=='reveal')return;if(s.rv==='play'){const t=now()-s.t0;if(t>s.len*1000+400){this.halt(true);return;}const e=$('#blT');if(e)e.textContent=blTime(Math.max(0,t));const h=$('#blHead');if(h)h.style.left=(100*Math.max(0,t)/(s.len*1000))+'%';}},
@@ -539,15 +546,20 @@ const RBB={
     if(s.phase==='reveal'){const T=s.rv==='play'?Math.max(0,now()-s.t0):s.el;
       body=`<div class="blwrap blrev"><div class="rbhead"><span class="lab">The reveal · ${s.lanes.length} tracks · ${s.bpm} BPM · ${esc(s.key)}</span><h2>${s.rv==='ready'?'All together, for the first time':s.rv==='play'?'Listen':'Again?'}</h2></div>
       <div class="bltlbox"><b class="blclock" id="blT">${blTime(T)}</b><div class="bltl" id="blTL">${this.pins()}</div></div>
-      <div class="blgrid"><div><span class="lab">The tracks${s.rv!=='play'?' · click to mute one for the next listen':''}</span><div class="bllanes">${s.lanes.map(t=>`<button class="bllane${s.mute.has(t.pid)?' off':''}" data-pid="${esc(t.pid)}" ${s.rv==='play'?'disabled':''}><b>${esc(t.name)}</b><span>${rbFmt(t.dur)}</span></button>`).join('')}</div>
+      <div class="blgrid"><div><div class="blmixh"><span class="lab">The tracks · ${s.lanes.length} · level, mute, download</span><button class="ghost" id="blZip">⬇ Download all tracks (.zip)</button></div>
+        <div class="blmix">${s.lanes.map(t=>{const v=s.vol.get(t.pid)??1;return `<div class="blch${s.mute.has(t.pid)?' off':''}" data-pid="${esc(t.pid)}"><b>${esc(t.name)}</b><span>${rbFmt(t.dur)}</span>
+          <input type="range" min="0" max="150" value="${Math.round(v*100)}" aria-label="${esc(t.name)} level"><em>${Math.round(v*100)} %</em><button class="ghost blm" title="Mute">M</button><a class="ghost" href="${t.url||(t.url=URL.createObjectURL(t.blob))}" download="${esc(this.fileName(t))}" title="Download">⬇</a></div>`;}).join('')}</div>
         <span class="lab" style="margin-top:12px;display:block">Listen for · mark it on your phone</span><div class="bllisten">${BLIND.listen.map(x=>`<div>${blIco(x.k,22)}<b>${esc(x.name)}</b><span>${esc(x.sub)}</span></div>`).join('')}</div></div>
         <div><span class="lab">The moments</span><div class="bltop" id="blTop">${this.topHTML()}</div></div></div></div>`;
       lbl=s.rv==='play'?'Stop':s.rv==='ready'?'▶ Play them all':'▶ Play again';}
-    if(s.phase==='done'){body=`<div class="dbig"><span class="lab">Blind layers</span><h2>Unexpected is the material</h2><p>Recording without listening generates possibilities. Listening closely reveals moments worth pursuing.</p></div>`;lbl='Back to the menu';}
+    if(s.phase==='done'){body=`<div class="dbig"><span class="lab">Blind layers</span><h2>Unexpected is the material</h2><p>Recording without listening generates possibilities. Listening closely reveals moments worth pursuing.</p>${s.takes.size?'<button class="big go" id="blZip">⬇ Download all tracks (.zip)</button>':''}</div>`;lbl='Back to the menu';}
     const tip={brief:'Mode · Blind layers',make:'Nobody hears anyone else',hand:'Export from bar 1',reveal:'Radical listening starts now',done:''}[s.phase];
     st.innerHTML=`<div class="destruct roundabout blind dots ph-${s.phase}">${body}<div class="dfoot"><span class="lab bltip">${tip}</span>${s.phase==='done'?againBtn():''}${s.phase==='reveal'&&s.rv!=='play'?'<button class="big" id="blDone">Finish</button>':''}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
     $('#bNext').onclick=()=>this.next();bindAgain(st);const d=$('#blDone',st);if(d)d.onclick=()=>this.go('done');
-    $$('.bllane',st).forEach(b=>b.onclick=()=>{const id=b.dataset.pid;s.mute.has(id)?s.mute.delete(id):s.mute.add(id);b.classList.toggle('off');});},
+    const z=$('#blZip',st);if(z)z.onclick=()=>this.zipAll();
+    $$('.blch',st).forEach(row=>{const id=row.dataset.pid,r=row.querySelector('input'),em=row.querySelector('em');
+      r.oninput=()=>{s.vol.set(id,r.value/100);em.textContent=r.value+' %';this.setGain(id);};
+      row.querySelector('.blm').onclick=()=>{s.mute.has(id)?s.mute.delete(id):s.mute.add(id);row.classList.toggle('off');this.setGain(id);};});},
   pstate(p){const s=G.gs,c=s.phase==='brief'?null:this.cueFor(p),r=s.rec.get(p.id)||{};
     return {bl:true,k:[s.phase,s.rv,r.st||'',Math.round(r.dur||0)].join('|'),ph:s.phase,bpm:s.bpm,key:s.key,bars:s.o.bbars,cue:c,clock:pClock(),rv:s.rv,pc:!!pcFor(p),rec:r.st||'',dur:r.dur||0};},
   player(root,st){pClockStart(st.clock);const facts=`<div class="alpfacts"><span><small>Tempo</small><b>${st.bpm}</b></span><span><small>Key</small><b>${esc(st.key)}</b></span>${st.bars?`<span><small>Bars</small><b>${st.bars}</b></span>`:''}</div>`;let h='';

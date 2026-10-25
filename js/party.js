@@ -20,13 +20,14 @@ function partyAdd(pc,p,meta,src){const uid=pClean(meta.uid,24)||Math.random().to
     partySave();sfx.vote&&sfx.vote();}
   pcSendPc(pc,{t:'party-got',uid});
   const n=$('#bReview');if(n)n.innerHTML=partyBtnHTML();if(PARTY.open)partyDraw();}
-const partyBtnHTML=()=>{const n=PARTY.list.length,fresh=n-PARTY.seen;return `Review${n?` <em class="${fresh>0?'new':''}">${fresh>0?'+'+fresh:n}</em>`:''}`;};
+// the number on the button counts only what arrived since the teacher last opened Review
+const partyBtnHTML=()=>{const fresh=PARTY.list.length-PARTY.seen;return `Review${fresh>0?` <em class="new">${fresh}</em>`:''}`;};
 const partySrc=e=>e.url||(e.burl||(e.burl=e.blob?URL.createObjectURL(e.blob):''));
 
 function openReview(){PARTY.open=true;PARTY.seen=PARTY.list.length;let ov=$('#review');if(!ov){ov=el('div','reviewov');ov.id='review';document.body.appendChild(ov);}
   partyDraw();const n=$('#bReview');if(n)n.innerHTML=partyBtnHTML();
   ov.onkeydown=null;document.addEventListener('keydown',partyKey,true);}
-function closeReview(){PARTY.open=false;partyStop();const ov=$('#review');if(ov)ov.remove();document.removeEventListener('keydown',partyKey,true);const n=$('#bReview');if(n)n.innerHTML=partyBtnHTML();}
+function closeReview(){PARTY.open=false;PARTY.seen=PARTY.list.length;partyStop();const ov=$('#review');if(ov)ov.remove();document.removeEventListener('keydown',partyKey,true);const n=$('#bReview');if(n)n.innerHTML=partyBtnHTML();}
 function partyKey(e){if(e.key==='Escape'){e.stopPropagation();closeReview();}}
 function partyStop(){if(PARTY.audio){PARTY.audio.pause();PARTY.audio=null;}$$('.rvplay.on').forEach(b=>{b.classList.remove('on');b.textContent='▶';});const np=$('#rvNow');if(np)np.innerHTML='';}
 // play one file, or a group's files one after another

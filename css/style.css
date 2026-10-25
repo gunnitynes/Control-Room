@@ -2042,3 +2042,18 @@ body.annon .tdate{opacity:0;transform:scale(.9)}
 .rvempty{border:4px dashed var(--ink3);padding:40px;text-align:center}.rvempty h2{font:900 44px var(--disp);text-transform:uppercase}
 .rvnow{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;padding:10px 18px;background:var(--ink);color:var(--paper);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--red)}
 .rvnow:empty{display:none}.rvnow b{font:900 18px var(--disp);text-transform:uppercase}.rvnow span:last-child{font:700 10px var(--mono);text-transform:uppercase;opacity:.8}
+/* the date: Attendance screen only, centred over the QR (dateOverQR sets left) */
+.top .tdate{position:absolute;top:50%;transform:translate(-50%,-50%);margin:0}
+body.annon .top .tdate{opacity:0;transform:translate(-50%,-50%) scale(.9)}
+#homeQR{cursor:zoom-in}
+/* the big QR: as big as the screen allows, with the class above it */
+.qrbig figure{width:min(74vh,86vw);height:min(74vh,86vw)}
+.qrbig .qrcls{font:900 clamp(30px,4vw,56px)/1 var(--disp);font-stretch:62%;text-transform:uppercase;color:#161514;background:#F2B705;border:3px solid #161514;padding:4px 14px}
+/* Blind layers: the tracks as a small mixer */
+.blmixh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.blmix{display:grid;gap:6px}
+.blch{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(90px,180px) 48px auto auto;gap:8px;align-items:center;padding:6px 10px;border:3px solid var(--ink);background:var(--paper);box-shadow:3px 3px 0 var(--ink)}
+.blch b{font:900 17px var(--disp);text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.blch span,.blch em{font:700 10px var(--mono);font-style:normal}
+.blch input{accent-color:var(--ink);width:100%}.blch .ghost{text-decoration:none;padding:6px 9px}
+.blch.off{opacity:.5}.blch.off .blm{background:var(--red);color:#fff}
+#drNew{margin-left:auto;margin-right:12px}
