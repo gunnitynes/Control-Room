@@ -176,6 +176,13 @@ Phones and the host keep old files otherwise.
   uploads it with `{t:'file'}` chunks (core.js `pcSendFile` / `pcData` / `B64`, both directions, game hooks `onPcFile`,
   `onPcMsg`, `onPcProg`). "Pass it on" sends each take (and in `pass:'project'` the dropped project zip) to the next
   computer in `s.ring`, where it becomes a WAV. Takes stay in host memory for the listening party (`journeys()`).
+- **Soundabout Roundabout ▸ Blind layers** (option `mode:'blind'`, the owner's Week 4 "Record with intuition" PDF): `RBB` in
+  games-make.js, state `G.gs.bl`; the roundabout spec hands every hook to RBB when `bl` is set, and `how` is a getter per mode.
+  Groups of `size` (pkTeam names), a starting point per group (BLIND.tempo/tonal/palette, or `start:'own'`), then layers: performer
+  `ids[(L-1)%n]`, operator `ids[L%n]`, a cue card (BLIND.cues: Start / Memory / Space / Variation). The reveal goes group by group: the
+  teacher starts the clock when the group presses play, phones tap one of six moments (BLIND.listen, `{t:'mark',k}`), `blMoments`
+  clusters marks within 5 s and ranks by students → the group's top 3 go to their phones + notebooks for Develop, then Share.
+  Content in data/content.js → BLIND. No CADCAST needed (each group works on one computer).
 - **Room vote** (js/vote.js): the Vote button opens `openVoteChooser()`: The next module (`voteGames`) or Your own question
   (`openCustomVote`: a question + any number of answers, Enter adds the next, the last one saved as `vote.custom`, kind 'text'). `G.view==='vote'`, state in `V`. Phones get `view:'vote'` with `s=voteState(p)` and send
   `{t:'vote', v}` (not `act`). Votes are by player id and only count while the player is in the room. Close → 3-2-1 →
