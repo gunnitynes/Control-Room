@@ -22,18 +22,22 @@ game({
     {key:'swap',label:'Swaps',choices:[[1,'One swap','per deal'],[0,'No swaps','keep what you got']],def:1},
   ],
   note:'Your materials stay in this browser and go only to the computers in your room. Files arrive on each student’s CADCAST page (gunnitynes.github.io/CADCAST/go), ready to drag into the DAW.',
-  check(){return dropPool().length?'':'Load your materials first';},
+  check(){return dropPool().length?'':'Add some materials first';},
+  // the crate: add files (one, several, or a whole folder) as often as you like; each item can be taken out again
   setupExtra(){const P=dropPool(),k={};P.forEach(c=>{const t=dropKind(c.name);k[t]=(k[t]||0)+1;});
-    return `<div class="fsec mxsongs"><h3><b>▤</b>Your materials<small>${P.length?`${P.length} items`:'nothing loaded yet'} · stay in this browser</small></h3>
-      <div class="chimport"><label class="big go">${P.length?'Load a different folder':'Load your materials folder'}<input type="file" id="drFolder" webkitdirectory multiple hidden></label><span class="chprog" id="drProg"></span>
-        <p class="fine">Any files: WAV, MP3, MIDI, stems, project zips. Subfolders are kept as labels (e.g. “Drums”, “Chords”). Up to 100 MB per file.</p></div>
-      ${P.length?`<div class="drkinds">${Object.entries(k).map(([t,n])=>`<span style="--c:var(${DROP_COL[t]})"><b>${n}</b>${t}</span>`).join('')}</div><button class="ghost" id="drClear">Remove your materials</button>`:''}</div>`;},
-  setupBind(st,redraw){const fo=$('#drFolder',st);
-    if(fo)fo.onchange=async()=>{const files=[...fo.files].filter(f=>!/^\./.test(f.name)&&f.size>0);if(!files.length){toast('No files in that folder');return;}const prog=$('#drProg',st);let n=0,big=0;
-      for(const c of dropPool())await clipDB.del(c.id);
+    return `<div class="fsec mxsongs"><h3><b>▤</b>Your materials<small>${P.length?`${P.length} item${P.length===1?'':'s'}`:'nothing loaded yet'} · stay in this browser</small></h3>
+      <div class="chimport"><div class="frow"><label class="big go">+ Add files<input type="file" id="drFiles" multiple hidden></label><label class="ghost drfold">+ Add a folder<input type="file" id="drFolder" webkitdirectory multiple hidden></label></div><span class="chprog" id="drProg"></span>
+        <p class="fine">Pick one file or many (⌘-click / Shift-click), or a whole folder; every pick adds to the crate. WAV, MP3, MIDI, stems, project zips, up to 100 MB each. A folder’s subfolders become labels (e.g. “Drums”).</p></div>
+      ${P.length?`<div class="drkinds">${Object.entries(k).map(([t,n])=>`<span style="--c:var(${DROP_COL[t]})"><b>${n}</b>${t}</span>`).join('')}</div>
+      <div class="drlist">${P.map(c=>{const t=dropKind(c.name);return `<div class="dritem sm" style="--c:var(${DROP_COL[t]})"><i>${esc(dropExt(c.name)||'FILE')}</i><b>${esc(dropName(c))}</b>${dropLabel(c)?`<small>${esc(dropLabel(c))}</small>`:''}<button class="drx" data-id="${esc(c.id)}" title="Take it out of the crate" aria-label="Remove ${esc(c.name)}">×</button></div>`;}).join('')}</div>
+      <button class="ghost" id="drClear">Empty the crate</button>`:''}</div>`;},
+  setupBind(st,redraw){const prog=$('#drProg',st);
+    const add=async list=>{const files=[...list].filter(f=>!/^\./.test(f.name)&&f.size>0);if(!files.length){toast('No files there');return;}let n=0,big=0;
       for(const f of files){if(f.size>100e6){big++;continue;}const path=f.webkitRelativePath||f.name;await clipDB.put({id:'dr:'+path,dec:-6,name:f.name,path,blob:f,at:Date.now()+n});n++;if(prog)prog.textContent=`Saving ${n} of ${files.length}…`;}
-      await loadMyClips();toast(`${n} items saved in this browser${big?` · ${big} over 100 MB skipped`:''}`);redraw();};
-    const cl=$('#drClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Remove all your materials from this browser?'))return;for(const c of dropPool())await clipDB.del(c.id);await loadMyClips();redraw();};},
+      await loadMyClips();toast(`${n} item${n===1?'':'s'} added to the crate${big?` · ${big} over 100 MB skipped`:''}`);redraw();};
+    const fi=$('#drFiles',st),fo=$('#drFolder',st);if(fi)fi.onchange=()=>add(fi.files);if(fo)fo.onchange=()=>add(fo.files);
+    $$('.drx',st).forEach(b=>b.onclick=async()=>{await clipDB.del(b.dataset.id);await loadMyClips();redraw();});
+    const cl=$('#drClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Take everything out of the crate?'))return;for(const c of dropPool())await clipDB.del(c.id);await loadMyClips();redraw();};},
   topInfo(){const s=G.gs;return !s?this.tag:s.round?`Drop ${s.round} · ${s.o.n} item${s.o.n>1?'s':''} each`:'Ready to drop';},
   start(o){G.gs={o,round:0,got:new Map(),status:new Map(),swapped:new Set(),used:new Set(),phase:'ready',landing:false};},
   // what each student gets this round

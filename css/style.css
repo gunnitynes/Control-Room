@@ -1970,3 +1970,18 @@ a.ghost{color:inherit;text-decoration:none;display:inline-block;line-height:norm
 .utilpop button:hover,.utilpop a:hover{background:var(--yel)}
 .utilpop em{font:700 10px var(--mono);font-style:normal;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2)}
 .utilpop #bSfx[aria-pressed="true"] em{color:var(--green)}
+/* Supply Drop: the crate list (every item can be taken out) */
+.drlist{display:grid;gap:6px;max-height:300px;overflow-y:auto;margin-bottom:10px;padding-right:4px}
+.dritem.sm{grid-template-columns:auto minmax(0,1fr) auto;padding:4px 6px}.dritem.sm i{padding:4px;font-size:10px}.dritem.sm b{font-size:14px}
+.dritem.sm small{grid-column:2}
+.drx{grid-row:1/span 2;grid-column:3;width:28px;height:28px;border:2px solid var(--ink);background:var(--paper);font:900 16px/1 var(--disp);color:var(--ink)}
+.drx:hover{background:var(--red);color:#fff}
+label.drfold{cursor:pointer;display:inline-flex;align-items:center;padding:12px 14px}
+/* the counter sits right beside the divider in every view (hands, when up, come before it) */
+.tmid>#hands:not(:empty)+.count{margin-left:0}
+.tmid>#hands:empty+.count{margin-left:auto}
+/* home: Activities in the header centre; a check-in announcement takes its place for a moment */
+.tact{align-self:center;margin:0 auto;min-width:min(380px,30vw);padding:5px 34px 6px;font-size:21px;display:grid;justify-items:center;gap:2px;line-height:1;box-shadow:4px 4px 0 var(--ink);transition:opacity .25s,transform .25s}
+.tact small{font-size:9px;line-height:1}
+body.annon .tact{opacity:0;transform:scale(.85);pointer-events:none}
+.tmid:has(.tact)>.count{margin-left:0}

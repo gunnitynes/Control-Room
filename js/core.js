@@ -274,9 +274,11 @@ const PC_CH=11000;
 const B64=u8=>{let s='';for(let i=0;i<u8.length;i+=8192)s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));return btoa(s);};
 const UNB64=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;};
 async function pcSendFile(p,meta,blob,onProg){const u8=new Uint8Array(await blob.arrayBuffer()),CH=PC_CH,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);let e0=null;
-  for(let i=0;i<n;i++){const pc=pcFor(p),e=pc&&PCC.get(pc);if(i===0)e0=PCC.get(pc);else if(!e||e!==e0||e.dead)return false;   // the connection broke mid-file: the rest would never complete it
+  for(let i=0;i<n;i++){const pc=pcFor(p),e=pc&&PCC.get(pc);if(i>0&&(!e||e!==e0||e.dead))return false;   // the connection broke mid-file: the rest would never complete it
     for(let k=0;e&&e.conn.dataChannel&&e.conn.dataChannel.bufferedAmount>1.5e6&&k<600;k++)await new Promise(r=>setTimeout(r,50));
-    if(!pcSend(p,{t:'file',fid,i,n,meta:i?null:{...meta,size:u8.length,mime:blob.type},data:B64(u8.subarray(i*CH,(i+1)*CH))}))return false;if(onProg)onProg((i+1)/n);}
+    if(!pcSend(p,{t:'file',fid,i,n,meta:i?null:{...meta,size:u8.length,mime:blob.type},data:B64(u8.subarray(i*CH,(i+1)*CH))}))return false;
+    if(i===0)e0=PCC.get(pcFor(p));   // AFTER chunk 0: when the file is the first thing sent, pcSend only now opened the connection
+    if(onProg)onProg((i+1)/n);}
   return true;}
 const PCF=new Map();
 function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadcast.allow',{})[pc],p=a&&G.players.get(a.pid);if(!p)return;
@@ -327,7 +329,11 @@ function askTeacher(){if($('#teachov'))return;const ov=el('div','sheetov');ov.id
   const f=$('#teachForm');setTimeout(()=>$('#teachIn').focus(),50);
   f.onsubmit=e=>{e.preventDefault();if(setTeacher($('#teachIn').value))ov.remove();else $('#teachIn').focus();};}
 // the CADCAST patch bay must run in this same browser: it reads the room code and the paired computers from localStorage
-function openMixer(){const w=window.open(new URL('../CADCAST/patch/',location.href).href,'cadcast-patch');if(w)try{w.focus();}catch(e){}else toast('Allow pop-ups for this page to open the mixer');}
+// CADCAST: bring the patch bay forward if it is already open (window.open('', name) never reloads it); load it only when it isn't
+function openMixer(){const url=new URL('../CADCAST/patch/',location.href).href;let w=null;try{w=window.open('','cadcast-patch');}catch(e){}
+  if(!w){toast('Allow pop-ups for this page to open CADCAST');return;}
+  let blank=true;try{blank=!w.location.href||w.location.href==='about:blank';}catch(e){blank=false;}
+  if(blank)w.location.href=url;try{w.focus();}catch(e){}}
 function startLobby(){const id=lobbyId();if(!id||!window.Peer||(G.lobbyPeer&&!G.lobbyPeer.destroyed))return;
   const lp=new Peer(id,peerCfg());G.lobbyPeer=lp;
   lp.on('open',()=>{if(G.lobbyErr){G.lobbyErr=false;if(atRest())render();}});
@@ -400,8 +406,9 @@ function setHand(p,up){const was=!!p.hand;p.hand=up?(p.hand||Date.now()):0;if(up
    check-ins plays one after another (faster when the queue is long). */
 const ANN={q:[],busy:false};
 function announceIn(p){if(ROLE!=='host')return;ANN.q.push({name:p.name,sh:p.sh});if(!ANN.busy)annNext();}
-function annNext(){const a=ANN.q.shift();if(!a){ANN.busy=false;return;}if(G.view!=='home'||G.splash){ANN.q=[];ANN.busy=false;return;}ANN.busy=true;
-  const top=$('.top'),sh=$('.top .tshapes'),hd=$('.top #hands'),ct=hd&&hd.childElementCount?hd:$('.top .tmid>.count');   // stop before any raised handif(!top||!ct){ANN.busy=false;return;}
+function annNext(){const a=ANN.q.shift(),end=()=>{ANN.busy=false;document.body.classList.remove('annon');};if(!a)return end();if(G.view!=='home'||G.splash){ANN.q=[];return end();}ANN.busy=true;
+  const top=$('.top'),sh=$('.top .tshapes'),hd=$('.top #hands'),ct=hd&&hd.childElementCount?hd:$('.top .tmid>.count');   // stop before any raised hand
+  if(!top||!ct)return end();document.body.classList.add('annon');
   const r=top.getBoundingClientRect(),L=(sh?sh.getBoundingClientRect().right:r.left+200)+16,R=ct.getBoundingClientRect().left-16,el=document.createElement('div');
   el.className='annc c'+a.sh;el.style.cssText=`left:${L}px;width:${Math.max(160,R-L)}px;top:${r.top}px;height:${r.height-3}px`;
   el.innerHTML=`<div class="anncard"><i class="annck">✓</i><b>${esc(a.name)}</b><span class="lab">checked in</span></div>${[0,1,2,3,0,1].map((k,i)=>`<i class="annbit b${i}">${shape(k,18,'var(--ink)',['var(--red)','var(--blue)','var(--yel)','var(--green)'][k])}</i>`).join('')}`;
@@ -426,7 +433,7 @@ function liveUpdate(){
 function topBar(){
   const g=G.game,inG=!atRest()&&G.view!=='vote'&&G.view!=='pick'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
-    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
+    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>${G.view==='home'?`<button class="big go tact" id="bAct">Activities <small>games &amp; tools</small></button>`:''}`;
   const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button>
     ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
@@ -454,7 +461,7 @@ function render(){
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bManual'))$('#bManual').onclick=e=>{e.preventDefault();G.utilOpen=false;render();window.open('Teacher/','cr-manual');};   // a script-opened tab, so the manual's Back can close it
   if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
-  $('#bMix').onclick=openMixer;
+  $('#bMix').onclick=openMixer;if($('#bAct'))$('#bAct').onclick=()=>{G.view='menu';render();syncAll();};
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
   home.onclick=()=>{if(G.view==='menu'){G.view='home';render();syncAll();}else if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote'||G.view==='pick')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
@@ -519,14 +526,14 @@ function rHome(st){const ps=players();
       ${attBoxHTML()}
       <div class="hnames">${ps.length?ps.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<span class="hname c${p.sh}${p.att==='in'?' att':''}${p.conn&&p.conn.open?'':' off'}${p.hand?' hand':''}" data-id="${esc(p.id)}">${p.att==='in'?'✓ ':''}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</span>`).join(''):'<p class="fine">Names appear here as students check in.</p>'}</div>
       <div class="frow hroom"><button class="ghost" id="bNew" title="A fresh room with a new code: everyone scans again">New room</button></div>
-      <button class="big go hact" id="bAct">Activities <small>games &amp; tools</small></button></aside>
+</aside>
     <section class="hatt"><span class="lab">Attendance${ATT.cls?' · '+esc(ATT.cls):''}</span>
       <div class="hqr" id="homeQR" aria-label="Scan to check in"></div>
       <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b></div></section></div>`;
   const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-330,innerWidth*.36,640));   // leaves room for the code under it
   if(G.code){if(G.homeQR&&G.homeQR.code===G.code&&G.homeQR.size===size)q.appendChild(G.homeQR.node);
     else{const n=document.createElement('div');drawQR(n,G.code,size);G.homeQR={code:G.code,size,node:n};q.appendChild(n);}}
-  $('#bAct',st).onclick=()=>{G.view='menu';render();syncAll();};$('#bNew',st).onclick=newRoom;$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
+  $('#bNew',st).onclick=newRoom;$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
   if(!teacherName())setTimeout(askTeacher,300);}
 
 function rMenu(st){

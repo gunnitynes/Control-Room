@@ -52,7 +52,7 @@ js/remix-engine.js  Live Remix engine: rxAnalyse (STFT spectral-flux onsets → 
 js/games-remix.js   Live Remix (Make something): 4 moves per phone (a used move is replaced), take turns round the room
                     (play:turns, s.turn, nextTurn) or everyone at once with cooldowns; the deck on the big screen; songs are the
                     teacher's own (clipDB dec -5) or the Chronologist music; analyses cached in localStorage rx.an
-js/games-drop.js    Supply Drop (Make something): the teacher's materials folder (clipDB dec -6, subfolders = labels) dealt at
+js/games-drop.js    Supply Drop (Make something): the teacher's crate (clipDB dec -6; + Add files / + Add a folder both ADD, × takes one out; a folder's subfolders = labels) dealt at
                     random to every CADCAST computer (pcSendFile kind 'drop'); modes unique / random / same; one swap per drop
 js/games-conduct.js The Conductor (Make something): a laptop orchestra. DAWs keep tempo/bar with Ableton Link (Link can't
                     run in a browser); the CADCAST Mixer, open in the same browser, does the rest over BroadcastChannel
@@ -104,7 +104,7 @@ Phones and the host keep old files otherwise.
 
 ## Architecture
 
-- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`) and the room code (no count or URL under it), teacher name ("Not you?") with Copy attendance right under it, the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, New room, Copy attendance, and **Activities** → the module menu (`G.view==='menu'`). The Teacher panel is on the right on both screens (home `.hside`, menu `.roomp`, moved with CSS `order`; stacked on top on narrow screens); the Teacher box is `.teachbox.tight` on both screens. The logo goes home (no Attendance button). The header shows Vote/Pick when `atRest()`, then Timer · CADCAST, then **Supply drop** (`#bDrop`, straight to its setup, menu only) and the **⋯ utilities** menu last (`#util`, `G.utilOpen`: Sound effects, Theme, Manual; closes on any outside click). Manual (`#bManual`: `window.open('Teacher/','cr-manual')` so the room keeps running; the handbook's fixed ← Control Room button closes that tab, or opens `../?host` when there is no opener). `atRest()` = home or menu. Most teachers only use this screen.
+- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`) and the room code (no count or URL under it), teacher name ("Not you?") with Copy attendance right under it, the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, New room; **Activities** (→ the module menu, `G.view==='menu'`) is the big green button in the header centre (`.tact`), hidden by `body.annon` while check-in announcements play. The Teacher panel is on the right on both screens (home `.hside`, menu `.roomp`, moved with CSS `order`; stacked on top on narrow screens); the Teacher box is `.teachbox.tight` on both screens. The logo goes home (no Attendance button). The header shows Vote/Pick when `atRest()`, then Timer · CADCAST, then **Supply drop** (`#bDrop`, straight to its setup, menu only) and the **⋯ utilities** menu last (`#util`, `G.utilOpen`: Sound effects, Theme, Manual; closes on any outside click). Manual (`#bManual`: `window.open('Teacher/','cr-manual')` so the room keeps running; the handbook's fixed ← Control Room button closes that tab, or opens `../?host` when there is no opener). `atRest()` = home or menu. Most teachers only use this screen.
 - `ROLE` is `player` when the URL has `?room=CODE` (or on a narrow screen without `?host`), otherwise `host`.
 - PeerJS connects phones to the host; the host is the only source of truth (`G` on the host, `PL` on phones).
   - host → phone: `{t:'st', view, g, s:pstate}`, `{t:'names'}` (class list), `{t:'log'}` (notebook), `{t:'kick'}`, `{t:'taken'}`
@@ -170,6 +170,9 @@ Phones and the host keep old files otherwise.
 - **Screensaver**: the Catalyst logo in the header (`#bSaver`, images/catalyst-logo.png, drawn as a CSS mask) opens `openSaver()`: a full-screen page with the logo, black by default (click flips to white, saved as `saver.light`); every key is swallowed, Esc (or leaving full screen) calls `closeSaver()`. The room keeps running underneath.
 - **Raise your hand** (phones only): `#pHand` in the phone header sends `{t:'hand', up}`; the host keeps `p.hand` (time raised),
   shows `#hands` in the header middle, left of the student count (one name, or "Multiple"; click for the ordered list, lower one or all) and a yellow name chip (menu `.mchip` and home `.hname`).
+- The student count always sits at the right end of `.tmid`, against the divider (`#hands` before it when hands are up).
+- **CADCAST button** (`openMixer`): `window.open('', 'cadcast-patch')` first, so an open patch bay is brought forward, never reloaded.
+- **pcSendFile**: take the connection to watch only AFTER chunk 0 is sent (the first message to a computer opens it).
 - **Check-in announcement** (home only): a new player in the `hi` handler → `announceIn(p)` → a queued fixed overlay `.annc` over the header middle
   (between the shapes and the hands/count), so re-renders never restart it; shorter holds when the queue is long; the count pops.
   `handsUpdate()` updates in place and never re-renders a running game. Hands drop on disconnect; lowering is echoed back to the phone.
