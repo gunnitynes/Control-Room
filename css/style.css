@@ -1981,7 +1981,9 @@ label.drfold{cursor:pointer;display:inline-flex;align-items:center;padding:12px 
 .tmid>#hands:not(:empty)+.count{margin-left:0}
 .tmid>#hands:empty+.count{margin-left:auto}
 /* home: Activities in the header centre; a check-in announcement takes its place for a moment */
-.tact{align-self:center;margin:0 auto;min-width:min(380px,30vw);padding:5px 34px 6px;font-size:21px;display:grid;justify-items:center;gap:2px;line-height:1;box-shadow:4px 4px 0 var(--ink);transition:opacity .25s,transform .25s}
-.tact small{font-size:9px;line-height:1}
-body.annon .tact{opacity:0;transform:scale(.85);pointer-events:none}
+.tact{align-self:center;margin:0 auto;min-width:min(340px,26vw);padding:5px 28px 6px;font-size:18px;display:grid;justify-items:center;gap:2px;line-height:1;box-shadow:4px 4px 0 var(--ink);transform:translate(-2px,-2px);transition:opacity .25s,transform .25s}
+.tact small{font-size:8.5px;line-height:1}
+/* the header is 70 px tall, the same as CADCAST's patch bay, so switching between them doesn't jump */
+.host .top{min-height:70px}
+body.annon .tact{opacity:0;transform:translate(-2px,-2px) scale(.85);pointer-events:none}
 .tmid:has(.tact)>.count{margin-left:0}

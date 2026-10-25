@@ -14,12 +14,12 @@ const dropName=c=>String(c.name).replace(/\.[a-z0-9]+$/i,'');
 game({
   id:'drop',group:'make',name:'Supply Drop',tag:'Random material from the teacher lands on every student’s computer. Make something with what you got.',
   how:['Your teacher has a crate of material: loops, MIDI, stems, sounds.','Every deal drops a random pick on your computer (through CADCAST). Drag it into your DAW.','Don’t like it? Swap one item once per deal. Then make something with it.'],
-  badges:['CADCAST','No score','Materials'],kind:'free',
+  badges:['CADCAST','No score','Materials'],kind:'free',startLabel:'Drop',
   icon:`<svg viewBox="0 0 64 64"><path d="M16 6 h32 l-6 14 h-20 z" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/><path d="M22 20 L28 34 M42 20 L36 34" stroke="var(--ink)" stroke-width="2.5"/><rect x="18" y="34" width="28" height="24" fill="var(--yel)" stroke="var(--ink)" stroke-width="3"/><path d="M18 42 h28 M32 34 v24" stroke="var(--ink)" stroke-width="2.5"/></svg>`,
   options:[
-    {key:'n',label:'Items each',choices:[[1,'1','item'],[2,'2','items'],[3,'3','items']],def:1},
-    {key:'mode',label:'Deal',choices:[['unique','No repeats','nobody gets the same item while the pool lasts'],['random','Anything goes','fully random'],['same','Same for everyone','one random set for the whole room']],def:'unique'},
-    {key:'swap',label:'Swaps',choices:[[1,'One swap','per deal'],[0,'No swaps','keep what you got']],def:1},
+    {key:'n',label:'Items each',choices:[[1,'1','item'],[2,'2','items'],[3,'3','items'],['all','All','the whole crate']],def:1},
+    {key:'mode',label:'Deal',show:v=>v.n!=='all',choices:[['unique','No repeats','nobody gets the same item while the pool lasts'],['random','Anything goes','fully random'],['same','Same for everyone','one random set for the whole room']],def:'unique'},
+    {key:'swap',label:'Swaps',choices:[[1,'One swap','per deal'],[0,'No swaps','keep what you got']],def:1,show:v=>v.n!=='all'},
   ],
   note:'Your materials stay in this browser and go only to the computers in your room. Files arrive on each student’s CADCAST page (gunnitynes.github.io/CADCAST/go), ready to drag into the DAW.',
   check(){return dropPool().length?'':'Add some materials first';},
@@ -38,27 +38,30 @@ game({
     const fi=$('#drFiles',st),fo=$('#drFolder',st);if(fi)fi.onchange=()=>add(fi.files);if(fo)fo.onchange=()=>add(fo.files);
     $$('.drx',st).forEach(b=>b.onclick=async()=>{await clipDB.del(b.dataset.id);await loadMyClips();redraw();});
     const cl=$('#drClear',st);if(cl)cl.onclick=async()=>{if(!confirm('Take everything out of the crate?'))return;for(const c of dropPool())await clipDB.del(c.id);await loadMyClips();redraw();};},
-  topInfo(){const s=G.gs;return !s?this.tag:s.round?`Drop ${s.round} · ${s.o.n} item${s.o.n>1?'s':''} each`:'Ready to drop';},
-  start(o){G.gs={o,round:0,got:new Map(),status:new Map(),swapped:new Set(),used:new Set(),phase:'ready',landing:false};},
+  topInfo(){const s=G.gs;return !s?this.tag:s.round?(s.o.n==='all'?`Drop ${s.round} · the whole crate`:`Drop ${s.round} · ${s.o.n} item${s.o.n>1?'s':''} each`):'Ready to drop';},
+  start(o){G.gs={o,round:0,got:new Map(),status:new Map(),swapped:new Set(),used:new Set(),phase:'ready',landing:false};this.go();},
   // what each student gets this round
-  deal(){const s=G.gs,pool=dropPool(),ps=online(),n=s.o.n;s.round++;s.got=new Map();s.status=new Map();s.swapped=new Set();
+  deal(){const s=G.gs,pool=dropPool(),ps=online(),n=s.o.n==='all'?pool.length:s.o.n;s.round++;s.got=new Map();s.status=new Map();s.swapped=new Set();
     if(!pool.length)return;
-    if(s.o.mode==='same'){const set=shuffle(pool).slice(0,n);ps.forEach(p=>s.got.set(p.id,set.map(c=>c.id)));}
+    if(s.o.n==='all')ps.forEach(p=>s.got.set(p.id,pool.map(c=>c.id)));
+    else if(s.o.mode==='same'){const set=shuffle(pool).slice(0,n);ps.forEach(p=>s.got.set(p.id,set.map(c=>c.id)));}
     else if(s.o.mode==='random')ps.forEach(p=>s.got.set(p.id,shuffle(pool).slice(0,n).map(c=>c.id)));
     else{let bag=shuffle(pool.filter(c=>!s.used.has(c.id)));if(bag.length<ps.length*n){s.used=new Set();bag=shuffle(pool);}
       ps.forEach(p=>{const mine=[];while(mine.length<n){if(!bag.length)bag=shuffle(pool);const c=bag.shift();if(!mine.includes(c.id))mine.push(c.id);}mine.forEach(id=>s.used.add(id));s.got.set(p.id,mine);});}
     ps.forEach(p=>this.send(p));},
   send(p,only){const s=G.gs,ids=s.got.get(p.id)||[],r=s.round;
     if(!pcFor(p)){s.status.set(p.id,{st:'nopc'});return;}
-    const st={st:'sending',done:0,of:ids.length};s.status.set(p.id,st);
+    const st={st:'sending',done:0,of:only?1:ids.length};s.status.set(p.id,st);
+    // a file counts as delivered when the computer's receipt ({t:'file-ok'}, onPcMsg) comes back, not when it has been queued
     (async()=>{for(const id of (only?[only]:ids)){const c=dropPool().find(x=>x.id===id);if(!c)continue;
-        const ok=await pcSendFile(p,{kind:'drop',round:r,name:c.name,label:dropLabel(c)},c.blob);if(G.gs!==s||s.round!==r)return;if(ok)st.done++;else st.st='fail';this.live();}
-      if(st.st!=='fail')st.st='sent';sync(p);this.live();})();},
+        const ok=await pcSendFile(p,{kind:'drop',round:r,name:c.name,label:dropLabel(c)},c.blob);if(G.gs!==s||s.round!==r)return;if(!ok){st.st='fail';sync(p);this.live();return;}}})();},
+  onPcMsg(p,m){const s=G.gs;if(!s||m.t!=='file-ok'||m.kind!=='drop'||m.round!==s.round)return;const st=s.status.get(p.id);if(!st||st.st==='fail')return;
+    st.done=(st.done||0)+1;if(st.done>=st.of){st.st='sent';sync(p);}this.live();},
   go(){const s=G.gs;s.phase='dealt';s.landing=true;this.deal();sfx.whoosh&&sfx.whoosh();render();syncAll();setTimeout(()=>{if(G.gs===s){s.landing=false;}},1500);},
   next(){this.go();},
-  onJoin(p){const s=G.gs;if(s&&s.phase==='dealt'&&!s.got.has(p.id)){const pool=dropPool();s.got.set(p.id,shuffle(pool).slice(0,s.o.n).map(c=>c.id));this.send(p);sync(p);render();}},
+  onJoin(p){const s=G.gs;if(s&&s.phase==='dealt'&&!s.got.has(p.id)){const pool=dropPool();s.got.set(p.id,shuffle(pool).slice(0,s.o.n==='all'?pool.length:s.o.n).map(c=>c.id));this.send(p);sync(p);render();}},
   onPair(p){const s=G.gs;if(s&&s.phase==='dealt'&&s.got.has(p.id)&&(s.status.get(p.id)||{}).st==='nopc'){this.send(p);sync(p);this.live();}},
-  act(p,d){const s=G.gs;if(d.t!=='swap'||s.phase!=='dealt'||!s.o.swap||s.swapped.has(p.id))return;const L=s.got.get(p.id);if(!L)return;const k=Math.max(0,Math.min(L.length-1,+d.k||0));
+  act(p,d){const s=G.gs;if(d.t!=='swap'||s.phase!=='dealt'||!s.o.swap||s.o.n==='all'||s.swapped.has(p.id))return;const L=s.got.get(p.id);if(!L)return;const k=Math.max(0,Math.min(L.length-1,+d.k||0));
     const pool=dropPool().filter(c=>!L.includes(c.id)),fresh=pool.filter(c=>!s.used.has(c.id)),c=pick(fresh.length?fresh:pool);if(!c)return;
     L[k]=c.id;s.used.add(c.id);s.swapped.add(p.id);sfx.card&&sfx.card();if(pcFor(p)){const st=s.status.get(p.id)||{};st.st='sending';this.send(p,c.id);}sync(p);render();},
   live(){const box=$('#drWall');if(box)box.innerHTML=this.wall();},
@@ -75,7 +78,7 @@ game({
     $('#bNext').onclick=()=>this.next();},
   pstate(p){const s=G.gs,P=dropPool(),L=(s.got.get(p.id)||[]).map(id=>P.find(c=>c.id===id)).filter(Boolean),st=s.status.get(p.id)||{};
     return {k:'dr'+s.round+L.map(c=>c.id).join('|')+(st.st||'')+(s.swapped.has(p.id)?'s':''),ph:s.phase,round:s.round,
-      items:L.map(c=>({name:dropName(c),ext:dropExt(c.name),kind:dropKind(c.name),label:dropLabel(c)})),st:st.st||'',canSwap:!!s.o.swap&&!s.swapped.has(p.id)};},
+      items:L.map(c=>({name:dropName(c),ext:dropExt(c.name),kind:dropKind(c.name),label:dropLabel(c)})),st:st.st||'',canSwap:!!s.o.swap&&s.o.n!=='all'&&!s.swapped.has(p.id)};},
   player(root,st){
     if(st.ph==='ready'){root.innerHTML=`<div class="pcenter dots"><div class="drcrate small"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i></div><h2>Supply drop incoming</h2><p>Open <b>gunnitynes.github.io/CADCAST/go</b> on your computer so the files land there.</p></div>`;return;}
     const where=st.st==='sent'?'✓ On your computer: drag it into your DAW.':st.st==='sending'?'Landing on your computer…':st.st==='fail'?'Didn’t reach your computer. Ask your teacher to drop again.':'Your computer isn’t signed in through CADCAST: open gunnitynes.github.io/CADCAST/go and scan its code.';

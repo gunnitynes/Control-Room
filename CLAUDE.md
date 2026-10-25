@@ -173,6 +173,10 @@ Phones and the host keep old files otherwise.
 - The student count always sits at the right end of `.tmid`, against the divider (`#hands` before it when hands are up).
 - **CADCAST button** (`openMixer`): `window.open('', 'cadcast-patch')` first, so an open patch bay is brought forward, never reloaded.
 - **pcSendFile**: take the connection to watch only AFTER chunk 0 is sent (the first message to a computer opens it).
+  It first calls `pcAlive(p)`: ping the computer (CADCAST/go answers `{t:'pong'}`), no answer in 4 s → close and reconnect (a reloaded
+  student page leaves the old connection looking open). Supply Drop counts a file delivered only on the computer's receipt `{t:'file-ok'}`
+  (games-drop `onPcMsg`). Items each can be **All** (the whole crate; no deal mode or swaps then); the setup button is **Drop** and drops at once.
+- The host header is 70 px (`.host .top`), the same as CADCAST's patch bay, so switching tabs doesn't jump.
 - **Check-in announcement** (home only): a new player in the `hi` handler → `announceIn(p)` → a queued fixed overlay `.annc` over the header middle
   (between the shapes and the hands/count), so re-renders never restart it; shorter holds when the queue is long; the count pops.
   `handsUpdate()` updates in place and never re-renders a running game. Hands drop on disconnect; lowering is echoed back to the phone.

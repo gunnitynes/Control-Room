@@ -273,7 +273,12 @@ function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)retur
 const PC_CH=11000;
 const B64=u8=>{let s='';for(let i=0;i<u8.length;i+=8192)s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));return btoa(s);};
 const UNB64=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;};
-async function pcSendFile(p,meta,blob,onProg){const u8=new Uint8Array(await blob.arrayBuffer()),CH=PC_CH,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);let e0=null;
+// is the computer still on the other end? A reloaded CADCAST page leaves our old connection looking open for a long
+// time, and everything sent into it is lost. Ping it (CADCAST/go answers {t:'pong'}); no answer in 4 s → reconnect.
+function pcAlive(p){const pc=pcFor(p),e=pc&&PCC.get(pc);if(!e||e.dead||!e.conn.open)return Promise.resolve(true);
+  return new Promise(res=>{const k=Math.random().toString(36).slice(2,8),t=setTimeout(()=>{e.pong=null;e.dead=true;try{e.conn.close();}catch(x){}res(false);},4000);
+    e.pong={k,f:()=>{clearTimeout(t);e.pong=null;res(true);}};pcSend(p,{t:'ping',k});});}
+async function pcSendFile(p,meta,blob,onProg){await pcAlive(p);const u8=new Uint8Array(await blob.arrayBuffer()),CH=PC_CH,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);let e0=null;
   for(let i=0;i<n;i++){const pc=pcFor(p),e=pc&&PCC.get(pc);if(i>0&&(!e||e!==e0||e.dead))return false;   // the connection broke mid-file: the rest would never complete it
     for(let k=0;e&&e.conn.dataChannel&&e.conn.dataChannel.bufferedAmount>1.5e6&&k<600;k++)await new Promise(r=>setTimeout(r,50));
     if(!pcSend(p,{t:'file',fid,i,n,meta:i?null:{...meta,size:u8.length,mime:blob.type},data:B64(u8.subarray(i*CH,(i+1)*CH))}))return false;
@@ -289,6 +294,7 @@ function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadca
     if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f.got/f.n,f.meta);
     if(f.got===f.n&&f.meta){PCF.delete(m.fid);const b=new Blob(f.parts,{type:f.meta.mime||''});if(G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,f.meta,b);}
     return;}
+  if(m.t==='pong'){const e=PCC.get(pc);if(e&&e.pong&&e.pong.k===m.k)e.pong.f();return;}
   if(G.view==='play'&&G.game&&G.game.onPcMsg)G.game.onPcMsg(p,m);}
 /* ---------- the class lobby: a relay address named after the TEACHER (controlroom-lobby-<name>) that tells any device
    which room that teacher has open right now. Student computers (CADCAST/go?t=<name>) ask it, so two teachers teaching
