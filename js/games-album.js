@@ -106,6 +106,7 @@ game({
     pcSend(p,{t:'album-got',ok:f.ok&&!f.warn,text:f.ok?(f.warn?f.text:f.text+'. It’s on the big screen.'):f.text});
     if(!f.ok){(s.fail||(s.fail=new Map())).set(p.id,f.text);toast(`${p.name}: ${f.text}`);this.live();return;}s.fail&&s.fail.delete(p.id);
     const had=s.parts.has(p.id);s.parts.set(p.id,{buf:f.buf,text:f.text,warn:!!f.warn,name,at:Date.now()});
+    toast(`${f.warn?'!':'✓'} ${p.name}’s ${this.roleName(p.id)} is in${f.warn?': '+f.text:''}`);
     if(!had){const fill=AL_FILL[this.role(p.id).id]||'1111111';s.on.set(p.id,new Set(s.secs.map((_,k)=>k).filter(k=>fill[Math.min(k,fill.length-1)]==='1')));s.lvl.set(p.id,.8);sfx.inn&&sfx.inn();}
     if(s.play)this.reschedule(p.id);
     if(s.phase==='make')this.live();else render();sync(p);},

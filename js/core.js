@@ -88,6 +88,9 @@ function logo(){return `<div class="logo"><span class="lg"><b>Control</b><b>Room
 if(store.get('theme','paper')==='night')document.documentElement.dataset.theme='night';
 function toggleTheme(){const n=document.documentElement.dataset.theme==='night'?'paper':'night';if(n==='night')document.documentElement.dataset.theme='night';else delete document.documentElement.dataset.theme;store.set('theme',n);}
 const ROLE=QS.has('room')||QS.has('pair')||(matchMedia('(max-width:700px)').matches&&!QS.has('host'))?'player':'host';
+if(ROLE==='host')try{window.name='controlroom-host';}catch(e){}   // CADCAST's Control Room button finds this tab by name
+// and tells CADCAST's patch bay that a Control Room is open in this browser (so its button never opens a second room)
+if(ROLE==='host'&&window.BroadcastChannel){const ch=new BroadcastChannel('cr-host');ch.onmessage=e=>{if(e.data==='alive?')ch.postMessage('alive');};}
 
 /* ---------- registry ---------- */
 const GROUPS=[
@@ -263,19 +266,23 @@ function pcSend(p,msg){const pc=pcFor(p);if(!pc||!G.peer||G.peer.destroyed)retur
     conn.on('open',()=>{e.q.forEach(m=>{try{conn.send(m);}catch(x){}});e.q=[];});conn.on('close',()=>{e.dead=true;});conn.on('error',()=>{e.dead=true;});
     conn.on('data',m=>pcData(pc,m));}
   if(e.conn.open){try{e.conn.send(msg);}catch(x){e.q.push(msg);}}else e.q.push(msg);return true;}
-/* files over the same connection, both ways: base64 chunks small enough for a data channel ({t:'file', fid, i, n, meta, data}),
-   sent no faster than the channel drains. The computer (CADCAST/go) speaks the same format. */
+/* files over the same connection, both ways: base64 chunks ({t:'file', fid, i, n, meta, data}), sent no faster than the
+   channel drains. The computer (CADCAST/go) speaks the same format. A chunk MUST stay under 16 KB once JSON-encoded:
+   PeerJS 1.5 silently refuses bigger messages on a 'json' connection (an error event, no exception), so 11,000 bytes
+   (14,668 base64 characters) a chunk. */
+const PC_CH=11000;
 const B64=u8=>{let s='';for(let i=0;i<u8.length;i+=8192)s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192));return btoa(s);};
 const UNB64=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;};
-async function pcSendFile(p,meta,blob,onProg){const u8=new Uint8Array(await blob.arrayBuffer()),CH=48000,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);
-  for(let i=0;i<n;i++){const pc=pcFor(p),e=pc&&PCC.get(pc);
+async function pcSendFile(p,meta,blob,onProg){const u8=new Uint8Array(await blob.arrayBuffer()),CH=PC_CH,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);let e0=null;
+  for(let i=0;i<n;i++){const pc=pcFor(p),e=pc&&PCC.get(pc);if(i===0)e0=PCC.get(pc);else if(!e||e!==e0||e.dead)return false;   // the connection broke mid-file: the rest would never complete it
     for(let k=0;e&&e.conn.dataChannel&&e.conn.dataChannel.bufferedAmount>1.5e6&&k<600;k++)await new Promise(r=>setTimeout(r,50));
     if(!pcSend(p,{t:'file',fid,i,n,meta:i?null:{...meta,size:u8.length,mime:blob.type},data:B64(u8.subarray(i*CH,(i+1)*CH))}))return false;if(onProg)onProg((i+1)/n);}
   return true;}
 const PCF=new Map();
 function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadcast.allow',{})[pc],p=a&&G.players.get(a.pid);if(!p)return;
-  if(m.t==='file'){if(!(Number.isInteger(m.n)&&m.n>0&&m.n<=8000&&Number.isInteger(m.i)&&m.i>=0&&m.i<m.n&&typeof m.data==='string'&&m.data.length<70000))return;   // ≤ ~380 MB, sane chunks
-    let f=PCF.get(m.fid);if(!f){if(PCF.size>=24)return;PCF.set(m.fid,f={parts:[],got:0,n:m.n,meta:null});}if(m.meta)f.meta=m.meta;
+  if(m.t==='file'){if(!(Number.isInteger(m.n)&&m.n>0&&m.n<=32000&&Number.isInteger(m.i)&&m.i>=0&&m.i<m.n&&typeof m.data==='string'&&m.data.length<16000))return;   // ≤ ~350 MB, sane chunks
+    let f=PCF.get(m.fid);if(!f){for(const [k,v] of PCF)if(Date.now()-v.at>600000)PCF.delete(k);   // files that never finished
+      if(PCF.size>=24)return;PCF.set(m.fid,f={parts:[],got:0,n:m.n,meta:null,at:Date.now()});}f.at=Date.now();if(m.meta)f.meta=m.meta;
     if(!f.parts[m.i]){f.parts[m.i]=UNB64(m.data);f.got++;}
     if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f.got/f.n,f.meta);
     if(f.got===f.n&&f.meta){PCF.delete(m.fid);const b=new Blob(f.parts,{type:f.meta.mime||''});if(G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,f.meta,b);}
@@ -359,7 +366,7 @@ function hostData(conn,m){
       if(q){G.players.delete(q.id);q.id=id;G.players.set(id,q);p=q;}
     }
     if(p){if(p.conn&&p.conn!==conn)try{p.conn.close();}catch(e){}p.conn=conn;}
-    else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP(),in:Date.now()};G.players.set(id,p);if(G.view!=='play')sfx.join();}
+    else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP(),in:Date.now()};G.players.set(id,p);if(G.view!=='play')sfx.join();announceIn(p);}
     attCheckIn(p);lobbyNames();
     sync(p);sendLog(p);saveRoom();tmrJoin(p);
     if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else if(G.view==='vote'){voteLive();syncAll();}else if(G.view==='pick'){pickLive();sync(p);}else render();
@@ -382,14 +389,29 @@ function kick(id){const p=G.players.get(id);if(!p)return;G.banned.add(id);if(p.c
 const HAND_ICON=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 12.5V6a1.5 1.5 0 0 1 3 0v5.5M10.5 11V4.2a1.5 1.5 0 0 1 3 0V11M13.5 11V5.2a1.5 1.5 0 0 1 3 0V12M16.5 12V8.4a1.5 1.5 0 0 1 3 0v5.4c0 4.4-3 7.7-7.2 7.7-2.9 0-4.7-1.4-6.1-3.7L3.6 14a1.6 1.6 0 0 1 2.6-1.8l1.3 1.6" fill="currentColor" fill-opacity=".25" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const handsUp=()=>players().filter(p=>p.hand).sort((a,b)=>a.hand-b.hand);
 function handsHTML(){const H=handsUp();if(!H.length)return '';
-  const label=`${esc(H[0].name.split(' ')[0])}${H.length>1?` <em>+${H.length-1}</em>`:''}`;
+  const label=H.length>1?'Multiple':esc(H[0].name);
   return `<button class="handbtn" id="bHands" aria-expanded="${!!G.handsOpen}" title="Raised hands, in order">${HAND_ICON}<b>${label}</b></button>${G.handsOpen?`<div class="handpop"><span class="lab">Hands up · first raised first</span>${H.map((p,i)=>`<button class="handrow c${p.sh}" data-lower="${esc(p.id)}" title="Lower this hand"><b>${i+1}</b>${shape(p.sh,16)}<span>${esc(p.name)}</span><em>${handAgo(p.hand)}</em><i>lower</i></button>`).join('')}<button class="ghost" id="bLowerAll">Lower all hands</button></div>`:''}`;}
 const handAgo=t=>{const s=Math.round((Date.now()-t)/1000);return s<60?s+' s':Math.floor(s/60)+' min';};
 function setHand(p,up){const was=!!p.hand;p.hand=up?(p.hand||Date.now()):0;if(up&&!was)(sfx.inn||sfx.vote||(()=>{}))();
   if(p.conn&&p.conn.open)try{p.conn.send({t:'hand',up:!!p.hand});}catch(e){}handsUpdate();}
 // updates in place: a hand going up must never re-render a running game
+/* ---------- the check-in announcement: on the home screen, every student who joins gets their name in lights in the
+   header (between the shapes and the count). A fixed overlay, so a re-render never restarts it; a queue, so a rush of
+   check-ins plays one after another (faster when the queue is long). */
+const ANN={q:[],busy:false};
+function announceIn(p){if(ROLE!=='host')return;ANN.q.push({name:p.name,sh:p.sh});if(!ANN.busy)annNext();}
+function annNext(){const a=ANN.q.shift();if(!a){ANN.busy=false;return;}if(G.view!=='home'||G.splash){ANN.q=[];ANN.busy=false;return;}ANN.busy=true;
+  const top=$('.top'),sh=$('.top .tshapes'),hd=$('.top #hands'),ct=hd&&hd.childElementCount?hd:$('.top .tmid>.count');   // stop before any raised handif(!top||!ct){ANN.busy=false;return;}
+  const r=top.getBoundingClientRect(),L=(sh?sh.getBoundingClientRect().right:r.left+200)+16,R=ct.getBoundingClientRect().left-16,el=document.createElement('div');
+  el.className='annc c'+a.sh;el.style.cssText=`left:${L}px;width:${Math.max(160,R-L)}px;top:${r.top}px;height:${r.height-3}px`;
+  el.innerHTML=`<div class="anncard"><i class="annck">✓</i><b>${esc(a.name)}</b><span class="lab">checked in</span></div>${[0,1,2,3,0,1].map((k,i)=>`<i class="annbit b${i}">${shape(k,18,'var(--ink)',['var(--red)','var(--blue)','var(--yel)','var(--green)'][k])}</i>`).join('')}`;
+  document.body.appendChild(el);const n=$('#nOn');if(n){n.classList.remove('pop');void n.offsetWidth;n.classList.add('pop');}
+  const hold=ANN.q.length>2?1100:ANN.q.length?1800:3200;
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>{el.remove();annNext();},420);},hold);}
 function handsUpdate(){const h=$('#hands');if(!handsUp().length)G.handsOpen=false;if(h)h.innerHTML=handsHTML();
-  $$('.mchip').forEach(b=>{const p=G.players.get(b.dataset.id);if(!p)return;b.classList.toggle('hand',!!p.hand);const i=b.querySelector('.mhand');if(p.hand&&!i)b.insertAdjacentHTML('beforeend',`<i class="mhand">${HAND_ICON}</i>`);if(!p.hand&&i)i.remove();});}
+  $$('.mchip,.hname').forEach(b=>{const p=G.players.get(b.dataset.id);if(!p)return;b.classList.toggle('hand',!!p.hand);const i=b.querySelector('.mhand');if(p.hand&&!i)b.insertAdjacentHTML('beforeend',`<i class="mhand">${HAND_ICON}</i>`);if(!p.hand&&i)i.remove();});}
+// the utilities menu closes on any click outside it (after that click has done its own job)
+if(ROLE==='host')document.addEventListener('click',e=>{if(G.utilOpen&&!e.target.closest('#util')){G.utilOpen=false;const u=$('#util');if(u){const pop=u.querySelector('.utilpop');if(pop)pop.remove();const b=$('#bUtil');if(b)b.setAttribute('aria-expanded','false');}}});
 if(ROLE==='host'){document.addEventListener('click',e=>{const t=e.target.closest('#bHands,[data-lower],#bLowerAll');if(!t)return;e.stopPropagation();
   if(t.id==='bHands')G.handsOpen=!G.handsOpen;else if(t.id==='bLowerAll')handsUp().forEach(p=>setHand(p,false));else{const p=G.players.get(t.dataset.lower);if(p)setHand(p,false);}handsUpdate();},true);
   setInterval(()=>{if(G.handsOpen)handsUpdate();},15000);}
@@ -406,15 +428,17 @@ function topBar(){
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
     :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
   const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
-  return `<header class="top">${logo()}<div class="tmid">${mid}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button><div id="hands">${handsHTML()}</div>
+  return `<header class="top">${logo()}<div class="tmid">${mid}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button>
     ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
     ${tmrBtnHTML()}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">CADCAST</button>
-    <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
-    <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
     ${G.view==='menu'?`<button class="ghost" id="bDrop" title="Supply Drop: deal your materials to every student computer">Supply drop</button>`:''}
-    ${atRest()?`<a class="ghost" id="bManual" href="Teacher/" target="_blank" title="The teacher handbook (opens in a new tab: this room keeps running)">Manual</a>`:''}
-    ${!atRest()?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
+    ${!atRest()?`<button class="ghost" id="bMenu">Menu</button>`:''}
+    <div class="util" id="util"><button class="ghost utilb" id="bUtil" aria-expanded="${!!G.utilOpen}" title="Utilities: sound effects, theme, the manual" aria-label="Utilities"><i></i><i></i><i></i></button>
+      ${G.utilOpen?`<div class="utilpop"><span class="lab">Utilities</span>
+        <button id="bSfx" aria-pressed="${SFX.on}"><b>Sound effects</b><em>${SFX.on?'On':'Off'}</em></button>
+        <button id="bTheme"><b>Theme</b><em>${document.documentElement.dataset.theme==='night'?'Night':'Paper'}</em></button>
+        <a id="bManual" href="Teacher/" target="_blank"><b>Manual</b><em>teacher handbook ↗</em></a></div>`:''}</div></div></header>`;
 }
 function render(){
   if(ROLE!=='host')return;
@@ -424,9 +448,10 @@ function render(){
   app.innerHTML=topBar()+`<main class="stage" id="stage"></main>`;
   const st=$('#stage');
   try{if(G.view==='home')rHome(st);else if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else if(G.view==='pick')rPick(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
-  $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
-  $('#bTheme').onclick=()=>{toggleTheme();render();};
-  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bManual'))$('#bManual').onclick=e=>{e.preventDefault();window.open('Teacher/','cr-manual');};   // a script-opened tab, so the manual's Back can close it
+  $('#bUtil').onclick=e=>{e.stopPropagation();G.utilOpen=!G.utilOpen;render();};
+  if($('#bSfx'))$('#bSfx').onclick=()=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);if(SFX.on)sfx.inn();render();};
+  if($('#bTheme'))$('#bTheme').onclick=()=>{toggleTheme();render();};
+  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bManual'))$('#bManual').onclick=e=>{e.preventDefault();G.utilOpen=false;render();window.open('Teacher/','cr-manual');};   // a script-opened tab, so the manual's Back can close it
   if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
   $('#bMix').onclick=openMixer;
@@ -485,21 +510,20 @@ function attBoxBind(st){  if($('#selCls',st))$('#selCls',st).onchange=e=>{const 
 
 /* THE HOME SCREEN: attendance first (most teachers only take attendance). A big, clear join QR in the middle, the room
    code, the class list and who has checked in; Activities is one click away. */
-function rHome(st){const ps=players(),inN=attUrl()&&ATT.cls?attCount():ps.length,on=online().length;
+function rHome(st){const ps=players();
   st.innerHTML=`<div class="home">
     <aside class="hside">
       <div class="teachbox tight${G.lobbyErr?' clash':''}"><span class="lab">Teacher</span><div class="tbrow"><b>${esc(teacherName()||'—')}</b><button class="ghost" id="bTeach">${teacherName()?'Not you?':'Set your name'}</button></div>
         ${G.lobbyErr?`<p class="tbwarn">Another Control Room is already open as “${esc(teacherName())}”: add your last name.</p>`:''}</div>
-      ${attBoxHTML()}
-      <div class="hnames">${ps.length?ps.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<span class="hname c${p.sh}${p.att==='in'?' att':''}${p.conn&&p.conn.open?'':' off'}">${p.att==='in'?'✓ ':''}${esc(p.name)}</span>`).join(''):'<p class="fine">Names appear here as students check in.</p>'}</div>
-      <div class="frow hroom"><button class="ghost" id="bNew" title="A fresh room with a new code: everyone scans again">New room</button></div>
       <button class="ghost attcopy" id="bAttCopy">⧉ Copy attendance${ps.length?` · ${ps.length}`:''}</button>
+      ${attBoxHTML()}
+      <div class="hnames">${ps.length?ps.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<span class="hname c${p.sh}${p.att==='in'?' att':''}${p.conn&&p.conn.open?'':' off'}${p.hand?' hand':''}" data-id="${esc(p.id)}">${p.att==='in'?'✓ ':''}${esc(p.name)}${p.hand?`<i class="mhand">${HAND_ICON}</i>`:''}</span>`).join(''):'<p class="fine">Names appear here as students check in.</p>'}</div>
+      <div class="frow hroom"><button class="ghost" id="bNew" title="A fresh room with a new code: everyone scans again">New room</button></div>
       <button class="big go hact" id="bAct">Activities <small>games &amp; tools</small></button></aside>
     <section class="hatt"><span class="lab">Attendance${ATT.cls?' · '+esc(ATT.cls):''}</span>
       <div class="hqr" id="homeQR" aria-label="Scan to check in"></div>
-      <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b><small>${esc(joinURL(G.code||'').replace(/^https?:\/\//,'').replace(/\?room=.*$/,''))} · code ${G.code||''}</small></div>
-      <div class="hcount"><b>${inN}</b><span>${attUrl()&&ATT.cls?'checked in today':'in the room'}${on&&on!==inN?` · ${on} online`:''}</span></div></section></div>`;
-  const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-420,innerWidth*.36,620));   // leaves room for the code and the count under it
+      <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b></div></section></div>`;
+  const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-330,innerWidth*.36,640));   // leaves room for the code under it
   if(G.code){if(G.homeQR&&G.homeQR.code===G.code&&G.homeQR.size===size)q.appendChild(G.homeQR.node);
     else{const n=document.createElement('div');drawQR(n,G.code,size);G.homeQR={code:G.code,size,node:n};q.appendChild(n);}}
   $('#bAct',st).onclick=()=>{G.view='menu';render();syncAll();};$('#bNew',st).onclick=newRoom;$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);

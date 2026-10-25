@@ -104,7 +104,7 @@ Phones and the host keep old files otherwise.
 
 ## Architecture
 
-- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`), room code, check-in count, teacher name ("Not you?"), the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, New room, Copy attendance, and **Activities** → the module menu (`G.view==='menu'`). The Teacher panel is on the right on both screens (home `.hside`, menu `.roomp`, moved with CSS `order`; stacked on top on narrow screens); the Teacher box is `.teachbox.tight` on both screens. The logo goes home (no Attendance button). The header shows Vote/Pick when `atRest()`, then Timer · CADCAST · SFX · Theme, then **Supply drop** (`#bDrop`, straight to its setup, menu only) and **Manual** last (`#bManual`, home + menu: `window.open('Teacher/','cr-manual')` so the room keeps running; the handbook's fixed ← Control Room button closes that tab, or opens `../?host` when there is no opener). `atRest()` = home or menu. Most teachers only use this screen.
+- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`) and the room code (no count or URL under it), teacher name ("Not you?") with Copy attendance right under it, the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, New room, Copy attendance, and **Activities** → the module menu (`G.view==='menu'`). The Teacher panel is on the right on both screens (home `.hside`, menu `.roomp`, moved with CSS `order`; stacked on top on narrow screens); the Teacher box is `.teachbox.tight` on both screens. The logo goes home (no Attendance button). The header shows Vote/Pick when `atRest()`, then Timer · CADCAST, then **Supply drop** (`#bDrop`, straight to its setup, menu only) and the **⋯ utilities** menu last (`#util`, `G.utilOpen`: Sound effects, Theme, Manual; closes on any outside click). Manual (`#bManual`: `window.open('Teacher/','cr-manual')` so the room keeps running; the handbook's fixed ← Control Room button closes that tab, or opens `../?host` when there is no opener). `atRest()` = home or menu. Most teachers only use this screen.
 - `ROLE` is `player` when the URL has `?room=CODE` (or on a narrow screen without `?host`), otherwise `host`.
 - PeerJS connects phones to the host; the host is the only source of truth (`G` on the host, `PL` on phones).
   - host → phone: `{t:'st', view, g, s:pstate}`, `{t:'names'}` (class list), `{t:'log'}` (notebook), `{t:'kick'}`, `{t:'taken'}`
@@ -169,7 +169,9 @@ Phones and the host keep old files otherwise.
 - **Teacher link** (Teacher box ▸ ⧉ Copy teacher link, `teacherLink()`): `?host#teacher=NAME&sheet=/exec URL`; `applyTeacherLink()` at host boot stores both and wipes the hash. Private (holds the sheet link). No login. Class list ▸ ⧉ Copy your sheet link and the sheet card copy the /exec link alone. Copy attendance sits right under the Teacher box.
 - **Screensaver**: the Catalyst logo in the header (`#bSaver`, images/catalyst-logo.png, drawn as a CSS mask) opens `openSaver()`: a full-screen page with the logo, black by default (click flips to white, saved as `saver.light`); every key is swallowed, Esc (or leaving full screen) calls `closeSaver()`. The room keeps running underneath.
 - **Raise your hand** (phones only): `#pHand` in the phone header sends `{t:'hand', up}`; the host keeps `p.hand` (time raised),
-  shows `#hands` in the header (first raised + count; click for the ordered list, lower one or all) and a yellow name chip.
+  shows `#hands` in the header middle, left of the student count (one name, or "Multiple"; click for the ordered list, lower one or all) and a yellow name chip (menu `.mchip` and home `.hname`).
+- **Check-in announcement** (home only): a new player in the `hi` handler → `announceIn(p)` → a queued fixed overlay `.annc` over the header middle
+  (between the shapes and the hands/count), so re-renders never restart it; shorter holds when the queue is long; the count pops.
   `handsUpdate()` updates in place and never re-renders a running game. Hands drop on disconnect; lowering is echoed back to the phone.
 - **Soundabout Roundabout relay**: after the sketch and each stop a `rec` phase: the phone's Record/Stop sends `{t:'rec'}`; the
   host tells the computer `{t:'rec-start'|'rec-stop'}`; CADCAST/go records its capture stream (MediaRecorder, opus) and
@@ -213,7 +215,10 @@ Cloudflare TURN free tier: 1,000 GB/month.
 - Never commit a real Apps Script /exec link, TURN token or other secret: the repo is public. (The owner's sheet link was in
   integrations/attendance/README.md until 2026-10-22 and is still in git history: the owner should redeploy the script to get a new link.)
 - Everything a student types is shown with `esc()` or `textContent`; keep it that way in new code.
-- Files from computers (core `pcData`) and to computers (CADCAST/go `gotChunk`) are capped: 48 KB chunks, ≤ 8000 chunks, few at once.
+- Files from computers (core `pcData`) and to computers (CADCAST/go `gotChunk`) are capped: 11,000-byte chunks (`PC_CH`), ≤ 32000 chunks, few at once.
+  **Chunks must stay under 16 KB once JSON-encoded: PeerJS 1.5 silently drops bigger messages on a 'json' connection** (an error event, no
+  exception). 48 KB chunks broke every file transfer until 2026-10-25. CADCAST's patch bay finds this tab by `window.name='controlroom-host'`
+  and asks BroadcastChannel 'cr-host' whether a Control Room is open before ever opening another.
 - CADCAST/go accepts teacher messages only from `controlroom-v1-<room>` (the room it paired in, or the teacher's current room from the lobby).
 - Outside scripts are pinned and SRI-checked (`SRI` in core.js, `integrity` in CADCAST); a new version needs a new hash from cdnjs.
 - The TURN Worker answers only gunnitynes.github.io / localhost Origins.

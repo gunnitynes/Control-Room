@@ -1937,3 +1937,36 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
 .blmk:active,.blmk.hit{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);background:var(--yel)}
 .blp .blmom.sm{align-self:stretch;margin:0}
 a.ghost{color:inherit;text-decoration:none;display:inline-block;line-height:normal}
+/* ---------- header: raised hands beside the count, the check-in announcement, the utilities menu */
+.tmid>#hands{margin-left:auto;align-self:center;padding-left:12px}
+.tmid>#hands:empty{display:none}
+.tmid>#hands+.count{margin-left:0}
+.tmid .handbtn{font-size:18px;padding:8px 18px 8px 12px;max-width:340px}
+.tmid .handbtn svg{width:30px;height:30px}
+.tmid .handpop{right:auto;left:0}
+.hname.hand{background:var(--yel);box-shadow:3px 3px 0 var(--ink)}.hname .mhand{display:inline-grid;margin-left:4px;vertical-align:middle}.hname .mhand svg{width:16px;height:16px;animation:handwave 1.4s ease-in-out infinite}
+#nOn.pop{animation:countpop .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes countpop{40%{transform:scale(1.5);color:var(--green)}}
+.annc{position:fixed;z-index:90;display:grid;place-items:center;pointer-events:none}
+.anncard{position:relative;display:flex;align-items:center;gap:14px;max-width:100%;padding:8px 26px 8px 12px;background:var(--green);color:#fff;border:4px solid var(--ink);box-shadow:7px 7px 0 var(--ink);
+  animation:annin .6s cubic-bezier(.25,1.6,.45,1) both}
+.anncard b{font:900 clamp(26px,2.6vw,42px)/1 var(--disp);font-stretch:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;text-transform:uppercase;letter-spacing:.01em}
+.anncard .lab{align-self:end;margin-bottom:4px;white-space:nowrap;opacity:.85}
+.annck{display:grid;place-items:center;width:40px;height:40px;flex:none;border-radius:50%;background:#fff;color:var(--green);border:3px solid var(--ink);font:900 24px/1 var(--disp);font-style:normal;animation:anncheck .5s .25s cubic-bezier(.3,1.8,.5,1) both}
+.annbit{position:absolute;left:50%;top:50%;line-height:0;opacity:0;animation:annbit .9s .15s cubic-bezier(.2,.8,.3,1) both}
+.annbit.b0{--x:-260px;--y:-14px;--r:-200deg}.annbit.b1{--x:250px;--y:-20px;--r:220deg}.annbit.b2{--x:-180px;--y:22px;--r:160deg}
+.annbit.b3{--x:200px;--y:24px;--r:-140deg}.annbit.b4{--x:-90px;--y:-30px;--r:300deg}.annbit.b5{--x:120px;--y:30px;--r:-260deg}
+.annc.out .anncard{animation:annout .4s ease-in both}
+@keyframes annin{0%{transform:translateY(-120%) rotate(-6deg) scale(.6);opacity:0}60%{transform:translateY(6%) rotate(2deg) scale(1.06);opacity:1}100%{transform:none}}
+@keyframes annout{to{transform:translateY(-130%) rotate(4deg);opacity:0}}
+@keyframes anncheck{from{transform:scale(0) rotate(-90deg)}}
+@keyframes annbit{0%{opacity:1;transform:translate(-50%,-50%) scale(.3)}70%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r)) scale(1)}}
+.util{position:relative;align-self:center}
+.utilb{display:inline-flex;gap:4px;align-items:center;padding:10px 10px;min-height:34px}
+.utilb i{width:6px;height:6px;border-radius:50%;background:currentColor;display:block}
+.utilb[aria-expanded="true"]{background:var(--ink);color:var(--paper)}
+.utilpop{position:absolute;right:0;top:calc(100% + 10px);z-index:80;width:250px;display:grid;gap:6px;padding:12px;background:var(--paper);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink)}
+.utilpop button,.utilpop a{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);text-decoration:none;font:800 15px var(--disp);text-align:left}
+.utilpop button:hover,.utilpop a:hover{background:var(--yel)}
+.utilpop em{font:700 10px var(--mono);font-style:normal;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2)}
+.utilpop #bSfx[aria-pressed="true"] em{color:var(--green)}
