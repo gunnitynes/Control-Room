@@ -390,6 +390,7 @@ function hostData(conn,m){
   if(m.t==='ping'){try{conn.send({t:'pong'});}catch(e){}return;}
   if(m.t==='who'){G.lobby.add(conn);try{conn.send(namesMsg());}catch(e){}return;}
   if(m.t==='pair'){cadcastPair(conn,m);return;}
+  if(m.t==='selfie'){selfieData(players().find(x=>x.conn===conn),m);return;}
   if(m.t==='hand'){const p=players().find(x=>x.conn===conn);if(p)setHand(p,!!m.up);return;}
   if(m.t==='vote'){const p=players().find(x=>x.conn===conn);if(p&&G.view==='vote'&&V)voteAct(p,m);return;}
   if(m.t==='hi'){
@@ -405,7 +406,7 @@ function hostData(conn,m){
     if(p){if(p.conn&&p.conn!==conn)try{p.conn.close();}catch(e){}p.conn=conn;}
     else{p={id,name:listed||uniqueName(m.name,id),sh:G.players.size%4,conn,...blankP(),in:Date.now()};G.players.set(id,p);if(G.view!=='play')sfx.join();announceIn(p);}
     attCheckIn(p);lobbyNames();
-    sync(p);sendLog(p);saveRoom();tmrJoin(p);
+    sync(p);sendLog(p);saveRoom();tmrJoin(p);selfieTell(p);
     if(G.view==='play'){G.game.onJoin&&G.game.onJoin(p);liveUpdate();}else if(G.view==='vote'){voteLive();syncAll();}else if(G.view==='pick'){pickLive();sync(p);}else render();
     return;
   }
@@ -476,6 +477,7 @@ function topBar(){
     <div class="util" id="util"><button class="ghost utilb" id="bUtil" aria-expanded="${!!G.utilOpen}" title="Utilities: sound effects, theme, the manual" aria-label="Utilities"><i></i><i></i><i></i></button>
       ${G.utilOpen?`<div class="utilpop"><span class="lab">Utilities</span>
         <button id="bSfx" aria-pressed="${SFX.on}"><b>Sound effects</b><em>${SFX.on?'On':'Off'}</em></button>
+        <button id="bFaces"><b>Faces</b><em>${facesSub()}</em></button>
         <button id="bTheme"><b>Theme</b><em>${document.documentElement.dataset.theme==='night'?'Night':'Paper'}</em></button>
         <a id="bManual" href="Teacher/" target="_blank"><b>Manual</b><em>teacher handbook ↗</em></a></div>`:''}</div></div></header>`;
 }
@@ -492,6 +494,7 @@ function render(){
   $('#bUtil').onclick=e=>{e.stopPropagation();G.utilOpen=!G.utilOpen;render();};
   if($('#bSfx'))$('#bSfx').onclick=()=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);if(SFX.on)sfx.inn();render();};
   if($('#bTheme'))$('#bTheme').onclick=()=>{toggleTheme();render();};
+  if($('#bFaces'))$('#bFaces').onclick=()=>{G.utilOpen=false;render();openFaces();};
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bManual'))$('#bManual').onclick=e=>{e.preventDefault();G.utilOpen=false;render();window.open('Teacher/','cr-manual');};   // a script-opened tab, so the manual's Back can close it
   if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
@@ -895,6 +898,8 @@ function pData(m){
   if(!m||typeof m!=='object'||m.t==='pong')return;
   if(m.t==='log'){const had=(PL.log||[]).length;PL.log=Array.isArray(m.log)?m.log:[];const b=$('.nbcount');if(b){b.textContent=PL.log.length;if(PL.log.length>had){const n=$('#nbBtn');if(n){n.classList.remove('ping');void n.offsetWidth;n.classList.add('ping');}}}if($('#nb'))openNotebook();return;}
   if(m.t==='names'){PL.names=m;if(!PL.joined)pRender();return;}
+  if(m.t==='selfie-has'){const was=PL.selfieHas;PL.selfieHas=!!m.has;if(was!==PL.selfieHas&&PL.joined&&(!PL.st||PL.st.view!=='play'))pRender();return;}   // idle screen only: never redraw a game for this
+  if(m.t==='selfie-ok'){selfieOk();return;}
   if(m.t==='hand'){PL.hand=!!m.up;pHandShow();return;}
   if(m.t==='timer'){pTmrMsg(m);return;}
   if(m.t==='paired'){showPaired(m);return;}
@@ -967,7 +972,9 @@ function pRender(){
     <h2>${s.g?'Next up':'You’re in'}</h2>${s.g?`<p class="nextg">${esc(s.gname)}</p>`:''}
     <p>${s.g?'The game starts in a moment.':`Look for <b>${esc(s.name)}</b> on the big screen. The next game starts soon.`}</p>
     ${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>
-    <button class="guidebtn" id="pGuide"><b>Guide</b><span>to the Control Room</span><i>→</i></button></div>`;
+    <button class="guidebtn" id="pGuide"><b>Guide</b><span>to the Control Room</span><i>→</i></button>
+    ${PL.selfieHas!=null?`<button class="pselfie" id="pSelfie">${PL.selfieHas?'📷 Your selfie for your teacher · take a new one':'📷 Add a selfie for your teacher'}</button>`:''}</div>`;
+  const sb=$('#pSelfie',body);if(sb)sb.onclick=selfieEditor;if(PL.selfieHas===false)setTimeout(selfieOffer,1200);   // offered once, quietly, on the idle screen
 }
 // shrink a name until its longest word fits on one line (a long surname never breaks mid-word)
 function fitWords(el,max,min){let fs=max;el.style.overflowWrap='normal';el.style.fontSize=fs+'px';

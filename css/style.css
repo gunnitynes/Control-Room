@@ -2057,3 +2057,30 @@ body.annon .top .tdate{opacity:0;transform:translate(-50%,-50%) scale(.9)}
 .blch input{accent-color:var(--ink);width:100%}.blch .ghost{text-decoration:none;padding:6px 9px}
 .blch.off{opacity:.5}.blch.off .blm{background:var(--red);color:#fff}
 #drNew{margin-left:auto;margin-right:12px}
+/* ---------- selfies: phone (offer, crop) and the teacher's Faces page */
+.pselfie{margin-top:10px;align-self:center;border:0;background:transparent;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);text-decoration:underline;text-underline-offset:3px;padding:6px}
+.sfoffer{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:150;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:12px 14px;border:3px solid var(--ink);background:var(--paper);box-shadow:5px 5px 0 var(--ink);animation:sfup .4s cubic-bezier(.2,1.3,.4,1) both}
+.sfoffer b{display:block;font:900 17px/1.1 var(--disp);text-transform:uppercase}.sfoffer span{font-size:14px;color:var(--ink2)}
+.sfoffer .ghost{background:var(--yel)}.sfoffer .sfno{grid-column:1/-1;justify-self:start;border:0;background:none;font:700 10px var(--mono);text-transform:uppercase;color:var(--ink2);text-decoration:underline;padding:0}
+@keyframes sfup{from{transform:translateY(120%)}}
+.sfov{position:fixed;inset:0;z-index:160;background:var(--paper);overflow:auto;display:grid;place-items:center;padding:16px}
+.sfcard{width:min(420px,100%);display:grid;gap:12px;justify-items:center;text-align:center}
+.sfcard h2{font:900 clamp(30px,9vw,44px)/.9 var(--disp);font-stretch:62%;text-transform:uppercase}
+.sfstage{position:relative;width:min(300px,82vw);aspect-ratio:1;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);overflow:hidden;touch-action:none;cursor:grab;background:#111}
+.sfstage canvas{display:block}
+.sfbox{position:absolute;inset:9% 17% 6%;border:3px dashed #fff;border-radius:50% 50% 46% 46%;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none}
+.sfzoom{display:flex;gap:10px;align-items:center;font:700 11px var(--mono);text-transform:uppercase;width:min(300px,82vw)}.sfzoom input{flex:1;accent-color:var(--ink)}
+.sfbtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.sftoast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,40px);opacity:0;z-index:170;padding:10px 16px;border:3px solid var(--ink);background:var(--ink);color:var(--paper);font:800 15px var(--disp);transition:.25s;pointer-events:none}
+.sftoast.on{opacity:1;transform:translate(-50%,0)}
+.facesov{position:fixed;inset:0;z-index:400;background:var(--paper);overflow-y:auto;padding:28px clamp(18px,3vw,44px) 60px;display:grid;gap:20px;align-content:start}
+.fchead{display:flex;align-items:end;gap:18px;flex-wrap:wrap;border-bottom:4px solid var(--ink);padding-bottom:12px}
+.fchead h1{font:900 clamp(56px,7vw,110px)/.8 var(--disp);font-stretch:62%;text-transform:uppercase;margin-top:4px}.fchead .fine{flex:1;min-width:16em}.fchead .lab{color:var(--red)}
+.fcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px}
+.fc{position:relative;margin:0;border:4px solid var(--ink);background:var(--paper);box-shadow:6px 6px 0 var(--ink);cursor:default}
+.fc img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-bottom:4px solid var(--ink)}
+.fc figcaption{padding:8px 10px;font:900 20px/1.05 var(--disp);text-transform:uppercase;font-stretch:72%;min-height:2.3em}
+.fc figcaption i{font-style:normal;color:var(--ink3)}
+.fc.here{box-shadow:6px 6px 0 var(--green)}.fcin{position:absolute;top:8px;left:8px;font:700 9px var(--mono);text-transform:uppercase;padding:3px 6px;background:var(--green);color:#fff}
+.fcx{position:absolute;top:6px;right:6px;width:28px;height:28px;border:2px solid var(--ink);background:var(--paper);font:900 16px/1 var(--disp);opacity:0}.fc:hover .fcx{opacity:1}
+.fchead .ghost.on{background:var(--ink);color:var(--paper)}
