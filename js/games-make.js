@@ -54,7 +54,7 @@ function slotGame(spec){
   g.next=()=>{const s=G.gs;if(s.phase==='slots')g.spin();else if(s.phase==='solo')g.sprint();else if(s.phase==='sprint'){stopClock();s.phase=s.o.mode==='room'?'slots':'solo';render();syncAll();}};
   g.sprint=()=>{const s=G.gs;s.phase='sprint';sfx.whoosh();
     if(s.o.mode==='room')online().forEach(p=>logAdd(p,{kind:'brief',game:g.name,title:g.title&&s.reels.every(r=>r.val)?g.title(s.reels):'',text:s.reels.map(r=>`${r.title}: ${r.val}`).join('\n')}));
-    startClock((s.o.mins||20)*60000,()=>{sfx.alarm();toast('Time! Pencils down.');syncAll();});render();syncAll();};
+    startClock((s.o.mins||20)*60000,()=>{sfx.alarm();timesUp('Pencils down. Save your project.');syncAll();});render();syncAll();};
   g.act=(p,d)=>{const s=G.gs;if(d.t==='spin'||d.t==='lock'){g.soloAct(p,d);return;}if(d.t==='pull'&&s.phase==='slots'&&!s.spinning){s.charge+=1;sfx.spin();if(s.charge>=need())g.spin();else{const m=$('#charge');if(m)m.style.width=(100*s.charge/need())+'%';online().forEach(sync);}}};
   g.frame=t=>{const s=G.gs;const dt=(t-s.lastT)/1000;s.lastT=t;if(s.charge>0&&!s.spinning){s.charge=Math.max(0,s.charge-dt*.6);const m=$('#charge');if(m)m.style.width=(100*s.charge/need())+'%';}clockFrame();};
   g.stop=()=>{};
@@ -204,7 +204,7 @@ game({
     if(ph==='deal'){s.round++;s.now=new Map();sfx.whoosh&&sfx.whoosh();
       online().forEach(p=>{if(s.out.has(p.id)){const line=s.lines.get(p.id)||[];line.push({round:s.round,status:'rest',kind:null});s.lines.set(p.id,line);}else this.give(p);});
       later(()=>{if(G.gs===s&&s.phase==='deal')this.go('work');},2600);}
-    if(ph==='work'){startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('between');});s.pcEnds=Date.now()+s.o.mins*60000;s.now.forEach((m,id)=>{const p=G.players.get(id);if(p)this.toPc(p);});}
+    if(ph==='work'){startClock(s.o.mins*60000,()=>{sfx.alarm();timesUp('Stop and save. Your next mission comes in a moment.');this.go('between');});s.pcEnds=Date.now()+s.o.mins*60000;s.now.forEach((m,id)=>{const p=G.players.get(id);if(p)this.toPc(p);});}
     if(ph==='between'){s.now.forEach((m,id)=>{if(m.status==='working')m.status='busy';});s.now.forEach((m,id)=>{const p=G.players.get(id);if(p)pcSend(p,{t:'mission-end',round:m.round});});}
     if(ph==='done'){sfx.fanfare();players().forEach(p=>{const L=(s.lines.get(p.id)||[]).filter(x=>x.status==='done');if(L.length)logAdd(p,{kind:'finish',game:this.name,text:`Your lineage: ${L.length} round${L.length>1?'s':''} · ${L.map(x=>x.label).join(' → ')}`});});}
     render();syncAll();},
@@ -354,11 +354,11 @@ game({
   nextOf(id){const r=this.ringOf();const i=r.indexOf(id);return r.length>1&&i>=0?G.players.get(r[(i+1)%r.length]):null;},
   prevOf(id){const r=this.ringOf();const i=r.indexOf(id);return r.length>1&&i>=0?G.players.get(r[(i-1+r.length)%r.length]):null;},
   go(ph){const s=G.gs;if(s.phase==='rec'&&ph!=='rec')online().forEach(p=>pcSend(p,{t:'take-end'}));s.phase=ph;stopClock();clearLater();this.stopPlay();
-    if(ph==='sketch'){this.ringOf();startClock(s.o.sketch*60000,()=>{sfx.alarm();this.go('rec');});}
+    if(ph==='sketch'){this.ringOf();startClock(s.o.sketch*60000,()=>{sfx.alarm();timesUp(s.o.pass==='seats'?'Save your project. Then wait for “Pass it on”.':'Export your track from the very start (MP3 is fastest) and drop it on your CADCAST page.');this.go('rec');});}
     if(ph==='rec'){s.rec=new Map();this.ringOf().forEach(id=>{const p=G.players.get(id);if(p&&pcFor(p))pcSend(p,{t:'take-in',round:s.round,label:s.round?`Stop ${s.round} of ${s.o.rounds}`:'The first sketch',project:s.o.pass==='project',next:s.o.pass==='seats'||s.round>=s.o.rounds?'':(this.nextOf(id)||{}).name||''});});}
     if(ph==='pass'){this.relay();s.round++;sfx.whoosh();startClock(30000,()=>this.go('card'));}
     if(ph==='card')this.draw();
-    if(ph==='build')startClock(s.o.stop*60000,()=>{sfx.alarm();this.go('rec');});
+    if(ph==='build')startClock(s.o.stop*60000,()=>{sfx.alarm();timesUp(s.o.pass==='seats'?'Save your project. Then wait for “Pass it on”.':'Export your track from the very start (MP3 is fastest) and drop it on your CADCAST page.');this.go('rec');});
     if(ph==='done')sfx.fanfare();
     render();syncAll();},
   next(){const s=G.gs;if(s.bl)return RBB.next();({brief:()=>this.go('sketch'),sketch:()=>this.go('rec'),rec:()=>this.go(s.round<s.o.rounds?'pass':'done'),pass:()=>this.go('card'),card:()=>this.go('build'),build:()=>this.go('rec'),done:()=>exitGame(true)})[s.phase]();},
@@ -493,7 +493,7 @@ const RBB={
   takeIn(p){const s=G.gs;if(pcFor(p))pcSend(p,{t:'take-in',round:s.id,label:`Blind layers · ${s.bpm} BPM · ${s.key}`,project:false,next:''});},
   go(ph){const s=G.gs;if(s.phase==='hand'&&ph!=='hand')online().forEach(p=>pcSend(p,{t:'take-end'}));s.phase=ph;stopClock();clearLater();
     if(ph==='make'){online().forEach(p=>{const c=this.cueFor(p);logAdd(p,{kind:'card',game:'Blind layers',title:`${s.bpm} BPM · ${s.key} · ${c.kind}`,text:c.text});});
-      startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('hand');});}
+      startClock(s.o.mins*60000,()=>{sfx.alarm();timesUp('Export your whole track from bar 1 (MP3 is fastest) and drop it on your CADCAST page.');this.go('hand');});}
     if(ph==='hand'){online().forEach(p=>this.takeIn(p));sfx.whoosh();}
     if(ph==='reveal'){this.halt();s.rv='ready';s.marks=[];this.prep();}
     if(ph==='done'){this.halt();sfx.fanfare();}

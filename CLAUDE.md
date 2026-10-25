@@ -211,6 +211,10 @@ Phones and the host keep old files otherwise.
   the phone sends `{t:'pair', lp:true}` and the allow entry gets `party:true`, so it never becomes the student's CADCAST computer
   (`pcFor` skips it, the patch bay ignores it). Such a page reaches us itself with `{t:'pc-hello', pc}` (accepted only from
   `cadcast-pc-<pc>` that is in the allow list; the connection then feeds `pcData`).
+- **Time's up** (core `timesUp(next)`): every MAKING clock's end calls it (album, blind orchestra, conductor, mix room, cross-pollinator,
+  constraint generator, roundabout sketch/stop, blind layers): a red full-screen card on the host (click / Space / Esc closes it, the key
+  never reaches the game), `{t:'timesup', game, next}` to every phone (`pTimesUp`, tap to close, vibrate + boop) and every CADCAST page (✕ / OK).
+  Short answer/vote clocks don't use it.
 - **Selfies** (js/selfie.js, to learn names; optional, never shown in the room): on join the host sends `{t:'selfie-has', has}`; a phone
   without one offers it ONCE (`selfieOffer`, `selfie.offered` in its store); taking a new one is the button in the notebook header (`#nbSelfie`,
   where the Guide button was). Wording: "your teachers" (plural).

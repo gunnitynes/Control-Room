@@ -85,7 +85,7 @@ game({
     const keys=alKeys().filter(k=>!last||k!==last.key),bpms=[85,95,100,110,120,128,140].filter(b=>!last||b!==last.bpm);
     Object.assign(s,{key:last?pick(keys):o.key==='random'?pick(alKeys()):o.key,bpm:last?pick(bpms):o.bpm,id:Date.now()%1e9,phase:'make',roles:new Map(),parts:new Map(),prog:new Map(),secs:AL_SECS.slice(),on:new Map(),lvl:new Map(),mute:new Set(),
       titles:new Map(),title:`${pick(AL_ADJ)} ${pick(AL_NOUN)}`,play:null,out:null,fail:null,rendering:false});
-    stopClock();if(o.mins)startClock(o.mins<0?-o.mins*1000:o.mins*60000,()=>{sfx.alarm();toast('Time! Export your part and drop it on CADCAST.');});
+    stopClock();if(o.mins)startClock(o.mins<0?-o.mins*1000:o.mins*60000,()=>{sfx.alarm();timesUp(`Export bars 1 to ${s.o.bars+1} (MP3 is fastest) and drop the file on your CADCAST page.`);});
     shuffle(online()).forEach(p=>{if(!s.roles.has(p.id))this.deal(p,prevRoles.get(p.id));});},   // a new song gives everyone a different role than last time
   stop(){this.halt();stopClock();const s=G.gs;if(s)online().forEach(p=>pcSend(p,{t:'album-end'}));},
   leave(){},

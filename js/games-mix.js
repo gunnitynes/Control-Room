@@ -95,7 +95,7 @@ game({
     if(!s.held.has(j)){let t;do{t=-5+Math.random()*21;}while(Math.abs(t)<3);s.trim[j]=t;}   // a part nobody held gets its hidden trim now
     s.assign.set(p.id,[j]);s.held.add(j);s.vals.set(p.id,{[j]:{...this.levels()[j]}});sync(p);render();},
   go(ph){const s=G.gs;s.phase=ph;stopClock();
-    if(ph==='mix'){s.round++;s.ab='room';this.deal();this.scramble();startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('reveal');});}
+    if(ph==='mix'){s.round++;s.ab='room';this.deal();this.scramble();startClock(s.o.mins*60000,()=>{sfx.alarm();timesUp('Hands off the faders: here’s how close you got.');this.go('reveal');});}
     if(ph==='reveal'){s.ab='room';const L=this.levels();s.res=mxMatch(L.map((l,i)=>({...l,v:mxEffV(l.v,i)})),L.map(l=>l.pan),s.o.ctl==='both',s.held);sfx.fanfare();}
     this.apply();render();syncAll();},
   next(){const s=G.gs;({load:()=>{},orig:()=>this.go('mix'),mix:()=>this.go('reveal'),reveal:()=>this.go('mix')})[s.phase]();},

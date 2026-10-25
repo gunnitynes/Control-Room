@@ -45,7 +45,7 @@ game({
     if(ph==='sync'){s.synced=null;cdTell({t:'sync',bpm:s.o.bpm,secs:8});}
     if(ph==='conduct'){s.cond=this.nextConductor();s.inMix=new Set();s.pending=new Set();s.score=new Map();s.startBar=Math.max(0,s.bar);
       cdTell({t:'cond',on:true,bpm:s.o.bpm});const id=Date.now();s.piece={id,cond:s.cond?s.cond.name:'?',condId:s.cond&&s.cond.id,blob:null};cdTell({t:'rec',on:true,id});
-      startClock(s.o.mins*60000,()=>{sfx.alarm();this.go('between');});}
+      startClock(s.o.mins*60000,()=>{sfx.alarm();timesUp('That piece is over. Listen back on the big screen.');this.go('between');});}
     if(ph==='between'){const P=s.piece;P.score=new Map([...s.score].map(([k,v])=>[k,v.map(x=>[x[0]-s.startBar,(x[1]??s.bar+1)-s.startBar])]));P.bars=Math.max(1,s.bar+1-s.startBar);P.names=new Map(this.players().map(x=>[x.pid,x.p.name]));
       s.pieces.push(P);s.waitRec=P;cdTell({t:'rec',on:false,id:P.id});cdTell({t:'cond',on:false});}
     render();syncAll();},

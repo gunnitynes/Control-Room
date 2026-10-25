@@ -481,6 +481,19 @@ function topBar(){
         <button id="bTheme"><b>Theme</b><em>${document.documentElement.dataset.theme==='night'?'Night':'Paper'}</em></button>
         <a id="bManual" href="Teacher/" target="_blank"><b>Manual</b><em>teacher handbook ↗</em></a></div>`:''}</div></div></header>`;
 }
+/* ---------- TIME'S UP: a module's work clock ran out. One clear screen on the big screen, on every phone and on every
+   CADCAST page, saying what happens now (next). The game carries on underneath; the screen goes away with a click, Space
+   or Esc on the big screen, a tap on a phone, ✕ on a computer. */
+function timesUp(next){if(ROLE!=='host')return;const g=G.game,name=g?g.name:'';
+  let ov=$('#tup');if(!ov){ov=el('div','tupov');ov.id='tup';document.body.appendChild(ov);}
+  ov.innerHTML=`<div class="tupcard"><span class="lab">${esc(name)}</span><h1>Time’s<br><i>up</i></h1>${next?`<p>${esc(next)}</p>`:''}<button class="big go" id="tupOk">OK <small>SPACE</small></button></div>`;
+  const close=()=>{ov.remove();document.removeEventListener('keydown',key,true);};
+  const key=e=>{if(e.key===' '||e.key==='Escape'||e.key==='Enter'){e.preventDefault();e.stopPropagation();close();}};
+  document.addEventListener('keydown',key,true);ov.onclick=close;
+  players().forEach(p=>{if(p.conn&&p.conn.open)try{p.conn.send({t:'timesup',game:name,next:next||''});}catch(e){}pcSend(p,{t:'timesup',game:name,next:next||''});});}
+function pTimesUp(m){let ov=$('#ptup');if(!ov){ov=el('div','ptupov');ov.id='ptup';document.body.appendChild(ov);}
+  ov.innerHTML=`<div><span class="lab">${esc(m.game||'')}</span><h1>Time’s<br><i>up!</i></h1>${m.next?`<p>${esc(m.next)}</p>`:''}<small>Tap to close</small></div>`;ov.onclick=()=>ov.remove();
+  try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){}if(typeof tmrBoop==='function'&&SFX.on!==undefined)tmrBoop();}
 // the Attendance screen's date sits centred over the big QR code (the header's middle isn't the QR's middle)
 function dateOverQR(){const d=$('.top .tdate'),q=$('#homeQR');if(!d||!q)return;const t=$('.top').getBoundingClientRect(),r=q.getBoundingClientRect();d.style.left=(r.left+r.width/2-t.left)+'px';}
 function render(){
@@ -900,6 +913,7 @@ function pData(m){
   if(m.t==='names'){PL.names=m;if(!PL.joined)pRender();return;}
   if(m.t==='selfie-has'){const was=PL.selfieHas;PL.selfieHas=!!m.has;if(was!==PL.selfieHas&&PL.joined&&(!PL.st||PL.st.view!=='play'))pRender();return;}   // idle screen only: never redraw a game for this
   if(m.t==='selfie-ok'){selfieOk();return;}
+  if(m.t==='timesup'){pTimesUp(m);return;}
   if(m.t==='hand'){PL.hand=!!m.up;pHandShow();return;}
   if(m.t==='timer'){pTmrMsg(m);return;}
   if(m.t==='paired'){showPaired(m);return;}

@@ -38,7 +38,7 @@ game({
     pcSendFile(p,{kind:'drop',round:s.id,name,label:`${MD_ROLE[role].l} · ${s.bpm} BPM · ${s.o.bars} bars`,head:'Blind Orchestra · your part',title:'Your part: '+MD_ROLE[role].l},new Blob([mdWrite([{role,prog:c.prog,notes:c.notes,label:MD_ROLE[role].l}],s.bpm,'Blind Orchestra')],{type:'audio/midi'}));
     pcSend(p,{t:'album',m:{round:s.id,at:Date.now(),head:'Blind Orchestra',title:'',role:MD_ROLE[role].l,tip:BO_TIPS[role]+' The song is a secret.',bpm:s.bpm,key:s.S.key.name,bars:s.o.bars,files:[],ends:s.clockEnd?Date.now()+clockLeft():0}});},
   go(ph){const s=G.gs;s.phase=ph;
-    if(ph==='make'){if(s.o.mins)startClock(s.o.mins<0?-s.o.mins*1000:s.o.mins*60000,()=>{sfx.alarm();toast('Time! Export your part and drop it on CADCAST.');});online().forEach(p=>this.handOut(p));}
+    if(ph==='make'){if(s.o.mins)startClock(s.o.mins<0?-s.o.mins*1000:s.o.mins*60000,()=>{sfx.alarm();timesUp('Export your part (MP3 is fastest) and drop it on your CADCAST page.');});online().forEach(p=>this.handOut(p));}
     if(ph==='listen'){stopClock();online().forEach(p=>pcSend(p,{t:'album-end'}));const all=[...new Set(mdLib().map(mdName))].filter(t=>t!==s.S.title);s.opts=shuffle([s.S.title,...shuffle(all).slice(0,3)]);s.guess=new Map();this.playOrch();}
     if(ph==='reveal'){try{sfx.fanfare();}catch(e){}}
     render();syncAll();},
