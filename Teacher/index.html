@@ -82,6 +82,9 @@ a.sec{font-weight:800;color:var(--blue);text-decoration-thickness:2px}
 .tb-n{display:grid;justify-items:center;margin-left:auto;font-size:8px}.tb-n b{font:900 22px/.9 var(--disp)}
 .tb-sep{width:3px;align-self:stretch;background:var(--ink)}.tb-qr{width:30px;height:30px;background:repeating-conic-gradient(var(--ink) 0 25%,#fff 0 50%) 0 0/10px 10px;border:2px solid var(--ink)}
 .tb-c{font:900 22px var(--disp);letter-spacing:-.02em}
+.tb-d{font:900 18px var(--disp);font-stretch:62%;text-transform:uppercase;margin:0 auto}.tb-d i{font-style:normal;color:var(--red)}
+.tb-b.rv em{font-style:normal;margin-left:3px;padding:0 4px;background:var(--red);color:#fff}
+.ttwo.three{grid-template-columns:repeat(3,1fr)}@media(max-width:760px){.ttwo.three{grid-template-columns:1fr}}
 .tb-b{padding:6px 9px;border:2px solid var(--ink);background:#fff}.tb-b.hot{background:var(--yel);box-shadow:3px 3px 0 var(--ink)}.tb-b.tmr{background:var(--ink);color:var(--paper)}
 .tool{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start;padding:22px;border:5px solid var(--ink);background:color-mix(in srgb,var(--c) 12%,#fff);box-shadow:9px 9px 0 var(--ink);margin:0 0 22px;scroll-margin-top:20px}
 .tool h3{margin:2px 0 8px;font-size:clamp(30px,4.4vw,46px)}.tool .lead{font-size:19px}.tool p:last-child{margin-bottom:0}
@@ -153,7 +156,7 @@ details>div{padding:0 16px 14px}
   <li><a href="#cadcast" style="--c:var(--green)"><b>4</b>Student computers</a></li>
   <li><a href="#sheet" style="--c:var(--red)"><b>5</b>Attendance sheet</a></li>
   <li><a href="#lesson" style="--c:var(--blue)"><b>6</b>Running a lesson</a></li>
-  <li><a href="#tools" style="--c:var(--red)"><b>7</b>Vote, timer &amp; more</a></li>
+  <li><a href="#tools" style="--c:var(--red)"><b>7</b>Top bar tools &amp; Review</a></li>
   <li><a href="#modules" style="--c:var(--yel)"><b>8</b>The 23 modules</a></li>
   <li><a href="#help" style="--c:var(--green)"><b>9</b>Help &amp; privacy</a></li>
 </ol>
@@ -162,10 +165,10 @@ details>div{padding:0 16px 14px}
 <section id="what" style="--c:var(--red)">
   <header><h2><span class="no">1</span>What it is</h2><p>gunnitynes.github.io/Control-Room</p></header>
   <p class="lead">Control Room runs on your computer and the projector.</p>
-  <div class="attfirst"><span class="lab">First of all</span><strong>Joining is checking in.</strong><p>When a student joins with their phone and picks their name, their attendance is marked. Control Room is an <b>attendance tool</b> first, with the games on top: every lesson starts with everyone checking in. With a Google Sheet the list is written for you (<a class="sec" href="#sheet">section 5</a>); without one, you copy it with one click (<a class="sec" href="#nosheet">no sheet</a>).</p><p><b>Control Room opens on the Attendance screen:</b> a big QR code in the middle for students to scan, your class list and who has checked in. If attendance is all you need, that’s the only screen you use. <kbd>Activities</kbd> opens the games and tools; the Control Room logo brings you back.</p></div>
-  <p class="lead">Next to the games there are everyday classroom tools in the top bar: <a class="sec" href="#tools">a room vote, a timer, a random picker and a screensaver</a>.</p>
+  <div class="attfirst"><span class="lab">First of all</span><strong>Joining is checking in.</strong><p>When a student joins with their phone and picks their name, their attendance is marked. Control Room is an <b>attendance tool</b> first, with the games on top: every lesson starts with everyone checking in. With a Google Sheet the list is written for you (<a class="sec" href="#sheet">section 5</a>); without one, you copy it with one click (<a class="sec" href="#nosheet">no sheet</a>).</p><p><b>Control Room opens on the Attendance screen:</b> today’s date in the top bar, a big QR code in the middle for students to scan, and on the right your Teacher box, the class list and who has checked in. Every student who checks in gets their name in lights in the top bar for a moment. If attendance is all you need, that’s the only screen you use. The big green <kbd>Activities</kbd> button under the QR code opens the games and tools; the Control Room logo (top left) brings you back.</p></div>
+  <p class="lead">Next to the games there are everyday classroom tools in the top bar: <a class="sec" href="#tools">a room vote, a random picker, a timer, a screensaver</a>, and <a class="sec" href="#review">Review</a>, where you play the work students upload to the <b>Listening party</b>.</p>
   <p class="lead">Students join with their phones, and the phones become buzzers, faders, knobs, voting cards and remix pads. Twenty-three modules: quizzes, ear training and creative sprints.</p>
-  <p>Nothing to install, no accounts. It is a website: open it in <em>Google Chrome</em> on the computer connected to the projector and speakers. Students only need a phone with a camera and a browser. Phones and your computer need internet (they find each other through a free relay, then talk directly).</p>
+  <p>Nothing to install, no accounts. It is a website: open it in <em>Google Chrome</em> on the computer connected to the projector and speakers. Students only need a phone with a camera and a browser. Phones and your computer need internet (they find each other through a free relay; on school Wi-Fi the traffic goes through a secure relay by itself).</p>
   <div class="note"><b>What you need</b>
     Your computer with Chrome, on the projector and the room speakers · students’ phones · internet in the room.
     <br>Optional: students’ own computers with a DAW (Ableton Live, Logic …) for the modules that send sound and files (<a class="sec" href="#cadcast">section 4</a>).</div>
@@ -176,9 +179,9 @@ details>div{padding:0 16px 14px}
   <header><h2><span class="no">2</span>Setup</h2><p>once per computer · about two minutes</p></header>
   <ol class="steps">
     <li class="c-blue"><div><strong>Open Control Room</strong><p>In Chrome, go to <span class="url">gunnitynes.github.io/Control-Room</span>.</p></div></li>
-    <li class="c-red"><div><strong>Tell it who’s teaching</strong><p>The first time, it asks <em>“Who’s teaching?”</em>. Type your name, e.g. <em>Gunni</em>. Student computers find <b>your</b> class by this name, so several teachers can run Control Room at the same time in different rooms. If a colleague has the same first name, use your last name too. You can change it any time under <em>Teacher</em> on the main menu.</p></div></li>
+    <li class="c-red"><div><strong>Tell it who’s teaching</strong><p>The first time, it asks <em>“Who’s teaching?”</em>. Type your name, e.g. <em>Gunni</em>. Student computers find <b>your</b> class by this name, so several teachers can run Control Room at the same time in different rooms. If a colleague has the same first name, use your last name too. You can change it any time in the <em>Teacher</em> box (<em>Not you?</em> on the Attendance screen, <em>Change</em> on the Activities screen).</p></div></li>
     <li class="c-yel"><div><strong>Connect your class list (optional)</strong><p>With your own Google Sheet, students tap their name instead of typing it, and every check-in lands on the sheet as attendance. Set it up once, see <a class="sec" href="#sheet">section 5</a>.</p></div></li>
-    <li class="c-green" id="tlink"><div><strong>Copy your teacher link</strong><p>Under <em>Teacher</em> on the main menu: <kbd>⧉ Copy teacher link</kbd>. It is <b>your</b> Control Room: open it on any computer and it starts set up as you, with your name and, once connected, your Google Sheet. Save it as a bookmark or in an email to yourself, If you connect your sheet later, copy it again.</p></div></li>
+    <li class="c-green" id="tlink"><div><strong>Copy your teacher link</strong><p>On the Activities screen, in the <em>Teacher</em> box: <kbd>⧉ Copy teacher link</kbd>. It is <b>your</b> Control Room: open it on any computer and it starts set up as you, with your name and, once connected, your Google Sheet. Save it as a bookmark or in an email to yourself. If you connect your sheet later, copy it again.</p></div></li>
   </ol>
   <div class="note blue"><b>One browser, one computer</b>Your class list link, your music folders and your settings are saved in <em>this Chrome on this computer</em>. Teaching from another computer? Use your <a class="sec" href="#tlink">teacher link</a>: one click and that computer is set up as you.</div>
 </section>
@@ -193,12 +196,12 @@ details>div{padding:0 16px 14px}
       <ul><li>Every quiz, ear-training game and most creative modules work like this.</li>
         <li>All sound comes from your computer and the room speakers.</li>
         <li>Press <kbd>Q</kbd> any time to show the join code big. Latecomers can join mid-game.</li>
-        <li>Without a class list, students type their first name instead, and you copy the attendance list from the main menu (<a class="sec" href="#nosheet">no sheet</a>).</li></ul></div>
+        <li>Without a class list, students type their first name instead, and you copy the attendance list with one click (<a class="sec" href="#nosheet">no sheet</a>).</li></ul></div>
     <div class="way b"><span class="tag">Way B · phone + computer</span><h3>With CADCAST</h3>
       <p>Each student opens <b>the CADCAST page on their own computer</b>. It shows a QR code; they scan <b>that</b> with their phone and tap their name.</p>
       <ul><li>One scan signs them in twice: the phone joins Control Room, and the computer becomes theirs.</li>
-        <li>Their computer can now <b>send you its sound</b> (what their DAW plays) and <b>send and receive files</b>: missions, materials, recordings, finished parts.</li>
-        <li>Needed for Supply Drop, The Conductor and The Class Album; it adds files to Constraint Generator and the relay to Soundabout Roundabout.</li></ul></div>
+        <li>Their computer can now <b>send you its sound</b> (what their DAW plays) and <b>send and receive files</b>: missions, materials, finished tracks and parts.</li>
+        <li>Needed for Supply Drop, Soundabout Roundabout, The Conductor, The Class Album and Blind Orchestra; it adds files to Constraint Generator. The <a class="sec" href="#review">Listening party</a> upload lives on the same page.</li></ul></div>
   </div>
   <div class="note"><b>You don’t have to choose for the whole lesson</b>A student who joined with the big-screen code can pair their computer later: they open the CADCAST page and scan it with the same phone.</div>
 </section>
@@ -209,7 +212,7 @@ details>div{padding:0 16px 14px}
   <h3>Every lesson</h3>
   <ol class="steps">
     <li class="c-green"><div><strong>Students open the CADCAST page</strong><p>On every student computer, <span class="url">gunnitynes.github.io/CADCAST/go/</span> is already bookmarked. It finds your class by itself. Only if it doesn’t, it asks for <em>“Your teacher’s name”</em>: students type your name (the same as in Control Room) once.</p></div></li>
-    <li class="c-blue"><div><strong>Open CADCAST to hear them</strong><p>Click <kbd>CADCAST</kbd> at the top right of Control Room. It opens the CADCAST patch bay in a new tab of <b>the same Chrome</b> (allow pop-ups if Chrome asks). Every paired computer appears as a strip with its student’s name and a fader. That tab must stay open in that browser for The Conductor.</p></div></li>
+    <li class="c-blue"><div><strong>Open CADCAST to hear them</strong><p>Click <kbd>CADCAST</kbd> in Control Room’s top bar. It opens the CADCAST patch bay in a new tab of <b>the same Chrome</b> (allow pop-ups if Chrome asks): every paired computer appears as a channel strip with its student’s name, a fader and meters. Click <kbd>CADCAST</kbd> again later and the open patch bay comes to the front (it doesn’t load again); the Control Room logo in the patch bay’s top left takes you back. Keep the tab open for The Conductor.</p></div></li>
   </ol>
   <h3>On each student computer, once</h3>
   <p>CADCAST hears exactly what the student’s DAW plays. The school computers are ready for it: <b>BlackHole</b> (a virtual audio cable) is installed, and an output device called <b>CADCAST</b> sends the sound to the student’s audio interface and to BlackHole at the same time. So the student still hears themselves, and CADCAST hears it too.</p>
@@ -222,8 +225,11 @@ details>div{padding:0 16px 14px}
     <li class="c-green"><div><strong>Open the CADCAST page and pair</strong><p>Open the bookmark in Chrome. It shows a QR code: scan it with the phone, tap your name. The phone says <em>“Your computer is now …”</em>. Chrome asks to use the microphone: <b>Allow</b>. It only reads BlackHole, never the real microphone. Then press <kbd>Connect</kbd>.</p></div></li>
   </ol>
   <div class="note green"><b>What travels through CADCAST</b>
-    <b style="font:inherit;display:inline">To you:</b> their sound (live, in the CADCAST tab) · Roundabout tracks · their finished part for The Class Album.<br>
-    <b style="font:inherit;display:inline">To them:</b> you can send files to every student computer, such as audio, MIDI or project zips, through several Control Room modules. Files appear on their CADCAST page, and they drag them straight into the DAW.</div>
+    <b style="font:inherit;display:inline">To you:</b> their sound (live, in the CADCAST tab) · their tracks for Soundabout Roundabout and Blind layers · their part for The Class Album and Blind Orchestra · whatever they upload to the <a class="sec" href="#review">Listening party</a>.<br>
+    <b style="font:inherit;display:inline">To them:</b> your Supply Drop materials, Constraint Generator files, the track passed on in Soundabout Roundabout, MIDI parts for Blind Orchestra. They appear on their CADCAST page as tiles: drag one straight into the DAW, or download it (a tick shows what they already downloaded).</div>
+  <h3>Handing in a track</h3>
+  <p>When a module asks for a track, the student’s CADCAST page shows a hand-in box. They export from their DAW <b>from the very start</b> and drop the file in the box (or anywhere on the page). Ask for <b>MP3 (320 kbps)</b>: it arrives about five times faster than a WAV. The box shows every step, so nobody has to guess: <em>Sending … %</em> → <em>Delivered, Control Room is checking it</em> → a green <em>✓ Received by Control Room</em> (for the Class Album with a note like “8 bars, spot on”). If something goes wrong it turns red and says why. On your screen the student’s card shows <em>arriving … %</em>, then ✓.</p>
+  <p>Once material arrives, the CADCAST page becomes a single column: the student’s name and connection in a slim strip at the top, then the cards, <b>the newest on top</b>. Finished cards (“Hand-in closed”) fade and move to the bottom.</p>
   <p>A computer stays paired for 12 hours, so reloading the page reconnects on its own. <em>Not you?</em> on the page shows the code again for a different student.</p>
 </section>
 
@@ -233,7 +239,7 @@ details>div{padding:0 16px 14px}
   <p class="lead">Students tap their name on the phone and they are checked in on <b>your</b> Google Sheet, with the date and time. You build the sheet, paste a small script into it and give Control Room its link.</p>
 
   <div class="note blue" id="nosheet"><b>No Google Sheet? Copy the list</b>
-    Students type their first name when they join. On the main menu, just under the <em>Teacher</em> box, click the yellow <kbd>⧉ Copy attendance</kbd> button: it copies everyone who joined this room, sorted by name, with the time they joined, under a heading with the date. Paste it into an email, a document or a spreadsheet (each name and time lands in its own column).
+    Students type their first name when they join. Just under the <em>Teacher</em> box (Attendance or Activities screen), click the yellow <kbd>⧉ Copy attendance</kbd> button: it copies everyone who joined this room, sorted by name, with the time they joined, under a heading with the date. Paste it into an email, a document or a spreadsheet (each name and time lands in its own column).
     <br><b style="font:800 inherit;font-weight:800;display:inline;color:var(--red)">Copy it before you click New room</b>: a new room starts an empty list. The list also covers anyone who joined and left, unless you removed them by clicking their name. It works with a Google Sheet too, as a quick check.</div>
 
   <h3>Step 1 · Make the sheet</h3>
@@ -250,7 +256,7 @@ details>div{padding:0 16px 14px}
 
   <h3>Step 2 · Add the script</h3>
   <ol class="steps">
-    <li class="c-red"><div><strong>Copy the script from Control Room</strong><p>Main menu ▸ <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd>. That card has a <kbd>Copy the script</kbd> button: it copies the whole script, with the setup instructions written at the top of it. The card shows these same steps too.</p></div></li>
+    <li class="c-red"><div><strong>Copy the script from Control Room</strong><p>Attendance screen ▸ <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd>. That card has a <kbd>Copy the script</kbd> button: it copies the whole script, with the setup instructions written at the top of it. The card shows these same steps too.</p></div></li>
     <li class="c-blue"><div><strong>Paste it into your sheet</strong><p>In your sheet: <kbd>Extensions</kbd> ▸ <kbd>Apps Script</kbd>. Select everything that is there (<kbd>⌘A</kbd> / <kbd>Ctrl A</kbd>), then paste (<kbd>⌘V</kbd> / <kbd>Ctrl V</kbd>).</p></div></li>
     <li class="c-green"><div><strong>Save</strong><p>The disk icon or <kbd>⌘S</kbd>. If it asks for a project name, type <em>Control Room</em>.</p></div></li>
   </ol>
@@ -266,14 +272,14 @@ details>div{padding:0 16px 14px}
 
   <h3>Step 4 · Link it to Control Room</h3>
   <ol class="steps">
-    <li class="c-red"><div><strong>Paste the link</strong><p>Main menu ▸ <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd>. Step 4 of that card: paste the <code>/exec</code> link and press <kbd>Connect</kbd>. Control Room checks it and shows how many classes it found.</p></div></li>
-    <li class="c-blue"><div><strong>Each lesson: pick the class</strong><p>Main menu ▸ <em>Class list</em> ▸ choose the class. Phones now show that class’s names to tap. Below the menu you see how many are checked in today; names on the room panel get a mark when the sheet has them.</p></div></li>
+    <li class="c-red"><div><strong>Paste the link</strong><p>Attendance screen ▸ <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd>. Step 4 of that card: paste the <code>/exec</code> link and press <kbd>Connect</kbd>. Control Room checks it and shows how many classes it found.</p></div></li>
+    <li class="c-blue"><div><strong>Each lesson: pick the class</strong><p>Attendance screen ▸ <em>Class list</em> ▸ choose the class. Phones now show that class’s names to tap. Names on the list get a ✓ when the sheet has them.</p></div></li>
   </ol>
 
   <h3>Your sheet link: keep it in your files</h3>
   <p>The <code>/exec</code> link is how Control Room reaches your sheet. It never changes, and it is the only thing you need to connect the sheet on another computer.</p>
   <ol class="steps">
-    <li class="c-blue"><div><strong>Copy it any time</strong><p>Main menu ▸ <em>Class list</em> ▸ <kbd>⧉ Copy your sheet link</kbd>. (Also in the sheet card, next to <kbd>Disconnect</kbd>.) Save it somewhere, like in a note or an email to yourself.</p></div></li>
+    <li class="c-blue"><div><strong>Copy it any time</strong><p>Attendance screen ▸ <em>Class list</em> ▸ <kbd>⧉ Copy your sheet link</kbd>. (Also in the sheet card, next to <kbd>Disconnect</kbd>.) Save it somewhere, like in a note or an email to yourself.</p></div></li>
     <li class="c-green"><div><strong>On another computer</strong><p>Easiest: open your <a class="sec" href="#tlink">teacher link</a>, which brings your name and sheet with it. Or if you don’t have your teacher link handy, open Control Room, type your name, then <em>Class list</em> ▸ <kbd>＋ Connect your own Google Sheet…</kbd> and paste the sheet link in step 4. Either way: no script and no deploying again.</p></div></li>
   </ol>
 
@@ -302,10 +308,10 @@ details>div{padding:0 16px 14px}
 <section id="lesson" style="--c:var(--blue)">
   <header><h2><span class="no">6</span>Running a lesson</h2><p>the rhythm of a Control Room class</p></header>
   <ol class="steps">
-    <li class="c-red"><div><strong>Students check in</strong><p>Control Room opens on the Attendance screen with a big QR code: students scan it and tap their name (or use Way B, <a class="sec" href="#ways">section 3</a>). Names appear on the right as they check in. Then click <kbd>Activities</kbd> for the games, or stay here if you only take attendance.</p></div></li>
+    <li class="c-red"><div><strong>Students check in</strong><p>Control Room opens on the Attendance screen with a big QR code: students scan it and tap their name (or use Way B, <a class="sec" href="#ways">section 3</a>). Names appear on the right as they check in, and each one gets a moment in lights in the top bar. Then click <kbd>Activities</kbd> under the QR code for the games, or stay here if you only take attendance.</p></div></li>
     <li class="c-blue"><div><strong>Pick a module, set it up</strong><p>Click a module. Its setup screen has the options (rounds, time, difficulty, categories …) and a short “how it works”. Your choices are remembered for next time. Or let the class choose with a <a class="sec" href="#vote">room vote</a>.</p></div></li>
     <li class="c-yel"><div><strong>Play</strong><p><kbd>Space</kbd> moves on. Students follow by themselves. Click the logo top left to go back to the menu.</p></div></li>
-    <li class="c-green"><div><strong>Finish</strong><p>Every end screen offers <em>Play another round</em> (<kbd>R</kbd>). Points across the lesson add up in the room standings; the leaderboard only appears when you click <em>Show the leaderboard</em>. No Google Sheet? Click <kbd>⧉ Copy attendance</kbd> on the main menu before you close (<a class="sec" href="#nosheet">no sheet</a>).</p></div></li>
+    <li class="c-green"><div><strong>Finish</strong><p>Every end screen offers <em>Play another round</em> (<kbd>R</kbd>). Points across the lesson add up in the room standings; the leaderboard only appears when you click <em>Show the leaderboard</em>. No Google Sheet? Click <kbd>⧉ Copy attendance</kbd> (under the Teacher box) before you close (<a class="sec" href="#nosheet">no sheet</a>).</p></div></li>
   </ol>
   <h3>Keys on your computer</h3>
   <div class="keys">
@@ -314,11 +320,11 @@ details>div{padding:0 16px 14px}
     <div><kbd>A</kbd><span>Autoplay on or off: the next round starts by itself</span></div>
     <div><kbd>R</kbd><span>Play another round with the same settings</span></div>
     <div><kbd>Q</kbd><span>Show the join code big</span></div>
-    <div><kbd>Esc</kbd><span>Close the big code, or end the screensaver</span></div>
+    <div><kbd>Esc</kbd><span>Close the big code, the Review page, or end the screensaver</span></div>
   </div>
   <h3>On every phone</h3>
   <div class="keys">
-    <div><b style="color:var(--yel);font-size:26px">▲</b><span><b>Raise your hand</b>: names light up on your screen in the order hands went up. Click the hand counter to lower them.</span></div>
+    <div><b style="color:var(--yel);font-size:26px">▲</b><span><b>Raise your hand</b>: the name lights up in your top bar, next to the student count (“Multiple” when more than one), and on the name list. Click it for the order and to lower hands.</span></div>
     <div><b style="color:var(--red);font-size:26px">●</b><span><b>Notebook</b>: every brief, rule, card and result a student collects, to keep.</span></div>
     <div><b style="color:var(--blue);font-size:26px">■</b><span><b>The Guide</b>: a poster tour of every module and how the phone plays it.</span></div>
     <div><b style="color:var(--green);font-size:26px">◆</b><span><b>Sit out</b>: busy students can skip a round and jump back in.</span></div>
@@ -327,9 +333,10 @@ details>div{padding:0 16px 14px}
 
 <!-- 7 -->
 <section id="tools" style="--c:var(--red)">
-  <header><h2><span class="no">7</span>Vote, timer &amp; more</h2><p>the classroom tools in the top bar · on every screen</p></header>
-  <div class="tbar" aria-hidden="true"><span class="tb-logo">CONTROL<br><i>ROOM</i></span><span class="tb-n"><b>14</b>students</span><span class="tb-sep"></span><span class="tb-qr"></span><span class="tb-c">C///</span>
-    <span class="tb-b hot">Vote</span><span class="tb-b hot">Pick</span><span class="tb-b hot tmr">⏱ 4:59</span><span class="tb-b">CADCAST</span><span class="tb-b">⋯</span></div>
+  <header><h2><span class="no">7</span>Top bar tools &amp; Review</h2><p>Vote and Pick on the Attendance and Activities screens · the rest on every screen</p></header>
+  <div class="tbar" aria-hidden="true"><span class="tb-logo">CONTROL<br><i>ROOM</i></span><span class="tb-d">Monday <i>9 November</i></span><span class="tb-n" style="margin-left:0"><b>14</b>students</span><span class="tb-sep"></span><span class="tb-qr"></span><span class="tb-c">C///</span>
+    <span class="tb-b hot">Vote</span><span class="tb-b hot">Pick</span><span class="tb-b hot tmr">⏱ 4:59</span><span class="tb-b">CADCAST</span><span class="tb-b rv">Review <em>+3</em></span><span class="tb-b">Supply drop</span><span class="tb-b">⋯</span></div>
+  <div class="ttwo three"><div><b>Logo</b><span>Back: from a game to Activities, from Activities to Attendance.</span></div><div><b>Supply drop</b><span>On the Activities screen: straight to Supply Drop.</span></div><div><b>⋯</b><span>Sound effects on or off, paper or night theme, and this manual (it opens in its own tab; ← Control Room brings you back).</span></div></div>
 
   <article class="tool big" id="vote" style="--c:var(--red)"><div class="tico"><i class="shp c"></i></div><div>
     <span class="lab">Top bar ▸ Vote</span><h3>The room vote</h3>
@@ -354,7 +361,14 @@ details>div{padding:0 16px 14px}
       <p>Need the projector to go quiet? Click the Catalyst logo: the screen turns black with the white logo in the middle. Click to switch to white. <kbd>Esc</kbd> brings Control Room back.</p>
       <p>The room keeps running underneath: phones stay connected and nothing is lost.</p></div></article>
   </div>
-  <p class="fine">Also on the main menu: <kbd>⧉ Copy attendance</kbd> (<a class="sec" href="#nosheet">no sheet</a>) and your <a class="sec" href="#tlink">teacher link</a>. <b>Review</b> in the top bar is the <b>Listening party</b>: students upload finished work (files or a folder, alone or as a named group) from the Listening party button on their CADCAST page, and you play or download it there (kept 24 hours; a laptop that isn’t their studio computer is signed in with a quick QR scan first). Raised hands show in the top bar, next to the student count (“Multiple” when more than one; click it for the order). Sound effects, the theme and this manual are under <kbd>⋯</kbd> at the far right. On the Attendance screen, every student who checks in gets their name in lights in the top bar.</p>
+  <article class="tool big" id="review" style="--c:var(--green)"><div class="tico"><i class="shp c"></i></div><div>
+    <span class="lab">Top bar ▸ Review</span><h3>The Listening party</h3>
+    <p class="lead">Students share finished work with you, and you play it to the class. No email, no USB sticks.</p>
+    <div class="ttwo three"><div><b>1 · Students upload</b><span>On their CADCAST page: <em>🎧 Listening party</em>. Working in a group? They type the group name first. Then they choose files, a whole folder, or drag them in. Each file shows <em>✓ In the review</em> when it has reached you.</span></div>
+      <div><b>2 · Another computer?</b><span>On a laptop that isn’t their signed-in studio computer, the page first asks them to prove they’re in the class: they scan its QR code with their phone and tap their name. That laptop is for the Listening party only; it never takes over their studio computer.</span></div>
+      <div><b>3 · You review</b><span><kbd>Review</kbd> shows a count (+3 = new since you last looked). It opens a page with a card per group or student: ▶ play a file, <em>Play all</em> for the whole group, ⬇ download. <kbd>Esc</kbd> closes it; the room keeps running.</span></div></div>
+    <p>Uploads are kept for 24 hours. Download what you want to keep.</p></div></article>
+  <p class="fine">On the Activities screen, the Teacher box also has your <a class="sec" href="#tlink">teacher link</a> and the CADCAST page link; <kbd>⧉ Copy attendance</kbd> sits under it on both screens (<a class="sec" href="#nosheet">no sheet</a>).</p>
 </section>
 
 <!-- 8 -->
@@ -383,12 +397,12 @@ details>div{padding:0 16px 14px}
   <div class="mods">
     <div class="mod" style="--c:var(--yel)"><b>14</b><div><strong>Constraint Generator</strong><span>Quick studio missions: a task, a rule and a fresh MIDI or audio file every round.</span></div><div class="need"><i>Phones</i><i class="cc">CADCAST for files</i></div></div>
     <div class="mod" style="--c:var(--yel)"><b>15</b><div><strong>Genre Cross-Pollinator</strong><span>Two genres that should never meet, and a name for the child.</span></div><div class="need"><i>Phones</i></div></div>
-    <div class="mod" style="--c:var(--yel)"><b>16</b><div><strong>Soundabout Roundabout</strong><span>Start a track and pass it round the room; every stop deals a prompt card. Students export their track (MP3 is fastest) and drop it on their CADCAST page; Control Room passes it to the next computer. Second mode, <b>Blind layers</b> (Week 4, record with intuition): one tempo and one key for the room; everyone makes their own track alone, hands it in, and every track plays together for the first time on your speakers while phones mark the moments.</span></div><div class="need"><i>Phones</i><i class="cc">CADCAST for the relay</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>16</b><div><strong>Soundabout Roundabout</strong><span><b>Pass it round:</b> start a track and pass it round the room; every stop deals a prompt card. At each stop students export their track (MP3 is fastest) and drop it on their CADCAST page; Control Room passes it to the next computer, and the listening party plays every journey. <b>Blind layers</b> (Week 4, record with intuition): one tempo and one key for the room; everyone makes their own track alone with a cue card, hands it in, and every track plays together for the first time on your speakers while phones mark the moments that jump out.</span></div><div class="need"><i>Phones</i><i class="cc">CADCAST</i></div></div>
     <div class="mod" style="--c:var(--yel)"><b>17</b><div><strong>Metaphor Translation</strong><span>An image on the big screen becomes three production rules. The room votes.</span></div><div class="need"><i>Phones</i><i class="own">Your photos</i></div></div>
     <div class="mod" style="--c:var(--yel)"><b>18</b><div><strong>Live Remix</strong><span>One song, the whole room at the controls: stutters, tape stops, filters, 808s. Take turns or all at once.</span></div><div class="need"><i>Phones</i><i class="own">Your songs</i></div></div>
-    <div class="mod" style="--c:var(--yel)"><b>19</b><div><strong>Supply Drop</strong><span>Your crate of loops, MIDI and stems lands at random on every computer. Fill the crate with single files, a few at a time, or whole folders.</span></div><div class="need"><i class="cc">CADCAST</i><i class="own">Your materials</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>19</b><div><strong>Supply Drop</strong><span>Your crate of loops, MIDI and stems lands on every computer: 1–3 random items each, or <b>All</b> of it. Fill the crate with single files, several at once, or whole folders; take items out with ×. <kbd>Drop</kbd> sends it, and a student’s card shows ✓ only once their computer really has it.</span></div><div class="need"><i class="cc">CADCAST</i><i class="own">Your materials</i></div></div>
     <div class="mod" style="--c:var(--yel)"><b>20</b><div><strong>The Conductor</strong><span>A laptop orchestra: loops of at least 4 bars in sync with Ableton Link; one student conducts from their phone.</span></div><div class="need"><i class="cc">CADCAST tab</i><i>Ableton Link</i></div></div>
-    <div class="mod" style="--c:var(--yel)"><b>21</b><div><strong>The Class Album</strong><span>Everyone makes one part of the same song, hands it in from their computer, the class arranges it. Download the mix and stems. After a song, <b>Create another song</b> starts the next one (new roles, new key); the album is every song, downloaded as one zip.</span></div><div class="need"><i class="cc">CADCAST</i></div></div>
+    <div class="mod" style="--c:var(--yel)"><b>21</b><div><strong>The Class Album</strong><span>Everyone makes one part of the same song (MP3 is the fastest hand-in), the class arranges it. After a song, <b>Create another song</b> starts the next one (new roles, new key); the album is every song, downloaded as one zip.</span></div><div class="need"><i class="cc">CADCAST</i></div></div>
     <div class="mod" style="--c:var(--yel)"><b>22</b><div><strong>The Frankenhit</strong><span>Each student owns a part (drums, bass, chords, melody) and spins it: it lands on that part of a random famous song, moved into one tempo and key. Keep or reroll, guess where each part was stolen from, take the MIDI home.</span></div><div class="need"><i>Phones</i><i class="own">Your MIDI library</i></div></div>
     <div class="mod" style="--c:var(--yel)"><b>23</b><div><strong>Blind Orchestra</strong><span>Each computer gets one part of a secret song as MIDI. Students produce it their way and hand it in; then every part plays together and the room guesses the song they just covered.</span></div><div class="need"><i class="cc">CADCAST</i><i class="own">Your MIDI library</i></div></div>
   </div>
@@ -402,25 +416,30 @@ details>div{padding:0 16px 14px}
   <details><summary>A phone can’t join</summary><div><ul>
     <li>Check the phone has internet (school Wi-Fi sometimes blocks new devices: mobile data works too).</li>
     <li>Press <kbd>Q</kbd> and scan again, or open <span class="url">gunnitynes.github.io/Control-Room</span> on the phone and type the four-letter room code from the big screen.</li>
-    <li>“Already in the room on another phone”: the name is taken by a phone that is still connected. Remove the wrong one by clicking its name chip on the room panel.</li></ul></div></details>
+    <li>“Already in the room on another phone”: the name is taken by a phone that is still connected. Remove the wrong one by clicking its name on the Activities screen.</li></ul></div></details>
   <details><summary>On school Wi-Fi, phones or computers can’t connect</summary><div><ul>
     <li>Many school networks stop devices in a room from talking to each other. Control Room and CADCAST then send the traffic through a relay on the internet (Cloudflare), on the same port as ordinary websites. This happens by itself: nothing to set up.</li>
     <li>Audio that goes through the relay is sent at 128 kb/s instead of 320 kb/s; the student’s CADCAST page says “through the relay”.</li>
     <li>Still stuck? Try one phone on mobile data. If even that fails, the school may be blocking the internet services themselves: ask IT to allow <code>peerjs.com</code> and <code>cloudflare.com</code>.</li></ul></div></details>
   <details><summary>A computer doesn’t pair or shows the wrong class</summary><div><ul>
-    <li>The CADCAST page must know your name: use the link from your main menu (it carries <code>?t=Your+Name</code>), or type your name in “Your teacher’s name”.</li>
-    <li>If the main menu warns that another Control Room is open with your name, close the other tab, or add your last name.</li>
+    <li>The CADCAST page must know your name: use the <em>CADCAST page</em> link in the Teacher box on the Activities screen (it carries <code>?t=Your+Name</code>), or type your name in “Your teacher’s name”.</li>
+    <li>If the Teacher box warns that another Control Room is open with your name, close the other tab, or add your last name.</li>
     <li>Control Room must be open on your computer while students pair.</li></ul></div></details>
   <details><summary>I can’t hear a student’s computer</summary><div><ul>
     <li>The <kbd>CADCAST</kbd> tab must be open in the same Chrome as Control Room.</li>
     <li>On their side: the DAW plays into the Multi-Output Device, the CADCAST page says <em>Connected</em>, and Chrome was allowed to use the microphone.</li>
     <li>“Paired · no sound yet” in the CADCAST tab means the page is paired but nothing is playing into BlackHole.</li></ul></div></details>
+  <details><summary>A file or a hand-in didn’t arrive</summary><div><ul>
+    <li>Reload both sides once (<kbd>⌘⇧R</kbd>): Control Room on your computer and the CADCAST page on theirs, so both run the latest version.</li>
+    <li>The student’s hand-in box says what happened: <em>✓ Received by Control Room</em>, or red with a reason. <em>Not delivered</em> means their page lost the connection: check it says Connected, then drop the file again.</li>
+    <li>Big WAVs are slow: ask for MP3. Files over 90 MB are refused.</li>
+    <li>In Supply Drop, a card without ✓ hasn’t reached that computer yet; <kbd>Drop again</kbd> sends a new round.</li></ul></div></details>
   <details><summary>The sound is on the wrong speakers</summary><div><p>Control Room plays through your computer’s current output. Set the room speakers in your system sound settings before the lesson.</p></div></details>
   <details open><summary>Privacy</summary><div><ul>
     <li>No accounts and no tracking. Students give a first name or tap one from your list.</li>
     <li>Your class list goes from <b>your</b> sheet to <b>your</b> computer and the phones in the room, nowhere else. Check-ins go back to your sheet only.</li>
-    <li>Sound and files between computers travel directly over the room’s network; the free PeerJS relay only introduces the devices to each other.</li>
-    <li>Your music, stems and photos stay in your browser.</li></ul></div></details>
+    <li>Live sound travels directly between computers, or through a secure relay (Cloudflare) when the school network blocks that. Files (Supply Drop, hand-ins, the Listening party) go up once to a private Cloudflare link that only your class’s pages are given, and are deleted after 24 hours.</li>
+    <li>Your music, MIDI library, stems and photos stay in your browser. Only what you drop to students, and what students hand in, is sent.</li></ul></div></details>
 </section>
 
 <footer class="foot"><p>One room. One big screen. Everybody plays.</p><button class="print" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);print()">Print or save as PDF</button></footer>
