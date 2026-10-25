@@ -278,7 +278,23 @@ const UNB64=t=>{const s=atob(t),u=new Uint8Array(s.length);for(let i=0;i<s.lengt
 function pcAlive(p){const pc=pcFor(p),e=pc&&PCC.get(pc);if(!e||e.dead||!e.conn.open)return Promise.resolve(true);
   return new Promise(res=>{const k=Math.random().toString(36).slice(2,8),t=setTimeout(()=>{e.pong=null;e.dead=true;try{e.conn.close();}catch(x){}res(false);},4000);
     e.pong={k,f:()=>{clearTimeout(t);e.pong=null;res(true);}};pcSend(p,{t:'ping',k});});}
-async function pcSendFile(p,meta,blob,onProg){await pcAlive(p);const u8=new Uint8Array(await blob.arrayBuffer()),CH=PC_CH,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);let e0=null;
+/* FILE LINKS (integrations/turn/worker.js): when the Worker has file storage, a file goes up ONCE over HTTPS (kept 24 h)
+   and only its link travels to the computer ({t:'file-link'}), which downloads it: far faster than the relay, and a
+   Supply Drop of one file to 20 computers is one upload. Without storage (or if the upload fails) files go in chunks. */
+const FILES_URL=location.hostname==='localhost'&&QS.get('files')||TURN_URL;
+const FILES={ok:null,at:0,up:new WeakMap()};
+async function filesReady(){if(FILES.ok!==null&&Date.now()-FILES.at<300000)return FILES.ok;FILES.at=Date.now();
+  try{const r=await fetch(FILES_URL+'/drop/ok',{cache:'no-store'});FILES.ok=r.ok&&!!(await r.json()).ok;}catch(e){FILES.ok=false;}return FILES.ok;}
+function filesPut(blob,name,prog){return new Promise(res=>{const x=new XMLHttpRequest();x.open('POST',FILES_URL+'/drop');x.setRequestHeader('Content-Type',blob.type||'application/octet-stream');x.setRequestHeader('X-Name',encodeURIComponent(name||'file'));
+  x.upload.onprogress=e=>{if(prog&&e.lengthComputable)prog(e.loaded/e.total);};x.onload=()=>{try{res(x.status===200?JSON.parse(x.responseText).url:null);}catch(e){res(null);}};x.onerror=()=>res(null);x.send(blob);});}
+// one upload per file per day, shared by every computer it goes to
+function filesUrl(blob,name,prog){const c=FILES.up.get(blob);if(c&&Date.now()-c.at<20*3600e3)return c.p;const pr=filesPut(blob,name,prog).then(u=>{if(!u)FILES.up.delete(blob);return u;});FILES.up.set(blob,{p:pr,at:Date.now()});return pr;}
+async function filesGet(url,prog){const t0=Date.now();for(;;){let r=null;try{r=await fetch(url,{cache:'no-store'});}catch(e){}   // a new file can take a moment to show up everywhere
+    if(r&&r.ok){const n=+r.headers.get('Content-Length')||0,rd=r.body.getReader(),parts=[];let got=0;for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;if(prog&&n)prog(got/n);}return new Blob(parts);}
+    if(Date.now()-t0>60000)return null;await new Promise(z=>setTimeout(z,2500));}}
+async function pcSendFile(p,meta,blob,onProg){await pcAlive(p);
+  if(blob.size>150e3&&blob.size<=90e6&&await filesReady()){const url=await filesUrl(blob,meta.name||'file',onProg);
+    if(url){if(onProg)onProg(1);return pcSend(p,{t:'file-link',fid:Math.random().toString(36).slice(2,10),meta:{...meta,size:blob.size,mime:blob.type},url});}}const u8=new Uint8Array(await blob.arrayBuffer()),CH=PC_CH,n=Math.max(1,Math.ceil(u8.length/CH)),fid=Math.random().toString(36).slice(2,10);let e0=null;
   for(let i=0;i<n;i++){const pc=pcFor(p),e=pc&&PCC.get(pc);if(i>0&&(!e||e!==e0||e.dead))return false;   // the connection broke mid-file: the rest would never complete it
     for(let k=0;e&&e.conn.dataChannel&&e.conn.dataChannel.bufferedAmount>1.5e6&&k<600;k++)await new Promise(r=>setTimeout(r,50));
     if(!pcSend(p,{t:'file',fid,i,n,meta:i?null:{...meta,size:u8.length,mime:blob.type},data:B64(u8.subarray(i*CH,(i+1)*CH))}))return false;
@@ -294,6 +310,9 @@ function pcData(pc,m){if(!m||typeof m!=='object')return;const a=store.get('cadca
     if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f.got/f.n,f.meta);
     if(f.got===f.n&&f.meta){PCF.delete(m.fid);const b=new Blob(f.parts,{type:f.meta.mime||''});if(G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,f.meta,b);}
     return;}
+  if(m.t==='file-link'){if(!m.meta||typeof m.url!=='string'||!(m.url.startsWith(FILES_URL+'/drop/')||m.url.startsWith(TURN_URL+'/drop/')))return;   // only our own Worker's links
+    const meta=m.meta,prog=f=>{if(G.view==='play'&&G.game&&G.game.onPcProg)G.game.onPcProg(p,f,meta);};prog(0);
+    filesGet(m.url,prog).then(b=>{if(b&&G.view==='play'&&G.game&&G.game.onPcFile)G.game.onPcFile(p,meta,new Blob([b],{type:meta.mime||''}));});return;}
   if(m.t==='pong'){const e=PCC.get(pc);if(e&&e.pong&&e.pong.k===m.k)e.pong.f();return;}
   if(G.view==='play'&&G.game&&G.game.onPcMsg)G.game.onPcMsg(p,m);}
 /* ---------- the class lobby: a relay address named after the TEACHER (controlroom-lobby-<name>) that tells any device
@@ -439,7 +458,7 @@ function liveUpdate(){
 function topBar(){
   const g=G.game,inG=!atRest()&&G.view!=='vote'&&G.view!=='pick'&&g;
   const mid=inG?`<div class="qno" style="--c:var(${g.col})"><b>${numOf(g)}</b><span>${esc((GROUPS.find(x=>x.id===g.group)||{}).short||'')}</span></div><div class="cat"><div><b>${esc(g.name)}</b><span id="tinfo">${esc(G.view==='play'&&g.topInfo?g.topInfo():g.tag)}</span></div></div>`
-    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>${G.view==='home'?`<button class="big go tact" id="bAct">Activities <small>games &amp; tools</small></button>`:''}`;
+    :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>${atRest()?`<div class="tdate" aria-label="Today"><b>${esc(new Date().toLocaleDateString('en-GB',{weekday:'long'}))}</b><i>${esc(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long'}))}</i></div>`:''}`;
   const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div id="hands">${handsHTML()}</div><div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button>
     ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
@@ -467,7 +486,7 @@ function render(){
   if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bManual'))$('#bManual').onclick=e=>{e.preventDefault();G.utilOpen=false;render();window.open('Teacher/','cr-manual');};   // a script-opened tab, so the manual's Back can close it
   if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
-  $('#bMix').onclick=openMixer;if($('#bAct'))$('#bAct').onclick=()=>{G.view='menu';render();syncAll();};
+  $('#bMix').onclick=openMixer;
   // the CONTROL ROOM wordmark is the home button
   const home=$('.top .logo');home.setAttribute('role','button');home.tabIndex=0;home.title='Main menu';
   home.onclick=()=>{if(G.view==='menu'){G.view='home';render();syncAll();}else if(G.view==='setup'){G.view='menu';render();syncAll();}else if(G.view==='play'||G.view==='vote'||G.view==='pick')exitGame();};home.onkeydown=e=>{if(e.key==='Enter')home.onclick();};
@@ -535,11 +554,12 @@ function rHome(st){const ps=players();
 </aside>
     <section class="hatt"><span class="lab">Attendance${ATT.cls?' · '+esc(ATT.cls):''}</span>
       <div class="hqr" id="homeQR" aria-label="Scan to check in"></div>
-      <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b></div></section></div>`;
-  const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-330,innerWidth*.36,640));   // leaves room for the code under it
+      <div class="hcode"><span>Scan to check in</span><b>${G.code||'····'}</b></div>
+      <button class="big go hact" id="bAct">Activities <small>games &amp; tools</small></button></section></div>`;
+  const q=$('#homeQR',st),size=Math.round(Math.min(innerHeight-420,innerWidth*.36,620));   // leaves room for the code and Activities under it
   if(G.code){if(G.homeQR&&G.homeQR.code===G.code&&G.homeQR.size===size)q.appendChild(G.homeQR.node);
     else{const n=document.createElement('div');drawQR(n,G.code,size);G.homeQR={code:G.code,size,node:n};q.appendChild(n);}}
-  $('#bNew',st).onclick=newRoom;$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
+  $('#bNew',st).onclick=newRoom;$('#bAct',st).onclick=()=>{G.view='menu';render();syncAll();};$('#bAttCopy',st).onclick=copyAttendance;$('#bTeach',st).onclick=askTeacher;attBoxBind(st);
   if(!teacherName())setTimeout(askTeacher,300);}
 
 function rMenu(st){
@@ -939,10 +959,14 @@ function pRender(){
     ${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>
     <button class="guidebtn" id="pGuide"><b>Guide</b><span>to the Control Room</span><i>→</i></button></div>`;
 }
+// shrink a name until its longest word fits on one line (a long surname never breaks mid-word)
+function fitWords(el,max,min){let fs=max;el.style.overflowWrap='normal';el.style.fontSize=fs+'px';
+  while(fs>min&&el.scrollWidth>el.clientWidth+1){fs-=2;el.style.fontSize=fs+'px';}if(el.scrollWidth>el.clientWidth+1)el.style.overflowWrap='anywhere';}
 /* the computer that was scanned is now this student's: a short confirmation card over whatever is on screen */
 function showPaired(m){let ov=$('#paired');if(!ov){ov=el('div','pairedov');ov.id='paired';document.body.appendChild(ov);}
   ov.innerHTML=m.ok?`<div class="pairedcard"><div class="paircheck">✓</div><span class="lab">Your computer is now</span><div class="pairname">${esc(m.name)}</div><p>It sends your sound to the teacher and gets your files.</p></div>`
     :`<div class="pairedcard bad"><div class="paircheck">!</div><span class="lab">Computer not connected</span><p>${esc(m.why||'Scan its code again.')}</p></div>`;
+  const pn=ov.querySelector('.pairname');if(pn)fitWords(pn,Math.max(40,Math.min(64,Math.round(innerWidth*.13))),22);
   if(navigator.vibrate)navigator.vibrate(m.ok?[30,40,30]:200);ov.onclick=()=>ov.remove();clearTimeout(showPaired.t);showPaired.t=setTimeout(()=>ov.remove(),m.ok?4200:7000);}
 /* ---------- Add to Home Screen (tap the logo on a phone) ---------- */
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;

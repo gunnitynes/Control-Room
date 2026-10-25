@@ -324,7 +324,7 @@ game({
   // two modes: Pass it round (a track travels the room) and Blind layers (RBB: groups record from memory, nobody listens back)
   get how(){return optVals(this).mode==='blind'
     ?['Groups of 3–4 agree a starting point: tempo with a click, a key, the sounds. All channels start muted.','Layer by layer, one plays from memory (a cue card on their phone) while the next one records. Nobody listens back.','The reveal: each group unmutes everything and plays it to the room. Phones mark the moments that jump out; develop two or three of them, then share.']
-    :['Everyone starts a short sketch on their own computer.','When the timer ends, play your track from the start and record it from your phone. CADCAST sends it to the next computer.','A prompt card lands on your phone. Grow the track you were passed, then record and pass it on again. The listening party plays every journey.'];},
+    :['Everyone starts a short sketch on their own computer.','When the timer ends, export your track (MP3 is fastest) and drop it on your CADCAST page. Control Room passes it to the next computer.','A prompt card lands on your phone. Grow the track you were passed, then hand it in and pass it on again. The listening party plays every journey.'];},
   badges:['Sprint','No score','Prompt cards','CADCAST'],kind:'free',
   icon:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="21" fill="none" stroke="var(--ink)" stroke-width="4" stroke-dasharray="26 7"/><path d="M50 14 L54 26 L42 25 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="2.5"/><path d="M14 50 L10 38 L22 39 Z" fill="var(--blue)" stroke="var(--ink)" stroke-width="2.5"/><rect x="25" y="25" width="14" height="14" fill="var(--yel)" stroke="var(--ink)" stroke-width="3" transform="rotate(12 32 32)"/></svg>`,
   options:[
@@ -337,11 +337,11 @@ game({
     {key:'layer',label:'Time per layer',type:'step',min:1,max:15,step:1,def:4,unit:'min',show:v=>v.mode==='blind',help:'Set it up, record one take, mute it, next performer. The clock rings but waits for you.'},
     {key:'start',label:'Starting point',choices:[['deal','Dealt','a tempo, key and sounds for each group'],['own','Groups decide','they agree it together']],def:'deal',show:v=>v.mode==='blind'},
     {key:'dev',label:'Develop',type:'step',min:5,max:60,step:5,def:20,unit:'min',show:v=>v.mode==='blind',help:'Time to make something from the moments the room marked at the reveal.'},
-    {key:'pass',label:'Pass the track',choices:[['audio','As a recording','CADCAST sends it to the next computer'],['project','Recording + project','the next person also gets the project file (same DAW for everyone)'],['seats','Move seats','record for the party, then change seats']],def:'audio',help:'Recording and passing need each computer signed in through CADCAST (gunnitynes.github.io/CADCAST/go). Students who are not: they change seats.',show:v=>v.mode!=='blind'},
+    {key:'pass',label:'Pass the track',choices:[['audio','As an export','students drop their track on CADCAST, it goes to the next computer'],['project','Export + project','the next person also gets the project file (same DAW for everyone)'],['seats','Move seats','hand in for the party, then change seats']],def:'audio',help:'Handing in and passing need each computer signed in through CADCAST (gunnitynes.github.io/CADCAST/go). Students who are not: they change seats.',show:v=>v.mode!=='blind'},
     {key:'deal',label:'Cards',choices:[['each','Everyone different','a card per student'],['room','One for the room','the same card on the big screen']],def:'each',show:v=>v.mode!=='blind'},
   ],
   note:`${RB_ALL.length} prompt cards in ${RB_KINDS.length} kinds (${RB_KINDS.join(', ')}). A card is not dealt again until every card has been used (counted in this browser). Edit them in data/content.js → ROUNDABOUT.`,
-  topInfo(){const s=G.gs;if(s&&s.bl)return RBB.topInfo();return s?({brief:'Ready',sketch:'First sketch',rec:'Record your track',pass:'Pass it on!',card:`Stop ${s.round} · your card`,build:`Stop ${s.round} of ${s.o.rounds}`,done:'Listening party'})[s.phase]:this.tag;},
+  topInfo(){const s=G.gs;if(s&&s.bl)return RBB.topInfo();return s?({brief:'Ready',sketch:'First sketch',rec:'Hand in your track',pass:'Pass it on!',card:`Stop ${s.round} · your card`,build:`Stop ${s.round} of ${s.o.rounds}`,done:'Listening party'})[s.phase]:this.tag;},
   start(o){if(o.mode==='blind')return RBB.start(o);G.gs={o,phase:'brief',round:0,cards:new Map(),room:null,done:new Set(),swapped:new Set(),ring:[],rec:new Map(),takes:new Map(),projects:new Map(),got:new Map(),play:null};},
   logCard(p,c){logAdd(p,{kind:'card',game:this.name,title:`Stop ${G.gs.round} · ${c.kind}`,text:c.text});},
   draw(){const s=G.gs,ps=online();s.done=new Set();s.swapped=new Set();sfx.card();
@@ -354,9 +354,9 @@ game({
   ringOf(){const s=G.gs;online().forEach(p=>{if(!s.ring.includes(p.id))s.ring.push(p.id);});return s.ring.filter(id=>G.players.has(id));},
   nextOf(id){const r=this.ringOf();const i=r.indexOf(id);return r.length>1&&i>=0?G.players.get(r[(i+1)%r.length]):null;},
   prevOf(id){const r=this.ringOf();const i=r.indexOf(id);return r.length>1&&i>=0?G.players.get(r[(i-1+r.length)%r.length]):null;},
-  go(ph){const s=G.gs;s.phase=ph;stopClock();clearLater();this.stopPlay();
+  go(ph){const s=G.gs;if(s.phase==='rec'&&ph!=='rec')online().forEach(p=>pcSend(p,{t:'take-end'}));s.phase=ph;stopClock();clearLater();this.stopPlay();
     if(ph==='sketch'){this.ringOf();startClock(s.o.sketch*60000,()=>{sfx.alarm();this.go('rec');});}
-    if(ph==='rec')s.rec=new Map();
+    if(ph==='rec'){s.rec=new Map();this.ringOf().forEach(id=>{const p=G.players.get(id);if(p&&pcFor(p))pcSend(p,{t:'take-in',round:s.round,label:s.round?`Stop ${s.round} of ${s.o.rounds}`:'The first sketch',project:s.o.pass==='project',next:s.o.pass==='seats'||s.round>=s.o.rounds?'':(this.nextOf(id)||{}).name||''});});}
     if(ph==='pass'){this.relay();s.round++;sfx.whoosh();startClock(30000,()=>this.go('card'));}
     if(ph==='card')this.draw();
     if(ph==='build')startClock(s.o.stop*60000,()=>{sfx.alarm();this.go('rec');});
@@ -364,7 +364,7 @@ game({
     render();syncAll();},
   next(){const s=G.gs;if(s.bl)return RBB.next();({brief:()=>this.go('sketch'),sketch:()=>this.go('rec'),rec:()=>this.go(s.round<s.o.rounds?'pass':'done'),pass:()=>this.go('card'),card:()=>this.go('build'),build:()=>this.go('rec'),done:()=>exitGame(true)})[s.phase]();},
   frame(){clockFrame();if(G.gs&&G.gs.bl)RBB.frame();},
-  stop(){if(G.gs.bl)return;this.stopPlay();online().forEach(p=>{if((G.gs.rec.get(p.id)||{}).st==='rec')pcSend(p,{t:'rec-stop'});});},
+  stop(){if(G.gs.bl)return;this.stopPlay();if(G.gs.phase==='rec')online().forEach(p=>pcSend(p,{t:'take-end'}));},
   key:(r,id)=>r+':'+id,
   // pass: every recording made at this stop goes to the next computer in the ring
   relay(){const s=G.gs,r=s.round;s.got=new Map();
@@ -374,33 +374,35 @@ game({
       if(!pcFor(to)){s.got.get(to.id).st='nopc';return;}
       if(!t){s.got.get(to.id).st='notake';pcSend(to,{t:'relay-note',round:r,text:`${from.name} didn’t record this stop. Go to ${from.name}’s seat to hear it.`});return;}
       const g=s.got.get(to.id);g.st='sending';
-      pcSendFile(to,{kind:'take',round:r,from:from.name},t.blob).then(ok=>{g.st=ok?'sent':'fail';
+      pcSendFile(to,{kind:'take',round:r,from:from.name,name:t.file||''},t.blob).then(ok=>{g.st=ok?'sent':'fail';
         if(ok&&pr)pcSendFile(to,{kind:'project',round:r,from:from.name,name:pr.name},pr.blob).then(()=>{});
         sync(to);this.live();});});},
   act(p,d){const s=G.gs;if(s.bl)return RBB.act(p,d);
     if(d.t==='got'&&(s.phase==='card'||s.phase==='build')){s.done.add(p.id);sfx.vote();sync(p);const e=$('#nDone');if(e)e.textContent=s.done.size;}
     if(d.t==='swap'&&s.phase==='card'&&!s.room&&!s.swapped.has(p.id)){s.swapped.add(p.id);const c=rbDeal(1)[0];s.cards.set(p.id,c);this.logCard(p,c);sfx.card();sync(p);render();}
-    if(d.t==='rec'&&s.phase==='rec'){
-      if(d.on){if(!pcFor(p)){s.rec.set(p.id,{st:'nopc'});sync(p);this.live();return;}
-        pcSend(p,{t:'rec-start',round:s.round,project:s.o.pass==='project'});s.rec.set(p.id,{st:'rec',t0:Date.now()});}
-      else{pcSend(p,{t:'rec-stop'});const r=s.rec.get(p.id)||{};s.rec.set(p.id,{...r,st:'up'});}
-      sync(p);this.live();}},
+    // d.t==='rec' (record from the phone) is gone: students hand in an export on CADCAST/go now
+  },
+  // a computer that signs in during the hand-in gets the hand-in card too
+  onPair(p){const s=G.gs;if(!s||s.bl||s.phase!=='rec')return;pcSend(p,{t:'take-in',round:s.round,label:s.round?`Stop ${s.round} of ${s.o.rounds}`:'The first sketch',project:s.o.pass==='project',next:(this.nextOf(p.id)||{}).name||''});this.live();},
   onPcMsg(p,m){const s=G.gs;if(!s||s.bl||m.t!=='rec-state')return;const r=s.rec.get(p.id)||{};
     if(m.state==='rec')s.rec.set(p.id,{...r,st:'rec',t0:r.t0||Date.now()});
     if(m.state==='up')s.rec.set(p.id,{...r,st:'up',dur:m.dur});
     if(m.state==='error')s.rec.set(p.id,{st:'err',msg:m.msg});
     sync(p);this.live();},
-  onPcProg(p,f,meta){const s=G.gs;if(!s||s.bl||!meta||meta.kind!=='take')return;const r=s.rec.get(p.id);if(r&&r.st==='up'){r.prog=f;this.live();}},
+  onPcProg(p,f,meta){const s=G.gs;if(!s||s.bl||!meta||meta.kind!=='take'||meta.round!==s.round)return;s.rec.set(p.id,{st:'up',prog:f});this.live();},
   onPcFile(p,meta,blob){const s=G.gs;if(!s||s.bl)return;const k=this.key(meta.round,p.id);
-    if(meta.kind==='take'){s.takes.set(k,{blob,dur:meta.dur||0,pid:p.id,name:p.name,round:meta.round});if(meta.round===s.round)s.rec.set(p.id,{st:'ok',dur:meta.dur});sfx.vote();}
+    if(meta.kind==='take'){const t={blob,dur:meta.dur||0,pid:p.id,name:p.name,round:meta.round,file:meta.name||''};s.takes.set(k,t);if(meta.round===s.round)s.rec.set(p.id,{st:'ok',dur:t.dur});sfx.vote();
+      // the length (and a decoded copy for the listening party), then the receipt on their computer
+      blob.arrayBuffer().then(b=>new Promise((res,rej)=>audio().decodeAudioData(b,res,rej))).then(buf=>{t.buf=buf;t.dur=buf.duration;const r=s.rec.get(p.id);if(r&&meta.round===s.round)r.dur=t.dur;this.live();sync(p);},()=>{})
+        .finally(()=>pcSend(p,{t:'take-got',round:meta.round,dur:t.dur}));}
     if(meta.kind==='project'){s.projects.set(k,{blob,name:meta.name||'project.zip'});const r=s.rec.get(p.id);if(r)r.proj=meta.name;}
     sync(p);this.live();},
   // live updates without re-rendering the whole stage
   live(){const s=G.gs;if(!s)return;if(s.phase==='rec'||s.phase==='pass'){const box=$('#rbLive');if(box)box.innerHTML=this.liveHTML();}},
   liveHTML(){const s=G.gs,ids=this.ringOf();
-    if(s.phase==='rec'){const lab=p=>{const r=s.rec.get(p.id)||{};return r.st==='rec'?'● recording':r.st==='up'?`sending ${r.prog?Math.round(r.prog*100)+'%':'…'}`:r.st==='ok'?`✓ ${rbFmt(r.dur||0)}${r.proj?' + project':''}`:r.st==='nopc'?'no CADCAST':r.st==='err'?'mic blocked':pcFor(p)?'ready':'no CADCAST';};
+    if(s.phase==='rec'){const lab=p=>{const r=s.rec.get(p.id)||{};return r.st==='up'?`arriving ${r.prog?Math.round(r.prog*100)+'%':'…'}`:r.st==='ok'?`✓ ${r.dur?rbFmt(r.dur):'in'}${r.proj?' + project':''}`:pcFor(p)?'exporting…':'no CADCAST';};
       const n=ids.filter(id=>(s.rec.get(id)||{}).st==='ok').length,can=ids.filter(id=>pcFor(G.players.get(id))).length;
-      return `<p class="rbcount"><b>${n}</b> of ${can} recorded${can<ids.length?` · ${ids.length-can} without CADCAST change seats`:''}</p><div class="rbrec">${ids.map(id=>{const p=G.players.get(id),r=s.rec.get(id)||{};return `<div class="rbr c${p.sh} st-${r.st||(pcFor(p)?'ready':'nopc')}"><b>${esc(p.name)}</b><span>${esc(lab(p))}</span></div>`;}).join('')}</div>`;}
+      return `<p class="rbcount"><b>${n}</b> of ${can} handed in${can<ids.length?` · ${ids.length-can} without CADCAST change seats`:''}</p><div class="rbrec">${ids.map(id=>{const p=G.players.get(id),r=s.rec.get(id)||{};return `<div class="rbr c${p.sh} st-${r.st||(pcFor(p)?'ready':'nopc')}"><b>${esc(p.name)}</b><span>${esc(lab(p))}</span></div>`;}).join('')}</div>`;}
     return `<div class="rbrec">${ids.map(id=>{const to=G.players.get(id),g=s.got.get(id);if(!g)return '';const from=G.players.get(g.from);
       const lab={sending:'sending…',sent:'✓ on their computer',fail:'not delivered',notake:'no recording · change seats',nopc:'no CADCAST · change seats',none:'change seats'}[g.st]||'';
       return `<div class="rbr c${to.sh} st-${g.st}"><b>${esc(from?from.name:'?')} → ${esc(to.name)}</b><span>${esc(lab)}</span></div>`;}).join('')}</div>`;},
@@ -420,7 +422,7 @@ game({
     const bodies={
       brief:`<div class="dbig"><span class="lab">Before the first stop</span><h2>Start a sketch</h2><p>${o.sketch} minute${o.sketch>1?'s':''}: a loop, a beat, a sound you love. Then it goes on a journey round the room, ${o.rounds} stop${o.rounds>1?'s':''} long.</p>${o.pass!=='seats'?'<p class="fine">Every computer signed in through CADCAST (gunnitynes.github.io/CADCAST/go) records and passes its track by itself.</p>':''}</div>`,
       sketch:`<div class="dbig"><span class="lab">First sketch</span>${clockHTML('huge')}<p>Start something worth passing on.</p></div>`,
-      rec:`<div class="rbreco"><div class="rbhead"><span class="lab">${s.round?`Stop ${s.round} of ${o.rounds}`:'The first sketch'} · record</span><h2>Play it, record it</h2><p>On your phone tap <b>Record</b>, play your track from the start, tap <b>Stop</b> when it ends.${o.pass==='project'?' Then drop your project on your computer.':''}</p></div><div id="rbLive">${this.liveHTML()}</div></div>`,
+      rec:`<div class="rbreco"><div class="rbhead"><span class="lab">${s.round?`Stop ${s.round} of ${o.rounds}`:'The first sketch'} · hand in</span><h2>Export it, hand it in</h2><p>Export your track from the very start (<b>MP3</b> is fastest) and drop it on your CADCAST page.${o.pass==='project'?' Drop your project zip there too.':''}</p></div><div id="rbLive">${this.liveHTML()}</div></div>`,
       pass:`<div class="rbreco"><div class="rbhead"><div class="arrows"><i></i><i></i><i></i><i></i></div><h2>Pass it on!</h2><p>${o.pass==='seats'?'Move one seat on. The track in front of you is now yours to grow.':'Each track is on its way to the next computer. Drag it into your DAW.'}</p>${clockHTML()}</div><div id="rbLive">${this.liveHTML()}</div></div>`,
       card:s.room?`<div class="dbig"><span class="lab">Stop ${s.round} of ${o.rounds} · ${esc(s.room.kind)}</span><div class="scard"><b>${esc(s.room.text)}</b></div><p><b id="nDone">${s.done.size}</b> of ${online().length} ready</p><div class="frow"><button class="ghost" id="bRedraw">Draw another card</button></div></div>`
         :`<div class="rbcards"><div class="rbhead"><span class="lab">Stop ${s.round} of ${o.rounds} · everyone has their own card</span><h2>Check your phone</h2><p><b id="nDone">${s.done.size}</b> of ${online().length} ready</p></div>${wall()}</div>`,
@@ -428,7 +430,7 @@ game({
       done:`<div class="rbparty"><div class="rbhead"><span class="lab">Listening party</span><h2>Every journey</h2><p>Click a track to hear it grow, stop by stop.</p></div>
         <div class="rbjour">${J.map((j,ji)=>`<div class="rbj"><button class="rbplay" data-j="${ji}" ${j.stops.some(x=>x.t)?'':'disabled'}>▶</button><b>${esc(j.name)}’s track</b><div class="rbstops">${j.stops.map((x,k)=>`<button class="rbstop c${(G.players.get(x.pid)||{}).sh||0}${x.t?'':' none'}" data-j="${ji}" data-k="${k}" ${x.t?'':'disabled'}><i>${k?`Stop ${k}`:'Sketch'}</i><span>${esc(x.name)}</span><em>${x.t?rbFmt(x.t.dur):'—'}</em></button>`).join('<s>→</s>')}</div></div>`).join('')||'<p>No recordings this time. Go round the room and play each track.</p>'}</div></div>`,
     };
-    const lbl={brief:'Start the sketch',sketch:'Time: record',rec:last?'Listening party':'Pass it on',pass:'Deal the cards',card:'Start the clock',build:'Time: record',done:'Back to the menu'}[s.phase];
+    const lbl={brief:'Start the sketch',sketch:'Time: hand in',rec:last?'Listening party':'Pass it on',pass:'Deal the cards',card:'Start the clock',build:'Time: hand in',done:'Back to the menu'}[s.phase];
     const seq=['sketch','rec',...[...Array(o.rounds)].flatMap(()=>['pass','card','build','rec']),'done'],at=s.phase==='brief'?-1:s.phase==='sketch'?0:s.phase==='done'?seq.length-1:s.phase==='rec'?(s.round?1+s.round*4:1):2+(s.round-1)*4+['pass','card','build'].indexOf(s.phase);
     st.innerHTML=`<div class="destruct roundabout dots ph-${s.phase}">${bodies[s.phase]}<div class="dfoot"><div class="steps2">${seq.map((p,i)=>`<i class="${i<at?'past':i===at?'cur':''}" title="${p}"></i>`).join('')}</div>${s.phase==='done'?againBtn():''}<button class="big go" id="bNext">${esc(lbl)} <small>SPACE</small></button></div></div>`;
     $('#bNext').onclick=()=>this.next();bindAgain(st);if($('#bRedraw'))$('#bRedraw').onclick=()=>{s.room=rbDeal(1)[0];s.done=new Set();online().forEach(p=>this.logCard(p,s.room));sfx.card();render();syncAll();};
@@ -436,19 +438,16 @@ game({
     $$('.rbstop',st).forEach(b=>b.onclick=()=>this.playJourney(+b.dataset.j,+b.dataset.k));
   },
   pstate(p){if(G.gs.bl)return RBB.pstate(p);const s=G.gs,c=this.cardFor(p),r=s.rec.get(p.id)||{},g=s.got.get(p.id),from=g&&G.players.get(g.from);
-    return {k:s.phase+s.round+(c?c.text.length:0)+(s.done.has(p.id)?'d':'')+(s.swapped.has(p.id)?'s':'')+(r.st||'')+(g?g.st:''),ph:s.phase,round:s.round,rounds:s.o.rounds,card:c,done:s.done.has(p.id),
+    return {k:s.phase+s.round+(c?c.text.length:0)+(s.done.has(p.id)?'d':'')+(s.swapped.has(p.id)?'s':'')+(r.st||'')+Math.round(r.dur||0)+(g?g.st:''),ph:s.phase,round:s.round,rounds:s.o.rounds,card:c,done:s.done.has(p.id),
       canSwap:!s.room&&s.phase==='card'&&!s.swapped.has(p.id),clock:pClock(),pc:!!pcFor(p),rec:r.st||'',dur:r.dur||0,mode:s.o.pass,
       from:from?from.name:'',got:g?g.st:'',to:(this.nextOf(p.id)||{}).name||''};},
   player(root,st){if(st.bl)return RBB.player(root,st);pClockStart(st.clock);
     if(st.ph==='rec'){
-      const body=!st.pc?`<p>Your computer isn’t signed in through CADCAST, so it can’t record. Play your track to ${esc(st.to||'your neighbour')} when it’s time to pass.</p>`
-        :st.rec==='rec'?`<div class="rbbig on"><i></i>Recording</div><p>Play your track from the start. Tap Stop when it ends.</p><button class="big rbstopb" id="pRec">■ Stop</button>`
-        :st.rec==='up'?`<div class="rbbig">Sending…</div><p>Your recording is on its way.${st.mode==='project'?' Drop your project on your computer too.':''}</p>`
-        :st.rec==='ok'?`<div class="rbbig ok">✓ Recorded · ${rbFmt(st.dur)}</div><p>Wait for “Pass it on”.</p><button class="ghost" id="pRec">Record again</button>`
-        :st.rec==='err'?`<p>Your computer blocked the microphone. Allow it in Chrome (left of the address bar), then try again.</p><button class="big go" id="pRec">● Record</button>`
-        :`<p>Get your track ready to play from the start. Tap Record, then press play in your DAW.</p><button class="big rbrecb" id="pRec">● Record</button>`;
-      root.innerHTML=`<div class="pcol2"><h2 class="pbigt">Record your track</h2>${body}</div>`;
-      const b=$('#pRec',root);if(b)b.onclick=()=>{papi.send({t:'rec',on:st.rec!=='rec'});papi.vibe(st.rec==='rec'?[20,40,20]:40);b.disabled=true;};return;}
+      const body=!st.pc?`<p>Your computer isn’t signed in through CADCAST, so it can’t hand in. Play your track to ${esc(st.to||'your neighbour')} when it’s time to pass.</p>`
+        :st.rec==='up'?`<div class="rbbig">Arriving…</div><p>Your track is on its way to Control Room.</p>`
+        :st.rec==='ok'?`<div class="rbbig ok">✓ Handed in${st.dur?' · '+rbFmt(st.dur):''}</div><p>Wait for “Pass it on”.</p>`
+        :`<div class="rbsteps"><div><b>1</b>Play your track from the very start</div><div><b>2</b>Export it as <i>MP3</i> (fastest) or WAV</div><div><b>3</b>Drop it on your <i>CADCAST</i> page</div></div>`;
+      root.innerHTML=`<div class="pcol2"><h2 class="pbigt">Hand in your track</h2>${body}</div>`;return;}
     const passTxt=st.mode==='seats'||!st.pc?`Move one seat on${st.from?` to ${st.from}’s computer`:''}. Your card arrives in a moment.`
       :st.got==='sent'?`${st.from}’s track is on your computer. Drag it into your DAW.`:st.got==='sending'?`${st.from}’s track is arriving on your computer…`
       :st.got==='notake'||st.got==='nopc'||st.got==='fail'?`${st.from} has no recording for you. Go to ${st.from}’s seat to hear it.`:'Your card arrives in a moment.';

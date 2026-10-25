@@ -104,7 +104,7 @@ Phones and the host keep old files otherwise.
 
 ## Architecture
 
-- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`) and the room code (no count or URL under it), teacher name ("Not you?") with Copy attendance right under it, the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, New room; **Activities** (→ the module menu, `G.view==='menu'`) is the big green button in the header centre (`.tact`), hidden by `body.annon` while check-in announcements play. The Teacher panel is on the right on both screens (home `.hside`, menu `.roomp`, moved with CSS `order`; stacked on top on narrow screens); the Teacher box is `.teachbox.tight` on both screens. The logo goes home (no Attendance button). The header shows Vote/Pick when `atRest()`, then Timer · CADCAST, then **Supply drop** (`#bDrop`, straight to its setup, menu only) and the **⋯ utilities** menu last (`#util`, `G.utilOpen`: Sound effects, Theme, Manual; closes on any outside click). Manual (`#bManual`: `window.open('Teacher/','cr-manual')` so the room keeps running; the handbook's fixed ← Control Room button closes that tab, or opens `../?host` when there is no opener). `atRest()` = home or menu. Most teachers only use this screen.
+- **Home = Attendance** (`G.view==='home'`, `rHome`): the first screen after the splash. Big join QR (cached node `G.homeQR`) and the room code (no count or URL under it), teacher name ("Not you?") with Copy attendance right under it, the shared class-list box (`attBoxHTML`/`attBoxBind`, also in the menu), names, New room; **Activities** (→ the module menu, `G.view==='menu'`) is the big green button under the QR. The Teacher panel is on the right on both screens (home `.hside`, menu `.roomp`, moved with CSS `order`; stacked on top on narrow screens); the Teacher box is `.teachbox.tight` on both screens. The logo goes home (no Attendance button). The header shows Vote/Pick when `atRest()`, then Timer · CADCAST, then **Supply drop** (`#bDrop`, straight to its setup, menu only) and the **⋯ utilities** menu last (`#util`, `G.utilOpen`: Sound effects, Theme, Manual; closes on any outside click). Manual (`#bManual`: `window.open('Teacher/','cr-manual')` so the room keeps running; the handbook's fixed ← Control Room button closes that tab, or opens `../?host` when there is no opener). `atRest()` = home or menu. Most teachers only use this screen.
 - `ROLE` is `player` when the URL has `?room=CODE` (or on a narrow screen without `?host`), otherwise `host`.
 - PeerJS connects phones to the host; the host is the only source of truth (`G` on the host, `PL` on phones).
   - host → phone: `{t:'st', view, g, s:pstate}`, `{t:'names'}` (class list), `{t:'log'}` (notebook), `{t:'kick'}`, `{t:'taken'}`
@@ -172,6 +172,13 @@ Phones and the host keep old files otherwise.
   shows `#hands` in the header middle, left of the student count (one name, or "Multiple"; click for the ordered list, lower one or all) and a yellow name chip (menu `.mchip` and home `.hname`).
 - The student count always sits at the right end of `.tmid`, against the divider (`#hands` before it when hands are up).
 - **CADCAST button** (`openMixer`): `window.open('', 'cadcast-patch')` first, so an open patch bay is brought forward, never reloaded.
+- **File links** (integrations/turn/worker.js, KV binding `DROPS`, 24 h, ≤ 90 MB): `filesReady()` asks `/drop/ok`; files over 150 KB go up
+  once (`filesUrl`, cached per blob, so one Supply Drop file to 20 computers is one upload) and only `{t:'file-link', fid, meta, url}` travels;
+  the other side downloads (`filesGet`, retries 404s for a minute: KV is eventually consistent) and carries on exactly as with chunks
+  (receipts `{t:'file-ok'}` included). Both directions (CADCAST/go `sendFile` uses it too). No binding → chunks, as before. Links are only
+  accepted from our Worker's /drop/. `?files=<url>` (localhost only) points both pages at another Worker for testing.
+- Header centre on home + menu: today's date (`.tdate`, like the splash); hidden under 1100 px and while announcements play. Activities is
+  under the big QR on home (`.hatt .hact`). Phones: `fitWords(el,max,min)` shrinks a name until its longest word fits (the paired card).
 - **pcSendFile**: take the connection to watch only AFTER chunk 0 is sent (the first message to a computer opens it).
   It first calls `pcAlive(p)`: ping the computer (CADCAST/go answers `{t:'pong'}`), no answer in 4 s → close and reconnect (a reloaded
   student page leaves the old connection looking open). Supply Drop counts a file delivered only on the computer's receipt `{t:'file-ok'}`
@@ -180,9 +187,10 @@ Phones and the host keep old files otherwise.
 - **Check-in announcement** (home only): a new player in the `hi` handler → `announceIn(p)` → a queued fixed overlay `.annc` over the header middle
   (between the shapes and the hands/count), so re-renders never restart it; shorter holds when the queue is long; the count pops.
   `handsUpdate()` updates in place and never re-renders a running game. Hands drop on disconnect; lowering is echoed back to the phone.
-- **Soundabout Roundabout relay**: after the sketch and each stop a `rec` phase: the phone's Record/Stop sends `{t:'rec'}`; the
-  host tells the computer `{t:'rec-start'|'rec-stop'}`; CADCAST/go records its capture stream (MediaRecorder, opus) and
-  uploads it with `{t:'file'}` chunks (core.js `pcSendFile` / `pcData` / `B64`, both directions, game hooks `onPcFile`,
+- **Soundabout Roundabout relay**: after the sketch and each stop a `rec` phase = the HAND-IN (2026-10-25: students export, nothing is
+  recorded any more): the host sends each computer `{t:'take-in', round, label, project, next}`, CADCAST/go shows a drop box (MP3 tip),
+  the export comes back as kind 'take' (keeps its name/extension), the host decodes it for the length and answers `{t:'take-got', dur}`;
+  leaving the phase sends `{t:'take-end'}`. Files travel with `{t:'file'}` chunks or file links (core.js `pcSendFile` / `pcData` / `B64`, both directions, game hooks `onPcFile`,
   `onPcMsg`, `onPcProg`). "Pass it on" sends each take (and in `pass:'project'` the dropped project zip) to the next
   computer in `s.ring`, where it becomes a WAV. Takes stay in host memory for the listening party (`journeys()`).
 - **Soundabout Roundabout ▸ Blind layers** (option `mode:'blind'`, the owner's Week 4 "Record with intuition" PDF): `RBB` in

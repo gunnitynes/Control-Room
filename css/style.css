@@ -1985,5 +1985,16 @@ label.drfold{cursor:pointer;display:inline-flex;align-items:center;padding:12px 
 .tact small{font-size:8.5px;line-height:1}
 /* the header is 70 px tall, the same as CADCAST's patch bay, so switching between them doesn't jump */
 .host .top{min-height:70px}
-body.annon .tact{opacity:0;transform:translate(-2px,-2px) scale(.85);pointer-events:none}
-.tmid:has(.tact)>.count{margin-left:0}
+/* Roundabout hand-in, on the phone */
+.rbsteps{display:grid;gap:8px;align-self:stretch;text-align:left}
+.rbsteps div{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border:3px solid var(--ink);background:var(--paper);font:800 17px/1.2 var(--disp)}
+.rbsteps b{display:grid;place-items:center;width:34px;height:34px;background:var(--ink);color:var(--paper);font:900 18px var(--disp)}
+.rbsteps i{font-style:normal;color:var(--red)}
+/* header centre on the home screen and the menu: today's date (as on the splash); a check-in announcement covers it for a moment */
+.tdate{align-self:center;margin:0 auto;display:flex;align-items:baseline;gap:.28em;font:900 clamp(26px,2.9vw,46px)/1 var(--disp);font-stretch:62%;text-transform:uppercase;letter-spacing:-.01em;white-space:nowrap;transition:opacity .25s,transform .25s}
+.tdate i{font-style:normal;color:var(--red)}
+body.annon .tdate{opacity:0;transform:scale(.9)}
+@media(max-width:1100px){.tdate{display:none}}
+/* home: Activities under the QR, centred on it */
+.hatt .hact{justify-self:center;min-width:min(440px,34vw);font-size:26px;padding:14px 40px;display:grid;justify-items:center;gap:2px;margin-top:4px}
+.hatt .hact small{font-size:11px}

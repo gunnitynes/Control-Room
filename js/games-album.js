@@ -51,7 +51,7 @@ async function alZip(files){const parts=[],cen=[];let off=0;const enc=new TextEn
 
 /* ---------- fitting an exported part to exactly N bars */
 async function alFit(blob,bpm,bars){const L=Math.round(bars*4*60/bpm*AL_SR),barN=L/bars;
-  let src;try{src=await new OfflineAudioContext(2,1,AL_SR).decodeAudioData(await blob.arrayBuffer());}catch(e){return {ok:false,text:'Couldn’t read that file. Export it as WAV.'};}
+  let src;try{src=await new OfflineAudioContext(2,1,AL_SR).decodeAudioData(await blob.arrayBuffer());}catch(e){return {ok:false,text:'Couldn’t read that file. Export it as MP3 or WAV.'};}
   const n=src.length,out=new AudioBuffer({numberOfChannels:2,length:L,sampleRate:AL_SR}),r=n/L;let text='',peak=0;
   for(let c=0;c<2;c++){const a=src.getChannelData(Math.min(c,src.numberOfChannels-1)),o=out.getChannelData(c);
     if(Math.abs(r-1)<.003||r>1){o.set(a.subarray(0,L));if(r<1.5)for(let i=L;i<n;i++)o[i%L]+=a[i];}              // a tail wraps round to the start, like a loop
@@ -202,7 +202,7 @@ game({
     if(s.phase==='make'){lbl='Arrange the song';dis=!nIn;
       body=`<div class="almake"><div class="altop"><div><span class="lab">The Class Album · ${o.bars} bars each</span><h2>${o.bpm} BPM · ${esc(s.key)}</h2>
           <p>Everyone makes one part of the same song. Roles are on the cards; click a role to deal another.</p></div>${o.mins?clockHTML():''}</div>
-        <ol class="cdsteps alsteps"><li><span>Set <b>${o.bpm} BPM</b> and build <b>your role</b> in <b>${esc(s.key)}</b>.</span></li><li><span>Make exactly <b>${o.bars} bars</b>, starting on bar 1.</span></li><li><span>Export <b>bars 1 to ${o.bars+1}</b> as WAV and drop it onto <b>your Class Album box on gunnitynes.github.io/CADCAST/go</b>.</span></li></ol>
+        <ol class="cdsteps alsteps"><li><span>Set <b>${o.bpm} BPM</b> and build <b>your role</b> in <b>${esc(s.key)}</b>.</span></li><li><span>Make exactly <b>${o.bars} bars</b>, starting on bar 1.</span></li><li><span>Export <b>bars 1 to ${o.bars+1}</b> as <b>MP3</b> (fastest) or WAV and drop it onto <b>your Class Album box on gunnitynes.github.io/CADCAST/go</b>.</span></li></ol>
         <div class="alwall" id="alWall">${this.wall()}</div></div>`;}
     if(s.phase==='arrange'){lbl=s.rendering?'Making the album…':'Make the album';dis=!!s.rendering;const tot=this.secLen()*s.secs.length;
       body=`<div class="alarr"><div class="altop"><div><span class="lab">Arrange it · ${s.secs.length} sections · ${alFmt(tot)}</span><h2>Who plays where?</h2>
@@ -230,7 +230,7 @@ game({
   player(root,st){pClockStart(st.clock);
     if(st.ph==='make'){root.innerHTML=`<div class="pcol2">${pClockHTML(st.clock)}<span class="lab">Your role</span><h2 class="pbigt alprole">${esc(st.role||'…')}</h2><p>${esc(st.tip)}</p>
         <div class="alpfacts"><span><small>Tempo</small><b>${st.bpm}</b></span><span><small>Key</small><b>${esc(st.key)}</b></span><span><small>Bars</small><b>${st.bars}</b></span></div>
-        <p class="cdyou ${st.part&&!st.part.warn?'ok':''}">${st.part?esc(st.part.text):st.pc?`When you’re done, export bars 1 to ${st.bars+1} as WAV and drop it on your computer’s CADCAST page (the Class Album box).`:'When you’re done, open gunnitynes.github.io/CADCAST/go on your computer, scan it, and drop your part there.'}</p></div>`;return;}
+        <p class="cdyou ${st.part&&!st.part.warn?'ok':''}">${st.part?esc(st.part.text):st.pc?`When you’re done, export bars 1 to ${st.bars+1} as MP3 (fastest) or WAV and drop it on your computer’s CADCAST page (the Class Album box).`:'When you’re done, open gunnitynes.github.io/CADCAST/go on your computer, scan it, and drop your part there.'}</p></div>`;return;}
     if(st.ph==='arrange'){if(!st.part){root.innerHTML=`<div class="pcenter dots"><h2>Arranging</h2><p>Your part didn’t make it in. Help the class decide on the big screen, or suggest a title:</p>${this.ptitle(st)}</div>`;this.bindPTitle(root);return;}
       root.innerHTML=`<div class="pcol2 alphone"><span class="lab">Your part · ${esc(st.role)}</span><h2 class="pbigt">Where do you play?</h2>
         <div class="alpcells">${st.secs.map((n,k)=>`<button class="${st.on.includes(k)?'on':''}" data-k="${k}"><b>${esc(n)}</b><span>${st.on.includes(k)?'playing':'silent'}</span></button>`).join('')}</div>
