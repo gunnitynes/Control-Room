@@ -1936,3 +1936,4 @@ button.catlogo{border:0;padding:0;cursor:pointer;transition:transform .12s}butto
 .blmk b{font:900 15px/1.05 var(--disp);text-transform:uppercase}
 .blmk:active,.blmk.hit{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);background:var(--yel)}
 .blp .blmom.sm{align-self:stretch;margin:0}
+a.ghost{color:inherit;text-decoration:none;display:inline-block;line-height:normal}

@@ -407,11 +407,13 @@ function topBar(){
     :G.view==='vote'?`<div class="cat"><div><b>Room vote</b><span>the students decide</span></div></div>`:G.view==='pick'?`<div class="cat"><div><b>The picker</b><span>one student, a group or teams</span></div></div>`:`<div class="tshapes" aria-hidden="true">${shape(0,34,'var(--ink)','var(--red)')}${shape(1,34,'var(--ink)','var(--blue)')}${shape(2,34,'var(--ink)','var(--yel)')}</div>`;
   const room=G.code&&G.view!=='home'?`<div class="mini"><button class="qr" id="miniQR" aria-label="Show the join QR large"></button>${!atRest()?`<div><b>${G.code}</b><span>join any time</span></div>`:''}</div>`:'';
   return `<header class="top">${logo()}<div class="tmid">${mid}<div class="count"><b id="nOn">${online().length}</b><span>students</span></div></div><div class="tright">${room}<button class="catlogo" id="bSaver" title="Screensaver: the Catalyst logo full screen (Esc to come back)" aria-label="Screensaver"></button><div id="hands">${handsHTML()}</div>
-    ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}${G.view==='menu'?`<button class="ghost" id="bDrop" title="Supply Drop: deal your materials to every student computer">Supply drop</button>`:''}
+    ${atRest()?`<button class="ghost" id="bVote" title="Let the room vote: on the next module or on your own question">Vote</button><button class="ghost" id="bPick" title="Pick at random: one student, a group or teams">Pick</button>`:''}
     ${tmrBtnHTML()}
     <button class="ghost" id="bMix" title="CADCAST: hear the students’ computers and mix them">CADCAST</button>
     <button class="ghost" id="bSfx" aria-pressed="${SFX.on}" title="Interface sound effects">SFX</button>
     <button class="ghost" id="bTheme" title="Paper or night (projector) look">Theme</button>
+    ${G.view==='menu'?`<button class="ghost" id="bDrop" title="Supply Drop: deal your materials to every student computer">Supply drop</button>`:''}
+    ${atRest()?`<a class="ghost" id="bManual" href="Teacher/" target="_blank" title="The teacher handbook (opens in a new tab: this room keeps running)">Manual</a>`:''}
     ${!atRest()?`<button class="ghost" id="bMenu">Menu</button>`:''}</div></header>`;
 }
 function render(){
@@ -424,7 +426,8 @@ function render(){
   try{if(G.view==='home')rHome(st);else if(G.view==='menu')rMenu(st);else if(G.view==='setup')rSetup(st);else if(G.view==='vote')rVote(st);else if(G.view==='pick')rPick(st);else G.game.render(st);}catch(e){console.error(e);st.innerHTML=`<div class="pcenter"><h2>Oops</h2><p>${esc(e.message)}</p></div>`;}
   $('#bSfx').onclick=e=>{SFX.on=!SFX.on;store.set('sfx.on',SFX.on);e.target.setAttribute('aria-pressed',SFX.on);if(SFX.on)sfx.inn();};
   $('#bTheme').onclick=()=>{toggleTheme();render();};
-  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
+  if($('#bMenu'))$('#bMenu').onclick=()=>exitGame();if($('#bManual'))$('#bManual').onclick=e=>{e.preventDefault();window.open('Teacher/','cr-manual');};   // a script-opened tab, so the manual's Back can close it
+  if($('#bDrop'))$('#bDrop').onclick=()=>{G.game=gameById('drop');G.view='setup';render();syncAll();};
   tmrBind();if($('#bVote'))$('#bVote').onclick=openVoteChooser;if($('#bPick'))$('#bPick').onclick=openPicker;
   $('#bMix').onclick=openMixer;
   // the CONTROL ROOM wordmark is the home button

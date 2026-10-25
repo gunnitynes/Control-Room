@@ -13,11 +13,16 @@
   --red:#E4402B;--blue:#2447D5;--yel:#F2B705;--green:#1E8C5A;--on:#fff;
   --disp:"Archivo","Arial Narrow",system-ui,sans-serif;--mono:"Space Mono",ui-monospace,Menlo,Consolas,monospace;color-scheme:light}
 *{box-sizing:border-box}
+/* back to Control Room: always on screen, top left */
+.back{position:fixed;top:14px;left:14px;z-index:20;font:700 12px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--ink);text-decoration:none;
+  padding:9px 13px;border:3px solid var(--ink);background:var(--paper);box-shadow:4px 4px 0 var(--ink)}
+.back:hover{background:var(--yel)}.back:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+@media print{.back{display:none}}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.55 var(--disp);
   background-image:radial-gradient(var(--hair) 1px,transparent 1.2px);background-size:22px 22px}
 a{color:inherit;text-decoration-thickness:2px;text-underline-offset:3px}
-.wrap{max-width:1040px;margin:0 auto;padding:0 22px 60px}
+.wrap{max-width:1040px;margin:0 auto;padding:54px 22px 60px}   /* room for the Back button */
 .lab{font:700 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em}
 h1,h2,h3{font-family:var(--disp);text-transform:uppercase;margin:0}
 h2{font:900 clamp(40px,8vw,84px)/.86 var(--disp);font-stretch:62%;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
@@ -131,6 +136,7 @@ details>div{padding:0 16px 14px}
 </style>
 </head>
 <body>
+<a class="back" id="back" href="../?host">← Control Room</a>
 <div class="wrap">
 
 <header class="hero">
@@ -420,6 +426,10 @@ details>div{padding:0 16px 14px}
 <footer class="foot"><p>One room. One big screen. Everybody plays.</p><button class="print" onclick="document.querySelectorAll('details').forEach(d=>d.open=true);print()">Print or save as PDF</button></footer>
 </div>
 <script>
+// Back: opened by Control Room's Manual button (window.open), close this tab so the teacher is back in the running room;
+// otherwise (a shared link, a bookmark) open Control Room here
+document.getElementById('back').onclick=e=>{if(!window.opener)return;e.preventDefault();try{window.opener.focus();}catch(x){}window.close();
+  setTimeout(()=>{location.href='../?host';},300);};
 /* the splash screen's four answer shapes, orbiting (same drawing as Control Room's poster) */
 (()=>{const c=document.getElementById('orbit');if(!c)return;const ctx=c.getContext('2d'),cs=getComputedStyle(document.documentElement),
   col=['--red','--blue','--yel','--green'].map(v=>cs.getPropertyValue(v).trim()),ink=cs.getPropertyValue('--ink').trim(),still=matchMedia('(prefers-reduced-motion: reduce)').matches;
