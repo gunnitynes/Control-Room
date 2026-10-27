@@ -477,7 +477,7 @@ function topBar(){
     <div class="util" id="util"><button class="ghost utilb" id="bUtil" aria-expanded="${!!G.utilOpen}" title="Utilities: sound effects, theme, the manual" aria-label="Utilities"><i></i><i></i><i></i></button>
       ${G.utilOpen?`<div class="utilpop"><span class="lab">Utilities</span>
         <button id="bSfx" aria-pressed="${SFX.on}"><b>Sound effects</b><em>${SFX.on?'On':'Off'}</em></button>
-        <button id="bFaces"><b>Faces</b><em>${facesSub()}</em></button>
+        ${SELFIES_ON?`<button id="bFaces"><b>Faces</b><em>${facesSub()}</em></button>`:''}
         <button id="bTheme"><b>Theme</b><em>${document.documentElement.dataset.theme==='night'?'Night':'Paper'}</em></button>
         <a id="bManual" href="Teacher/" target="_blank"><b>Manual</b><em>teacher handbook ↗</em></a></div>`:''}</div></div></header>`;
 }
@@ -988,7 +988,7 @@ function pRender(){
     ${PL.status?`<p class="pst">${esc(PL.status)}</p>`:''}</div>
     <button class="guidebtn" id="pGuide"><b>Guide</b><span>to the Control Room</span><i>→</i></button>
 </div>`;
-  if(PL.selfieHas===false)setTimeout(selfieOffer,1200);   // offered once, quietly; afterwards it lives in the notebook's header   // offered once, quietly, on the idle screen
+  if(PL.selfieHas===false)setTimeout(selfieOffer,1200);   // offered once, quietly; afterwards it lives in the notebook's header
 }
 // shrink a name until its longest word fits on one line (a long surname never breaks mid-word)
 function fitWords(el,max,min){let fs=max;el.style.overflowWrap='normal';el.style.fontSize=fs+'px';
@@ -1036,9 +1036,9 @@ function openNotebook(){
   ov.innerHTML=`<div class="nbpanel"><button class="guideX" id="nbX" aria-label="Close the notebook">✕</button>
     <header class="nbhero"><div class="nbshapes"><i></i><i></i><i></i></div><span class="lab">The notebook of</span><h2 style="font-size:min(clamp(52px,16vw,96px),${Math.floor(150/Math.max(6,...String(PL.name||'You').split(/\s+/).map(w=>w.length)))}vw)">${esc(PL.name||'You')}</h2>
       <div class="nbstickers"><div class="nbs1"><b>${s.total||0}</b><span>points</span></div><div class="nbs2"><b>${s.rank?ordinal(s.rank):'—'}</b><span>in the room</span></div><div class="nbs3"><b>${L.length}</b><span>${L.length===1?'entry':'entries'}</span></div></div>
-      <button class="ghost nbguide" id="nbSelfie">📷 ${PL.selfieHas?'Take a new selfie for your teachers':'Add a selfie for your teachers'}</button></header>
+      ${SELFIES_ON?`<button class="ghost nbguide" id="nbSelfie">📷 ${PL.selfieHas?'Take a new selfie for your teachers':'Add a selfie for your teachers'}</button>`:'<button class="ghost nbguide" id="nbGuide">Guide to the Control Room →</button>'}</header>
     <div class="nbbody">${out||'<div class="nbempty"><div class="nbshapes small"><i></i><i></i><i></i></div><h3>Empty pages</h3><p>Your briefs, rules, cards, kept picks, milestones and results collect here as the lesson goes on.</p></div>'}<p class="nbend">${L.length?'The first page of today':''}</p></div></div>`;
-  const close=()=>ov.remove();$('#nbX').onclick=close;$('#nbSelfie').onclick=()=>{close();selfieEditor();};ov.scrollTop=0;
+  const close=()=>ov.remove();$('#nbX').onclick=close;if($('#nbSelfie'))$('#nbSelfie').onclick=()=>{close();selfieEditor();};if($('#nbGuide'))$('#nbGuide').onclick=()=>{close();openGuide();};ov.scrollTop=0;
 }
 const T_=esc;
 function pFrame(){

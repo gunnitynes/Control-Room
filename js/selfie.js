@@ -7,6 +7,9 @@
    ==================================================================== */
 'use strict';
 
+// ON HOLD (2026-10-27, the owner's request): false hides every trace (no offer, no notebook button, no ⋯ Faces, nothing accepted).
+// Set it to true to bring selfies back.
+const SELFIES_ON=false;
 const SF_PX=240,SF_PART=11000;
 const sfKey=n=>'sf:'+String(n||'').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'').slice(0,40);
 
@@ -15,9 +18,9 @@ const SF={parts:new Map(),open:false,quiz:false};
 const selfies=()=>(typeof MYCLIPS==='undefined'?[]:MYCLIPS.list).filter(c=>c.dec===-8);
 const selfieFor=name=>selfies().find(c=>c.id===sfKey(name));
 // on join: does this student already have one? (the phone then offers it, or not)
-function selfieTell(p){if(!p||!p.conn||!p.conn.open)return;const go=()=>{try{p.conn.send({t:'selfie-has',has:!!selfieFor(p.name)});}catch(e){}};MYCLIPS.ready?MYCLIPS.ready.then(go):go();}
+function selfieTell(p){if(!SELFIES_ON||!p||!p.conn||!p.conn.open)return;const go=()=>{try{p.conn.send({t:'selfie-has',has:!!selfieFor(p.name)});}catch(e){}};MYCLIPS.ready?MYCLIPS.ready.then(go):go();}
 // pieces of a data URL from a phone {t:'selfie', i, n, d}
-async function selfieData(p,m){if(!p||!Number.isInteger(m.n)||m.n<1||m.n>12||!Number.isInteger(m.i)||m.i<0||m.i>=m.n||typeof m.d!=='string'||m.d.length>SF_PART+10)return;
+async function selfieData(p,m){if(!SELFIES_ON||!p||!Number.isInteger(m.n)||m.n<1||m.n>12||!Number.isInteger(m.i)||m.i<0||m.i>=m.n||typeof m.d!=='string'||m.d.length>SF_PART+10)return;
   let e=SF.parts.get(p.id);if(!e||e.n!==m.n){e={n:m.n,got:[]};SF.parts.set(p.id,e);}e.got[m.i]=m.d;if(e.got.filter(x=>x!=null).length<m.n)return;SF.parts.delete(p.id);
   const url=e.got.join('');if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(url))return;
   const blob=await (await fetch(url)).blob();if(blob.size>200e3)return;
@@ -44,7 +47,7 @@ function facesDraw(){const ov=$('#faces');if(!ov)return;const here=new Set(onlin
 
 /* ---------- phone ---------- */
 // the gentle first offer, once per phone (the idle screen also keeps a small "Your selfie" button)
-function selfieOffer(){if(store.get('selfie.offered',false)||PL.selfieHas!==false||$('#sfOffer'))return;store.set('selfie.offered',true);
+function selfieOffer(){if(!SELFIES_ON||store.get('selfie.offered',false)||PL.selfieHas!==false||$('#sfOffer'))return;store.set('selfie.offered',true);
   const d=el('div','sfoffer');d.id='sfOffer';d.innerHTML=`<div><b>Help your teachers learn your name</b><span>Add a selfie? Only your teachers see it, on their computer. You can change it later in your notebook.</span></div><button class="ghost" id="sfYes">Add one</button><button class="sfno" id="sfNo" aria-label="Not now">Not now</button>`;
   document.body.appendChild(d);$('#sfYes',d).onclick=()=>{d.remove();selfieEditor();};$('#sfNo',d).onclick=()=>d.remove();}
 // take or pick a photo, then frame the face in the square box

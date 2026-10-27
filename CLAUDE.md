@@ -218,6 +218,8 @@ Phones and the host keep old files otherwise.
   constraint generator, roundabout sketch/stop, blind layers): a red full-screen card on the host (click / Space / Esc closes it, the key
   never reaches the game), `{t:'timesup', game, next}` to every phone (`pTimesUp`, tap to close, vibrate + boop) and every CADCAST page (✕ / OK).
   Short answer/vote clocks don't use it.
+- **Selfies — ON HOLD** (2026-10-27): `SELFIES_ON=false` in js/selfie.js hides all of it and the handbook doesn't mention it; bring
+  it back only when the owner asks (flip the flag, restore the handbook lines: phone section, ⋯ card, privacy). How it works when on:
 - **Selfies** (js/selfie.js, to learn names; optional, never shown in the room): on join the host sends `{t:'selfie-has', has}`; a phone
   without one offers it ONCE (`selfieOffer`, `selfie.offered` in its store); taking a new one is the button in the notebook header (`#nbSelfie`,
   where the Guide button was). Wording: "your teachers" (plural).
